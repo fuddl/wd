@@ -1,0 +1,18 @@
+.remark {
+	display: grid;
+	grid-template-columns: 1fr 2fr
+}
+
+.remark__verb {
+	grid-column: 1;
+}
+
+.remark__object {
+	grid-column: 2;
+	margin-bottom: .5em;
+}
+
+small {
+	font-size: .5em;
+	line-height: 1;
+}

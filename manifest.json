@@ -1,0 +1,41 @@
+{
+  "manifest_version": 2,
+  "name": "Wikidata",
+  "version": "0.1",
+  "description": "Display information from wikidata.",
+  "icons": {
+    "48": "icons/inactive.svg",
+    "96": "icons/inactive.svg"
+  },  
+  "browser_action": {
+    "default_icon": "icons/inactive.svg",
+    "default_title": "This thing on wikidata."
+  },
+  "sidebar_action": {
+    "default_icon": "icons/wikidata.svg",
+    "default_title": "Wikidata",
+    "default_panel": "sidebar/entity.html",
+    "open_at_install": false
+  },
+  "permissions": [
+    "activeTab",
+    "storage",
+    "<all_urls>"
+  ],
+  "background": {
+    "scripts": [
+      "get-entity-by-authority-id.js",
+      "sqarql-query.js",
+      "background.js"
+    ]
+  },
+  "content_scripts": [
+  {
+    "matches": ["<all_urls>"],
+    "js": [
+      "sqarql-query.js",
+      "content.js"
+    ]
+  }
+]
+}
