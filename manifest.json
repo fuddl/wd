@@ -12,7 +12,7 @@
     "default_title": "This thing on wikidata."
   },
   "sidebar_action": {
-    "default_icon": "icons/wikidata.svg",
+    "default_icon": "icons/wd.svg",
     "default_title": "Wikidata",
     "default_panel": "sidebar/entity.html",
     "open_at_install": false
