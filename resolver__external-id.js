@@ -4,9 +4,11 @@ resolvers.externalId = {
 	},
 	getEntityId: async function() {
 		let match = await this.matchAuthorities();
-		let entity = await this.getEntityByExternalId(match.prop, match.id);
-		let entityId = entity[0].item.value.match(/https?:\/\/www\.wikidata\.org\/entity\/(Q\d+)/)[1]
-		return entityId;
+		if (match) {
+			let entity = await this.getEntityByExternalId(match.prop, match.id);
+			let entityId = entity[0].item.value.match(/https?:\/\/www\.wikidata\.org\/entity\/(Q\d+)/)[1]
+			return entityId;
+		}
 	},
 	matchAuthorities: async function() {
 		const authorityList = await this.getAuthorityList();
