@@ -24,7 +24,6 @@
   ],
   "background": {
     "scripts": [
-      "get-entity-by-authority-id.js",
       "sqarql-query.js",
       "background.js"
     ]

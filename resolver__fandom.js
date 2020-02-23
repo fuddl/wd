@@ -9,7 +9,7 @@ resolvers.fandom = {
 			parts[1] + ':',
 			parts[7],
 		].join('');
-		let domain = parts[3] ?? parts[4];
+		let domain = parts[3] ? parts[3] : parts[4];
 		let entity = await this.getEntityByFandomId(domain, id);
 		console.log(entity);
 		if (entity[0]) {

@@ -1,4 +1,4 @@
-templates.ensign = (vars) => { return `
+templates.ensign = (vars) => { return Sanitizer.escapeHTML`
 	<header class="ensign">
 		<h1 class="ensign__title">${ vars.label }</h1>
 		<small class="ensign__id">${ vars.id }</small>

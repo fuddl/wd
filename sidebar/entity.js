@@ -16,8 +16,8 @@ function updateView(url) {
 			let wrapper = document.createElement('div');
 			wrapper.insertAdjacentHTML('beforeend', templates.ensign({
 				id: id,
-				label: e.labels[lang].value ?? e.title,
-				description: e.descriptions[lang].value ?? 'Wikidata entity',
+				label: e.labels[lang].value ? e.labels[lang].value : e.title,
+				description: e.descriptions[lang].value ? e.descriptions[lang].value : 'Wikidata entity',
 			}));
 
 			for (prop of Object.keys(e.claims)) {

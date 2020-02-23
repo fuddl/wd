@@ -1,4 +1,4 @@
-templates.claim = (vars) => { return `
+templates.claim = (vars) => { return Sanitizer.escapeHTML`
 	<dl class="remark">
 		<dt class="remark__verb" title="${ vars.propDesc ?? '' }">
 			${ vars.prop }
