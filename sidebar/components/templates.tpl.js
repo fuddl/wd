@@ -1,7 +1,25 @@
 const templates = {
-	br: () => { return `<br />` },
-	code: (text) => { return `<code>${ text }</code>` },
-	link: (vars) => { return `<a href="${ vars.href ?? '' }" title="${ vars.title ?? '' }">${ vars.text }</a>` },
-	small: (text) => { return `<small>${ text }</small>` },
-	title: (text) => { return `<em>${ text }</em>` },
+	br: () => { return document.createElement('br') },
+	code: (text) => {
+		let tag = document.createElement('code');
+		tag.innerText = text;
+		return tag;
+	},
+	link: (vars) => {
+		let tag = document.createElement('a');
+		tag.setAttribute('href', vars.href)
+		tag.setAttribute('title', vars.title)
+		tag.innerText = vars.text;
+		return tag;
+	},
+	small: (text) => {
+		let tag = document.createElement('small');
+		tag.innerText = text;
+		return tag;
+	},
+	title: (text) => {
+		let tag = document.createElement('em');
+		tag.innerText = text;
+		return tag;
+	},
 };

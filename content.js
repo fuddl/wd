@@ -12,6 +12,7 @@ browser.runtime.sendMessage({
 				type: 'match_event',
 				wdEntityId: entityId,
 			});
+			break;
 		}
 	}
 })();

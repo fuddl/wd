@@ -14,7 +14,6 @@ browser.browserAction.onClicked.addListener((tab) => {
 	}
 	if (!tabEnities[tid].sidebarOpen) {
 		(async () => {
-			console.log(tabEnities[tid].id);
 			pushEnitiyToSidebar(tabEnities[tid].id, tid);
 		})();
 		browser.sidebarAction.open();
@@ -39,7 +38,6 @@ browser.runtime.onMessage.addListener(
 				});
 				(async () => {
 					if (await browser.sidebarAction.isOpen({})) {
-						console.log(data.wdEntityId);
 						pushEnitiyToSidebar(data.wdEntityId, sender.tab.id);
 					}
 				})();

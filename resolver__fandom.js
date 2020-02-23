@@ -11,7 +11,6 @@ resolvers.fandom = {
 		].join('');
 		let domain = parts[3] ? parts[3] : parts[4];
 		let entity = await this.getEntityByFandomId(domain, id);
-		console.log(entity);
 		if (entity[0]) {
 			let entityId = entity[0].item.value.match(/https?:\/\/www\.wikidata\.org\/entity\/(Q\d+)/)[1]
 			return entityId;
@@ -29,8 +28,6 @@ resolvers.fandom = {
 				?item wdt:${ props[domain] } "${ id }".
 			}
 		`;
-		console.log(domain);
-		console.log(query);
 		return sparqlQuery(query);
 	},
 };

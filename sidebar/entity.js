@@ -5,26 +5,47 @@ if (window.location.search) {
 	updateView(currentEntity);
 }
 
+function getValueByLang(e, key, fallback) {
+	if (!fallback) {
+		let fallback = '';
+	}
+	if (e.hasOwnProperty(key)) {
+		if (e[key].hasOwnProperty(lang)) {
+			if (e[key][lang].hasOwnProperty('value')) {
+				return e[key][lang].value;
+			} else {
+				return fallback;
+			}
+		} else {
+			return fallback;
+		}
+	} else {
+		return fallback;
+	}
+}
+
 function updateView(url) {
 	let id = url.replace('http://www.wikidata.org/entity/', '');
 	let content = document.getElementById('content');
 	content.innerHTML = '';
 	(async () => {
-		entities = await wikidataGetEntity(id);
+		let entities = await wikidataGetEntity(id);
 		for (id of Object.keys(entities)) {
 			let e = entities[id];
 			let wrapper = document.createElement('div');
-			wrapper.insertAdjacentHTML('beforeend', templates.ensign({
+			wrapper.appendChild(templates.ensign({
 				id: id,
-				label: e.labels[lang].value ? e.labels[lang].value : e.title,
-				description: e.descriptions[lang].value ? e.descriptions[lang].value : 'Wikidata entity',
+				label: getValueByLang(e, 'labels', e.title),
+				description: getValueByLang(e, 'descriptions', 'Wikidata entity'),
 			}));
 
+			let identifiers = document.createElement('div');
+			let items = document.createElement('div');
+			wrapper.appendChild(items);
+			wrapper.appendChild(identifiers);
+			content.appendChild(wrapper);
+
 			for (prop of Object.keys(e.claims)) {
-				let items = document.createElement('div');
-				let identifiers = document.createElement('div');
-				wrapper.appendChild(items);
-				wrapper.appendChild(identifiers);
 
 				let value = e.claims[prop];
 				if (value[0].mainsnak.datatype === "wikibase-item") {	
@@ -33,17 +54,16 @@ function updateView(url) {
 						let pid = value[0].mainsnak.property;
 						let label = await wikidataGetEntity(pid);
 						for (delta of value) {				
-							let ventiy;
-								let vid = delta.mainsnak.datavalue.value.id;
-								ventiy = await wikidataGetEntity(vid);
+							let vid = delta.mainsnak.datavalue.value.id;
+							let ventiy = await wikidataGetEntity(vid);
 
-								values.push(templates.link({
-									text: ventiy[vid].labels[lang].value,
-									href: 'https://www.wikidata.org/wiki/' + vid,
-									title: ventiy[vid].descriptions[lang].value,
-								}));
+							values.push(templates.link({
+								text: getValueByLang(ventiy[vid], 'labels', vid),
+								href: 'https://www.wikidata.org/wiki/' + vid,
+								title: getValueByLang(ventiy[vid], 'descriptions', ''),
+							}));
 						}
-						items.insertAdjacentHTML('beforeend', templates.claim({
+						items.appendChild(templates.remark({
 							prop: label[pid].labels[lang].value,
 							propDesc: label[pid].descriptions[lang].value,
 							vals: values,
@@ -59,17 +79,14 @@ function updateView(url) {
 						for (delta of value) {		
 							values.push(templates.code(delta.mainsnak.datavalue.value));
 						}
-						wrapper.insertAdjacentHTML('beforeend', templates.claim({
+						identifiers.appendChild(templates.remark({
 							prop: label[pid].labels[lang].value,
 							propDesc: label[pid].descriptions[lang].value,
 							vals: values,
 						}));
 					})();
 				}
-				wrapper.appendChild(identifiers);
 			}
-
-			content.appendChild(wrapper);
 		}
 	})();
 }
