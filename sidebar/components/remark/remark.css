@@ -1,15 +1,35 @@
 .remark {
-	display: grid;
-	grid-template-columns: 1fr 2fr
+}
+
+@media (min-width: 300px) {
+	.remark {
+		display: grid;
+		grid-template-columns: 1fr 2fr;
+	}
 }
 
 .remark__verb {
 	grid-column: 1;
+	font-size: .75em;
+	text-transform: uppercase;
+}
+
+@media (max-width: 299px) {
+	.remark__verb {
+		margin: 0 0 .75em 0;
+	}
 }
 
 .remark__object {
 	grid-column: 2;
 	margin-bottom: .5em;
+  padding: 0;
+}
+
+@media (max-width: 299px) {
+  .remark__object {
+  	margin: 0;
+  }
 }
 
 small {
