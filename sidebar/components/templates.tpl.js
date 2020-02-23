@@ -5,4 +5,3 @@ const templates = {
 	small: (text) => { return `<small>${ text }</small>` },
 	title: (text) => { return `<em>${ text }</em>` },
 };
-

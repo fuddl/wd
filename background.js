@@ -1,43 +1,54 @@
-let currentMatch = {};
+let tabEnities = {};
+
+function pushEnitiyToSidebar(id, tid) {
+	browser.sidebarAction.setPanel({
+		tabId: tid,
+		panel: browser.runtime.getURL('sidebar/entity.html') + '?' + id,
+	});
+}
 
 browser.browserAction.onClicked.addListener((tab) => {
-	let id = tab.id;
-	if (currentMatch.hasOwnProperty(id) && !currentMatch[id].sidebarOpen) {
+	let tid = tab.id;
+	if (!tabEnities.hasOwnProperty(tid)) {
+		tabEnities[tid] = {};
+	}
+	if (!tabEnities[tid].sidebarOpen) {
 		(async () => {
-			const entity = await getEntityByAuthorityId(currentMatch[id].prop, currentMatch[id].id);
-			browser.sidebarAction.setPanel({
-				tabId: id,
-				panel: browser.runtime.getURL('sidebar/entity.html') + '?' + entity[0].item.value,
-			});
+			console.log(tabEnities[tid].id);
+			pushEnitiyToSidebar(tabEnities[tid].id, tid);
 		})();
 		browser.sidebarAction.open();
-		currentMatch[id].sidebarOpen = true;
+		tabEnities[tid].sidebarOpen = true;
 	} else {
 		browser.sidebarAction.close();
-		currentMatch[id].sidebarOpen = false;
+		tabEnities[tid].sidebarOpen = false;
 	}
 });
 
 browser.runtime.onMessage.addListener( 
-  (data, sender) => {
-  	if (data.match) {
-      currentMatch[sender.tab.id] = data;
-		  browser.browserAction.setIcon({
-			  path: "icons/wd.svg",
-			  tabId: sender.tab.id,
-			});
-			(async () => {
-				const entity = await getEntityByAuthorityId(currentMatch[sender.tab.id].prop, currentMatch[sender.tab.id].id);
-				browser.sidebarAction.setPanel({
+	(data, sender) => {
+		if (data.type === 'match_event') {
+			if (data.wdEntityId) {
+				if (!tabEnities.hasOwnProperty(sender.tab.id)) {
+					tabEnities[sender.tab.id] = {};
+				}
+				tabEnities[sender.tab.id].id = data.wdEntityId;
+				browser.browserAction.setIcon({
+					path: "icons/wd.svg",
 					tabId: sender.tab.id,
-					panel: browser.runtime.getURL('sidebar/entity.html') + '?' + entity,
 				});
-			})();
-  	} else {
-		  browser.browserAction.setIcon({
-			  path: "icons/inactive.svg",
-			  tabId: sender.tab.id,
-			});
-  	}
-    return Promise.resolve('done');
+				(async () => {
+					if (await browser.sidebarAction.isOpen({})) {
+						console.log(data.wdEntityId);
+						pushEnitiyToSidebar(data.wdEntityId, sender.tab.id);
+					}
+				})();
+			} else {
+				browser.browserAction.setIcon({
+					path: "icons/inactive.svg",
+					tabId: sender.tab.id,
+				});
+			}
+		}
+		return Promise.resolve('done');
 });
