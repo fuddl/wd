@@ -35,6 +35,7 @@
       "sqarql-query.js",
       "wd-get-entity.js",
       "resolver.js",
+      "resolver__wikipedia.js",
       "resolver__fandom.js",
       "resolver__external-id.js",
       "content.js"
