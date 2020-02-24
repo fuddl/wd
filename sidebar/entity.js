@@ -24,6 +24,43 @@ function getValueByLang(e, key, fallback) {
 	}
 }
 
+function dateToString(value) {
+	let wiso = value.time;
+	let prec = value.precision;
+
+	if (wiso.startsWith('-') || prec <= 8) {
+		return false;
+	}
+
+	let pad = function (i) {
+    if (i < 10) {
+      return '0' + i;
+    }
+    return i;
+  }
+
+	let iso = wiso
+		.replace(/^\+/, '')
+		.replace(/Z$/, '')
+		.replace(/^(\d+)-00/, '$1-01')
+		.replace(/^(\d+)-(\d+)-00/, '$1-$2-01');
+
+	let date = new Date(iso);
+
+	let output = [];
+	if (prec > 8) {
+		output.push(date.getUTCFullYear());
+	}
+	if (prec > 9) {
+		output.push(pad(date.getUTCMonth() + 1));
+	}
+	if (prec > 10) {
+		output.push(pad(date.getUTCDate()));
+	}
+
+	return output.join('-');
+}
+
 function updateView(url) {
 	let id = url.replace('http://www.wikidata.org/entity/', '');
 	let content = document.getElementById('content');
@@ -48,7 +85,10 @@ function updateView(url) {
 			for (prop of Object.keys(e.claims)) {
 
 				let value = e.claims[prop];
-				if (value[0].mainsnak.datatype === "wikibase-item") {	
+
+				let type = value[0].mainsnak.datatype;
+
+				if (type === "wikibase-item") {	
 					(async () => {
 						let values = [];
 						let pid = value[0].mainsnak.property;
@@ -70,8 +110,32 @@ function updateView(url) {
 						}));
 					})();
 				}
+
+				if (type === "time") {	
+					(async () => {
+						let values = [];
+						let pid = value[0].mainsnak.property;
+						let label = await wikidataGetEntity(pid);
+						for (delta of value) {
+							let date = dateToString(delta.mainsnak.datavalue.value)
+
+							if (date) {
+								values.push(templates.time({
+									text: date,
+								}));
+							}
+						}
+						if (values.length > 0) {
+							items.appendChild(templates.remark({
+								prop: label[pid].labels[lang].value,
+								propDesc: label[pid].descriptions[lang].value,
+								vals: values,
+							}));
+						}
+					})();
+				}
 				
-				if (value[0].mainsnak.datatype === "external-id") {	
+				if (type === "external-id") {	
 					(async () => {
 						let values = [];
 						let pid = value[0].mainsnak.property;

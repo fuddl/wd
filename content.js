@@ -6,8 +6,6 @@ browser.runtime.sendMessage({
 (async () => {
 	for (id of Object.keys(resolvers)) {
 		let doesMatch = await resolvers[id].urlMatrch(location);
-		console.log(id);
-		console.log(doesMatch);
 		if (doesMatch) {
 			let entityId = await resolvers[id].getEntityId();
 			browser.runtime.sendMessage({

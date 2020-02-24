@@ -12,6 +12,11 @@ const templates = {
 		tag.innerText = vars.text;
 		return tag;
 	},
+	time: (vars) => {
+		let tag = document.createElement('time');
+		tag.innerText = vars.text;
+		return tag;
+	},
 	small: (text) => {
 		let tag = document.createElement('small');
 		tag.innerText = text;

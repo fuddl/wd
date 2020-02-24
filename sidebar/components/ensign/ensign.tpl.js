@@ -2,6 +2,7 @@ templates.ensign = (vars) => {
 	let header = document.createElement('header');
 	let title = document.createElement('h1');
 	let id = document.createElement('small');
+	let space = document.createTextNode(' ');
 	let description = document.createElement('p');
 	
 	let style = document.createElement('link');
@@ -20,6 +21,7 @@ templates.ensign = (vars) => {
 	description.innerText = vars.description;
 
 	header.appendChild(title);
+	header.appendChild(space);
 	header.appendChild(id);
 	header.appendChild(description);
 	header.appendChild(style);
