@@ -4,8 +4,8 @@
   "version": "0.2",
   "description": "Display information from wikidata.",
   "icons": {
-    "48": "icons/inactive.svg",
-    "96": "icons/inactive.svg"
+    "48": "icons/wd.svg",
+    "96": "icons/wd.svg"
   },  
   "browser_action": {
     "default_icon": "icons/inactive.svg",
@@ -38,6 +38,7 @@
       "resolver__wikipedia.js",
       "resolver__fandom.js",
       "resolver__external-id.js",
+      "resolver__official-website.js",
       "content.js"
     ]
   }

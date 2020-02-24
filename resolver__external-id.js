@@ -1,6 +1,6 @@
 resolvers.externalId = {
 	urlMatrch: async function(location) {
-		return await this.matchAuthorities !== false;
+		return await this.matchAuthorities() !== false;
 	},
 	getEntityId: async function() {
 		let match = await this.matchAuthorities();
@@ -29,8 +29,9 @@ resolvers.externalId = {
 				}
 			}
 		}
+		return false;
 	},
-  getEntityByExternalId: async function(prop, id) {
+	getEntityByExternalId: async function(prop, id) {
 		let query = `
 			SELECT ?item
 			WHERE {
@@ -43,7 +44,13 @@ resolvers.externalId = {
 		let query = 
 			`
 				SELECT ?item ?prefix ?regex ?suffix  ?url WHERE {
-					?item p:P1630 [ps:P1630 ?url].
+					{
+						?item p:P1630 [ps:P1630 ?url].
+					} UNION {
+						?item p:P3303 [ps:P3303 ?url].
+					} UNION {
+						?item p:P7250 [ps:P7250 ?url].
+					}
 					?item wdt:P1793 ?regex.
 					
 					BIND( strbefore( ?url, "$1" ) as ?prefix )
