@@ -37,7 +37,7 @@ const templates = {
 		tag.classList.add('placeholder')
 		tag.setAttribute('data-entity', vars.entity);
 		let words = [];
-		for (var i = 0; i <= rand(1,3); i++) {
+		for (var i = 0; i <= rand(1,2); i++) {
 			words.push("█".repeat(rand(5,10)))
 		}
 

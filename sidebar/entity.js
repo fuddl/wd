@@ -96,7 +96,8 @@ function updateView(url) {
 				for (delta of value) {		
 					let vid = delta.mainsnak.datavalue.value.id;
 
-					if (false && type === "wikibase-item") {	
+					console.log(type);
+					if (type === "time") {	
 						let date = dateToString(delta.mainsnak.datavalue.value)
 						if (date) {
 							values.push(templates.time({
@@ -114,13 +115,25 @@ function updateView(url) {
 							values.push(templates.code(delta.mainsnak.datavalue.value));
 						}
 					}
+					if (type === "commonsMedia") {
+						for (delta of value) {		
+							//values.push(templates.code(delta.mainsnak.datavalue.value));
+						}
+					}
 				}
-				items.appendChild(templates.remark({
+
+				let statement = templates.remark({
 					prop: templates.placeholder({
 						entity: pid,
 					}),
 					vals: values,
-				}));
+				})
+
+				if (type !== "external-id") {
+					items.appendChild(statement);
+				} else {
+					identifiers.appendChild(statement);
+				}
 			}
 		}
 		let placeholders = content.querySelectorAll('.placeholder');
@@ -129,7 +142,6 @@ function updateView(url) {
 			(async () => {
 				let id = placeholder.getAttribute('data-entity');
 				let entity = await wikidataGetEntity(id);
-				console.log(entity);
 				let link = document.createElement('a');
 				link.innerText = getValueByLang(entity[id], 'labels', id);
 				placeholder.parentNode.replaceChild(link, placeholder);
