@@ -96,7 +96,6 @@ function updateView(url) {
 				for (delta of value) {		
 					let vid = delta.mainsnak.datavalue.value.id;
 
-					console.log(type);
 					if (type === "time") {	
 						let date = dateToString(delta.mainsnak.datavalue.value)
 						if (date) {
@@ -116,8 +115,16 @@ function updateView(url) {
 						}
 					}
 					if (type === "commonsMedia") {
-						for (delta of value) {		
-							//values.push(templates.code(delta.mainsnak.datavalue.value));
+						for (delta of value) {
+							let name = delta.mainsnak.datavalue.value;
+							values.push(templates.picture({
+								srcSet: {
+									250: `http://commons.wikimedia.org/wiki/Special:FilePath/${ name }?width=250px`,
+									501: `http://commons.wikimedia.org/wiki/Special:FilePath/${ name }?width=501px`,
+									801: `http://commons.wikimedia.org/wiki/Special:FilePath/${ name }?width=801px`,
+									1068: `http://commons.wikimedia.org/wiki/Special:FilePath/${ name }?width=1068px`,
+								}
+							}));
 						}
 					}
 				}
@@ -127,7 +134,8 @@ function updateView(url) {
 						entity: pid,
 					}),
 					vals: values,
-				})
+					block: type === "commonsMedia",
+				});
 
 				if (type !== "external-id") {
 					items.appendChild(statement);

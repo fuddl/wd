@@ -27,6 +27,15 @@ const templates = {
 		tag.innerText = text;
 		return tag;
 	},
+	picture: (vars) => {
+		let tag = document.createElement('img');
+		let srcset = [];
+		for (key in vars.srcSet) {
+			srcset.push(`${ vars.srcSet[key] } ${ key }w`)
+		}
+		tag.setAttribute('srcset', srcset.join(','))
+		return tag;
+	},
 	placeholder: (vars) => {
 		let rand = (min, max) => {
 		  min = Math.ceil(min);

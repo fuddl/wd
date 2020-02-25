@@ -1,6 +1,11 @@
 templates.remark = (vars) => { 
 	let dl = document.createElement('dl');
 	dl.classList.add('remark');
+	if (vars.block) {
+		dl.classList.add('remark--block');
+	} else {
+		dl.classList.add('remark--inline');
+	}
 
 	let dt = document.createElement('dt');
 	dt.classList.add('remark__verb');
