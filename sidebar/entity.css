@@ -16,3 +16,8 @@ a {
   color: #3366cc;
   hyphens: none;
 }
+
+.placeholder {
+  color: #eaecf0;
+  white-space: break-word;
+}

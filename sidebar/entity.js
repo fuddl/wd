@@ -85,73 +85,56 @@ function updateView(url) {
 			for (prop of Object.keys(e.claims)) {
 
 				let value = e.claims[prop];
-
 				let type = value[0].mainsnak.datatype;
+				let values = [];
 
-				if (type === "wikibase-item") {	
-					(async () => {
-						let values = [];
-						let pid = value[0].mainsnak.property;
-						let label = await wikidataGetEntity(pid);
-						for (delta of value) {				
-							let vid = delta.mainsnak.datavalue.value.id;
-							let ventiy = await wikidataGetEntity(vid);
+				let pid = value[0].mainsnak.property;
+				let label = templates.placeholder({
+					entity: pid,
+				});
 
-							values.push(templates.link({
-								text: getValueByLang(ventiy[vid], 'labels', vid),
-								href: 'https://www.wikidata.org/wiki/' + vid,
-								title: getValueByLang(ventiy[vid], 'descriptions', ''),
+				for (delta of value) {		
+					let vid = delta.mainsnak.datavalue.value.id;
+
+					if (false && type === "wikibase-item") {	
+						let date = dateToString(delta.mainsnak.datavalue.value)
+						if (date) {
+							values.push(templates.time({
+								text: date,
 							}));
 						}
-						items.appendChild(templates.remark({
-							prop: label[pid].labels[lang].value,
-							propDesc: label[pid].descriptions[lang].value,
-							vals: values,
+					}		
+					if (type === "wikibase-item") {
+						values.push(templates.placeholder({
+							entity: vid,
 						}));
-					})();
-				}
-
-				if (type === "time") {	
-					(async () => {
-						let values = [];
-						let pid = value[0].mainsnak.property;
-						let label = await wikidataGetEntity(pid);
-						for (delta of value) {
-							let date = dateToString(delta.mainsnak.datavalue.value)
-
-							if (date) {
-								values.push(templates.time({
-									text: date,
-								}));
-							}
-						}
-						if (values.length > 0) {
-							items.appendChild(templates.remark({
-								prop: label[pid].labels[lang].value,
-								propDesc: label[pid].descriptions[lang].value,
-								vals: values,
-							}));
-						}
-					})();
-				}
-				
-				if (type === "external-id") {	
-					(async () => {
-						let values = [];
-						let pid = value[0].mainsnak.property;
-						let label = await wikidataGetEntity(pid);
+					}
+					if (type === "external-id") {
 						for (delta of value) {		
 							values.push(templates.code(delta.mainsnak.datavalue.value));
 						}
-						identifiers.appendChild(templates.remark({
-							prop: label[pid].labels[lang].value,
-							propDesc: label[pid].descriptions[lang].value,
-							vals: values,
-						}));
-					})();
+					}
 				}
+				items.appendChild(templates.remark({
+					prop: templates.placeholder({
+						entity: pid,
+					}),
+					vals: values,
+				}));
 			}
 		}
+		let placeholders = content.querySelectorAll('.placeholder');
+
+		Array.from(placeholders).reduce((k, placeholder) => {
+			(async () => {
+				let id = placeholder.getAttribute('data-entity');
+				let entity = await wikidataGetEntity(id);
+				console.log(entity);
+				let link = document.createElement('a');
+				link.innerText = getValueByLang(entity[id], 'labels', id);
+				placeholder.parentNode.replaceChild(link, placeholder);
+			})();
+		}, 0);
 	})();
 }
 

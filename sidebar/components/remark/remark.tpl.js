@@ -4,7 +4,7 @@ templates.remark = (vars) => {
 
 	let dt = document.createElement('dt');
 	dt.classList.add('remark__verb');
-	dt.innerText = vars.prop;
+	dt.appendChild(vars.prop);
 	dl.appendChild(dt);
 	
 	for (item of vars.vals) {

@@ -27,4 +27,21 @@ const templates = {
 		tag.innerText = text;
 		return tag;
 	},
+	placeholder: (vars) => {
+		let rand = (min, max) => {
+		  min = Math.ceil(min);
+		  max = Math.floor(max);
+		  return Math.floor(Math.random() * (max - min)) + min;
+		}
+		let tag = document.createElement('span');
+		tag.classList.add('placeholder')
+		tag.setAttribute('data-entity', vars.entity);
+		let words = [];
+		for (var i = 0; i <= rand(1,3); i++) {
+			words.push("█".repeat(rand(5,10)))
+		}
+
+		tag.innerText = words.join(' ');
+		return tag;
+	}
 };
