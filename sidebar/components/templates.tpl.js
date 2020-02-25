@@ -31,9 +31,13 @@ const templates = {
 		let tag = document.createElement('img');
 		let srcset = [];
 		for (key in vars.srcSet) {
-			srcset.push(`${ vars.srcSet[key] } ${ key }w`)
+			srcset.push(`${ vars.srcSet[key] } ${ key }w`);
 		}
-		tag.setAttribute('srcset', srcset.join(','))
+		tag.setAttribute('srcset', srcset.join(','));
+		tag.setAttribute('loading', 'lazy');
+
+		tag.setAttribute('src', vars.srcSet[0]);
+
 		return tag;
 	},
 	placeholder: (vars) => {

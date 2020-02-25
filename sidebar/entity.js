@@ -110,22 +110,18 @@ function updateView(url) {
 						}));
 					}
 					if (type === "external-id") {
-						for (delta of value) {		
-							values.push(templates.code(delta.mainsnak.datavalue.value));
-						}
+						values.push(templates.code(delta.mainsnak.datavalue.value));
 					}
 					if (type === "commonsMedia") {
-						for (delta of value) {
-							let name = delta.mainsnak.datavalue.value;
-							values.push(templates.picture({
-								srcSet: {
-									250: `http://commons.wikimedia.org/wiki/Special:FilePath/${ name }?width=250px`,
-									501: `http://commons.wikimedia.org/wiki/Special:FilePath/${ name }?width=501px`,
-									801: `http://commons.wikimedia.org/wiki/Special:FilePath/${ name }?width=801px`,
-									1068: `http://commons.wikimedia.org/wiki/Special:FilePath/${ name }?width=1068px`,
-								}
-							}));
-						}
+						let name = encodeURIComponent(delta.mainsnak.datavalue.value);
+						values.push(templates.picture({
+							srcSet: {
+								250: `http://commons.wikimedia.org/wiki/Special:FilePath/${ name }?width=250px`,
+								501: `http://commons.wikimedia.org/wiki/Special:FilePath/${ name }?width=501px`,
+								801: `http://commons.wikimedia.org/wiki/Special:FilePath/${ name }?width=801px`,
+								1068: `http://commons.wikimedia.org/wiki/Special:FilePath/${ name }?width=1068px`,
+							}
+						}));
 					}
 				}
 
