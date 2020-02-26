@@ -32,8 +32,9 @@ code {
   border: solid 1px #c8ccd1;
   white-space: pre-wrap;
   word-wrap: anywhere;
-  padding: 0.2em 0.5em;
+  padding: .05em .25em;
   display: inline-block;
   max-width: 100%;
+  font-size: .8em;
 }
 

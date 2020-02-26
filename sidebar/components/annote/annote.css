@@ -1,0 +1,5 @@
+.annote {
+	font-size: .5em;
+	display: grid;
+	grid-template-columns: auto auto;
+}

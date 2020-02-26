@@ -6,7 +6,8 @@
 }
 
 .remark + .remark {
-	margin-top: calc(-1em - 1px);
+	border-top: none;
+	margin-top: -1em;
 }
 
 @media (min-width: 300px) {

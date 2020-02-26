@@ -124,7 +124,7 @@ function renderStatements(snak, type, target, scope) {
 					qvalues.push(qualvalue);
 				}
 			}
-			target.appendChild(templates.remark({
+			target.appendChild(templates.annote({
 				prop: templates.placeholder({
 					entity: prop,
 				}),
