@@ -71,6 +71,69 @@ function dateToString(value) {
 	return output.join('-');
 }
 
+function insertAfter(referenceNode, newNode) {
+  referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
+}
+
+function renderStatements(snak, type, target, qualifiers) {
+	if (type === 'value') {
+		let valueType = snak.datatype;
+		if (valueType === "time") {	
+			let date = dateToString(snak.datavalue.value)
+			if (date) {
+				target.appendChild(templates.time({
+					text: date,
+				}));
+			}
+		}		
+		if (valueType === "wikibase-item") {
+			let vid = snak.datavalue.value.id;
+			target.appendChild(templates.placeholder({
+				entity: vid,
+			}));
+		}
+		if (valueType === "external-id") {
+			target.appendChild(templates.code(snak.datavalue.value));
+		}
+		if (valueType === "string") {
+			target.appendChild(templates.title(snak.datavalue.value));
+		}
+		if (valueType === "commonsMedia") {
+			let name = encodeURIComponent(snak.datavalue.value);
+			target.appendChild(templates.picture({
+				srcSet: {
+					250: `http://commons.wikimedia.org/wiki/Special:FilePath/${ name }?width=250px`,
+					501: `http://commons.wikimedia.org/wiki/Special:FilePath/${ name }?width=501px`,
+					801: `http://commons.wikimedia.org/wiki/Special:FilePath/${ name }?width=801px`,
+					1068: `http://commons.wikimedia.org/wiki/Special:FilePath/${ name }?width=1068px`,
+				}
+			}));
+		}
+	} else if(type === 'novalue') {
+		target.appendChild(document.createTextNode('—'));
+	} else if(type === 'somevalue') {
+		target.appendChild(document.createTextNode('?'));
+	}
+	if (qualifiers && delta.hasOwnProperty('qualifiers')) {
+		for (prop of Object.keys(delta.qualifiers)) {
+			let qvalues = [];
+			if (delta.qualifiers) {
+				for (qv of delta.qualifiers[prop]) {
+					let qualvalue = new DocumentFragment();
+					renderStatements(qv, qv.snaktype, qualvalue, false);
+					qvalues.push(qualvalue);
+				}
+			}
+			target.appendChild(templates.remark({
+				prop: templates.placeholder({
+					entity: prop,
+				}),
+				vals: qvalues,
+			}));
+		}
+	}
+}
+
 function updateView(url) {
 	let id = url.replace('http://www.wikidata.org/entity/', '');
 	let content = document.getElementById('content');
@@ -95,43 +158,19 @@ function updateView(url) {
 			for (prop of Object.keys(e.claims)) {
 
 				let value = e.claims[prop];
-				let type = value[0].mainsnak.datatype;
-				let values = [];
 
 				let pid = value[0].mainsnak.property;
 				let label = templates.placeholder({
 					entity: pid,
 				});
 
-				for (delta of value) {		
-					let vid = delta.mainsnak.datavalue.value.id;
-
-					if (type === "time") {	
-						let date = dateToString(delta.mainsnak.datavalue.value)
-						if (date) {
-							values.push(templates.time({
-								text: date,
-							}));
-						}
-					}		
-					if (type === "wikibase-item") {
-						values.push(templates.placeholder({
-							entity: vid,
-						}));
-					}
-					if (type === "external-id") {
-						values.push(templates.code(delta.mainsnak.datavalue.value));
-					}
-					if (type === "commonsMedia") {
-						let name = encodeURIComponent(delta.mainsnak.datavalue.value);
-						values.push(templates.picture({
-							srcSet: {
-								250: `http://commons.wikimedia.org/wiki/Special:FilePath/${ name }?width=250px`,
-								501: `http://commons.wikimedia.org/wiki/Special:FilePath/${ name }?width=501px`,
-								801: `http://commons.wikimedia.org/wiki/Special:FilePath/${ name }?width=801px`,
-								1068: `http://commons.wikimedia.org/wiki/Special:FilePath/${ name }?width=1068px`,
-							}
-						}));
+				let values = [];
+				for (delta of value) {
+					if (delta.hasOwnProperty('mainsnak') && delta.mainsnak) {
+						let thisvalue = new DocumentFragment();
+						let type = delta.mainsnak.snaktype;
+						renderStatements(delta.mainsnak, type, thisvalue, true);
+						values.push(thisvalue);
 					}
 				}
 
@@ -140,10 +179,10 @@ function updateView(url) {
 						entity: pid,
 					}),
 					vals: values,
-					block: type === "commonsMedia",
 				});
 
-				if (type !== "external-id") {
+
+				if (value[0].type === 'value' && value[0].mainsnak.datavalue.type !== "external-id") {
 					items.appendChild(statement);
 				} else {
 					identifiers.appendChild(statement);
