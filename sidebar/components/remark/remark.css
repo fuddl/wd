@@ -1,4 +1,12 @@
 .remark {
+	padding: 7px 10px;
+	background: #f8f9fa;
+	border: 1px solid #eaecf0;
+	line-height: 24px
+}
+
+.remark + .remark {
+	margin-top: calc(-1em - 1px);
 }
 
 @media (min-width: 300px) {
@@ -10,8 +18,6 @@
 
 .remark__verb {
 	grid-column: 1;
-	font-size: .75em;
-	text-transform: uppercase;
 }
 
 @media (max-width: 299px) {

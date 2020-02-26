@@ -75,7 +75,7 @@ function insertAfter(referenceNode, newNode) {
   referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
 }
 
-function renderStatements(snak, type, target, qualifiers) {
+function renderStatements(snak, type, target, scope) {
 	if (type === 'value') {
 		let valueType = snak.datatype;
 		if (valueType === "time") {	
@@ -114,13 +114,13 @@ function renderStatements(snak, type, target, qualifiers) {
 	} else if(type === 'somevalue') {
 		target.appendChild(document.createTextNode('?'));
 	}
-	if (qualifiers && delta.hasOwnProperty('qualifiers')) {
+	if (scope === 'statement' && delta.hasOwnProperty('qualifiers')) {
 		for (prop of Object.keys(delta.qualifiers)) {
 			let qvalues = [];
 			if (delta.qualifiers) {
 				for (qv of delta.qualifiers[prop]) {
 					let qualvalue = new DocumentFragment();
-					renderStatements(qv, qv.snaktype, qualvalue, false);
+					renderStatements(qv, qv.snaktype, qualvalue, 'qualifier');
 					qvalues.push(qualvalue);
 				}
 			}
@@ -166,10 +166,15 @@ function updateView(url) {
 
 				let values = [];
 				for (delta of value) {
+					if (delta.rank == "deprecated") {
+						delete delta;
+					}
+				}
+				for (delta of value) {
 					if (delta.hasOwnProperty('mainsnak') && delta.mainsnak) {
 						let thisvalue = new DocumentFragment();
 						let type = delta.mainsnak.snaktype;
-						renderStatements(delta.mainsnak, type, thisvalue, true);
+						renderStatements(delta.mainsnak, type, thisvalue, 'statement');
 						values.push(thisvalue);
 					}
 				}
