@@ -99,12 +99,8 @@ function renderStatements(snak, type, target, scope) {
 			target.appendChild(document.createTextNode(snak.datavalue.value));
 		}
 		if (valueType === "url") {
-			console.log(snak);
 			let humanReadable = snak.datavalue.value;
-			target.appendChild(templates.link({
-				text: humanReadable.replace(/^https?\:\/\//, '').replace(/^www\./, ''),
-				lang: snak.datavalue.value,
-			}));
+			target.appendChild(templates.urlLink(snak.datavalue.value));
 		}
 		if (valueType === "monolingualtext") {
 			target.appendChild(templates.title({

@@ -12,6 +12,14 @@ const templates = {
 		tag.innerText = vars.text;
 		return tag;
 	},
+	urlLink: (url) => {
+		let readable = url.replace(/^https?\:\/\//, '').replace(/^www\./, '').replace(/^mailto\:/, '')
+		let tag = document.createElement('a');
+		tag.setAttribute('title', url)
+		tag.classList.add('url')
+		tag.innerText = readable;
+		return tag;
+	},
 	time: (vars) => {
 		let tag = document.createElement('time');
 		tag.innerText = vars.text;
