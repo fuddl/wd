@@ -96,7 +96,13 @@ function renderStatements(snak, type, target, scope) {
 			target.appendChild(templates.code(snak.datavalue.value));
 		}
 		if (valueType === "string") {
-			target.appendChild(templates.title(snak.datavalue.value));
+			target.appendChild(document.createTextNode(snak.datavalue.value));
+		}
+		if (valueType === "monolingualtext") {
+			target.appendChild(templates.title({
+					text: snak.datavalue.value.text,
+					lang: snak.datavalue.value.lang
+				}));
 		}
 		if (valueType === "commonsMedia") {
 			let name = encodeURIComponent(snak.datavalue.value);

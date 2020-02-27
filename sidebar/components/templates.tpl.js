@@ -22,9 +22,12 @@ const templates = {
 		tag.innerText = text;
 		return tag;
 	},
-	title: (text) => {
+	title: (vars) => {
 		let tag = document.createElement('em');
-		tag.innerText = text;
+		tag.innerText = vars.text;
+		if (vars.lang) {
+			tag.setAttribute('lang', vars.lang);
+		}
 		return tag;
 	},
 	picture: (vars) => {
