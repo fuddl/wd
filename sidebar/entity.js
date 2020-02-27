@@ -98,11 +98,19 @@ function renderStatements(snak, type, target, scope) {
 		if (valueType === "string") {
 			target.appendChild(document.createTextNode(snak.datavalue.value));
 		}
+		if (valueType === "url") {
+			console.log(snak);
+			let humanReadable = snak.datavalue.value;
+			target.appendChild(templates.link({
+				text: humanReadable.replace(/^https?\:\/\//, '').replace(/^www\./, ''),
+				lang: snak.datavalue.value,
+			}));
+		}
 		if (valueType === "monolingualtext") {
 			target.appendChild(templates.title({
-					text: snak.datavalue.value.text,
-					lang: snak.datavalue.value.lang
-				}));
+				text: snak.datavalue.value.text,
+				lang: snak.datavalue.value.lang
+			}));
 		}
 		if (valueType === "commonsMedia") {
 			let name = encodeURIComponent(snak.datavalue.value);
