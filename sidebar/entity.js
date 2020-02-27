@@ -103,7 +103,6 @@ function renderStatements(snak, type, target, scope) {
 			target.appendChild(templates.urlLink(snak.datavalue.value));
 		}
 		if (valueType === "globe-coordinate") {
-			console.log();
 			target.appendChild(templates.mercator({
 				lat: snak.datavalue.value.latitude,
 				lon: snak.datavalue.value.longitude,
