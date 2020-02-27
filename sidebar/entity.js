@@ -102,6 +102,15 @@ function renderStatements(snak, type, target, scope) {
 			let humanReadable = snak.datavalue.value;
 			target.appendChild(templates.urlLink(snak.datavalue.value));
 		}
+		if (valueType === "globe-coordinate") {
+			console.log();
+			target.appendChild(templates.mercator({
+				lat: snak.datavalue.value.latitude,
+				lon: snak.datavalue.value.longitude,
+				height: 500,
+				width: 500,
+			}));
+		}
 		if (valueType === "monolingualtext") {
 			target.appendChild(templates.title({
 				text: snak.datavalue.value.text,
