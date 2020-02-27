@@ -30,6 +30,15 @@ img {
   word-wrap: anywhere;
 }
 
+figure {
+  margin: 0;
+}
+
+figcaption {
+  font-size: .35em;
+  line-height: 1;
+}
+
 code {
   font-family: 'Menlo','Consolas','Liberation Mono','Courier New',monospace;
   border: solid 1px #c8ccd1;

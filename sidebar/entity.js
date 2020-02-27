@@ -102,10 +102,16 @@ function renderStatements(snak, type, target, scope) {
 			let humanReadable = snak.datavalue.value;
 			target.appendChild(templates.urlLink(snak.datavalue.value));
 		}
+		if (valueType === 'quantity') {
+			let number = document.createTextNode(parseFloat(snak.datavalue.value.amount));
+			// @todo add unit
+			target.appendChild(number);
+		}
 		if (valueType === "globe-coordinate") {
 			target.appendChild(templates.mercator({
 				lat: snak.datavalue.value.latitude,
 				lon: snak.datavalue.value.longitude,
+				pre: snak.datavalue.value.precision,
 				height: 500,
 				width: 500,
 			}));

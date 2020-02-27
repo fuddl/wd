@@ -13,9 +13,9 @@ const templates = {
 		return tag;
 	},
 	urlLink: (url) => {
-		let readable = url.replace(/^https?\:\/\//, '').replace(/^www\./, '').replace(/^mailto\:/, '')
+		let readable = url.replace(/^[a-z]+\:\/\//, '').replace(/^www\./, '').replace(/\/$/, '');
 		let tag = document.createElement('a');
-		tag.setAttribute('title', url)
+		tag.setAttribute('href', url)
 		tag.classList.add('url')
 		tag.innerText = readable;
 		return tag;
