@@ -51,6 +51,16 @@ const templates = {
 
 		return tag;
 	},
+	footnoteRef: (vars) => {
+		let outer = document.createElement('sup');
+		let inner = document.createElement('a');
+
+		inner.setAttribute('href', vars.link);
+		inner.innerText = vars.text;
+		outer.appendChild(inner);
+
+		return outer;
+	},
 	placeholder: (vars) => {
 		let rand = (min, max) => {
 		  min = Math.ceil(min);

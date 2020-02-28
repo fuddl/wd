@@ -2,7 +2,7 @@ resolvers.wikipedia = {
 	urlMatrch: function(location) {
 		return location.href.match(/^https:\/\/[\w]+(\.m)?\.wik(ipedia|iquote|tionary|isource)\.org\/wiki\/[\w%\:\(\)]+$/) !== null;
 	},
-	getEntityId: async function() {
+	getEntityId: function() {
 		let meta = document.querySelector('script[type="application/ld+json"]');
 		let metaData = JSON.parse(meta.innerText);
 		let sameAs = metaData.sameAs;

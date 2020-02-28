@@ -75,8 +75,8 @@ function insertAfter(referenceNode, newNode) {
   referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
 }
 
-function renderStatements(snak, type, target, scope) {
-	if (type === 'value') {
+function renderStatements(snak, references, type, target, scope) {
+	if (type === 'value' || scope === 'reference') {
 		let valueType = snak.datatype;
 		if (valueType === "time") {	
 			let date = dateToString(snak.datavalue.value)
@@ -138,13 +138,18 @@ function renderStatements(snak, type, target, scope) {
 	} else if(type === 'somevalue') {
 		target.appendChild(document.createTextNode('?'));
 	}
+	if (target) {
+		for (reference of references) {
+			target.appendChild(reference);
+		}
+	}
 	if (scope === 'statement' && delta.hasOwnProperty('qualifiers')) {
 		for (prop of Object.keys(delta.qualifiers)) {
 			let qvalues = [];
 			if (delta.qualifiers) {
 				for (qv of delta.qualifiers[prop]) {
 					let qualvalue = new DocumentFragment();
-					renderStatements(qv, qv.snaktype, qualvalue, 'qualifier');
+					renderStatements(qv,[], qv.snaktype, qualvalue, 'qualifier');
 					qvalues.push(qualvalue);
 				}
 			}
@@ -164,8 +169,12 @@ function updateView(url) {
 	content.innerHTML = '';
 	(async () => {
 		let entities = await wikidataGetEntity(id);
+
+		let refCounter = {};
+
 		for (id of Object.keys(entities)) {
 			let e = entities[id];
+
 			let wrapper = document.createElement('div');
 			wrapper.appendChild(templates.ensign({
 				id: id,
@@ -175,8 +184,11 @@ function updateView(url) {
 
 			let identifiers = document.createElement('div');
 			let items = document.createElement('div');
+			let references = document.createElement('ol');
+
 			wrapper.appendChild(items);
 			wrapper.appendChild(identifiers);
+			wrapper.appendChild(references);
 			content.appendChild(wrapper);
 
 			for (prop of Object.keys(e.claims)) {
@@ -198,8 +210,42 @@ function updateView(url) {
 					if (delta.hasOwnProperty('mainsnak') && delta.mainsnak) {
 						let thisvalue = new DocumentFragment();
 						let type = delta.mainsnak.snaktype;
-						renderStatements(delta.mainsnak, type, thisvalue, 'statement');
+						let refs = [];
+						if (delta.references) {
+							let listItem = document.createElement('li');
+							for (ref of delta.references) {
+								if (typeof refCounter[ref.hash] === 'undefined') {
+									refCounter[ref.hash] = {
+										index: Object.keys(refCounter).length + 1,
+									}
+								}
+								let refvalues = [];
+								for (key in ref.snaks) {
+									for (refthing of ref.snaks[key]) {
+										let refvalue = new DocumentFragment();
+										renderStatements(refthing, [], refthing.datavalue.type, refvalue, 'reference');
+										refvalues.push(refvalue);
+									}
+									let refStatement = templates.proof({
+										prop: templates.placeholder({
+											entity: key,
+										}),
+										vals: refvalues,
+									});
+									listItem.appendChild(refStatement);
+								}
+								refs.push(templates.footnoteRef({
+									text: refCounter[ref.hash].index,
+									link: '#' + ref.hash,
+								}));
+								listItem.setAttribute('id', ref.hash);
+								references.appendChild(listItem);
+							}
+						}
+						renderStatements(delta.mainsnak, refs, type, thisvalue, 'statement');
+						
 						values.push(thisvalue);
+						
 					}
 				}
 
@@ -210,8 +256,7 @@ function updateView(url) {
 					vals: values,
 				});
 
-
-				if (value[0].type === 'value' && value[0].mainsnak.datavalue.type !== "external-id") {
+				if (value[0].mainsnak.snaktype === 'value' && value[0].mainsnak.datatype !== "external-id") {
 					items.appendChild(statement);
 				} else {
 					identifiers.appendChild(statement);

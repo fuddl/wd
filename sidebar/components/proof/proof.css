@@ -1,0 +1,16 @@
+.proof__verb {
+	display: inline-block;
+}
+
+.proof__verb > a {
+	color: inherit;
+}
+
+.proof__verb::after {
+	content: ': ';
+}
+
+.proof__object {
+	display: inline-block;
+	margin: 0;
+}

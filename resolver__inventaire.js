@@ -1,9 +1,9 @@
 resolvers.inventaire = {
-	urlMatrch: async function(location) {
+	urlMatrch: function(location) {
 		return this.getEntityId() !== null;
 	},
-	getEntityId: async function() {
-		return location.href.match(this.inventaireRegex)[1];
+	getEntityId: function() {
+		return location.href.match(this.inventaireRegex) != null ? location.href.match(this.inventaireRegex)[1] : null;
 	},
 	inventaireRegex: /https\:\/\/inventaire\.io\/entity\/wd\:(Q\d+)/,
 };
