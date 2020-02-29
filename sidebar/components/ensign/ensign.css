@@ -18,6 +18,7 @@
 	font-size: 16px;
 	margin-left: 0.4em;
 	font-family: 'Linux Libertine','Georgia','Times',serif;
+	user-select: all;
 }
 
 .ensign__id::before {

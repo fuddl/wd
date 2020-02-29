@@ -30,6 +30,14 @@ img {
   word-wrap: anywhere;
 }
 
+ol {
+  padding-left: 2.25em;
+}
+
+ol > li {
+  margin-bottom: 10px;
+}
+
 figure {
   margin: 0;
 }
@@ -42,12 +50,15 @@ figcaption {
 code {
   font-family: 'Menlo','Consolas','Liberation Mono','Courier New',monospace;
   border: solid 1px #c8ccd1;
-  white-space: pre-wrap;
-  word-wrap: anywhere;
-  padding: .05em .25em;
+  white-space: nowrap;
+  padding: .05em .5em;
   display: inline-block;
-  max-width: 100%;
+  max-width: calc(100% - 1em);
   font-size: .8em;
+  overflow: auto;
+  scrollbar-width: thin;
+  vertical-align: bottom;
+  user-select: all;
 }
 
 sup {

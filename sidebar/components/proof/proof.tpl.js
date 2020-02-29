@@ -6,6 +6,7 @@ templates.proof = (vars) => {
 	dt.classList.add('proof__verb');
 	dt.appendChild(vars.prop);
 	dl.appendChild(dt);
+	dl.appendChild(document.createTextNode(' '));
 	
 	for (item of vars.vals) {
 		let dd = document.createElement('dd');
