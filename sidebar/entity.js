@@ -119,11 +119,11 @@ function renderStatements(snak, references, type, target, scope) {
 			if (snak.datavalue.value.unit) {
 				let space = document.createTextNode(' ');
 				target.appendChild(space);
-				
+
 				target.appendChild(templates.proxy({
 					query: `
 						SELECT ?innerText WHERE {
-    					wd:Q48013 wdt:P5061 ?innerText.
+    					<${ snak.datavalue.value.unit }> wdt:P5061 ?innerText.
     					FILTER(LANG(?innerText) = "${ lang }").
 						}`
 				}));
