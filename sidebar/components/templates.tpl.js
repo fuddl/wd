@@ -77,5 +77,22 @@ const templates = {
 
 		tag.innerText = words.join(' ');
 		return tag;
+	},
+	proxy: (vars) => {
+		let tag = document.createElement('span');
+		tag.setAttribute('data-query', vars.query);
+		tag.classList.add('proxy');
+		let rand = (min, max) => {
+		  min = Math.ceil(min);
+		  max = Math.floor(max);
+		  return Math.floor(Math.random() * (max - min)) + min;
+		}
+		let words = [];
+		for (var i = 0; i <= rand(1,2); i++) {
+			words.push("█".repeat(rand(5,10)))
+		}
+
+		tag.innerText = words.join(' ');
+		return tag;
 	}
 };

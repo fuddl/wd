@@ -38,9 +38,13 @@ function dateToString(value) {
 	let wiso = value.time;
 	let prec = value.precision;
 
-	if (wiso.startsWith('-') || prec <= 8) {
+	console.log(value);
+
+	if (prec <= 6) {
 		return false;
 	}
+
+	let suffix = wiso.startsWith('-') ? ' BCE' : '';
 
 	let pad = function (i) {
     if (i < 10) {
@@ -50,7 +54,7 @@ function dateToString(value) {
   }
 
 	let iso = wiso
-		.replace(/^\+/, '')
+		.replace(/^(\+|-)/, '')
 		.replace(/Z$/, '')
 		.replace(/^(\d+)-00/, '$1-01')
 		.replace(/^(\d+)-(\d+)-00/, '$1-$2-01');
@@ -58,17 +62,23 @@ function dateToString(value) {
 	let date = new Date(iso);
 
 	let output = [];
-	if (prec > 8) {
-		output.push(date.getUTCFullYear());
-	}
-	if (prec > 9) {
-		output.push(pad(date.getUTCMonth() + 1));
-	}
-	if (prec > 10) {
-		output.push(pad(date.getUTCDate()));
+	if (prec === 7) {
+		output.push(date.getFullYear().toString().slice(0, -2) + 'XX');
+	} else if (prec === 8) {
+		output.push(date.getFullYear().toString().slice(0, -1) + 'X');
+	} else {		
+		if (prec > 8) {
+			output.push(date.getUTCFullYear());
+		}
+		if (prec > 9) {
+			output.push(pad(date.getUTCMonth() + 1));
+		}
+		if (prec > 10) {
+			output.push(pad(date.getUTCDate()));
+		}
 	}
 
-	return output.join('-');
+	return output.join('-') + suffix;
 }
 
 function insertAfter(referenceNode, newNode) {
@@ -104,8 +114,20 @@ function renderStatements(snak, references, type, target, scope) {
 		}
 		if (valueType === 'quantity') {
 			let number = document.createTextNode(parseFloat(snak.datavalue.value.amount));
-			// @todo add unit
 			target.appendChild(number);
+
+			if (snak.datavalue.value.unit) {
+				let space = document.createTextNode(' ');
+				target.appendChild(space);
+				
+				target.appendChild(templates.proxy({
+					query: `
+						SELECT ?innerText WHERE {
+    					wd:Q48013 wdt:P5061 ?innerText.
+    					FILTER(LANG(?innerText) = "${ lang }").
+						}`
+				}));
+			}
 		}
 		if (valueType === "globe-coordinate") {
 			target.appendChild(templates.mercator({
@@ -218,13 +240,17 @@ function updateView(url) {
 									refCounter[ref.hash] = {
 										index: Object.keys(refCounter).length + 1,
 									}
+									references.appendChild(listItem);
 								}
 								let refvalues = [];
 								for (key in ref.snaks) {
 									for (refthing of ref.snaks[key]) {
-										let refvalue = new DocumentFragment();
-										renderStatements(refthing, [], refthing.datavalue.type, refvalue, 'reference');
-										refvalues.push(refvalue);
+										if (refthing.datavalue) {
+											let refvalue = new DocumentFragment();
+
+											renderStatements(refthing, [], refthing.datavalue.type, refvalue, 'reference');
+											refvalues.push(refvalue);
+										}
 									}
 									let refStatement = templates.proof({
 										prop: templates.placeholder({
@@ -239,7 +265,6 @@ function updateView(url) {
 									link: '#' + ref.hash,
 								}));
 								listItem.setAttribute('id', ref.hash);
-								references.appendChild(listItem);
 							}
 						}
 						renderStatements(delta.mainsnak, refs, type, thisvalue, 'statement');
@@ -273,6 +298,17 @@ function updateView(url) {
 				link.setAttribute('href', getLink(id));
 				link.innerText = getValueByLang(entity[id], 'labels', id);
 				placeholder.parentNode.replaceChild(link, placeholder);
+			})();
+		}, 0);
+
+		let proxies = content.querySelectorAll('.proxy');
+
+		Array.from(proxies).reduce((k, proxy) => {
+			(async () => {
+				let result = await sparqlQuery(proxy.getAttribute('data-query'));
+				if (result[0].hasOwnProperty('innerText')) {
+					proxy.innerText = result[0].innerText.value;
+				}
 			})();
 		}, 0);
 	})();
