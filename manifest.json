@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Wikidata",
-  "version": "0.12",
+  "version": "0.13",
   "description": "Display information from wikidata.",
   "icons": {
     "48": "icons/wd.svg",
@@ -39,7 +39,7 @@
       "resolver__inventaire.js",
       "resolver__isbn.js",
       "resolver__fandom.js",
-      
+
       "resolver__external-id.js",
       "resolver__official-website.js",
       "content.js"
