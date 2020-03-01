@@ -37,7 +37,9 @@
       "resolver.js",
       "resolver__wikipedia.js",
       "resolver__inventaire.js",
+      "resolver__isbn.js",
       "resolver__fandom.js",
+      
       "resolver__external-id.js",
       "resolver__official-website.js",
       "content.js"

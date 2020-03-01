@@ -9,6 +9,8 @@ resolvers.officialWebsite = {
 		if (entity[0]) {
 			let entityId = entity[0].item.value.match(/https?:\/\/www\.wikidata\.org\/entity\/(Q\d+)/)[1]
 			return entityId;
+		} else {
+			return false;
 		}
 	},
 	getEntityByOfficialWebsite: async function(domain) {

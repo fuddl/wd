@@ -17,14 +17,9 @@ resolvers.externalId = {
 			if (location.href.startsWith(auth.prefix)) {
 				if (location.href.replace(location.hash, '').split('?')[0].endsWith(auth.suffix)) {
 					let core = location.href.replace(location.hash, '').split(auth.prefix)[1];
-					if (auth.suffix != '') {
-						core = core.split(auth.suffix)[0];
-					}
-					if (core.match(new RegExp(auth.regex))) {
-						return {
-							id: core,
-							prop: auth.prop,
-						}
+					return {
+						id: core,
+						prop: auth.prop,
 					}
 				}
 			}
@@ -55,7 +50,7 @@ resolvers.externalId = {
 					
 					BIND( strbefore( ?url, "$1" ) as ?prefix )
 					BIND( strafter( ?url, "$1" ) as ?suffix )
-				}
+				} ORDER BY DESC(strlen(str(?prefix)))
 			`;
 		const result = await sparqlQuery(query);
 		const authorities = {};
