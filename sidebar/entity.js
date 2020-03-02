@@ -342,7 +342,6 @@ function updateView(url) {
 		Array.from(proxies).reduce((k, proxy) => {
 			(async () => {
 				let result = await sparqlQuery(proxy.getAttribute('data-query'));
-				console.log(result[0]);
 				if (result[0].hasOwnProperty('innerText')) {
 					proxy.innerText = result[0].innerText.value;
 				}
