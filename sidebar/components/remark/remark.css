@@ -19,6 +19,7 @@
 
 .remark__verb {
 	grid-column: 1;
+	font-weight: bold;
 }
 
 @media (max-width: 299px) {
