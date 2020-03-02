@@ -38,8 +38,6 @@ function dateToString(value) {
 	let wiso = value.time;
 	let prec = value.precision;
 
-	console.log(value);
-
 	if (prec <= 6) {
 		return false;
 	}
@@ -63,9 +61,37 @@ function dateToString(value) {
 
 	let output = [];
 	if (prec === 7) {
-		output.push(date.getFullYear().toString().slice(0, -2) + 'XX');
+		let text = date.getFullYear().toString().slice(0, -2) + 'XX' + suffix;
+		return templates.proxy({
+			query: `
+				SELECT ?innerText WHERE {
+				  ?century wdt:P31 wd:Q578.
+				  ?century wdt:P585 "${ iso }Z"^^xsd:dateTime.
+				  SERVICE wikibase:label
+				  { 
+				    bd:serviceParam wikibase:language "[AUTO_LANGUAGE],${ lang }". 
+				    ?century rdfs:label ?innerText.
+				  }
+				}
+				LIMIT 1`,
+			text: text,
+		});
 	} else if (prec === 8) {
-		output.push(date.getFullYear().toString().slice(0, -1) + 'X');
+		let text =  date.getFullYear().toString().slice(0, -1) + 'X';
+		return templates.proxy({
+			query: `
+				SELECT ?innerText WHERE {
+				  ?decade wdt:P31 wd:Q39911.
+				  ?decade wdt:P585 "${ iso }Z"^^xsd:dateTime.
+				  SERVICE wikibase:label
+				  { 
+				    bd:serviceParam wikibase:language "[AUTO_LANGUAGE],${ lang }". 
+				    ?decade rdfs:label ?innerText.
+				  }
+				}
+				LIMIT 1`,
+			text: text,
+		});
 	} else {		
 		if (prec > 8) {
 			output.push(date.getUTCFullYear());
@@ -78,7 +104,7 @@ function dateToString(value) {
 		}
 	}
 
-	return output.join('-') + suffix;
+	return document.createTextNode(output.join('-') + suffix);
 }
 
 function insertAfter(referenceNode, newNode) {
@@ -90,11 +116,9 @@ function renderStatements(snak, references, type, target, scope) {
 		let valueType = snak.datatype;
 		if (valueType === "time") {	
 			let date = dateToString(snak.datavalue.value)
-			if (date) {
-				target.appendChild(templates.time({
-					text: date,
-				}));
-			}
+			target.appendChild(templates.time({
+				text: date,
+			}));
 		}		
 		if (valueType === "wikibase-item") {
 			let vid = snak.datavalue.value.id;
@@ -306,6 +330,7 @@ function updateView(url) {
 		Array.from(proxies).reduce((k, proxy) => {
 			(async () => {
 				let result = await sparqlQuery(proxy.getAttribute('data-query'));
+				console.log(result[0]);
 				if (result[0].hasOwnProperty('innerText')) {
 					proxy.innerText = result[0].innerText.value;
 				}

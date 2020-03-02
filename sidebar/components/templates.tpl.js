@@ -22,7 +22,7 @@ const templates = {
 	},
 	time: (vars) => {
 		let tag = document.createElement('time');
-		tag.innerText = vars.text;
+		tag.appendChild(vars.text);
 		return tag;
 	},
 	small: (text) => {
@@ -82,6 +82,9 @@ const templates = {
 		let tag = document.createElement('span');
 		tag.setAttribute('data-query', vars.query);
 		tag.classList.add('proxy');
+		if (vars.text) {
+			tag.innerText = vars.text;
+		}
 		
 		return tag;
 	}
