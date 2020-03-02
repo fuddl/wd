@@ -52,14 +52,12 @@ const templates = {
 		return tag;
 	},
 	footnoteRef: (vars) => {
-		let outer = document.createElement('sup');
-		let inner = document.createElement('a');
+		let tag = document.createElement('a');
 
-		inner.setAttribute('href', vars.link);
-		inner.innerText = vars.text;
-		outer.appendChild(inner);
+		tag.setAttribute('href', vars.link);
+		tag.innerText = vars.text;
 
-		return outer;
+		return tag;
 	},
 	placeholder: (vars) => {
 		let rand = (min, max) => {

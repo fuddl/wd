@@ -185,9 +185,17 @@ function renderStatements(snak, references, type, target, scope) {
 		target.appendChild(document.createTextNode('?'));
 	}
 	if (target) {
+		target.appendChild(document.createTextNode(' '));
+		let sup = document.createElement('sup');
+		let c = 0;
 		for (reference of references) {
-			target.appendChild(reference);
+			if (c > 0) {
+				sup.appendChild(document.createTextNode('/'));
+			}
+			sup.appendChild(reference);
+			c++;
 		}
+		target.appendChild(sup);
 	}
 	if (scope === 'statement' && delta.hasOwnProperty('qualifiers')) {
 		for (prop of Object.keys(delta.qualifiers)) {
