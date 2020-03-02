@@ -258,31 +258,35 @@ function updateView(url) {
 						let type = delta.mainsnak.snaktype;
 						let refs = [];
 						if (delta.references) {
-							let listItem = document.createElement('li');
 							for (ref of delta.references) {
+								let listItem;
+								let refvalues = [];
 								if (typeof refCounter[ref.hash] === 'undefined') {
+									listItem = document.createElement('li');
 									refCounter[ref.hash] = {
 										index: Object.keys(refCounter).length + 1,
+										item: listItem,
 									}
 									references.appendChild(listItem);
-								}
-								let refvalues = [];
-								for (key in ref.snaks) {
-									for (refthing of ref.snaks[key]) {
-										if (refthing.datavalue) {
-											let refvalue = new DocumentFragment();
+									for (key in ref.snaks) {
+										for (refthing of ref.snaks[key]) {
+											if (refthing.datavalue) {
+												let refvalue = new DocumentFragment();
 
-											renderStatements(refthing, [], refthing.datavalue.type, refvalue, 'reference');
-											refvalues.push(refvalue);
+												renderStatements(refthing, [], refthing.datavalue.type, refvalue, 'reference');
+												refvalues.push(refvalue);
+											}
 										}
+										let refStatement = templates.proof({
+											prop: templates.placeholder({
+												entity: key,
+											}),
+											vals: refvalues,
+										});
+										listItem.appendChild(refStatement);
 									}
-									let refStatement = templates.proof({
-										prop: templates.placeholder({
-											entity: key,
-										}),
-										vals: refvalues,
-									});
-									listItem.appendChild(refStatement);
+								} else {
+									listItem = refCounter[ref.hash].item;
 								}
 								refs.push(templates.footnoteRef({
 									text: refCounter[ref.hash].index,
