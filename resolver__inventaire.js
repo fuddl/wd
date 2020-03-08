@@ -1,5 +1,5 @@
 resolvers.inventaire = {
-	urlMatrch: function(location) {
+	applicable: function(location) {
 		return this.getEntityId() !== null;
 	},
 	getEntityId: function() {

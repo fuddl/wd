@@ -1,6 +1,6 @@
 const resolvers = {
 	wikidata: {
-		urlMatrch: function(location) {
+		applicable: function(location) {
 			return location.href.match(/https:\/\/[\w]+.wikidata.org\/wiki\/Q\d+/) !== null;
 		},
 		getEntityId: function() {

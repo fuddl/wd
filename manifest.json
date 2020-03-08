@@ -35,6 +35,8 @@
       "sqarql-query.js",
       "wd-get-entity.js",
       "resolver.js",
+      "pagedata__title.js",
+      "pagedata__description.js",
       "resolver__wikipedia.js",
       "resolver__inventaire.js",
       "resolver__isbn.js",

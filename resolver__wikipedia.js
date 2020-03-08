@@ -1,6 +1,6 @@
 resolvers.wikipedia = {
-	urlMatrch: function(location) {
-		return location.href.match(/^https:\/\/[\w]+(\.m)?\.wik(ipedia|iquote|tionary|isource)\.org\/wiki\/[\w%\:\(\)]+$/) !== null;
+	applicable: function(location) {
+		return location.href.match(/^https:\/\/[\w]+(\.m)?\.wik(ipedia|iquote|tionary|isource)\.org\/wiki\/[\w%\.\:\(\)]+$/) !== null;
 	},
 	getEntityId: function() {
 		let meta = document.querySelector('script[type="application/ld+json"]');

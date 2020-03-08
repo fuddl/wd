@@ -1,6 +1,13 @@
 resolvers.officialWebsite = {
-	urlMatrch: function(location) {
-		return location.href.match(/^https?:\/\/.+/) !== null;
+	applicable: function(location) {
+		let isIndex = location.href.match(this.indexPageRegex) !== null;
+		if (isIndex) {
+			return [{
+				prop: 'P856',
+				value: location.href,
+				recommended: isIndex,
+			}];
+		}
 	},
 	getEntityId: async function() {
 		let domain = window.location.origin;
@@ -13,6 +20,7 @@ resolvers.officialWebsite = {
 			return false;
 		}
 	},
+	indexPageRegex: /^https?:\/\/[^\/]+(\/(\?.*|index\.php(\?.*)?)?)?$/,
 	getEntityByOfficialWebsite: async function(domain) {
 		let query = `
 			SELECT ?item

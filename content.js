@@ -1,20 +1,29 @@
-browser.runtime.sendMessage({
-	"match": false,
-	"href": location.href,
-});
-
 (async () => {
+	let applicables = [];
+
+	let foundMatch = false;
 	for (id of Object.keys(resolvers)) {
-		let doesMatch = await resolvers[id].urlMatrch(location);
-		if (doesMatch) {
+		let isApplicable = await resolvers[id].applicable(location);
+		if (isApplicable) {
 			let entityId = await resolvers[id].getEntityId();
-			if (entityId) {
+			if (entityId && !foundMatch) {
+				foundMatch = true;
 				browser.runtime.sendMessage({
 					type: 'match_event',
 					wdEntityId: entityId,
 				});
-				break;
 			}
+			applicables.push(isApplicable);
 		}
+	}
+	if (applicables.length > 0 && !foundMatch) {
+		browser.runtime.sendMessage({
+			type: 'match_proposal',
+			proposals: {
+				ids: applicables,
+				titles: findTitles(),
+				desc: findDescriptions(),
+			}
+		});
 	}
 })();

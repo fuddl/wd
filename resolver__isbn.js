@@ -1,5 +1,5 @@
 resolvers.isbn = {
-	urlMatrch: function(location) {
+	applicable: function(location) {
 		return this.findIsbn((found) => {
 			if (!found) {
 				return false;
@@ -17,13 +17,20 @@ resolvers.isbn = {
 		}
 
 		for (container of jsonContainers) {
-			let json = JSON.parse(container.innerText);
-			if (json["@context"] === 'https://schema.org/') {
-				if (json["@type"] === 'Book') {
-					if (typeof json["isbn"] != 'undefined') {
-						return callback(json["isbn"]);
+
+			// since the json might be invalid
+			try {
+				let json = JSON.parse(container.innerText);
+				if (json["@context"] === 'https://schema.org/') {
+					if (json["@type"] === 'Book') {
+						if (typeof json["isbn"] != 'undefined') {
+							return callback(json["isbn"]);
+						}
 					}
 				}
+			} catch(error) {
+				console.error('JSON on this site might be invalid.');
+				return false;
 			}
 		}
 		return false;
