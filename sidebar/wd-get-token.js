@@ -8,10 +8,13 @@ async function wikidataGetEditToken(query, lang) {
 			throw 'Status Code: ' + response.status;
 		}	
 
-		console.log(await response.text());
 		let json = JSON.parse( await response.text());
 		
-		return json.search;
+		if (json.query.tokens.csrftoken) {
+			return json.search;
+		} else {
+			return false;
+		}
 	} catch(error) {
 		throw ['Fetch Error :-S', error];
 	}

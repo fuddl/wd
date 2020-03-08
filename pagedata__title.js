@@ -20,5 +20,9 @@ function findTitles() {
 	if (titleElement) {
 		titles.push(titleElement.innerText);
 	}
+	titles = titles.filter(function (title) {
+  	return title != '';
+	});
+
 	return titles;
 }
