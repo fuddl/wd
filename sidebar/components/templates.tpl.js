@@ -16,7 +16,7 @@ const templates = {
 		let readable = url
 		  .replace(/^[a-z]+\:\/\//, '')
 		  .replace(/^www\./, '')
-		  .replace(/\/index.(php|html?)$/, '')
+		  .replace(/\/index\.(php|html?)$/, '')
 		  .replace(/\/$/, '');
 		let tag = document.createElement('a');
 		tag.setAttribute('href', url)
