@@ -2,4 +2,15 @@
 	font-size: .5em;
 	display: grid;
 	grid-template-columns: auto auto;
+	line-height: 1em;
+	grid-gap: .5em 1em;
+}
+
+.annote__verb {
+	grid-column: 1;
+}
+
+.annote__object {
+	margin: 0;
+	grid-column: 2;
 }

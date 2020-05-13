@@ -195,25 +195,26 @@ function renderStatements(snak, references, type, target, scope) {
 			sup.appendChild(reference);
 			c++;
 		}
-		target.appendChild(sup);
+	  if (sup.hasChildNodes()) {
+			target.appendChild(sup);
+	  }
 	}
 	if (scope === 'statement' && delta.hasOwnProperty('qualifiers')) {
+		let qualifiers = [];
 		for (prop of Object.keys(delta.qualifiers)) {
 			let qvalues = [];
-			if (delta.qualifiers) {
-				for (qv of delta.qualifiers[prop]) {
-					let qualvalue = new DocumentFragment();
-					renderStatements(qv,[], qv.snaktype, qualvalue, 'qualifier');
-					qvalues.push(qualvalue);
-				}
+			for (qv of delta.qualifiers[prop]) {
+				let qualvalue = new DocumentFragment();
+				renderStatements(qv,[], qv.snaktype, qualvalue, 'qualifier');
+				qvalues.push(qualvalue);
 			}
-			target.appendChild(templates.annote({
-				prop: templates.placeholder({
-					entity: prop,
-				}),
+
+			qualifiers.push({
+				prop: templates.placeholder({ entity: prop }),
 				vals: qvalues,
-			}));
+			});
 		}
+		target.appendChild(templates.annote(qualifiers));
 	}
 }
 
