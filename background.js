@@ -7,6 +7,12 @@ function pushEnitiyToSidebar(id, tid) {
 	});
 }
 
+async function openEnitiyInNewTab(id) {
+	await browser.tabs.create({
+    url: browser.runtime.getURL('sidebar/entity.html') + '?' + id
+  });
+}
+
 function pushProposalToSidebar(proposals, tid) {
 	browser.sidebarAction.setPanel({
 		tabId: tid,
@@ -19,21 +25,25 @@ browser.browserAction.onClicked.addListener((tab) => {
 	if (!tabStates[tid]) {
 		tabStates[tid] = {};
 	}
-	if (!tabStates[tid].sidebarOpen) {
-		if (tabStates[tid].mode === 'show_entity') {
-			(async () => {
-				pushEnitiyToSidebar(tabStates[tid].entity, tid);
-			})();
-		} else if(data.type === 'propose_match') {
-			(async () => {
-				pushProposalToSidebar(tabStates[tid].proposals, tid);
-			})();
+	if (browser.sidebarAction) {
+		if (!tabStates[tid].sidebarOpen) {
+			if (tabStates[tid].mode === 'show_entity') {
+				(async () => {
+					pushEnitiyToSidebar(tabStates[tid].entity, tid);
+				})();
+			} else if(data.type === 'propose_match') {
+				(async () => {
+					pushProposalToSidebar(tabStates[tid].proposals, tid);
+				})();
+			}
+			browser.sidebarAction.open();
+			tabStates[tid].sidebarOpen = true;
+		} else {
+			browser.sidebarAction.close();
+			tabStates[tid].sidebarOpen = false;
 		}
-		browser.sidebarAction.open();
-		tabStates[tid].sidebarOpen = true;
 	} else {
-		browser.sidebarAction.close();
-		tabStates[tid].sidebarOpen = false;
+		openEnitiyInNewTab(tabStates[tid].entity);
 	}
 });
 

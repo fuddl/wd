@@ -15,7 +15,14 @@ templates.ensign = (vars) => {
 	title.innerText = vars.label;
 
 	id.classList.add('ensign__id');
-	id.innerText = vars.id;
+	let link = document.createElement('a');
+	link.classList.add("ensign__id__link")
+	link.setAttribute('href', 'https://www.wikidata.org/wiki/' + vars.id);
+	link.innerText = vars.id;
+	link.addEventListener('click', (e) => {
+		e.preventDefault();
+	});
+	id.appendChild(link);
 
 	description.classList.add('ensign__description');
 	description.innerText = vars.description;

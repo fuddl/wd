@@ -21,6 +21,15 @@
 	user-select: all;
 }
 
+.ensign__id__link {
+	color: inherit;
+	cursor: inherit;
+}
+
+.ensign__id__link:hover {
+	text-decoration: none;
+}
+
 .ensign__id::before {
 	content: '(';
 }
