@@ -117,10 +117,12 @@ function renderStatements(snak, references, type, target, scope) {
 	if (type === 'value' || scope === 'reference') {
 		let valueType = snak.datatype;
 		if (valueType === "time") {	
-			let date = dateToString(snak.datavalue.value)
-			target.appendChild(templates.time({
-				text: date,
-			}));
+			let date = dateToString(snak.datavalue.value);
+			if (date) {		
+				target.appendChild(templates.time({
+					text: date,
+				}));
+			}
 		}		
 		if (valueType === "wikibase-item") {
 			let vid = snak.datavalue.value.id;
