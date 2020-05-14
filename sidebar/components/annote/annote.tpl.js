@@ -6,7 +6,6 @@ templates.annote = (qualifiers) => {
 		let dt = document.createElement('dt');
 		dt.classList.add('annote__verb');
 
-		console.log(typeof group);
 		dt.appendChild(group.prop);
 		dl.appendChild(dt);
 		
@@ -23,6 +22,5 @@ templates.annote = (qualifiers) => {
 	style.setAttribute('href', "components/annote/annote.css");
 
 	dl.appendChild(style);
-	console.log(dl.outerHTML);
 	return dl;
 }

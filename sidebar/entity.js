@@ -2,7 +2,9 @@ const lang = navigator.language.substr(0,2);
 
 if (window.location.search) {
 	let currentEntity = window.location.search.replace(/^\?/, '');
-	updateView(currentEntity);
+	if (currentEntity.match(/Q\d+/)) {
+		updateView(currentEntity);
+	}
 }
 
 function getLink(entityId) {

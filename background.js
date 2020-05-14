@@ -20,9 +20,9 @@ browser.browserAction.onClicked.addListener((tab) => {
 		tabStates[tid] = {};
 	}
 	if (!tabStates[tid].sidebarOpen) {
-		if (tabStates[tid].mode = 'show_entity') {
+		if (tabStates[tid].mode === 'show_entity') {
 			(async () => {
-				pushEnitiyToSidebar(tabStates[tid].id, tid);
+				pushEnitiyToSidebar(tabStates[tid].entity, tid);
 			})();
 		} else if(data.type === 'propose_match') {
 			(async () => {
