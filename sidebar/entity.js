@@ -235,6 +235,8 @@ function updateView(url) {
 			let e = entities[id];
 
 			let wrapper = document.createElement('div');
+			document.querySelector('title').innerText = getValueByLang(e, 'labels', e.title);
+			
 			wrapper.appendChild(templates.ensign({
 				id: id,
 				label: getValueByLang(e, 'labels', e.title),
@@ -337,7 +339,12 @@ function updateView(url) {
 				let entity = await wikidataGetEntity(id);
 				let link = document.createElement('a');
 				link.setAttribute('href', getLink(id));
+				link.setAttribute('title', getValueByLang(entity[id], 'descriptions'));
 				link.innerText = getValueByLang(entity[id], 'labels', id);
+				link.addEventListener('click', (e) => {
+					e.preventDefault();
+					window.location = '?' + id;
+				});
 				placeholder.parentNode.replaceChild(link, placeholder);
 			})();
 		}, 0);

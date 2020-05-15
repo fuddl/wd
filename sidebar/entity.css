@@ -28,6 +28,7 @@ img {
 .placeholder {
   color: #eaecf0;
   white-space: break-word;
+  font-size: .6em;
 }
 
 .url {
