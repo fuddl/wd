@@ -1,6 +1,5 @@
 async function wikidataGetEditToken(query, lang) {
 	let url = `https://www.wikidata.org/w/api.php?action=query&meta=tokens&format=json`;
-	console.log(url);
 	try {
 		const response = await fetch(url);
 

@@ -2,7 +2,7 @@ const lang = navigator.language.substr(0,2);
 
 if (window.location.search) {
 	let currentEntity = window.location.search.replace(/^\?/, '');
-	if (currentEntity.match(/Q\d+/)) {
+	if (currentEntity.match(/[QM]\d+/)) {
 		updateView(currentEntity);
 	}
 }
@@ -115,7 +115,7 @@ function insertAfter(referenceNode, newNode) {
 
 function renderStatements(snak, references, type, target, scope) {
 	if (type === 'value' || scope === 'reference') {
-		let valueType = snak.datatype;
+		let valueType = snak.datatype ? snak.datatype : snak.datavalue.type ;
 		if (valueType === "time") {	
 			let date = dateToString(snak.datavalue.value);
 			if (date) {		
@@ -124,7 +124,7 @@ function renderStatements(snak, references, type, target, scope) {
 				}));
 			}
 		}		
-		if (valueType === "wikibase-item") {
+		if (valueType === "wikibase-item" || valueType === "wikibase-entityid") {
 			let vid = snak.datavalue.value.id;
 			target.appendChild(templates.placeholder({
 				entity: vid,
@@ -157,7 +157,7 @@ function renderStatements(snak, references, type, target, scope) {
 				}));
 			}
 		}
-		if (valueType === "globe-coordinate") {
+		if (valueType === "globe-coordinate" || valueType ===  'globecoordinate') {
 			target.appendChild(templates.mercator({
 				lat: snak.datavalue.value.latitude,
 				lon: snak.datavalue.value.longitude,
@@ -237,8 +237,7 @@ function renderStatements(snak, references, type, target, scope) {
 	}
 }
 
-function updateView(url) {
-	let id = url.replace('http://www.wikidata.org/entity/', '');
+function updateView(id) {
 	let content = document.getElementById('content');
 	content.innerHTML = '';
 	(async () => {
@@ -267,82 +266,109 @@ function updateView(url) {
 			wrapper.appendChild(references);
 			content.appendChild(wrapper);
 
-			for (prop of Object.keys(e.claims)) {
+			if (e.statements) {
+				for (prop of Object.keys(e.statements)) {
+					let values = [];
+					let value = e.statements[prop];
 
-				let value = e.claims[prop];
-
-				let pid = value[0].mainsnak.property;
-				let label = templates.placeholder({
-					entity: pid,
-				});
-
-				let values = [];
-				for (delta of value) {
-					if (delta.rank == "deprecated") {
-						delete delta;
-					}
-				}
-				for (delta of value) {
-					if (delta.hasOwnProperty('mainsnak') && delta.mainsnak) {
-						let thisvalue = new DocumentFragment();
-						let type = delta.mainsnak.snaktype;
-						let refs = [];
-						if (delta.references) {
-							for (ref of delta.references) {
-								let listItem;
-								let refvalues = [];
-								if (typeof refCounter[ref.hash] === 'undefined') {
-									listItem = document.createElement('li');
-									refCounter[ref.hash] = {
-										index: Object.keys(refCounter).length + 1,
-										item: listItem,
-									}
-									references.appendChild(listItem);
-									for (key in ref.snaks) {
-										for (refthing of ref.snaks[key]) {
-											if (refthing.datavalue) {
-												let refvalue = new DocumentFragment();
-
-												renderStatements(refthing, [], refthing.datavalue.type, refvalue, 'reference');
-												refvalues.push(refvalue);
-											}
-										}
-										let refStatement = templates.proof({
-											prop: templates.placeholder({
-												entity: key,
-											}),
-											vals: refvalues,
-										});
-										listItem.appendChild(refStatement);
-									}
-								} else {
-									listItem = refCounter[ref.hash].item;
-								}
-								refs.push(templates.footnoteRef({
-									text: refCounter[ref.hash].index,
-									link: '#' + ref.hash,
-								}));
-								listItem.setAttribute('id', ref.hash);
-							}
+					let pid = value[0].mainsnak.property;
+					for (delta of value) {
+						if (delta.hasOwnProperty('mainsnak') && delta.mainsnak) {
+							let thisvalue = new DocumentFragment();
+							let type = delta.mainsnak.snaktype;
+							renderStatements(delta.mainsnak, [], type, thisvalue, 'statement');
+							values.push(thisvalue);
 						}
-						renderStatements(delta.mainsnak, refs, type, thisvalue, 'statement');
-						
-						values.push(thisvalue);
-						
 					}
-				}
-
-				let statement = templates.remark({
-					prop: templates.placeholder({
-						entity: pid,
-					}),
-					vals: values,
-				});
-
-				if (value[0].mainsnak.snaktype === 'value' && value[0].mainsnak.datatype !== "external-id") {
+					let statement = templates.remark({
+						prop: templates.placeholder({
+							entity: pid,
+						}),
+						vals: values,
+					});
 					items.appendChild(statement);
-				} else {
-					identifiers.appendChild(statement);
+				}
+			}
+
+			if (e.claims) {
+				for (prop of Object.keys(e.claims)) {
+
+					let value = e.claims[prop];
+
+					let pid = value[0].mainsnak.property;
+					let label = templates.placeholder({
+						entity: pid,
+					});
+
+					let values = [];
+					// @todo filter normal when preferred is present
+					for (delta of value) {
+						if (delta.rank == "deprecated") {
+							delete delta;
+						}
+					}
+					for (delta of value) {
+						if (delta.hasOwnProperty('mainsnak') && delta.mainsnak) {
+							let thisvalue = new DocumentFragment();
+							let type = delta.mainsnak.snaktype;
+							let refs = [];
+							if (delta.references) {
+								for (ref of delta.references) {
+									let listItem;
+									let refvalues = [];
+									if (typeof refCounter[ref.hash] === 'undefined') {
+										listItem = document.createElement('li');
+										refCounter[ref.hash] = {
+											index: Object.keys(refCounter).length + 1,
+											item: listItem,
+										}
+										references.appendChild(listItem);
+										for (key in ref.snaks) {
+											for (refthing of ref.snaks[key]) {
+												if (refthing.datavalue) {
+													let refvalue = new DocumentFragment();
+
+													renderStatements(refthing, [], refthing.datavalue.type, refvalue, 'reference');
+													refvalues.push(refvalue);
+												}
+											}
+											let refStatement = templates.proof({
+												prop: templates.placeholder({
+													entity: key,
+												}),
+												vals: refvalues,
+											});
+											listItem.appendChild(refStatement);
+										}
+									} else {
+										listItem = refCounter[ref.hash].item;
+									}
+									refs.push(templates.footnoteRef({
+										text: refCounter[ref.hash].index,
+										link: '#' + ref.hash,
+									}));
+									listItem.setAttribute('id', ref.hash);
+								}
+							}
+							renderStatements(delta.mainsnak, refs, type, thisvalue, 'statement');
+							
+							values.push(thisvalue);
+							
+						}
+					}
+
+					let statement = templates.remark({
+						prop: templates.placeholder({
+							entity: pid,
+						}),
+						vals: values,
+					});
+
+					if (value[0].mainsnak.snaktype === 'value' && value[0].mainsnak.datatype !== "external-id") {
+						items.appendChild(statement);
+					} else {
+						identifiers.appendChild(statement);
+					}
 				}
 			}
 		}

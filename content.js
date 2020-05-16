@@ -6,6 +6,7 @@
 		let isApplicable = await resolvers[id].applicable(location);
 		if (isApplicable) {
 			let entityId = await resolvers[id].getEntityId();
+
 			if (entityId && !foundMatch) {
 				foundMatch = true;
 				browser.runtime.sendMessage({
