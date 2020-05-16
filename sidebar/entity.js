@@ -266,34 +266,11 @@ function updateView(id) {
 			wrapper.appendChild(references);
 			content.appendChild(wrapper);
 
-			if (e.statements) {
-				for (prop of Object.keys(e.statements)) {
-					let values = [];
-					let value = e.statements[prop];
+			if (e.claims || e.statements) {
+				let statements = e.claims ? e.claims : e.statements;
+				for (prop of Object.keys(statements)) {
 
-					let pid = value[0].mainsnak.property;
-					for (delta of value) {
-						if (delta.hasOwnProperty('mainsnak') && delta.mainsnak) {
-							let thisvalue = new DocumentFragment();
-							let type = delta.mainsnak.snaktype;
-							renderStatements(delta.mainsnak, [], type, thisvalue, 'statement');
-							values.push(thisvalue);
-						}
-					}
-					let statement = templates.remark({
-						prop: templates.placeholder({
-							entity: pid,
-						}),
-						vals: values,
-					});
-					items.appendChild(statement);
-				}
-			}
-
-			if (e.claims) {
-				for (prop of Object.keys(e.claims)) {
-
-					let value = e.claims[prop];
+					let value = statements[prop];
 
 					let pid = value[0].mainsnak.property;
 					let label = templates.placeholder({
