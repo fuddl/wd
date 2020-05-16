@@ -174,14 +174,29 @@ function renderStatements(snak, references, type, target, scope) {
 		}
 		if (valueType === "commonsMedia") {
 			let name = encodeURIComponent(snak.datavalue.value);
-			target.appendChild(templates.picture({
-				srcSet: {
-					250: `http://commons.wikimedia.org/wiki/Special:FilePath/${ name }?width=250px`,
-					501: `http://commons.wikimedia.org/wiki/Special:FilePath/${ name }?width=501px`,
-					801: `http://commons.wikimedia.org/wiki/Special:FilePath/${ name }?width=801px`,
-					1068: `http://commons.wikimedia.org/wiki/Special:FilePath/${ name }?width=1068px`,
-				}
-			}));
+			if (name.match(/\.svg$/)) {
+				target.appendChild(templates.image({
+					src: `http://commons.wikimedia.org/wiki/Special:FilePath/${ name }`
+				}));
+			} else if (name.match(/\.(jpe?g|png|gif)$/)) {
+				target.appendChild(templates.picture({
+					srcSet: {
+						250: `http://commons.wikimedia.org/wiki/Special:FilePath/${ name }?width=250px`,
+						501: `http://commons.wikimedia.org/wiki/Special:FilePath/${ name }?width=501px`,
+						801: `http://commons.wikimedia.org/wiki/Special:FilePath/${ name }?width=801px`,
+						1068: `http://commons.wikimedia.org/wiki/Special:FilePath/${ name }?width=1068px`,
+					}
+				}));
+			} else if (name.match(/\.(wav|og[ga])$/)) {
+				target.appendChild(templates.audio({
+					src: `http://commons.wikimedia.org/wiki/Special:FilePath/${ name }`
+				}));
+			} else if (name.match(/\.webm$/)) {
+				target.appendChild(templates.video({
+					poster: `http://commons.wikimedia.org/wiki/Special:FilePath/${ name }?width=801px`,
+					src: `http://commons.wikimedia.org/wiki/Special:FilePath/${ name }`
+				}));
+			}
 		}
 	} else if(type === 'novalue') {
 		target.appendChild(document.createTextNode('—'));

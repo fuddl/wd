@@ -55,6 +55,34 @@ const templates = {
 
 		return tag;
 	},
+	image: (vars) => {
+		let tag = document.createElement('img');
+		tag.setAttribute('loading', 'lazy');
+
+		tag.setAttribute('src', vars.src);
+
+		return tag;
+	},
+	audio: (vars) => {
+		let tag = document.createElement('audio');
+		tag.setAttribute('controls', 'controls');
+		tag.setAttribute('preload', 'none');
+
+		tag.setAttribute('src', vars.src);
+		
+		return tag;
+	},
+	video: (vars) => {
+		let tag = document.createElement('video');
+		tag.setAttribute('controls', 'controls');
+
+		tag.setAttribute('controlslist', 'nofullscreen');
+		tag.setAttribute('preload', 'none');
+		tag.setAttribute('poster', vars.poster);
+		tag.setAttribute('src', vars.src);
+		
+		return tag;
+	},
 	footnoteRef: (vars) => {
 		let tag = document.createElement('a');
 

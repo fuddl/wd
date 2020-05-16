@@ -25,6 +25,11 @@ img {
   max-width: 100%;
 }
 
+audio,
+video {
+  width: 100%;
+}
+
 .placeholder {
   color: #eaecf0;
   white-space: break-word;
