@@ -1,3 +1,7 @@
+.ensign {
+	margin-bottom: 2em;
+}
+
 .ensign__title {
 	font-family: 'Linux Libertine','Georgia','Times',serif;
 	font-size: 1.7em;
@@ -10,7 +14,10 @@
 
 .ensign__description {
 	margin-top: 0;
-	margin-bottom: 2em;
+}
+
+.ensign__description--provisional {
+	opacity: .75;
 }
 
 .ensign__id {
@@ -36,4 +43,9 @@
 
 .ensign__id::after {
 	content: ')';
+}
+
+.ensign__description-form {
+	display: flex;
+  justify-content: stretch;
 }

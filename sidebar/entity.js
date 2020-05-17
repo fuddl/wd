@@ -1,10 +1,17 @@
 const lang = navigator.language.substr(0,2);
 
 if (window.location.search) {
-	let currentEntity = window.location.search.replace(/^\?/, '');
+	let currentEntity = window.location.search.match(/^\?(\w\d+)/, '')[1];
+	let nocache = window.location.search.match(/nocache/, '');
 	if (currentEntity.match(/[QM]\d+/)) {
-		updateView(currentEntity);
+		updateView(currentEntity, nocache === null);
 	}
+}
+
+async function getTokens() {
+	let response = await fetch('https://www.wikidata.org/w/api.php?action=query&meta=tokens&type=csrf&format=json');
+	let json = JSON.parse(await response.text());
+	return json.query.tokens.csrftoken;
 }
 
 function getLink(entityId) {
@@ -247,11 +254,11 @@ async function getAutodesc(id) {
 	}
 }
 
-function updateView(id) {
+function updateView(id, useCache = true) {
 	let content = document.getElementById('content');
 	content.innerHTML = '';
 	(async () => {
-		let entities = await wikidataGetEntity(id);
+		let entities = await wikidataGetEntity(id, useCache);
 
 		let refCounter = {};
 
@@ -262,14 +269,19 @@ function updateView(id) {
 			document.querySelector('title').innerText = getValueByLang(e, 'labels', e.title);
 			
 			let description = getValueByLang(e, 'descriptions', false);
+			let hasDescription = description != false;
 			if (!description) {
 				description = await getAutodesc(id);
 			}
 
 			wrapper.appendChild(templates.ensign({
+				revid: e.lastrevid,
 				id: id,
 				label: getValueByLang(e, 'labels', e.title),
-				description: description,
+				description: {
+					text: description,
+					provisional: !hasDescription
+				},
 			}));
 
 			let identifiers = document.createElement('div');
@@ -387,7 +399,7 @@ function updateView(id) {
 		Array.from(proxies).reduce((k, proxy) => {
 			(async () => {
 				let result = await sparqlQuery(proxy.getAttribute('data-query'));
-				if (result[0].hasOwnProperty('innerText')) {
+				if (result[0] && result[0].hasOwnProperty('innerText')) {
 					proxy.innerText = result[0].innerText.value;
 				}
 			})();

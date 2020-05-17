@@ -21,11 +21,30 @@ templates.ensign = (vars) => {
 	link.innerText = vars.id;
 	link.addEventListener('click', (e) => {
 		e.preventDefault();
+    const range = document.createRange();
+    range.selectNode(link);
+    window.getSelection().removeAllRanges();
+    window.getSelection().addRange(range);
 	});
 	id.appendChild(link);
 
+
+
 	description.classList.add('ensign__description');
-	description.innerText = vars.description;
+	if (vars.description.provisional) {
+		description.classList.add('ensign__description--provisional');
+
+		let descriptionEditFormAppended = false;
+		description.addEventListener('click', async () => {
+			if (!descriptionEditFormAppended) {
+				description.setAttribute('hidden', true);
+				let descriptionEditForm = await templates.ensignEditDescription(vars, description);
+				header.appendChild(descriptionEditForm);
+				descriptionEditFormAppended = true;
+			}
+		});
+	}
+	description.innerText = vars.description.text;
 
 	header.appendChild(title);
 	header.appendChild(space);
@@ -34,4 +53,95 @@ templates.ensign = (vars) => {
 	header.appendChild(style);
 
 	return header;
+}
+
+templates.ensignEditDescription = async (vars, description) => { 
+	let descriptionEditForm = document.createElement('form');
+	descriptionEditForm.setAttribute('method', 'post');
+	descriptionEditForm.setAttribute('action', 'https://www.wikidata.org/w/api.php');
+	descriptionEditForm.classList.add('ensign__description-form');
+
+	let token = await getTokens();
+
+	let inputs = {
+		'action': {
+			value: 'wbsetdescription',
+			type: 'hidden',
+		},
+		'format': {
+			value: 'json',
+			type: 'hidden',
+		},
+		'id': {
+			value: vars.id,
+			type: 'hidden',
+		},
+		'language': {
+			value: lang,
+			type: 'hidden',
+		},
+		'baserevid': {
+			value: vars.revid,
+			type: 'hidden',
+		},
+		'bot': {
+			value: false,
+			type: 'hidden',
+		},
+		'token': {
+	    value: token,
+		  type: 'hidden',
+		},
+		'errorformat': {
+			value: 'plaintext',
+			type: 'hidden',
+		},
+		'uselang': {
+			value: lang,
+			type: 'hidden',
+		},
+	};
+
+	let button = document.createElement('button');
+	button.innerText = '💾';
+
+	let valInput =  document.createElement('input');
+	valInput.setAttribute('name', 'value');
+	valInput.setAttribute('type', 'text');
+	valInput.setAttribute('value', vars.description.text);
+	descriptionEditForm.appendChild(valInput);
+
+  for (let [name, input] of Object.entries(inputs)) {
+		let newInput =  document.createElement('input');
+		newInput.setAttribute('name', name);
+		newInput.setAttribute('type', input.type);
+		newInput.setAttribute('value', input.value);
+		descriptionEditForm.appendChild(newInput);
+	}
+
+
+	descriptionEditForm.appendChild(button);
+
+	descriptionEditForm.addEventListener('submit', async function(e) {
+		e.preventDefault();
+		const formData = new FormData(descriptionEditForm);
+
+		let response = await fetch(descriptionEditForm.getAttribute('action'), {
+			method: 'post',
+			body: formData,
+		});
+
+		let json = JSON.parse(await response.text());
+		if (json.errors) {
+			valInput.setCustomValidity(json.errors['0']['*']);
+		}
+		if (json.success && json.success === 1) {
+			description.innerText = valInput.value;
+			description.classList.remove('ensign__description--provisional');
+			description.removeAttribute('hidden');
+			descriptionEditForm.setAttribute('hidden', true);
+		}
+	});
+	
+	return descriptionEditForm;
 }

@@ -80,3 +80,28 @@ sup {
   line-height: 1;
 }
 
+button {
+  background-color: #447ff5;
+  border-color: #447ff5;
+  color: white;
+  padding-top: 6px;
+  padding-bottom: 6px;
+  line-height: 1.28571429em;
+  border-style: solid;
+  border-width: 1px;
+  border-radius: 2px;
+  padding-left: 12px;
+  padding-right: 12px;
+  font-weight: bold;
+  font-size: 17px;
+}
+
+input {
+  height: 2.28571429em;
+  box-sizing: border-box;
+  padding: 6px 8px;
+  border-radius: 2px;
+  border: 1px solid #a2a9b1;
+  font-size: 16px;
+  flex-grow: 1;
+}
