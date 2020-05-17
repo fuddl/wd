@@ -21,6 +21,10 @@ a {
   hyphens: none;
 }
 
+[hidden] {
+  display: none !important;
+}
+
 img {
   max-width: 100%;
 }
