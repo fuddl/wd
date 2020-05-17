@@ -237,6 +237,16 @@ function renderStatements(snak, references, type, target, scope) {
 	}
 }
 
+async function getAutodesc(id) {
+	let response = await fetch('https://tools.wmflabs.org/autodesc/?q=' + id + '&lang=' + lang + '&mode=long&links=text&redlinks=&format=json');
+	let json = JSON.parse(await response.text());
+	if (!json.result.match(/<i>/)) {
+		return json.result;
+	} else {
+		return '???';
+	}
+}
+
 function updateView(id) {
 	let content = document.getElementById('content');
 	content.innerHTML = '';
@@ -251,10 +261,15 @@ function updateView(id) {
 			let wrapper = document.createElement('div');
 			document.querySelector('title').innerText = getValueByLang(e, 'labels', e.title);
 			
+			let description = getValueByLang(e, 'descriptions', false);
+			if (!description) {
+				description = await getAutodesc(id);
+			}
+
 			wrapper.appendChild(templates.ensign({
 				id: id,
 				label: getValueByLang(e, 'labels', e.title),
-				description: getValueByLang(e, 'descriptions', 'Wikidata entity'),
+				description: description,
 			}));
 
 			let identifiers = document.createElement('div');
