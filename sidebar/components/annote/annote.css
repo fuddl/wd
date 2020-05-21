@@ -1,7 +1,7 @@
 .annote {
 	font-size: .5em;
 	display: grid;
-	grid-template-columns: auto auto;
+	grid-template-columns: max-content auto;
 	line-height: 1em;
 	grid-gap: .5em 1em;
 }

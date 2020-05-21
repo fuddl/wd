@@ -99,7 +99,6 @@ function groupClaims(claims) {
 				'P451',  // unmarried partner
 				'P3342', // significant person
 				'P551',  // residence
-				'P551',  // residence
 			]
 		},
 		{

@@ -375,10 +375,12 @@ function updateView(id, useCache = true) {
 					});
 
 					let firstValue = value.find(x=>x!==undefined);
-					if (firstValue.mainsnak.snaktype === 'value' && firstValue.mainsnak.datatype !== "external-id") {
-						items.appendChild(statement);
-					} else {
-						identifiers.appendChild(statement);
+					if (firstValue) {
+						if (firstValue.mainsnak.snaktype === 'value' && firstValue.mainsnak.datatype !== "external-id") {
+							items.appendChild(statement);
+						} else {
+							identifiers.appendChild(statement);
+						}
 					}
 				}
 			}
