@@ -294,7 +294,7 @@ function updateView(id, useCache = true) {
 
 			if (e.claims || e.statements) {
 				let statements = e.claims ? e.claims : e.statements;
-				for (prop of Object.keys(statements)) {
+				for (prop of groupClaims(statements)) {
 
 					let value = statements[prop];
 
