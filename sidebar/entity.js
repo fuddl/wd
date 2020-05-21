@@ -350,7 +350,9 @@ function updateView(id, useCache = true) {
 										link: '#' + ref.hash,
 										title: listItem.innerText,
 									}));
-									footnoteStorage[ref.hash] = listItem;
+									footnoteStorage[ref.hash] = {
+										content: listItem,
+									};
 								}
 							}
 							renderStatements(delta.mainsnak, refs, type, thisvalue, 'statement');
@@ -384,14 +386,17 @@ function updateView(id, useCache = true) {
 		let footnoteNumber = 1;
 		Array.from(footnotes).reduce((k, footnote) => {
 			let footnoteId = footnote.getAttribute('href').substr(1);
-			footnote.innerText = footnoteNumber;
-			let referenceItem = footnoteStorage[footnoteId];
-			references.appendChild(referenceItem);
+			let referenceItem = footnoteStorage[footnoteId].content;
+			if (!footnoteStorage[footnoteId].number) {
+				references.appendChild(referenceItem);
+				footnoteStorage[footnoteId].number = footnoteNumber;
+				footnoteNumber++;
+			}
+			footnote.innerText = footnoteStorage[footnoteId].number;
 			content.appendChild(references);
 			footnote.addEventListener('mouseover', () => {
 				footnote.setAttribute('title', referenceItem.innerText);
 			});
-			footnoteNumber++;
 		}, 0);
 
 		let placeholders = content.querySelectorAll('.placeholder');
