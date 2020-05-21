@@ -27,11 +27,12 @@ browser.browserAction.onClicked.addListener((tab) => {
 	}
 	if (browser.sidebarAction) {
 		if (!tabStates[tid].sidebarOpen) {
+			console.log(tabStates[tid].mode);
 			if (tabStates[tid].mode === 'show_entity') {
 				(async () => {
 					pushEnitiyToSidebar(tabStates[tid].entity, tid);
 				})();
-			} else if(data.type === 'propose_match') {
+			} else if(tabStates[tid].mode === 'propose_match') {
 				(async () => {
 					pushProposalToSidebar(tabStates[tid].proposals, tid);
 				})();

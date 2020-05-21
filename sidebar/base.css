@@ -84,7 +84,7 @@ sup {
   line-height: 1;
 }
 
-button {
+form button {
   background-color: #447ff5;
   border-color: #447ff5;
   color: white;
@@ -100,7 +100,7 @@ button {
   font-size: 17px;
 }
 
-input {
+form input {
   height: 2.28571429em;
   box-sizing: border-box;
   padding: 6px 8px;

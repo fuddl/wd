@@ -1,4 +1,5 @@
 const lang = navigator.language.substr(0,2);
+const footnoteStorage = {};
 
 if (window.location.search) {
 	let currentEntity = window.location.search.match(/^\?(\w\d+)/, '')[1];
@@ -286,11 +287,9 @@ function updateView(id, useCache = true) {
 
 			let identifiers = document.createElement('div');
 			let items = document.createElement('div');
-			let references = document.createElement('ol');
 
 			wrapper.appendChild(items);
 			wrapper.appendChild(identifiers);
-			wrapper.appendChild(references);
 			content.appendChild(wrapper);
 
 			if (e.claims || e.statements) {
@@ -323,10 +322,8 @@ function updateView(id, useCache = true) {
 									if (typeof refCounter[ref.hash] === 'undefined') {
 										listItem = document.createElement('li');
 										refCounter[ref.hash] = {
-											index: Object.keys(refCounter).length + 1,
 											item: listItem,
 										}
-										references.appendChild(listItem);
 										for (key in ref.snaks) {
 											for (refthing of ref.snaks[key]) {
 												if (refthing.datavalue) {
@@ -347,11 +344,13 @@ function updateView(id, useCache = true) {
 									} else {
 										listItem = refCounter[ref.hash].item;
 									}
-									refs.push(templates.footnoteRef({
-										text: refCounter[ref.hash].index,
-										link: '#' + ref.hash,
-									}));
 									listItem.setAttribute('id', ref.hash);
+									refs.push(templates.footnoteRef({
+										text: '▐',
+										link: '#' + ref.hash,
+										title: listItem.innerText,
+									}));
+									footnoteStorage[ref.hash] = listItem;
 								}
 							}
 							renderStatements(delta.mainsnak, refs, type, thisvalue, 'statement');
@@ -376,6 +375,25 @@ function updateView(id, useCache = true) {
 				}
 			}
 		}
+
+
+		let footnotes = content.querySelectorAll('.footnote');
+
+		let references = document.createElement('ol');
+
+		let footnoteNumber = 1;
+		Array.from(footnotes).reduce((k, footnote) => {
+			let footnoteId = footnote.getAttribute('href').substr(1);
+			footnote.innerText = footnoteNumber;
+			let referenceItem = footnoteStorage[footnoteId];
+			references.appendChild(referenceItem);
+			content.appendChild(references);
+			footnote.addEventListener('mouseover', () => {
+				footnote.setAttribute('title', referenceItem.innerText);
+			});
+			footnoteNumber++;
+		}, 0);
+
 		let placeholders = content.querySelectorAll('.placeholder');
 
 		Array.from(placeholders).reduce((k, placeholder) => {

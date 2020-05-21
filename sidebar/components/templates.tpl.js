@@ -86,8 +86,10 @@ const templates = {
 	footnoteRef: (vars) => {
 		let tag = document.createElement('a');
 
+		tag.classList.add('footnote');
 		tag.setAttribute('href', vars.link);
-		tag.innerText = vars.text;
+		//tag.setAttribute('title', vars.title);
+		tag.innerText = '*';
 
 		return tag;
 	},

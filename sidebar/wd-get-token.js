@@ -18,3 +18,10 @@ async function wikidataGetEditToken(query, lang) {
 		throw ['Fetch Error :-S', error];
 	}
 }
+
+
+async function getTokens() {
+	let response = await fetch('https://www.wikidata.org/w/api.php?action=query&meta=tokens&type=csrf&format=json');
+	let json = JSON.parse(await response.text());
+	return json.query.tokens.csrftoken;
+}

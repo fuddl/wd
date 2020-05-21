@@ -16,6 +16,7 @@
 	font-family: inherit;
 	display: block;
 	width: 100%;
+	box-sizing: border-box;
 }
 
 .join__id {
