@@ -182,11 +182,11 @@ function renderStatements(snak, references, type, target, scope) {
 		}
 		if (valueType === "commonsMedia") {
 			let name = encodeURIComponent(snak.datavalue.value);
-			if (name.match(/\.svg$/)) {
+			if (name.match(/\.svg$/i)) {
 				target.appendChild(templates.image({
 					src: `http://commons.wikimedia.org/wiki/Special:FilePath/${ name }`
 				}));
-			} else if (name.match(/\.(jpe?g|png|gif)$/)) {
+			} else if (name.match(/\.(jpe?g|png|gif)$/i)) {
 				target.appendChild(templates.picture({
 					srcSet: {
 						250: `http://commons.wikimedia.org/wiki/Special:FilePath/${ name }?width=250px`,
@@ -195,11 +195,11 @@ function renderStatements(snak, references, type, target, scope) {
 						1068: `http://commons.wikimedia.org/wiki/Special:FilePath/${ name }?width=1068px`,
 					}
 				}));
-			} else if (name.match(/\.(wav|og[ga])$/)) {
+			} else if (name.match(/\.(wav|og[ga])$/i)) {
 				target.appendChild(templates.audio({
 					src: `http://commons.wikimedia.org/wiki/Special:FilePath/${ name }`
 				}));
-			} else if (name.match(/\.webm$/)) {
+			} else if (name.match(/\.webm$/i)) {
 				target.appendChild(templates.video({
 					poster: `http://commons.wikimedia.org/wiki/Special:FilePath/${ name }?width=801px`,
 					src: `http://commons.wikimedia.org/wiki/Special:FilePath/${ name }`
@@ -304,14 +304,19 @@ function updateView(id, useCache = true) {
 					});
 
 					let values = [];
-					// @todo filter normal when preferred is present
+					let hasPreferred = false;
 					for (delta of value) {
-						if (delta.rank == "deprecated") {
-							delete delta;
+						if (delta.rank == "preferred") {
+							hasPreferred = true;
+						}
+					}
+					for (const [key, delta] of Object.entries(value)) {
+						if (delta.rank == "deprecated" || (delta.rank == "normal" && hasPreferred)) {
+							delete value[key];
 						}
 					}
 					for (delta of value) {
-						if (delta.hasOwnProperty('mainsnak') && delta.mainsnak) {
+						if (delta && delta.hasOwnProperty('mainsnak') && delta.mainsnak) {
 							let thisvalue = new DocumentFragment();
 							let type = delta.mainsnak.snaktype;
 							let refs = [];
@@ -369,7 +374,8 @@ function updateView(id, useCache = true) {
 						vals: values,
 					});
 
-					if (value[0].mainsnak.snaktype === 'value' && value[0].mainsnak.datatype !== "external-id") {
+					let firstValue = value.find(x=>x!==undefined);
+					if (firstValue.mainsnak.snaktype === 'value' && firstValue.mainsnak.datatype !== "external-id") {
 						items.appendChild(statement);
 					} else {
 						identifiers.appendChild(statement);
