@@ -15,35 +15,6 @@ async function getTokens() {
 	return json.query.tokens.csrftoken;
 }
 
-function getLink(entityId) {
-	let ns = entityId.charAt(0);
-	let prefixes = {
-		Q: 'https://www.wikidata.org/wiki/',
-		P: 'https://www.wikidata.org/wiki/Property:',
-		L: 'https://www.wikidata.org/wiki/Lexeme:',
-	}
-	return prefixes[ns] + entityId;
-}
-
-function getValueByLang(e, key, fallback) {
-	if (!fallback) {
-		let fallback = '';
-	}
-	if (e.hasOwnProperty(key)) {
-		if (e[key].hasOwnProperty(lang)) {
-			if (e[key][lang].hasOwnProperty('value')) {
-				return e[key][lang].value;
-			} else {
-				return fallback;
-			}
-		} else {
-			return fallback;
-		}
-	} else {
-		return fallback;
-	}
-}
-
 function dateToString(value) {
 	let wiso = value.time;
 	let prec = value.precision;
@@ -407,23 +378,7 @@ function updateView(id, useCache = true) {
 			});
 		}, 0);
 
-		let placeholders = content.querySelectorAll('.placeholder');
-
-		Array.from(placeholders).reduce((k, placeholder) => {
-			(async () => {
-				let id = placeholder.getAttribute('data-entity');
-				let entity = await wikidataGetEntity(id);
-				let link = document.createElement('a');
-				link.setAttribute('href', getLink(id));
-				link.setAttribute('title', getValueByLang(entity[id], 'descriptions'));
-				link.innerText = getValueByLang(entity[id], 'labels', id);
-				link.addEventListener('click', (e) => {
-					e.preventDefault();
-					window.location = '?' + id;
-				});
-				placeholder.parentNode.replaceChild(link, placeholder);
-			})();
-		}, 0);
+		resolvePlaceholders();
 
 		let proxies = content.querySelectorAll('.proxy');
 

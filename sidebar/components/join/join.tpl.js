@@ -50,16 +50,14 @@ templates.join = (vars) => {
 					item.appendChild(desc);
 				}
 				proposals.appendChild(item);
+				console.log(suggestion);
 				item.setAttribute('data-entity', suggestion.title);
 				item.setAttribute('data-label', suggestion.label);
 				item.addEventListener('click', async () => {
 					humanField.value = item.getAttribute('data-label');
 					idField.value = item.getAttribute('data-entity');
 					proposals.innerHTML = '';
-					let itemid = item.getAttribute('data-entity');
-					let entity = await wikidataGetEntity(itemid);
-					console.log(entity[itemid]);
-					await setClaim(entity[itemid], vars.prop, vars.value)
+					wrapper.setAttribute('data-selected-entity', item.getAttribute('data-entity'))
 				});
 			}
 		}

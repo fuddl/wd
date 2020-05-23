@@ -27,7 +27,6 @@ browser.browserAction.onClicked.addListener((tab) => {
 	}
 	if (browser.sidebarAction) {
 		if (!tabStates[tid].sidebarOpen) {
-			console.log(tabStates[tid].mode);
 			if (tabStates[tid].mode === 'show_entity') {
 				(async () => {
 					pushEnitiyToSidebar(tabStates[tid].entity, tid);

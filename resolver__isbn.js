@@ -58,7 +58,6 @@ resolvers.isbn = {
 			  FILTER(?plain_isbn in ("${ plain }")) 
 			}
 		`;
-		console.log(query);
 		return sparqlQuery(query);
 	},
 };
