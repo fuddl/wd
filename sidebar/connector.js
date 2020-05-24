@@ -21,6 +21,7 @@ async function setClaim(subjectId, property, value) {
 		method: 'post',
 		body: new URLSearchParams(data),
 	});
+
   return JSON.parse(await response.text());
 }
 
@@ -49,11 +50,11 @@ content.appendChild(direction);
 content.appendChild(labelField);
 
 let saveButton = document.createElement('button');
-let form = document.createElement('form');
+let form = document.createElement('div');
 saveButton.setAttribute('disabled', 'disabled');
 saveButton.innerText = '💾';
 
-form.style.marginTop = '1em';
+form.classList.add('submit-actions');
 
 form.appendChild(saveButton);
 content.appendChild(form);
@@ -62,7 +63,6 @@ let selectedEntity = '';
 
 var observer = new MutationObserver(function(mutations) {
   mutations.forEach(function(mutation) {
-  	console.log(saveButton);
     if (mutation.type == "attributes") {
       if (labelField.hasAttribute('data-selected-entity')) {
       	saveButton.removeAttribute('disabled');

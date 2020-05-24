@@ -84,7 +84,12 @@ sup {
   line-height: 1;
 }
 
-form button {
+.submit-actions {
+  margin-top: 1em;
+}
+
+form button,
+.submit-actions button {
   background-color: #447ff5;
   border-color: #447ff5;
   color: white;
