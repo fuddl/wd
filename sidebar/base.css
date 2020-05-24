@@ -4,7 +4,6 @@ html {
 
 body {
 	color: #222222;
-	margin: 1em;
 	font-size: 14px;
   font-family:-apple-system,'BlinkMacSystemFont','Segoe UI','Roboto','Lato','Helvetica','Arial',sans-serif;
   user-select: text;
@@ -113,4 +112,20 @@ form input {
   border: 1px solid #a2a9b1;
   font-size: 16px;
   flex-grow: 1;
+}
+
+html {
+  scroll-snap-type: y mandatory;
+}
+
+#content {
+  padding: 1em;
+  min-height: 100vh;
+  scroll-snap-align: start;
+}
+
+#contexual {
+  height: 10em;
+  scroll-snap-align: start;
+  border: 1px solid red;
 }
