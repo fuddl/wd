@@ -50,7 +50,6 @@ templates.join = (vars) => {
 					item.appendChild(desc);
 				}
 				proposals.appendChild(item);
-				console.log(suggestion);
 				item.setAttribute('data-entity', suggestion.title);
 				item.setAttribute('data-label', suggestion.label);
 				item.addEventListener('click', async () => {
@@ -63,7 +62,7 @@ templates.join = (vars) => {
 		}
 	}
 
-	humanField.addEventListener('change', updateList);
+	//humanField.addEventListener('change', updateList);
 	humanField.addEventListener('focus', updateList);
 	humanField.addEventListener('keyup', updateList);
 

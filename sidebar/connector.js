@@ -49,10 +49,14 @@ content.appendChild(direction);
 content.appendChild(labelField);
 
 let saveButton = document.createElement('button');
+let form = document.createElement('form');
 saveButton.setAttribute('disabled', 'disabled');
 saveButton.innerText = '💾';
 
-content.appendChild(saveButton);
+form.style.marginTop = '1em';
+
+form.appendChild(saveButton);
+content.appendChild(form);
 
 let selectedEntity = '';
 
