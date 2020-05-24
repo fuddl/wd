@@ -1,4 +1,4 @@
-(async () => {
+async function findApplicables(location) {
 	let applicables = [];
 
 	let foundMatch = false;
@@ -27,4 +27,12 @@
 			}
 		});
 	}
-})();
+};
+
+findApplicables(location);
+
+browser.runtime.onMessage.addListener(function(msg, sender, sendResponse) {
+  if (msg.action == 'find_applicables') {
+    findApplicables(location);
+  }
+});

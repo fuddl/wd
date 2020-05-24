@@ -102,3 +102,8 @@ browser.runtime.onMessage.addListener(
 		}
 		return Promise.resolve('done');
 });
+
+browser.webNavigation.onHistoryStateUpdated.addListener(function(e) {
+	console.log(e.tabId);
+	browser.tabs.sendMessage(e.tabId, {action: "find_applicables"});
+});
