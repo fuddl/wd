@@ -217,7 +217,7 @@ function renderStatements(snak, references, type, target, scope) {
 }
 
 async function getAutodesc(id) {
-	let response = await fetch('https://tools.wmflabs.org/autodesc/?q=' + id + '&lang=' + lang + '&mode=long&links=text&redlinks=&format=json');
+	let response = await fetch('https://tools.wmflabs.org/autodesc/?q=' + id + '&lang=' + lang + '&mode=short&links=text&redlinks=&format=json');
 	let json = JSON.parse(await response.text());
 	if (!json.result.match(/<i>/)) {
 		return json.result;
