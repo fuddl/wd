@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Wikidata",
-  "version": "0.29",
+  "version": "0.31",
   "description": "Display information from wikidata.",
   "icons": {
     "48": "icons/wd.svg",
@@ -9,7 +9,7 @@
   },  
   "browser_action": {
     "default_icon": "icons/inactive.svg",
-    "default_title": "This thing on wikidata."
+    "default_title": "Wikidata"
   },
   "sidebar_action": {
     "default_icon": "icons/wd.svg",

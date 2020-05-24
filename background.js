@@ -59,6 +59,11 @@ browser.runtime.onMessage.addListener(
 				path: "icons/wd.svg",
 				tabId: sender.tab.id,
 			});
+			browser.browserAction.setTitle({
+				title: data.wdEntityId,
+				tabId: sender.tab.id,
+			});
+
 			(async () => {
 				if (await browser.sidebarAction.isOpen({})) {
 					pushEnitiyToSidebar(data.wdEntityId, sender.tab.id);
@@ -72,6 +77,12 @@ browser.runtime.onMessage.addListener(
 				path: "icons/halfactive.svg",
 				tabId: sender.tab.id,
 			});
+
+			browser.browserAction.setTitle({
+				title: data.proposals.ids[0][0].value,
+				tabId: sender.tab.id,
+			});
+
 			(async () => {
 				if (await browser.sidebarAction.isOpen({})) {
 					pushProposalToSidebar(data.proposals, sender.tab.id);
@@ -82,6 +93,10 @@ browser.runtime.onMessage.addListener(
 
 			browser.browserAction.setIcon({
 				path: "icons/inactive.svg",
+				tabId: sender.tab.id,
+			});
+			browser.browserAction.setTitle({
+				title: 'Wikidata',
 				tabId: sender.tab.id,
 			});
 		}
