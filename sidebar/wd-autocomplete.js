@@ -1,5 +1,5 @@
 async function wikidataAutocomplete(query, lang) {
-	let url = `https://www.wikidata.org/w/api.php?action=wbsearchentities&language=${ lang }&format=json&search=${ query }`;
+	let url = `https://www.wikidata.org/w/api.php?action=wbsearchentities&language=${ lang }&format=json&search=${ query }&limit=50`;
 	try {
 		const response = await fetch(url);
 

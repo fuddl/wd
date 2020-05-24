@@ -110,6 +110,7 @@ function groupClaims(claims) {
 				'P1441',  // present in work
 				'P4584',  // first appearance
 				'P840',   // narrative location
+				'P2913',  // date depicted
 			]
 		},
 		{
