@@ -19,6 +19,7 @@
 
 .remark__verb {
 	grid-column: 1;
+	grid-row: span 2;
 	font-weight: bold;
 }
 

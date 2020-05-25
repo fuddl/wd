@@ -16,7 +16,7 @@ async function openEnitiyInNewTab(id) {
 function pushProposalToSidebar(proposals, tid) {
 	browser.sidebarAction.setPanel({
 		tabId: tid,
-		panel: browser.runtime.getURL('sidebar/connector.html') + '?' + JSON.stringify(proposals),
+		panel: browser.runtime.getURL('sidebar/connector.html') + '?' + encodeURIComponent(JSON.stringify(proposals)),
 	});
 }
 

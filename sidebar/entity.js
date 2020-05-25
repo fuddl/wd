@@ -4,7 +4,7 @@ const footnoteStorage = {};
 if (window.location.search) {
 	let currentEntity = window.location.search.match(/^\?(\w\d+)/, '')[1];
 	let nocache = window.location.search.match(/nocache/, '');
-	if (currentEntity.match(/[QM]\d+/)) {
+	if (currentEntity.match(/[QMPL]\d+/)) {
 		updateView(currentEntity, nocache === null);
 	}
 }
