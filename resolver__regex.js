@@ -7,6 +7,7 @@ resolvers.regex = {
 		P436: /^https:\/\/musicbrainz\.org\/release-group\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/,
 		P724: /^https:\/\/archive\.org\/details\/([0-9A-Za-z@\._-]+)/,
 		P2969: /^https:\/\/www\.goodreads\.com\/book\/show\/(\d+)/,
+		P6327: /^https:\/\/www\.goodreads\.com\/characters\/(\d+)/,
 	},
 	applicable: async function(location) {
 		for (prop in this.patterns) {
