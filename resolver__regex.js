@@ -8,6 +8,7 @@ resolvers.regex = {
 		P724: /^https:\/\/archive\.org\/details\/([0-9A-Za-z@\._-]+)/,
 		P2969: /^https:\/\/www\.goodreads\.com\/book\/show\/(\d+)/,
 		P6327: /^https:\/\/www\.goodreads\.com\/characters\/(\d+)/,
+		P1651: /^https:\/\/www\.youtube\.com\/watch\?v=([-_0-9A-Za-z]{11})/,
 	},
 	applicable: async function(location) {
 		for (prop in this.patterns) {

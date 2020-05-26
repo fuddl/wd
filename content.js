@@ -24,7 +24,12 @@ async function findApplicables(location) {
 				ids: applicables,
 				titles: findTitles(),
 				desc: findDescriptions(),
-			}
+				source: {
+					url: location.toString(),
+					title: document.querySelector('title').innerText,
+					lang: document.querySelector('html').lang,
+				}
+			},
 		});
 	}
 };

@@ -105,6 +105,10 @@ form button,
   font-size: 17px;
 }
 
+button[disabled] {
+  opacity: .5;
+}
+
 form input {
   height: 2.28571429em;
   box-sizing: border-box;

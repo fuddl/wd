@@ -25,6 +25,67 @@ async function setClaim(subjectId, property, value) {
   return JSON.parse(await response.text());
 }
 
+async function addURLReference(claimId, lastrevid, source) {
+	let token = await getTokens();
+	let now = new Date();
+
+	snaks = {
+	  "P854": [{
+      "snaktype": "value",
+      "property": "P854",
+      "datavalue": {
+        "value": source.url,
+        "type": "string"
+      },
+      "datatype": "url"
+	  }],
+	  "P1476": [{
+      "snaktype": "value",
+      "property": "P1476",
+      "datavalue": {
+        "value": {
+          "text": source.title,
+          "language": source.lang ? source.lang : 'zxx',
+        },
+        "type": "monolingualtext"
+      },
+      "datatype": "string"
+	  }],
+	  "P813": [{
+      "snaktype": "value",
+      "property": "P813",
+      "datavalue": {
+        "type": "time",
+        "value": {
+          "after": 0,
+          "before": 0,
+          "calendarmodel": "http://www.wikidata.org/entity/Q1985727",
+          "precision": 11,
+          "time": `+${ now.toISOString().substr(0,10) }T00:00:00Z`,
+          "timezone": 0
+        }
+      }
+    }]
+	};
+
+	let data = new FormData();
+	data.append('action', 'wbsetreference');
+	data.append('statement', claimId);
+	data.append('snaks', JSON.stringify(snaks));
+	data.append('summary', 'added with Wikidata for Firefox');
+	data.append('token', token);
+	data.append('baserevid', lastrevid);
+	data.append('bot', '1');
+	data.append('format', "json");
+
+	let response = await fetch('https://www.wikidata.org/w/api.php', {
+		method: 'post',
+		body: new URLSearchParams(data),
+	});
+
+  return JSON.parse(await response.text());
+}
+
 let preview = templates.remark({
 	prop: templates.placeholder({
 		entity: proposals.ids[0][0].prop,
@@ -77,11 +138,15 @@ observer.observe(labelField, {
 });
 
 saveButton.addEventListener('click', async function() {
-	if (selectedEntity) {
+	if (selectedEntity && !saveButton.hasAttribute('disabled')) {
 		saveButton.setAttribute('disabled', 'disabled');
 		let answer = await setClaim(selectedEntity, proposals.ids[0][0].prop, proposals.ids[0][0].value);
 		if (answer.success && answer.success == 1) {
-			window.location = 'entity.html?' + selectedEntity;
+			let answer2 = await addURLReference(answer.claim.id, answer.pageinfo.lastrevid, proposals.source);
+			saveButton.removeAttribute('disabled');
+			if (answer.success && answer.success == 1) {
+				window.location = 'entity.html?' + selectedEntity;
+			} 
 		} 
 	}
 });
