@@ -38,7 +38,6 @@ templates.join = (vars) => {
 	let updateList = async () => {
 		let suggestions = await wikidataAutocomplete(humanField.value, 'en');
 		proposals.innerHTML = '';
-		console.log(suggestions);
 
 		suggestions.push({
 			label: humanField.value,
@@ -52,11 +51,14 @@ templates.join = (vars) => {
 				item.setAttribute('tabindex', '0');
 				item.classList.add('join__proposal');
 				item.innerText = suggestion.label;
-				if (suggestion.description) {
-					let desc = document.createElement('div');
-					desc.innerText = suggestion.description;
-					item.appendChild(desc);
+				let desc = document.createElement('div');
+				item.appendChild(desc);
+				desc.classList.add('join__proposal__desc');
+				desc.innerText = suggestion.description ?? '█████ █ ██████ ████ ████';
+				if (!suggestion.description) {
+					desc.classList.add('join__proposal__desc--placeholder');
 				}
+
 				proposals.appendChild(item);
 				item.setAttribute('data-entity', suggestion.title);
 				item.setAttribute('data-label', suggestion.label);
@@ -68,7 +70,10 @@ templates.join = (vars) => {
 					wrapper.setAttribute('data-selected-label', item.getAttribute('data-label'))
 				});
 			}
-
+		}
+		for (placeholder of proposals.querySelectorAll('.join__proposal__desc--placeholder')) {	
+			let entityWithoutDesc = placeholder.parentNode.getAttribute('data-entity');
+			placeholder.innerText = await getAutodesc(entityWithoutDesc);
 		}
 	}
 

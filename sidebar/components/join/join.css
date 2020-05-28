@@ -82,3 +82,7 @@
 	color: white;
 	outline: none;
 }
+
+.join__proposal__desc--placeholder {
+	opacity: .5;
+}
