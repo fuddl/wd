@@ -9,6 +9,10 @@ resolvers.regex = {
 		P2969: /^https:\/\/www\.goodreads\.com\/book\/show\/(\d+)/,
 		P6327: /^https:\/\/www\.goodreads\.com\/characters\/(\d+)/,
 		P1651: /^https:\/\/www\.youtube\.com\/watch\?v=([-_0-9A-Za-z]{11})/,
+		P1821: /^https:\/\/\w+\.openfoodfacts\.org\/category\/((?:[a-z]{2,3}:)?[a-z-]+)/,
+		P5930: /^https:\/\/\w+\.openfoodfacts\.org\/ingredient\/((?:[a-z]{2,3}:)?[a-z-]+)/,
+		P2397: /^https:\/\/\w+\.youtube\.com\/channel\/(UC[-_0-9A-Za-z]{21}[AQgw])/,
+		P4198: /^https:\/\/play\.google\.com\/(?:store\/music\/artist\?id=|music\/listen\#\/(?:wst\/)?artist\/)(([A-Z]|[a-z]|[0-9]){27})/,
 	},
 	applicable: async function(location) {
 		for (prop in this.patterns) {

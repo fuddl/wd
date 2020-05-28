@@ -103,6 +103,6 @@ browser.runtime.onMessage.addListener(
 		return Promise.resolve('done');
 });
 
-browser.webNavigation.onDOMContentLoaded.addListener(function(e) {
+browser.webNavigation.onHistoryStateUpdated.addListener(function(e) {
 	browser.tabs.sendMessage(e.tabId, {action: "find_applicables"});
 });

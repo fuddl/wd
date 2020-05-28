@@ -41,3 +41,11 @@ browser.runtime.onMessage.addListener(function(msg, sender, sendResponse) {
     findApplicables(location);
   }
 });
+
+window.onpopstate = function(event) {
+  findApplicables(location);
+};
+
+window.addEventListener('hashchange', function() {
+  findApplicables(location);
+}, false);
