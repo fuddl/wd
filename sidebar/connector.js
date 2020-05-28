@@ -1,6 +1,33 @@
 let proposals = JSON.parse(decodeURIComponent(window.location.search.replace(/^\?/, '')));
 let content = document.getElementById('content');
 
+async function createEntity(label, lang) {
+	let token = await getTokens();
+
+	let labels = { labels: {} };
+	labels.labels[lang] = {
+		"language": lang,
+		"value": label,
+	};
+
+	let data = new FormData();
+	data.append('action', 'wbeditentity');
+	data.append('new', 'item');
+	data.append('data', JSON.stringify(labels));
+
+	data.append('summary', 'created with Wikidata for Firefox');
+	data.append('token', token);
+	data.append('bot', '1');
+	data.append('format', "json");
+
+	let response = await fetch('https://www.wikidata.org/w/api.php', {
+		method: 'post',
+		body: new URLSearchParams(data),
+	});
+
+  return JSON.parse(await response.text());
+}
+
 async function setClaim(subjectId, property, value) {
 	let token = await getTokens();
 	let subject = await wikidataGetEntity(subjectId);
@@ -140,6 +167,13 @@ observer.observe(labelField, {
 saveButton.addEventListener('click', async function() {
 	if (selectedEntity && !saveButton.hasAttribute('disabled')) {
 		saveButton.setAttribute('disabled', 'disabled');
+
+		if (selectedEntity === '🆕') {
+			let lang = navigator.language.substr(0,2);;
+			let createAnswer = await createEntity(labelField.getAttribute('data-selected-label'), lang);
+			selectedEntity = createAnswer.entity.id;
+		}
+
 		let answer = await setClaim(selectedEntity, proposals.ids[0][0].prop, proposals.ids[0][0].value);
 		if (answer.success && answer.success == 1) {
 			let answer2 = await addURLReference(answer.claim.id, answer.pageinfo.lastrevid, proposals.source);

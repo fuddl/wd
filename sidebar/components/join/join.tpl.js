@@ -18,7 +18,7 @@ templates.join = (vars) => {
 	humanField.setAttribute('type', 'text');
 	idField.classList.add('join__id');
 	idField.placeholder = '???';
-	idField.setAttribute('pattern', `[A-Z]\\d+`);
+	idField.setAttribute('pattern', `(🆕|[A-Z]\\d+)`);
 
 	let proposalId = 'join-proposals-' + joinCounter;
 
@@ -38,6 +38,14 @@ templates.join = (vars) => {
 	let updateList = async () => {
 		let suggestions = await wikidataAutocomplete(humanField.value, 'en');
 		proposals.innerHTML = '';
+		console.log(suggestions);
+
+		suggestions.push({
+			label: humanField.value,
+			title: '🆕',
+			description: '🆕',
+		});
+
 		if (suggestions) { 
 			for (suggestion of suggestions) {
 				let item = document.createElement('button');
@@ -57,8 +65,10 @@ templates.join = (vars) => {
 					idField.value = item.getAttribute('data-entity');
 					proposals.innerHTML = '';
 					wrapper.setAttribute('data-selected-entity', item.getAttribute('data-entity'))
+					wrapper.setAttribute('data-selected-label', item.getAttribute('data-label'))
 				});
 			}
+
 		}
 	}
 
