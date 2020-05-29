@@ -54,7 +54,7 @@ templates.join = (vars) => {
 				let desc = document.createElement('div');
 				item.appendChild(desc);
 				desc.classList.add('join__proposal__desc');
-				desc.innerText = suggestion.description ?? '█████ █ ██████ ████ ████';
+				desc.innerText = suggestion.description ? suggestion.description : '█████ █ ██████ ████ ████';
 				if (!suggestion.description) {
 					desc.classList.add('join__proposal__desc--placeholder');
 				}
