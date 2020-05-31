@@ -49,3 +49,16 @@ window.onpopstate = function(event) {
 window.addEventListener('hashchange', function() {
   findApplicables(location);
 }, false);
+
+let head = document.querySelector('head');
+
+let title = head.querySelector('title').innerText;
+let titleObserver = new MutationObserver(function() {
+  let newTitle = head.querySelector('title').innerText;
+	if (newTitle != title) {
+		findApplicables(location);
+		title = newTitle;
+	}
+});
+
+titleObserver.observe(head, { characterData: true });
