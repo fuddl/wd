@@ -18,7 +18,7 @@ templates.join = (vars) => {
 	humanField.setAttribute('type', 'text');
 	idField.classList.add('join__id');
 	idField.placeholder = '???';
-	idField.setAttribute('pattern', `(🆕|[A-Z]\\d+)`);
+	idField.setAttribute('pattern', `(CREATE|[A-Z]\\d+)`);
 
 	let proposalId = 'join-proposals-' + joinCounter;
 
@@ -41,8 +41,8 @@ templates.join = (vars) => {
 
 		suggestions.push({
 			label: humanField.value,
-			title: '🆕',
-			description: '🆕',
+			title: 'CREATE',
+			description: 'CREATE',
 		});
 
 		if (suggestions) { 

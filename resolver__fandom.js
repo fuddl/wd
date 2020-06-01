@@ -28,7 +28,7 @@ resolvers.fandom = {
 		let id = [
 			parts[6] ? parts[6] + '.' : '',
 			parts[1] + ':',
-			parts[7],
+			decodeURIComponent(parts[7]),
 		].join('');
 		return id;
 	},

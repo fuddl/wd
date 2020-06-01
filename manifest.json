@@ -26,6 +26,9 @@
   "background": {
     "scripts": [
       "sqarql-query.js",
+      "wd-get-entity.js",
+      "sidebar/wd-get-token.js",
+      "background__add-to-wikidata.js",
       "background.js"
     ]
   },

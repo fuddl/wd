@@ -14,6 +14,7 @@ async function openEnitiyInNewTab(id) {
 }
 
 function pushProposalToSidebar(proposals, tid) {
+	proposals.fromTab = tid;
 	browser.sidebarAction.setPanel({
 		tabId: tid,
 		panel: browser.runtime.getURL('sidebar/connector.html') + '?' + encodeURIComponent(JSON.stringify(proposals)),
@@ -49,56 +50,62 @@ browser.browserAction.onClicked.addListener((tab) => {
 
 browser.runtime.onMessage.addListener(
 	(data, sender) => {
-		if (!tabStates[sender.tab.id]) {
-			tabStates[sender.tab.id] = {};
-		}
-		if (data.type === 'match_event') {
-			tabStates[sender.tab.id].mode = 'show_entity';
-			tabStates[sender.tab.id].entity = data.wdEntityId;
-			browser.browserAction.setIcon({
-				path: "icons/wd.svg",
-				tabId: sender.tab.id,
-			});
-			browser.browserAction.setTitle({
-				title: data.wdEntityId,
-				tabId: sender.tab.id,
-			});
+		if (sender.tab) {
+			if (!tabStates[sender.tab.id]) {
+				tabStates[sender.tab.id] = {};
+			}
+			if (data.type === 'match_event') {
+				tabStates[sender.tab.id].mode = 'show_entity';
+				tabStates[sender.tab.id].entity = data.wdEntityId;
+				browser.browserAction.setIcon({
+					path: "icons/wd.svg",
+					tabId: sender.tab.id,
+				});
+				browser.browserAction.setTitle({
+					title: data.wdEntityId,
+					tabId: sender.tab.id,
+				});
 
-			(async () => {
-				if (await browser.sidebarAction.isOpen({})) {
-					pushEnitiyToSidebar(data.wdEntityId, sender.tab.id);
-				}
-			})();
-		} else if(data.type === 'match_proposal') {
-			tabStates[sender.tab.id].mode = 'propose_match';
-			tabStates[sender.tab.id].proposals = data.proposals;
+				(async () => {
+					if (await browser.sidebarAction.isOpen({})) {
+						pushEnitiyToSidebar(data.wdEntityId, sender.tab.id);
+					}
+				})();
+			} else if(data.type === 'match_proposal') {
+				tabStates[sender.tab.id].mode = 'propose_match';
+				tabStates[sender.tab.id].proposals = data.proposals;
 
-			browser.browserAction.setIcon({
-				path: "icons/halfactive.svg",
-				tabId: sender.tab.id,
-			});
+				browser.browserAction.setIcon({
+					path: "icons/halfactive.svg",
+					tabId: sender.tab.id,
+				});
 
-			browser.browserAction.setTitle({
-				title: data.proposals.ids[0][0].value,
-				tabId: sender.tab.id,
-			});
+				browser.browserAction.setTitle({
+					title: data.proposals.ids[0][0].value,
+					tabId: sender.tab.id,
+				});
 
-			(async () => {
-				if (await browser.sidebarAction.isOpen({})) {
-					pushProposalToSidebar(data.proposals, sender.tab.id);
-				}
-			})();
+				(async () => {
+					if (await browser.sidebarAction.isOpen({})) {
+						pushProposalToSidebar(data.proposals, sender.tab.id);
+					}
+				})();
+			} else {
+				tabStates[sender.tab.id].mode = false;
+
+				browser.browserAction.setIcon({
+					path: "icons/inactive.svg",
+					tabId: sender.tab.id,
+				});
+				browser.browserAction.setTitle({
+					title: 'Wikidata',
+					tabId: sender.tab.id,
+				});
+			}
 		} else {
-			tabStates[sender.tab.id].mode = false;
-
-			browser.browserAction.setIcon({
-				path: "icons/inactive.svg",
-				tabId: sender.tab.id,
-			});
-			browser.browserAction.setTitle({
-				title: 'Wikidata',
-				tabId: sender.tab.id,
-			});
+			if(data.type === 'send_to_wikidata') {
+			  processJobs(data.data);
+		  }
 		}
 		return Promise.resolve('done');
 });
