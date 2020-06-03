@@ -246,6 +246,19 @@ function updateView(id, useCache = true) {
 				},
 			}));
 
+			wrapper.appendChild(templates.mojination([
+				{
+					link: 'add.html?' + id,
+					moji: '⊕',
+					callback: (e) => {
+						browser.runtime.sendMessage({
+							type: 'open_adder',
+							entity: id,
+						});
+					}
+				} 
+			]));
+
 			let identifiers = document.createElement('div');
 			let items = document.createElement('div');
 

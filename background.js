@@ -1,10 +1,18 @@
 let tabStates = {};
+let sidebarLocked = false;
 
 function pushEnitiyToSidebar(id, tid) {
-	browser.sidebarAction.setPanel({
-		tabId: tid,
-		panel: browser.runtime.getURL('sidebar/entity.html') + '?' + id,
-	});
+	if (!sidebarLocked) {
+		browser.sidebarAction.setPanel({
+			tabId: tid,
+			panel: browser.runtime.getURL('sidebar/entity.html') + '?' + id,
+		});
+	} else {
+		browser.runtime.sendMessage({
+			type: 'entity_add',
+			id: id,
+		});
+	}
 }
 
 async function openEnitiyInNewTab(id) {
@@ -15,10 +23,12 @@ async function openEnitiyInNewTab(id) {
 
 function pushProposalToSidebar(proposals, tid) {
 	proposals.fromTab = tid;
-	browser.sidebarAction.setPanel({
-		tabId: tid,
-		panel: browser.runtime.getURL('sidebar/connector.html') + '?' + encodeURIComponent(JSON.stringify(proposals)),
-	});
+	if (!sidebarLocked) {
+		browser.sidebarAction.setPanel({
+			tabId: tid,
+			panel: browser.runtime.getURL('sidebar/connector.html') + '?' + encodeURIComponent(JSON.stringify(proposals)),
+		});
+	}
 }
 
 browser.browserAction.onClicked.addListener((tab) => {
@@ -55,17 +65,19 @@ browser.runtime.onMessage.addListener(
 				tabStates[sender.tab.id] = {};
 			}
 			if (data.type === 'match_event') {
-				tabStates[sender.tab.id].mode = 'show_entity';
-				tabStates[sender.tab.id].entity = data.wdEntityId;
-				browser.browserAction.setIcon({
-					path: "icons/wd.svg",
-					tabId: sender.tab.id,
-				});
-				browser.browserAction.setTitle({
-					title: data.wdEntityId,
-					tabId: sender.tab.id,
-				});
+				if (!sidebarLocked) {
 
+					tabStates[sender.tab.id].mode = 'show_entity';
+					tabStates[sender.tab.id].entity = data.wdEntityId;
+					browser.browserAction.setIcon({
+						path: "icons/wd.svg",
+						tabId: sender.tab.id,
+					});
+					browser.browserAction.setTitle({
+						title: data.wdEntityId,
+						tabId: sender.tab.id,
+					});
+				}
 				(async () => {
 					if (await browser.sidebarAction.isOpen({})) {
 						pushEnitiyToSidebar(data.wdEntityId, sender.tab.id);
@@ -106,10 +118,34 @@ browser.runtime.onMessage.addListener(
 			if(data.type === 'send_to_wikidata') {
 			  processJobs(data.data);
 		  }
+		  if (data.type === 'open_adder') {
+			  sidebarLocked = true;
+		  	browser.sidebarAction.setPanel({
+					panel: browser.runtime.getURL('sidebar/add.html') + '?' + data.entity,
+				});
+		  }
+			if(data.type === 'collect_pagelinks') {
+			  browser.tabs.query({
+			    currentWindow: true,
+			    active: true
+			  }).then((tabs) => {
+				  for (let tab of tabs) {
+				    browser.tabs.sendMessage(
+				      tab.id,
+				      { action: "collect_pagelinks" }
+				    ).then(response => {
+				    }).catch((v) => {
+				    	console.log(v);
+				    });
+				  }
+				}).catch((v) => {
+				 	console.log(v);
+				});
+		  }
 		}
 		return Promise.resolve('done');
 });
 
 browser.webNavigation.onHistoryStateUpdated.addListener(function(e) {
-	browser.tabs.sendMessage(e.tabId, {action: "find_applicables"});
+	browser.tabs.sendMessage(e.tabId, { action: "find_applicables" });
 });

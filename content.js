@@ -15,6 +15,7 @@ async function findApplicables(location) {
 				});
 			}
 			applicables.push(isApplicable);
+			return entityId;
 		}
 	}
 	if (applicables.length > 0 && !foundMatch) {
@@ -36,9 +37,11 @@ async function findApplicables(location) {
 
 findApplicables(location);
 
-browser.runtime.onMessage.addListener(function(msg, sender, sendResponse) {
+browser.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
   if (msg.action == 'find_applicables') {
     findApplicables(location);
+  } else if (msg.action === 'collect_pagelinks') {
+  	return await collectPageLinks();
   }
 });
 

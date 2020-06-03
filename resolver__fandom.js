@@ -1,5 +1,7 @@
 resolvers.fandom = {
 	applicable: async function(location) {
+		this.location = location;
+		
 		if (location.href.match(this.fandomRegex)) {
 			let domain = this.getDomain();
 			let id = this.makeId();
@@ -37,7 +39,7 @@ resolvers.fandom = {
 		return parts[3] ? parts[3] : parts[4];
 	},
 	getParts: function() {
-		return location.href.match(this.fandomRegex);
+		return this.location.href.match(this.fandomRegex);
 	},
 	props: {
 		gamepedia: 'P6623',

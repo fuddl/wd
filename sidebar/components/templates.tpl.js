@@ -119,5 +119,16 @@ const templates = {
 		}
 		
 		return tag;
-	}
+	},
+	mojination: (items) => {
+		let wrapper = document.createElement('nav');
+		for (let item of items) {
+			let link = document.createElement('a');
+			link.setAttribute('href', item.link);
+			link.innerText = item.moji;
+			wrapper.appendChild(link);
+			link.addEventListener('click', item.callback)
+		}
+		return wrapper;
+	},
 };
