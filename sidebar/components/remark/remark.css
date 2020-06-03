@@ -5,6 +5,14 @@
 	line-height: 24px
 }
 
+
+@media (prefers-color-scheme: dark) {
+	.remark {
+		background-color: #27292D;
+		border-color: #27292D;
+	}
+}
+
 .remark + .remark {
 	border-top: none;
 	margin-top: -1em;
