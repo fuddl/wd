@@ -11,6 +11,13 @@ body {
   line-height: 1.2;
 }
 
+@media (prefers-color-scheme: dark) {
+  body {
+    background: #2F3136;
+    color: #F7F8F9;
+  }
+}
+
 a:hover {
   text-decoration: underline;
 }
@@ -19,6 +26,12 @@ a {
   text-decoration: none;
   color: #3366cc;
   hyphens: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  a {
+    color: #7198F7;
+  }
 }
 
 [hidden] {
