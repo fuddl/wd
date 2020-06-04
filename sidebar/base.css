@@ -137,10 +137,21 @@ form input {
   background-color: #EAECF0;
   border: 1px solid #EAECF0;
   padding: .25em 1em;
-  margin: .5em;
+  margin: 0 .5em .5em 0;
   border-radius: 1em;
+  cursor: pointer;
+  font-size: .75em;
+  user-select: none;
+}
+
+.tag__title {
+}
+
+.tag__desc {
+  display: block;
 }
 
 .tag--selected {
   border: 1px solid #01257D;
+  background: #EBF2FE;
 }

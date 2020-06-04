@@ -119,10 +119,16 @@ browser.runtime.onMessage.addListener(
 			  processJobs(data.data);
 		  }
 		  if (data.type === 'open_adder') {
-			  sidebarLocked = true;
-		  	browser.sidebarAction.setPanel({
+			  	sidebarLocked = true;
+		  			browser.sidebarAction.setPanel({
 					panel: browser.runtime.getURL('sidebar/add.html') + '?' + data.entity,
 				});
+		  }
+		  if (data.type === 'use_in_statement') {
+			browser.runtime.sendMessage({
+				type: 'use_in_statement',
+				wdEntityId: data.entityId,
+			});
 		  }
 			if(data.type === 'collect_pagelinks') {
 			  browser.tabs.query({

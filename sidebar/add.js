@@ -26,6 +26,9 @@ content.innerHTML = '';
 		focus: true,
 	}));
 
+	let tagSecetor = document.createElement('div');
+	content.appendChild(tagSecetor);
+
 	let receivedEntities = [];
 
 	browser.runtime.onMessage.addListener(async (data, sender) => {
@@ -37,9 +40,13 @@ content.innerHTML = '';
 					id: data.id,
 				});
 
-				content.appendChild(tag);
+				tagSecetor.appendChild(tag);
 				tag.postProcess();
 			}
+		}
+		if (data.type === 'use_in_statement') {
+			let target = tagSecetor.querySelector(`[data-entity="${ data.wdEntityId }"]`);
+			target.toggle();
 		}
 	});
 

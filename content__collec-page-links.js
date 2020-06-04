@@ -19,6 +19,14 @@ async function collectPageLinks() {
 					wpLink.innerText = '(' + id + ')';
 					wbAppend.appendChild(wpLink);
 					matchingLink.parentNode.insertBefore(wbAppend, matchingLink.nextSibling);
+					wpLink.style.cursor = 'pointer';
+					wpLink.addEventListener('click', (e) => {
+						e.preventDefault();
+						browser.runtime.sendMessage({
+							type: 'use_in_statement',
+							wdEntityId: id,
+						});
+					});
 				}
 			}
 		}
