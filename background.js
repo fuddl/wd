@@ -135,7 +135,7 @@ browser.runtime.onMessage.addListener(
 				      { action: "collect_pagelinks" }
 				    ).then(response => {
 				    }).catch((v) => {
-				    	console.log(v);
+				    	console.log(JSON.stringify(v));
 				    });
 				  }
 				}).catch((v) => {

@@ -5,7 +5,7 @@ async function findApplicables(location) {
 	for (id of Object.keys(resolvers)) {
 		let isApplicable = await resolvers[id].applicable(location);
 		if (isApplicable) {
-			let entityId = await resolvers[id].getEntityId();
+			let entityId = await resolvers[id].getEntityId(location);
 
 			if (entityId && !foundMatch) {
 				foundMatch = true;
@@ -13,9 +13,9 @@ async function findApplicables(location) {
 					type: 'match_event',
 					wdEntityId: entityId,
 				});
+				return entityId;
 			}
 			applicables.push(isApplicable);
-			return entityId;
 		}
 	}
 	if (applicables.length > 0 && !foundMatch) {
@@ -33,6 +33,7 @@ async function findApplicables(location) {
 			},
 		});
 	}
+	return false;
 };
 
 findApplicables(location);

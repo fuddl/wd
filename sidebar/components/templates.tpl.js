@@ -131,4 +131,30 @@ const templates = {
 		}
 		return wrapper;
 	},
+	tag: (vars) => {
+		let wrapper = document.createElement('label');
+		wrapper.classList.add('tag');
+
+		let title = document.createElement('div');
+		title.innerText = vars.id;
+		wrapper.appendChild(title);
+
+		let description = document.createElement('small');
+		description.innerText = '███████ ██████████';
+		wrapper.appendChild(description);
+
+		wrapper.postProcess = async function () {
+			let e = await wikidataGetEntity(vars.id);
+			title.innerText = getValueByLang(e[vars.id], 'labels', vars.id);
+			let desc =  getValueByLang(e[vars.id], 'descriptions', false);
+			if (desc) {
+				description.innerText = desc;
+			} else {
+				description.style.opacity = .5;
+				description.innerText = await getAutodesc(vars.id);
+			}
+		}
+
+		return wrapper;
+	},
 };

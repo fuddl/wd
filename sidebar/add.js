@@ -26,14 +26,20 @@ content.innerHTML = '';
 		focus: true,
 	}));
 
+	let receivedEntities = [];
 
 	browser.runtime.onMessage.addListener(async (data, sender) => {
 		if (data.type === 'entity_add') {
-			let tag = document.createElement('code');
-			tag.innerText = data.id;
-			content.appendChild(tag);
-			let e = await wikidataGetEntity(data.id);
-			tag.innerText = getValueByLang(e[data.id], 'labels', data.id);
+			if (!receivedEntities.includes(data.id)) {
+				receivedEntities.push(data.id);
+				
+				let tag = templates.tag({
+					id: data.id,
+				});
+
+				content.appendChild(tag);
+				tag.postProcess();
+			}
 		}
 	});
 

@@ -1,14 +1,24 @@
 async function collectPageLinks() {
-	let links = document.links;
-	let processedLinks = [];
-	for (let link of links) {
-		if (!processedLinks.includes(link.href)) {
-			let id = await findApplicables(link);
-			processedLinks.push(link.href);
-			if (id) {
-				for (let matchingLink of getLinksByHref(link.href)) {
-					matchingLink.style.outline = '1px solid red';
-					matchingLink.appendChild(document.createTextNode(id))
+	let uniqueLinks = {};
+	let foundEntities = [];
+	for (let link of document.links) {
+		if (!uniqueLinks[link.href]) {
+			uniqueLinks[link.href] = link;
+		}
+	}
+	for (let url in uniqueLinks) {
+		let id = await findApplicables(uniqueLinks[url]);
+
+		if (id && !foundEntities.includes(id)) {
+			foundEntities.push(id);
+			for (let matchingLink of getLinksByHref(uniqueLinks[url].href)) {
+				if (matchingLink) {
+					let wbAppend = document.createDocumentFragment();
+					wbAppend.appendChild(document.createTextNode(' '));
+					let wpLink = document.createElement('a');
+					wpLink.innerText = '(' + id + ')';
+					wbAppend.appendChild(wpLink);
+					matchingLink.parentNode.insertBefore(wbAppend, matchingLink.nextSibling);
 				}
 			}
 		}

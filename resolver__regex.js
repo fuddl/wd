@@ -1,4 +1,5 @@
 resolvers.regex = {
+	location: '',
 	patterns: {
 		P345:  /^https:\/\/(?:www|m)\.imdb\.com\/(?:(?:search\/)?title(?:\?companies=|\/)|name\/|event\/|news\/)(\w{2}\d{7})/,
 		P8013: /^https:\/\/trakt\.tv\/(people\/[^\/]+|movies\/[^\/]+|shows\/[^\/]+\/seasons\/\d+\/episodes\/\d+)/,
@@ -28,8 +29,8 @@ resolvers.regex = {
 		}
 		return false;
 	},
-	getEntityId: async function() {
-		let applicable = await this.applicable(window.location);
+	getEntityId: async function(location) {
+		let applicable = await this.applicable(location);
 
 		let prop = applicable[0].prop;
 		let id = applicable[0].value;

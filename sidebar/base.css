@@ -131,3 +131,16 @@ form input {
   font-size: 16px;
   flex-grow: 1;
 }
+
+.tag {
+  display: inline-block;
+  background-color: #EAECF0;
+  border: 1px solid #EAECF0;
+  padding: .25em 1em;
+  margin: .5em;
+  border-radius: 1em;
+}
+
+.tag--selected {
+  border: 1px solid #01257D;
+}
