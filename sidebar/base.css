@@ -102,7 +102,8 @@ sup {
 }
 
 form button,
-.submit-actions button {
+.submit-actions button,
+.footer button {
   background-color: #447ff5;
   border-color: #447ff5;
   color: white;
@@ -154,4 +155,21 @@ form input {
 .tag--selected {
   border: 1px solid #01257D;
   background: #EBF2FE;
+}
+
+.footer {
+  position: sticky;
+  bottom: 0;
+  border-top: 1px solid #eaecf0;
+  background: white;
+  padding: 1em;
+  margin-left: -1rem;
+  margin-right: -1rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  .footer {
+    background: #2F3136;
+    border-top-color: #27292D;
+  }
 }

@@ -174,4 +174,11 @@ const templates = {
 
 		return wrapper;
 	},
+	footer: (content) => {
+		let wrapper = document.createElement('div');
+		wrapper.classList.add('footer');
+		wrapper.appendChild(content);
+		
+		return wrapper;
+	}
 };

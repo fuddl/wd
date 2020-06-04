@@ -13,18 +13,20 @@ content.innerHTML = '';
 	propList.setAttribute('id', 'all-properties');
 	for (let prop of allProperties) {
 		let propListItem = document.createElement('option');
-		propListItem.innerText = prop.propertyLabel.value;
-		propListItem.setAttribute('data-description', prop.propertyDescription ? prop.propertyDescription.value : '');
+		propListItem.innerText = prop.propLabel.value;
+		propListItem.setAttribute('data-description', prop.propDescription ? prop.propDescription.value : '');
+		propListItem.setAttribute('data-prop', prop.pid ? prop.pid.value : '');
 		propList.appendChild(propListItem);
 	}
 	content.appendChild(propList);
 
 	let randomProperty = allProperties[Math.floor(Math.random()*allProperties.length)];
 
-	content.appendChild(templates.proppick({
-		placeholder: randomProperty.propertyLabel.value + '…',
+	let propPicker = templates.proppick({
+		placeholder: randomProperty.propLabel.value + '…',
 		focus: true,
-	}));
+	});
+	content.appendChild(propPicker);
 
 	let tagSecetor = document.createElement('div');
 	content.appendChild(tagSecetor);
@@ -54,7 +56,22 @@ content.innerHTML = '';
 		type: 'collect_pagelinks',
 	});
 
+	let saveButton = document.createElement('button');
+	saveButton.setAttribute('disabled', 'disabled');
+	saveButton.innerText = '💾';
 
+	document.body.appendChild(templates.footer(saveButton));
+
+	propPicker.addEventListener('change', function() {
+		saveButton.removeAttribute('disabled');
+	});
+
+	saveButton.addEventListener('click', function() {
+		if (!saveButton.hasAttribute('disabled')) {
+			let selecteds = propList.querySelectorAll('[data-selected]');
+			
+		}
+	});
 
 
 })();

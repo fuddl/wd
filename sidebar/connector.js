@@ -26,12 +26,12 @@ content.appendChild(direction);
 content.appendChild(labelField);
 
 let saveButton = document.createElement('button');
-let form = document.createElement('div');
 saveButton.setAttribute('disabled', 'disabled');
 saveButton.innerText = '💾';
 
-form.classList.add('submit-actions');
 
+let form = document.createElement('div');
+form.classList.add('submit-actions');
 form.appendChild(saveButton);
 content.appendChild(form);
 

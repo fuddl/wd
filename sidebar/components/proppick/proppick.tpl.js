@@ -23,7 +23,9 @@ templates.proppick = (vars) => {
 		let list = document.querySelector('datalist#all-properties');
 		for (let item of list.childNodes) {
 			if (item.innerText === input.value) {
-				desc.innerText = item.getAttribute('data-description')
+				desc.innerText = item.getAttribute('data-description');
+				wrapper.setAttribute('data-prop', 'P' + item.getAttribute('data-prop'));
+				wrapper.dispatchEvent('change');
 				continue;
 			}
 		}

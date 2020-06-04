@@ -8,12 +8,9 @@ resolvers.wikipedia = {
 		let title = decodeURIComponent(parts[4]).replace('_', ' ');
 		let query = `
 			SELECT ?item WHERE {
-			  VALUES ?lemma {
-			    "${ title }"@${ parts[1] }
-			  }
 			  ?sitelink schema:about ?item;
 			    schema:isPartOf <https://${ parts[1] }.${ parts[3] }.org/>;
-			    schema:name ?lemma.
+			    schema:name "${ title }"@${ parts[1] }.
 			}
 		`;
 		let entity = await sparqlQuery(query);
