@@ -157,7 +157,7 @@ function renderStatements(snak, references, type, target, scope) {
 				target.appendChild(templates.image({
 					src: `http://commons.wikimedia.org/wiki/Special:FilePath/${ name }`
 				}));
-			} else if (name.match(/\.(jpe?g|png|gif)$/i)) {
+			} else if (name.match(/\.(jpe?g|png|gif|tiff?)$/i)) {
 				target.appendChild(templates.picture({
 					srcSet: {
 						250: `http://commons.wikimedia.org/wiki/Special:FilePath/${ name }?width=250px`,
