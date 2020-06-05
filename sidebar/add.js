@@ -68,10 +68,32 @@ content.innerHTML = '';
 
 	saveButton.addEventListener('click', function() {
 		if (!saveButton.hasAttribute('disabled')) {
-			let selecteds = propList.querySelectorAll('[data-selected]');
-			
+			let selecteds = tagSecetor.querySelectorAll('[data-selected]');
+
+			let now = new Date();
+
+			let jobs = [];	
+
+			for (let selected of selecteds) {
+
+				let numericId = parseInt(selected.getAttribute('data-entity').replace(/\w/,''));
+
+				jobs.push({
+					type: 'set_claim',
+					subject: currentEntity,
+					verb: propPicker.getAttribute('data-prop'),
+					object: {
+						'entity-type': "item",
+						'numeric-id': numericId,
+					},
+				});
+
+			}
+			browser.runtime.sendMessage({
+				type: 'send_to_wikidata',
+				data: jobs,
+			});		
 		}
 	});
-
 
 })();

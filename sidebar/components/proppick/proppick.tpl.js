@@ -25,7 +25,7 @@ templates.proppick = (vars) => {
 			if (item.innerText === input.value) {
 				desc.innerText = item.getAttribute('data-description');
 				wrapper.setAttribute('data-prop', 'P' + item.getAttribute('data-prop'));
-				wrapper.dispatchEvent('change');
+				wrapper.dispatchEvent(new Event('change'));
 				continue;
 			}
 		}

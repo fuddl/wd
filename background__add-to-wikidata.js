@@ -60,7 +60,13 @@ async function setClaim(subjectId, property, value) {
 	data.append('entity', subject[subjectId].id);
 	data.append('snaktype', 'value');
 	data.append('property', property);
-	data.append('value', '"' + value + '"');
+
+	if (typeof value === "string") {
+		data.append('value', '"' + value + '"');
+	} else {
+		data.append('value', JSON.stringify(value));
+	}
+
 	data.append('summary', 'connected with Wikidata for Firefox');
 	data.append('token', token);
 	data.append('baserevid', subject[subjectId].lastrevid);
