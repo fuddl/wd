@@ -10,7 +10,6 @@ templates.express = (vars) => {
 	input.classList.add('express__pick');
 	input.setAttribute('type', 'search');
 	input.setAttribute('list', 'all-properties');
-	input.setAttribute('placeholder', vars.placeholder);
 	main.appendChild(input);
 
 	let style = document.createElement('link');

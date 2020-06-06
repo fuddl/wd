@@ -49,7 +49,7 @@
       "resolver__fandom.js",
 
       "resolver__official-website.js",
-      "content__collec-page-links.js",
+      "content__collect-page-links.js",
       "content.js"
     ]
   }

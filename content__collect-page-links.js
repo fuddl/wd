@@ -13,15 +13,33 @@ async function collectPageLinks() {
 			foundEntities.push(id);
 			for (let matchingLink of getLinksByHref(uniqueLinks[url].href)) {
 				if (matchingLink) {
-					let wbAppend = document.createDocumentFragment();
+					let wbAppend = document.createDocumentFragment();;
 					wbAppend.appendChild(document.createTextNode(' '));
-					let wpLink = document.createElement('a');
-					wpLink.innerText = '(' + id + ')';
+					
+					let wpLink = null;
+					if (matchingLink.nextElementSibling && matchingLink.nextElementSibling.classList.contains('entity-selector')) {
+						wpLink = matchingLink.nextElementSibling;
+						if (wpLink.classList.contains('entity-selector--selected')) {
+							browser.runtime.sendMessage({
+								type: 'entity_add',
+								id: id,
+							});
+							browser.runtime.sendMessage({
+								type: 'use_in_statement',
+								wdEntityId: id,
+							});
+						}
+					} else {
+						wpLink = document.createElement('a');
+					}
+
+					wpLink.classList.add('entity-selector');
+					wpLink.innerText = id;
 					wbAppend.appendChild(wpLink);
 					matchingLink.parentNode.insertBefore(wbAppend, matchingLink.nextSibling);
-					wpLink.style.cursor = 'pointer';
 					wpLink.addEventListener('click', (e) => {
 						e.preventDefault();
+						wpLink.classList.toggle('entity-selector--selected');
 						browser.runtime.sendMessage({
 							type: 'use_in_statement',
 							wdEntityId: id,

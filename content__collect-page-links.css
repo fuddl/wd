@@ -1,0 +1,31 @@
+.entity-selector {
+	cursor: pointer;
+}
+
+.entity-selector::before {
+	content: '(';
+}
+
+.entity-selector::after {
+	content: ')';
+}
+
+.entity-selector--selected {
+  display: inline-block;
+  background-color: #273863;
+  border: 1px solid;
+  padding: .25em 1em;
+  margin: 0 .5em .5em 0;
+  border-radius: 1em;
+  cursor: pointer;
+  font-size: .75em;
+  user-select: none;
+  line-height: 1.2;
+  text-decoration: none !important;
+  color: white;
+}
+
+.entity-selector--selected::before,
+.entity-selector--selected::after {
+	content: '';
+}
