@@ -8,28 +8,42 @@ let content = document.getElementById('content');
 content.innerHTML = '';
 (async () => {
 	let entities = await wikidataGetEntity(currentEntity);
-	let allProperties = await getAllProperties();
-	let propList = document.createElement('datalist');
-	propList.setAttribute('id', 'all-properties');
-	for (let prop of allProperties) {
-		let propListItem = document.createElement('option');
-		propListItem.innerText = prop.propLabel.value;
-		propListItem.setAttribute('data-description', prop.propDescription ? prop.propDescription.value : '');
-		propListItem.setAttribute('data-prop', prop.pid ? prop.pid.value : '');
-		propList.appendChild(propListItem);
-	}
-	content.appendChild(propList);
+	let e = entities[currentEntity];
 
-	let randomProperty = allProperties[Math.floor(Math.random()*allProperties.length)];
+	let description = getValueByLang(e, 'descriptions', false);
+	let hasDescription = description != false;
 
-	let propPicker = templates.proppick({
-		placeholder: randomProperty.propLabel.value + '…',
-		focus: true,
+	content.appendChild(templates.ensign({
+		revid: e.lastrevid,
+		id: currentEntity,
+		label: getValueByLang(e, 'labels', e.title),
+		description: {
+			text: description,
+			provisional: !hasDescription
+		},
+	}));
+
+	(async () => {
+		let allProperties = await getAllProperties();
+		let propList = document.createElement('datalist');
+		propList.setAttribute('id', 'all-properties');
+		for (let prop of allProperties) {
+			let propListItem = document.createElement('option');
+			propListItem.innerText = prop.propLabel.value;
+			propListItem.setAttribute('data-description', prop.propDescription ? prop.propDescription.value : '');
+			propListItem.setAttribute('data-prop', prop.pid ? prop.pid.value : '');
+			propList.appendChild(propListItem);
+		}
+		content.appendChild(propList);
+	})();
+
+	//let randomProperty = allProperties[Math.floor(Math.random()*allProperties.length)];
+
+	let propPicker = templates.express({
+		//placeholder: randomProperty.propLabel.value + '…',
 	});
-	content.appendChild(propPicker);
+	content.appendChild(propPicker.element);
 
-	let tagSecetor = document.createElement('div');
-	content.appendChild(tagSecetor);
 
 	let receivedEntities = [];
 
@@ -38,16 +52,18 @@ content.innerHTML = '';
 			if (!receivedEntities.includes(data.id)) {
 				receivedEntities.push(data.id);
 				
-				let tag = templates.tag({
+				let tag = templates.express__tag({
 					id: data.id,
+					dest: propPicker.selection,
+					src: propPicker.options,
 				});
 
-				tagSecetor.appendChild(tag);
+				propPicker.options.appendChild(tag);
 				tag.postProcess();
 			}
 		}
 		if (data.type === 'use_in_statement') {
-			let target = tagSecetor.querySelector(`[data-entity="${ data.wdEntityId }"]`);
+			let target = propPicker.element.querySelector(`[data-entity="${ data.wdEntityId }"]`);
 			target.toggle();
 		}
 	});
@@ -62,13 +78,13 @@ content.innerHTML = '';
 
 	document.body.appendChild(templates.footer(saveButton));
 
-	propPicker.addEventListener('change', function() {
+	propPicker.element.addEventListener('change', function() {
 		saveButton.removeAttribute('disabled');
 	});
 
 	saveButton.addEventListener('click', function() {
 		if (!saveButton.hasAttribute('disabled')) {
-			let selecteds = tagSecetor.querySelectorAll('[data-selected]');
+			let selecteds = propPicker.selection.querySelectorAll('[data-selected]');
 
 			let now = new Date();
 
@@ -81,7 +97,7 @@ content.innerHTML = '';
 				jobs.push({
 					type: 'set_claim',
 					subject: currentEntity,
-					verb: propPicker.getAttribute('data-prop'),
+					verb: propPicker.element.getAttribute('data-prop'),
 					object: {
 						'entity-type': "item",
 						'numeric-id': numericId,

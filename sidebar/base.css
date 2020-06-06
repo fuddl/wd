@@ -133,42 +133,6 @@ form input {
   flex-grow: 1;
 }
 
-.tag {
-  display: inline-block;
-  background-color: #EAECF0;
-  border: 1px solid #EAECF0;
-  padding: .25em 1em;
-  margin: 0 .5em .5em 0;
-  border-radius: 1em;
-  cursor: pointer;
-  font-size: .75em;
-  user-select: none;
-}
-
-@media (prefers-color-scheme: dark) {
-  .tag {
-    background-color: #55595D;
-    border-color: #55595D;
-  }
-}
-
-.tag__title {
-}
-
-.tag__desc {
-  display: block;
-}
-
-.tag--selected {
-  border: 1px solid #01257D;
-  background: #EBF2FE;
-}
-@media (prefers-color-scheme: dark) {
-  .tag--selected {
-    background: #273863;
-  }
-}
-
 .footer {
   position: sticky;
   bottom: 0;

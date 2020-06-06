@@ -120,49 +120,6 @@ const templates = {
 		
 		return tag;
 	},
-	tag: (vars) => {
-		let wrapper = document.createElement('label');
-		wrapper.setAttribute('data-entity', vars.id);
-		wrapper.classList.add('tag');
-
-		let title = document.createElement('div');
-		title.classList.add('tag__title')
-		title.innerText = vars.id;
-		wrapper.appendChild(title);
-
-		let description = document.createElement('small');
-		description.innerText = '███████ ██████████';
-		description.classList.add('tag__desc')
-		wrapper.appendChild(description);
-
-		wrapper.postProcess = async function () {
-			let e = await wikidataGetEntity(vars.id);
-			title.innerText = getValueByLang(e[vars.id], 'labels', vars.id);
-			let desc =  getValueByLang(e[vars.id], 'descriptions', false);
-			if (desc) {
-				description.innerText = desc;
-			} else {
-				description.style.opacity = .5;
-				description.innerText = await getAutodesc(vars.id);
-			}
-		}
-
-		wrapper.toggle = function() {
-			let enabled = wrapper.classList.toggle('tag--selected');
-			if (enabled) {
-				wrapper.parentNode.insertBefore(wrapper, wrapper.parentNode.firstChild);
-				wrapper.setAttribute('data-selected', true);
-			} else {
-				wrapper.removeAttribute('data-selected', true);
-			}
-		}
-
-		wrapper.addEventListener('click', () => {
-			wrapper.toggle();
-		});
-
-		return wrapper;
-	},
 	footer: (content) => {
 		let wrapper = document.createElement('div');
 		wrapper.classList.add('footer');

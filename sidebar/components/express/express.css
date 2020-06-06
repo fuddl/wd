@@ -1,0 +1,75 @@
+.express__main {
+	padding: 7px 10px;
+	background: #f8f9fa;
+	border: 1px solid #eaecf0;
+	line-height: 24px;
+	margin: 1em 0;
+}
+
+
+@media (prefers-color-scheme: dark) {
+	.express__main {
+		background-color: #27292D;
+		border-color: #27292D;
+	}
+}
+
+.express__pick {
+	font-weight: bold;
+	background: transparent;
+	border: none;
+	width: 100%;
+	color: inherit;
+	box-sizing: border-box;
+	padding: .5em 0;
+	transition: padding .25s;
+}
+
+.express__pick:focus {
+	outline: 1px solid;
+	padding: .5em;
+}
+
+.express__desc {
+	font-size: .5em;
+	min-height: 2em;
+	line-height: 1.2;
+}
+
+.express__selection {
+	margin-top: 1em;
+}
+
+.express__tag {
+  display: inline-block;
+  background-color: #EAECF0;
+  border: 1px solid #EAECF0;
+  padding: .25em 1em;
+  margin: 0 .5em .5em 0;
+  border-radius: 1em;
+  cursor: pointer;
+  font-size: .75em;
+  user-select: none;
+  line-height: 1.2;
+}
+
+@media (prefers-color-scheme: dark) {
+  .express__tag {
+    background-color: #55595D;
+    border-color: #55595D;
+  }
+}
+
+.express__tag__desc {
+  display: block;
+}
+
+.express__tag--selected {
+  border: 1px solid #01257D;
+  background: #EBF2FE;
+}
+@media (prefers-color-scheme: dark) {
+  .express__tag--selected {
+    background: #273863;
+  }
+}

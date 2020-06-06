@@ -12,7 +12,7 @@ templates.mojination = (items) => {
 		link.classList.add('mojination__moji');
 	}
 	document.addEventListener('wheel', (e) => {
-		if (window.scrollY === 0 && e.deltaY < -50) {
+		if (window.scrollY === 0 && e.deltaY < -20) {
 			wrapper.classList.remove('mojination--hidden');
 		} else {
 			wrapper.classList.add('mojination--hidden');
