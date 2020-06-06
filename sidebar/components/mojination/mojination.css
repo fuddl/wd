@@ -1,0 +1,33 @@
+.mojination {
+	position: fixed;
+	text-align: center;
+	line-height: 50vh;
+	top: 0;
+	left: 0;
+	right: 0;
+	transition: transform .25s;
+}
+
+.mojination--hidden {
+	transform: translateY(-100%);
+}
+
+.mojination:hover {
+	transform: none;
+}
+
+.mojination__moji {
+	display: inline-block;
+	font-size: 3em;
+	height: 1.2em;
+	width: 1.2em;
+	background: #273863;
+	text-align: center;
+	color: white;
+	line-height: 1.2em;
+	border-radius: .6em;
+}
+
+.mojination__moji:hover {
+	text-decoration: none;
+}
