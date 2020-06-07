@@ -66,7 +66,6 @@ browser.runtime.onMessage.addListener(
 			}
 			if (data.type === 'match_event') {
 				if (!sidebarLocked) {
-
 					tabStates[sender.tab.id].mode = 'show_entity';
 					tabStates[sender.tab.id].entity = data.wdEntityId;
 					browser.browserAction.setIcon({
@@ -80,7 +79,8 @@ browser.runtime.onMessage.addListener(
 				}
 				(async () => {
 					if (await browser.sidebarAction.isOpen({})) {
-						pushEnitiyToSidebar(data.wdEntityId, sender.tab.id);
+						let tabDest = sender.tab.id ? sender.tab.id : await browser.tabs.getCurrent();
+						pushEnitiyToSidebar(data.wdEntityId, tabDest);
 					}
 				})();
 			} else if(data.type === 'match_proposal') {
@@ -123,6 +123,9 @@ browser.runtime.onMessage.addListener(
 		  			browser.sidebarAction.setPanel({
 					panel: browser.runtime.getURL('sidebar/add.html') + '?' + data.entity,
 				});
+		  }
+		  if (data.type === 'unlock_sidebar') {
+			  sidebarLocked = false;
 		  }
 		  if (data.type === 'use_in_statement') {
 			browser.runtime.sendMessage({

@@ -108,7 +108,14 @@ content.innerHTML = '';
 			browser.runtime.sendMessage({
 				type: 'send_to_wikidata',
 				data: jobs,
-			});		
+			});
+			browser.runtime.sendMessage({
+				type: 'unlock_sidebar',
+			});
+			browser.runtime.sendMessage({
+				type: 'match_event',
+				wdEntityId: currentEntity,
+			});	
 		}
 	});
 
