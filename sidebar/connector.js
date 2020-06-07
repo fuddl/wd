@@ -15,11 +15,7 @@ let labelField = templates.join({
 content.appendChild(preview);
 resolvePlaceholders();
 
-let direction = document.createElement('div');
-direction.innerText = '⬇';
-direction.style.fontSize = '50vw';
-direction.style.textAlign = 'center';
-direction.style.color = '#c8ccd1';
+let direction = templates.direction();
 
 content.appendChild(direction);
 

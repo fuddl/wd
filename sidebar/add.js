@@ -23,6 +23,10 @@ content.innerHTML = '';
 		},
 	}));
 
+	let direction = templates.direction({flippable: true});
+
+	content.appendChild(direction);
+
 	(async () => {
 		let allProperties = await getAllProperties();
 		let propList = document.createElement('datalist');
@@ -84,7 +88,10 @@ content.innerHTML = '';
 
 	saveButton.addEventListener('click', function() {
 		if (!saveButton.hasAttribute('disabled')) {
+			saveButton.setAttribute('disabled', 'disabled')
 			let selecteds = propPicker.selection.querySelectorAll('[data-selected]');
+
+			let flipped = direction.hasAttribute('data-flipped');
 
 			let now = new Date();
 
@@ -92,15 +99,17 @@ content.innerHTML = '';
 
 			for (let selected of selecteds) {
 
-				let numericId = parseInt(selected.getAttribute('data-entity').replace(/\w/,''));
+				let selectedId = selected.getAttribute('data-entity');
+				let selectedNummericId = parseInt(selectedId.replace(/\w/,''));
+				let currentEntityNummericId = parseInt(currentEntity.replace(/\w/,''));
 
 				jobs.push({
 					type: 'set_claim',
-					subject: currentEntity,
+					subject: !flipped ? currentEntity : selectedId,
 					verb: propPicker.element.getAttribute('data-prop'),
 					object: {
 						'entity-type': "item",
-						'numeric-id': numericId,
+						'numeric-id': !flipped ? selectedNummericId : currentEntityNummericId,
 					},
 				});
 
@@ -112,10 +121,7 @@ content.innerHTML = '';
 			browser.runtime.sendMessage({
 				type: 'unlock_sidebar',
 			});
-			browser.runtime.sendMessage({
-				type: 'match_event',
-				wdEntityId: currentEntity,
-			});	
+			window.location = 'entity.html?' + selectedId;
 		}
 	});
 
