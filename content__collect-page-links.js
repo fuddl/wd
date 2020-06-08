@@ -7,7 +7,7 @@ async function collectPageLinks() {
 		}
 	}
 	for (let url in uniqueLinks) {
-		let id = await findApplicables(uniqueLinks[url]);
+		let id = await findApplicables(uniqueLinks[url], false);
 
 		if (id && !foundEntities.includes(id)) {
 			foundEntities.push(id);

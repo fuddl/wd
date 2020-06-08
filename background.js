@@ -1,8 +1,8 @@
 let tabStates = {};
 let sidebarLocked = false;
 
-function pushEnitiyToSidebar(id, tid) {
-	if (!sidebarLocked) {
+function pushEnitiyToSidebar(id, tid, setPanel = true) {
+	if (!sidebarLocked && setPanel) {
 		browser.sidebarAction.setPanel({
 			tabId: tid,
 			panel: browser.runtime.getURL('sidebar/entity.html') + '?' + id,
@@ -80,7 +80,7 @@ browser.runtime.onMessage.addListener(
 				(async () => {
 					if (await browser.sidebarAction.isOpen({})) {
 						let tabDest = sender.tab.id ? sender.tab.id : await browser.tabs.getCurrent();
-						pushEnitiyToSidebar(data.wdEntityId, tabDest);
+						pushEnitiyToSidebar(data.wdEntityId, tabDest, data.openInSidebar);
 					}
 				})();
 			} else if(data.type === 'match_proposal') {

@@ -121,7 +121,7 @@ content.innerHTML = '';
 			browser.runtime.sendMessage({
 				type: 'unlock_sidebar',
 			});
-			window.location = 'entity.html?' + selectedId;
+			window.location = 'entity.html?' + currentEntity;
 		}
 	});
 

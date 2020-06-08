@@ -1,4 +1,4 @@
-async function findApplicables(location) {
+async function findApplicables(location, openInSidebar = true) {
 	let applicables = [];
 
 	let foundMatch = false;
@@ -12,13 +12,14 @@ async function findApplicables(location) {
 				browser.runtime.sendMessage({
 					type: 'match_event',
 					wdEntityId: entityId,
+					openInSidebar: openInSidebar,
 				});
 				return entityId;
 			}
 			applicables.push(isApplicable);
 		}
 	}
-	if (applicables.length > 0 && !foundMatch) {
+	if (applicables.length > 0 && !foundMatch && openInSidebar) {
 		browser.runtime.sendMessage({
 			type: 'match_proposal',
 			proposals: {
