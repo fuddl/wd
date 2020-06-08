@@ -16,6 +16,7 @@ resolvers.regex = {
 		P4198: /^https:\/\/play\.google\.com\/(?:store\/music\/artist\?id=|music\/listen\#\/(?:wst\/)?artist\/)(([A-Z]|[a-z]|[0-9]){27})/,
 		P4300: /^https:\/\/(?:music|www)\.youtube\.com\/playlist\?list=((?:PL|OLAK|RDCLAK)[-_0-9A-Za-z]+)/,
 		P5327: /^https:\/\/www\.fernsehserien\.de\/([^?#]+)/,
+		P3984: /^https:\/\/www\.reddit\.com\/r\/([^\/?#]+)\//,
 	},
 	applicable: async function(location) {
 		for (prop in this.patterns) {

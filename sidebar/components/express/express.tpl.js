@@ -25,11 +25,23 @@ templates.express = (vars) => {
 
 	(async () => {
 		let storage = await browser.storage.local.get('lastUsedProp');
-		if (storage.lastUsedProp) {
-			desc.innerText = storage.lastUsedProp.desc;
-			input.value = storage.lastUsedProp.name;
-			wrapper.setAttribute('data-prop', 'P' + storage.lastUsedProp.prop);
+		if (!storage.lastUsedProp) {
+			let firstPropId = 'P527';
+			let firstProp = await wikidataGetEntity(firstPropId);
+
+			browser.storage.local.set({
+			  lastUsedProp:  {
+			  	prop: firstPropId,
+			  	name: getValueByLang(firstProp[firstPropId], 'labels', firstPropId),
+			  	desc: getValueByLang(firstProp[firstPropId], 'descriptions', ''),
+			  },
+			});
+
+			storage = await browser.storage.local.get('lastUsedProp');
 		}
+		desc.innerText = storage.lastUsedProp.desc;
+		input.value = storage.lastUsedProp.name;
+		wrapper.setAttribute('data-prop', 'P' + storage.lastUsedProp.prop);
 	})();
 
 	let aqureDescription = () => {
