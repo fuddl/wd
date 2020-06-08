@@ -41,15 +41,22 @@ content.innerHTML = '';
 		content.appendChild(propList);
 	})();
 
-	//let randomProperty = allProperties[Math.floor(Math.random()*allProperties.length)];
-
-	let propPicker = templates.express({
-		//placeholder: randomProperty.propLabel.value + '…',
-	});
+	let propPicker = templates.express();
 	content.appendChild(propPicker.element);
 
 
 	let receivedEntities = [];
+
+	let saveButton = document.createElement('button');
+
+	let checkSaveButton = function() {
+		let selectedEntities = propPicker.selection.querySelectorAll(`[data-selected]`);
+		if (selectedEntities.length > 0 && propPicker.element.hasAttribute('data-prop')) {
+			saveButton.removeAttribute('disabled');
+		} else {
+			saveButton.setAttribute('disabled');
+		}
+	};
 
 	browser.runtime.onMessage.addListener(async (data, sender) => {
 		if (data.type === 'entity_add') {
@@ -60,6 +67,7 @@ content.innerHTML = '';
 					id: data.id,
 					dest: propPicker.selection,
 					src: propPicker.options,
+					refresh: checkSaveButton,
 				});
 
 				propPicker.options.appendChild(tag);
@@ -76,14 +84,15 @@ content.innerHTML = '';
 		type: 'collect_pagelinks',
 	});
 
-	let saveButton = document.createElement('button');
 	saveButton.setAttribute('disabled', 'disabled');
 	saveButton.innerText = '💾';
 
 	document.body.appendChild(templates.footer(saveButton));
 
+
+
 	propPicker.element.addEventListener('change', function() {
-		saveButton.removeAttribute('disabled');
+		checkSaveButton();
 	});
 
 	saveButton.addEventListener('click', function() {
@@ -121,6 +130,7 @@ content.innerHTML = '';
 			browser.runtime.sendMessage({
 				type: 'unlock_sidebar',
 			});
+
 			window.location = 'entity.html?' + currentEntity;
 		}
 	});

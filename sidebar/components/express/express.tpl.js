@@ -2,6 +2,7 @@ templates.express = (vars) => {
 	let wrapper = document.createElement('div');
 	wrapper.classList.add('express');
 
+
 	let main = document.createElement('div');
 	main.classList.add('express__main');
 	wrapper.appendChild(main);
@@ -22,13 +23,32 @@ templates.express = (vars) => {
 	desc.classList.add('express__desc');
 	main.appendChild(desc);
 
+	(async () => {
+		let storage = await browser.storage.local.get('lastUsedProp');
+		if (storage.lastUsedProp) {
+			desc.innerText = storage.lastUsedProp.desc;
+			input.value = storage.lastUsedProp.name;
+			wrapper.setAttribute('data-prop', 'P' + storage.lastUsedProp.prop);
+		}
+	})();
+
 	let aqureDescription = () => {
 		let list = document.querySelector('datalist#all-properties');
 		for (let item of list.childNodes) {
 			if (item.innerText === input.value) {
-				desc.innerText = item.getAttribute('data-description');
-				wrapper.setAttribute('data-prop', 'P' + item.getAttribute('data-prop'));
+				let propId = item.getAttribute('data-prop');
+				let propDesc = item.getAttribute('data-description');
+				desc.innerText = propDesc;
+				wrapper.setAttribute('data-prop', 'P' + propId);
 				wrapper.dispatchEvent(new Event('change'));
+
+				browser.storage.local.set({
+				  lastUsedProp:  {
+				  	prop: propId,
+				  	name: input.value,
+				  	desc: propDesc,
+				  },
+				});
 				continue;
 			}
 		}
@@ -88,6 +108,7 @@ templates.express__tag = (vars) => {
 			vars.src.insertBefore(wrapper, vars.src.firstChild);
 			wrapper.removeAttribute('data-selected', true);
 		}
+		vars.refresh();
 	}
 
 	wrapper.addEventListener('click', () => {
