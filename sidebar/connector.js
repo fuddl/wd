@@ -117,6 +117,13 @@ saveButton.addEventListener('click', async function() {
 			data: jobs,
 		});
 
+		let cache = await browser.storage.local.get();
+		if (!('mapCache' in cache)) {
+			cache.mapCache = {};
+		}
+		cache.mapCache[proposals.source.url] = selectedEntity;
+		browser.storage.local.set(cache);
+
 		if (selectedEntity.match(/\w\d+/)) {
 			window.location = 'entity.html?' + selectedEntity;
 		}
