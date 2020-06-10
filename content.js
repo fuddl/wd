@@ -50,11 +50,11 @@ browser.runtime.onMessage.addListener(async function(msg, sender, sendResponse) 
 });
 
 window.onpopstate = function(event) {
-  findApplicables(location);
+  findApplicables(window.location);
 };
 
 window.addEventListener('hashchange', function() {
-  findApplicables(location);
+  findApplicables(window.location);
 }, false);
 
 let head = document.querySelector('head');
@@ -63,7 +63,7 @@ let title = head.querySelector('title').innerText;
 let titleObserver = new MutationObserver(function() {
   let newTitle = head.querySelector('title').innerText;
 	if (newTitle != title) {
-		findApplicables(location);
+		findApplicables(window.location);
 		title = newTitle;
 	}
 });
