@@ -83,6 +83,14 @@ browser.runtime.onMessage.addListener(
 						pushEnitiyToSidebar(data.wdEntityId, tabDest, data.openInSidebar);
 					}
 				})();
+				( async () => {
+					let cache = await browser.storage.local.get();
+					if (!('mapCache' in cache)) {
+						cache.mapCache = {};
+					}
+					cache.mapCache[data.url] = data.wdEntityId;
+					browser.storage.local.set(cache);
+			  	})();	
 			} else if(data.type === 'match_proposal') {
 				tabStates[sender.tab.id].mode = 'propose_match';
 				tabStates[sender.tab.id].proposals = data.proposals;
@@ -101,7 +109,7 @@ browser.runtime.onMessage.addListener(
 					if (await browser.sidebarAction.isOpen({})) {
 						pushProposalToSidebar(data.proposals, sender.tab.id);
 					}
-				})();
+				})();	
 			} else {
 				tabStates[sender.tab.id].mode = false;
 

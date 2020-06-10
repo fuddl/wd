@@ -17,6 +17,10 @@ resolvers.regex = {
 		P4300: /^https:\/\/(?:music|www)\.youtube\.com\/playlist\?list=((?:PL|OLAK|RDCLAK)[-_0-9A-Za-z]+)/,
 		P5327: /^https:\/\/www\.fernsehserien\.de\/([^?#]+)/,
 		P3984: /^https:\/\/www\.reddit\.com\/r\/([^\/?#]+)\//,
+		P1733: /^https:\/\/(?:store\.)?steam(?:community|powered)\.com\/app\/(\d+)/,
+		P2725: /^https:\/\/www\.gog\.com\/([^#?]+)/,
+		P4477: /^https:\/\/www\.humblebundle\.com\/store\/([^#\?\/]+)/,
+		P1933: /^https:\/\/www\.mobygames\.com\/game\/([^#\?\/]+)/,
 	},
 	applicable: async function(location) {
 		for (prop in this.patterns) {

@@ -13,6 +13,8 @@ async function findApplicables(location, openInSidebar = true) {
 					type: 'match_event',
 					wdEntityId: entityId,
 					openInSidebar: openInSidebar,
+					url: location.href,
+					cache: !resolvers[id].noCache,
 				});
 				return entityId;
 			}

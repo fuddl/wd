@@ -9,8 +9,8 @@ resolvers.officialWebsite = {
 			}];
 		}
 	},
-	getEntityId: async function() {
-		let domain = window.location.origin;
+	getEntityId: async function(location) {
+		let domain = location.origin;
 
 		let entity = await this.getEntityByOfficialWebsite(domain);
 		if (entity[0]) {

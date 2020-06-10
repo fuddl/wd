@@ -35,11 +35,10 @@ resolvers.isbn = {
 		}
 		return false;
 	},
-	getEntityId: async function() {
+	getEntityId: async function(location) {
 		return this.findIsbn( async (found) => {
 			let entity = await this.getEntityByIsbn(found);
 			if (entity[0]) {
-				console.log(JSON.stringify(entity[0]));
 				let entityId = entity[0].item.value.match(/https?:\/\/www\.wikidata\.org\/entity\/(Q\d+)/)[1]
 				return entityId;
 			} else {
