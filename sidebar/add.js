@@ -136,3 +136,9 @@ content.innerHTML = '';
 	});
 
 })();
+
+window.addEventListener('unload', (event) => {
+	browser.runtime.sendMessage({
+		type: 'unlock_sidebar',
+	});
+});

@@ -10,9 +10,11 @@
 	content: ')';
 }
 
-.entity-selector--selected {
-  display: inline-block;
-  background-color: #273863;
+.entity-selector--selectable {
+  display: inline-block !important;
+  height: auto !important;
+  width: auto !important;
+  background: #339966;
   border: 1px solid;
   padding: .25em 1em;
   margin: 0 .5em .5em 0;
@@ -22,10 +24,15 @@
   user-select: none;
   line-height: 1.2;
   text-decoration: none !important;
-  color: white;
+  color: white !important;
+  -moz-appearance: button;
 }
 
-.entity-selector--selected::before,
-.entity-selector--selected::after {
+.entity-selector--selected {
+  background-color: #006699;
+}
+
+.entity-selector--selectable::before,
+.entity-selector--selectable::after {
 	content: '';
 }

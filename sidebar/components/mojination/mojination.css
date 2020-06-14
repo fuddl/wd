@@ -6,6 +6,7 @@
 	left: 0;
 	right: 0;
 	transition: transform .25s;
+	pointer-events: none;
 }
 
 .mojination--hidden {
@@ -26,6 +27,7 @@
 	color: white;
 	line-height: 1.2em;
 	border-radius: .6em;
+	pointer-events: auto;
 }
 
 .mojination__moji:hover {

@@ -33,7 +33,10 @@ async function collectPageLinks() {
 						wpLink = document.createElement('a');
 					}
 
+					wpLink.setAttribute('href', 'https://www.wikidata.org/wiki/' + id);
 					wpLink.classList.add('entity-selector');
+					wpLink.classList.add('entity-selector--selectable');
+					
 					wpLink.innerText = id;
 					wbAppend.appendChild(wpLink);
 					matchingLink.parentNode.insertBefore(wbAppend, matchingLink.nextSibling);
