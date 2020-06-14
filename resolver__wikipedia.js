@@ -5,7 +5,7 @@ resolvers.wikipedia = {
 	},
 	getEntityId: async function(location) {
 		let parts = location.href.match(this.regex);
-		let title = decodeURIComponent(parts[4]).replace('_', ' ');
+		let title = decodeURIComponent(parts[4]).replace(/_/g, ' ');
 		let query = `
 			SELECT ?item WHERE {
 			  ?sitelink schema:about ?item;
@@ -13,6 +13,7 @@ resolvers.wikipedia = {
 			    schema:name "${ title }"@${ parts[1] }.
 			}
 		`;
+		console.log(query);
 		let entity = await sparqlQuery(query);
 		if (entity[0]) {
 			let entityId = entity[0].item.value.match(/https?:\/\/www\.wikidata\.org\/entity\/(Q\d+)/)[1]
