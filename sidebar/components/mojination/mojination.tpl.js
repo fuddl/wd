@@ -12,13 +12,12 @@ templates.mojination = (items) => {
 		link.classList.add('mojination__moji');
 	}
 	document.addEventListener('wheel', (e) => {
-		if (window.scrollY === 0) {
-			if (e.deltaY < -20) {
-				wrapper.classList.remove('mojination--hidden');
-			}
-		} else {
-			wrapper.classList.add('mojination--hidden');
-		}
+	if (e.deltaX < -20) {
+		wrapper.classList.remove('mojination--hidden');
+	} 
+	if (e.deltaY != 0) {
+		wrapper.classList.add('mojination--hidden');
+	}
 	});
 	return wrapper;
 }

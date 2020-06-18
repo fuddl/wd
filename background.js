@@ -139,6 +139,7 @@ browser.runtime.onMessage.addListener(
 			browser.runtime.sendMessage({
 				type: 'use_in_statement',
 				wdEntityId: data.entityId,
+				reference: data.reference ? data.reference : null,
 			});
 		  }
 			if(data.type === 'collect_pagelinks') {

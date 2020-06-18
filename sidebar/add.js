@@ -54,7 +54,7 @@ content.innerHTML = '';
 		if (selectedEntities.length > 0 && propPicker.element.hasAttribute('data-prop')) {
 			saveButton.removeAttribute('disabled');
 		} else {
-			saveButton.setAttribute('disabled');
+			saveButton.setAttribute('disabled', 'disabled');
 		}
 	};
 
@@ -76,7 +76,17 @@ content.innerHTML = '';
 		}
 		if (data.type === 'use_in_statement') {
 			let target = propPicker.element.querySelector(`[data-entity="${ data.wdEntityId }"]`);
+
 			target.toggle();
+
+			console.log(data);
+
+			if (data.reference.url) {
+				target.setAttribute('data-reference-url', data.reference.url);
+			}
+			if (data.reference.section) {
+				target.setAttribute('data-reference-section', data.reference.section);
+			}
 		}
 	});
 
@@ -112,6 +122,30 @@ content.innerHTML = '';
 				let selectedNummericId = parseInt(selectedId.replace(/\w/,''));
 				let currentEntityNummericId = parseInt(currentEntity.replace(/\w/,''));
 
+				let reference = [];
+				if (selected.getAttribute('data-reference-url')) {
+					reference.push({
+						"snaktype": "value",
+						"property": "P854",
+						"datavalue": {
+							"value": selected.getAttribute('data-reference-url'),
+							"type": "string"
+						},
+						"datatype": "url"
+					});
+				}
+				if (selected.getAttribute('data-reference-section')) {
+					reference.push({
+						"snaktype": "value",
+						"property": "P958",
+						"datavalue": {
+							"value": selected.getAttribute('data-reference-section'),
+							"type": "string"
+						},
+						"datatype": "string"
+					});
+				}
+
 				jobs.push({
 					type: 'set_claim',
 					subject: !flipped ? currentEntity : selectedId,
@@ -120,6 +154,7 @@ content.innerHTML = '';
 						'entity-type': "item",
 						'numeric-id': !flipped ? selectedNummericId : currentEntityNummericId,
 					},
+					references: reference ? [reference] : null,
 				});
 
 			}

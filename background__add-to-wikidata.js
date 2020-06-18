@@ -15,9 +15,11 @@ async function processJobs(jobs) {
 
 		} else if (job.type === 'set_claim') {
 			answer = await setClaim(job.subject !== 'LAST' ? job.subject : lastCreated, job.verb, job.object);
+			console.log(answer);
+			console.log(JSON.stringify(answer));
 			if (job.references && answer.success && answer.success == 1) {
 				for (reference of job.references) {
-					answer = await addReference(answer.claim.id, answer.pageinfo.lastrevid, reference);
+					await addReference(answer.claim.id, answer.pageinfo.lastrevid, reference);
 				}
 			}
 		}
