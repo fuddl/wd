@@ -9,6 +9,7 @@ resolvers.regex = {
 		P724:  /^https:\/\/archive\.org\/details\/([0-9A-Za-z@\._-]+)/,
 		P2969: /^https:\/\/www\.goodreads\.com\/book\/show\/(\d+)/,
 		P6327: /^https:\/\/www\.goodreads\.com\/characters\/(\d+)/,
+		P6947: /^https:\/\/www\.goodreads\.com\/series\/(\d+)/,
 		P1651: /^https:\/\/www\.youtube\.com\/watch\?v=([-_0-9A-Za-z]{11})/,
 		P1821: /^https:\/\/\w+\.openfoodfacts\.org\/category\/((?:[a-z]{2,3}:)?[a-z-]+)/,
 		P5930: /^https:\/\/\w+\.openfoodfacts\.org\/ingredient\/((?:[a-z]{2,3}:)?[a-z-]+)/,
