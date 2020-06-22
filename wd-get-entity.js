@@ -2,6 +2,7 @@ async function wikidataGetEntity(id, usecache = true) {
 	const endpoints = {
 		'Q': 'www.wikidata.org',
 		'P': 'www.wikidata.org',
+		'L': 'www.wikidata.org',
 		'M': 'commons.wikimedia.org',
 	};
 	let url = `https://${ endpoints[id.charAt(0)] }/wiki/Special:EntityData/${ id }.json`;

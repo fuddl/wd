@@ -102,8 +102,8 @@ function renderStatements(snak, references, type, target, scope) {
 					text: date,
 				}));
 			}
-		}		
-		if (valueType === "wikibase-item" || valueType === "wikibase-entityid") {
+		}
+		if (valueType === "wikibase-item" || valueType === "wikibase-entityid" || valueType === "wikibase-lexeme" || valueType === "wikibase-form") {
 			let vid = snak.datavalue.value.id;
 			target.appendChild(templates.placeholder({
 				entity: vid,
@@ -228,23 +228,37 @@ function updateView(id, useCache = true) {
 			let e = entities[id];
 
 			let wrapper = document.createElement('div');
-			document.querySelector('title').innerText = getValueByLang(e, 'labels', e.title);
 			
-			let description = getValueByLang(e, 'descriptions', false);
-			let hasDescription = description != false;
-			if (!description) {
-				description = await getAutodesc(id);
-			}
+			if (e.lemmas) {
+				for (let lang in e.lemmas) {
 
-			wrapper.appendChild(templates.ensign({
-				revid: e.lastrevid,
-				id: id,
-				label: getValueByLang(e, 'labels', e.title),
-				description: {
-					text: description,
-					provisional: !hasDescription
-				},
-			}));
+					wrapper.appendChild(templates.ensign({
+						revid: e.lastrevid,
+						id: id,
+						label: e.lemmas[lang].value,
+						description: {text:''},
+					}));
+				}
+			}
+			if (e.labels || e.descriptions) {
+				
+				document.querySelector('title').innerText = getValueByLang(e, 'labels', e.title);
+				let description = getValueByLang(e, 'descriptions', false);
+				let hasDescription = description != false;
+				if (!description) {
+					description = await getAutodesc(id);
+				}
+
+				wrapper.appendChild(templates.ensign({
+					revid: e.lastrevid,
+					id: id,
+					label: getValueByLang(e, 'labels', e.title),
+					description: {
+						text: description,
+						provisional: !hasDescription
+					},
+				}));
+			}
 
 			wrapper.appendChild(templates.mojination([
 				{
