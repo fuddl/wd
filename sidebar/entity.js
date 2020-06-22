@@ -230,15 +230,16 @@ function updateView(id, useCache = true) {
 			let wrapper = document.createElement('div');
 			
 			if (e.lemmas) {
+				let labels = [];
 				for (let lang in e.lemmas) {
-
-					wrapper.appendChild(templates.ensign({
-						revid: e.lastrevid,
-						id: id,
-						label: e.lemmas[lang].value,
-						description: {text:''},
-					}));
+					labels.push(e.lemmas[lang].value)
 				}
+				wrapper.appendChild(templates.ensign({
+					revid: e.lastrevid,
+					id: id,
+					label: labels.join(' ‧ '),
+					description: {text:''},
+				}));
 			}
 			if (e.labels || e.descriptions) {
 				
