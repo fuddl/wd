@@ -17,8 +17,22 @@ function resolvePlaceholders() {
 			let entity = await wikidataGetEntity(id);
 			let link = document.createElement('a');
 			link.setAttribute('href', getLink(id));
-			link.setAttribute('title', getValueByLang(entity[id], 'descriptions'));
-			link.innerText = getValueByLang(entity[id], 'labels', id);
+			if (entity[id].labels || entity[id].descriptions) {
+				link.setAttribute('title', getValueByLang(entity[id], 'descriptions'));
+				link.innerText = getValueByLang(entity[id], 'labels', id);
+			} else if (entity[id].lemmas) {
+				let labels = [];
+				for (let lang in entity[id].lemmas) {
+					labels.push(entity[id].lemmas[lang].value)
+				}
+				link.innerText = labels.join(' ‧ ');
+			} else if (entity[id].representations){
+				let labels = [];
+				for (let lang in entity[id].representations) {
+					labels.push(entity[id].representations[lang].value)
+				}
+				link.innerText = labels.join(' ‧ ');
+			}
 			link.addEventListener('click', (e) => {
 				e.preventDefault();
 				window.location = '?' + id;
