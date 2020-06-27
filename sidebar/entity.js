@@ -323,11 +323,24 @@ function updateView(id, useCache = true) {
 				for (let lang in e.lemmas) {
 					labels.push(e.lemmas[lang].value)
 				}
+
+				let lexemeDescription = document.createDocumentFragment();
+
+				lexemeDescription.appendChild(templates.placeholder({
+					entity: e.language
+				}));
+
+				lexemeDescription.appendChild(document.createTextNode(', '));
+
+				lexemeDescription.appendChild(templates.placeholder({
+					entity: e.lexicalCategory
+				}));
+
 				wrapper.appendChild(templates.ensign({
 					revid: e.lastrevid,
 					id: id,
 					label: labels.join(' ‧ '),
-					description: {text:''},
+					description: {text: lexemeDescription},
 				}));
 			}
 			if (e.labels || e.descriptions) {

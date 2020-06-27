@@ -54,7 +54,11 @@ templates.ensign = (vars) => {
 			}
 		});
 	}
-	description.innerText = vars.description.text;
+	if (typeof vars.description.text === 'string') {
+		description.innerText = vars.description.text;
+	} else {
+		description.appendChild(vars.description.text);
+	}
 
 	header.appendChild(title);
 	header.appendChild(space);
