@@ -36,14 +36,17 @@ templates.join = (vars) => {
 	wrapper.appendChild(style);
 
 	let updateList = async () => {
-		let suggestions = await wikidataAutocomplete(humanField.value, 'en');
+		const lang = navigator.language.substr(0,2);
+		let suggestions = await wikidataAutocomplete(humanField.value, lang, vars.scope);
 		proposals.innerHTML = '';
 
-		suggestions.push({
-			label: humanField.value,
-			title: 'CREATE',
-			description: 'CREATE',
-		});
+		if (vars.scope === 'item') {
+			suggestions.push({
+				label: humanField.value,
+				title: 'CREATE',
+				description: 'CREATE',
+			});
+		}
 
 		if (suggestions) { 
 			for (suggestion of suggestions) {
@@ -60,7 +63,7 @@ templates.join = (vars) => {
 				}
 
 				proposals.appendChild(item);
-				item.setAttribute('data-entity', suggestion.title);
+				item.setAttribute('data-entity', suggestion.title.replace(/^\w+\:/, ''));
 				item.setAttribute('data-label', suggestion.label);
 				item.addEventListener('click', async () => {
 					humanField.value = item.getAttribute('data-label');

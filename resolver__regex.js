@@ -22,6 +22,7 @@ resolvers.regex = {
 		P2725: /^https:\/\/www\.gog\.com\/([^#?]+)/,
 		P4477: /^https:\/\/www\.humblebundle\.com\/store\/([^#\?\/]+)/,
 		P1933: /^https:\/\/www\.mobygames\.com\/game\/([^#\?\/]+)/,
+		P8376: /^https:\/\/www\.duden\.de\/rechtschreibung\/([_0-9A-Za-z]+)/,
 	},
 	applicable: async function(location) {
 		for (prop in this.patterns) {
@@ -43,7 +44,7 @@ resolvers.regex = {
 		let id = applicable[0].value;
 		let entity = await this.getEntityByRegexedId(prop, id);
 		if (entity[0]) {
-			let entityId = entity[0].item.value.match(/https?:\/\/www\.wikidata\.org\/entity\/(Q\d+)/)[1]
+			let entityId = entity[0].item.value.match(/https?:\/\/www\.wikidata\.org\/entity\/(\w\d+)/)[1]
 			return entityId;
 		} else {
 			return false;

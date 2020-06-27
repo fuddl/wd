@@ -16,8 +16,18 @@ templates.ensign = (vars) => {
 
 	id.classList.add('ensign__id');
 	let link = document.createElement('a');
-	link.classList.add("ensign__id__link")
-	link.setAttribute('href', 'https://www.wikidata.org/wiki/' + vars.id);
+	link.classList.add("ensign__id__link");
+
+	let namespace = '';
+	if (!vars.id.startsWith('Q')) {
+		switch (vars.id.charAt(0)) {
+			case 'L':
+				namespace = 'Lexeme:';
+				break;
+		}
+	}
+
+	link.setAttribute('href', 'https://www.wikidata.org/wiki/' + namespace + vars.id);
 	link.innerText = vars.id;
 	link.addEventListener('click', (e) => {
 		e.preventDefault();
