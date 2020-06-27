@@ -3,6 +3,7 @@
 async function processJobs(jobs) {
 	let lastCreated = null;
 	let answer = null;
+	let refAnswer = null;
 	for (job of jobs) {
 		if (job.type === 'create') {
 			answer = await createEntity(job.label, job.lang);
@@ -17,7 +18,8 @@ async function processJobs(jobs) {
 			answer = await setClaim(job.subject !== 'LAST' ? job.subject : lastCreated, job.verb, job.object);
 			if (job.references && answer.success && answer.success == 1) {
 				for (reference of job.references) {
-					await addReference(answer.claim.id, answer.pageinfo.lastrevid, reference);
+					refAnswer = await addReference(answer.claim.id, answer.pageinfo.lastrevid, reference);
+					console.log(refAnswer);
 				}
 			}
 		}
