@@ -1,0 +1,32 @@
+.flex {
+	border-collapse: collapse;
+	width: 100%;
+}
+
+.flex > tbody > tr >  th {
+	text-align: left;
+}
+
+.flex td,
+.flex th {
+	border: 1px solid #a2a9b1;
+	padding: 0.2em 0.4em;
+	vertical-align: top;
+}
+
+@media (prefers-color-scheme: dark) {
+	.flex td,
+	.flex th {
+		border-color: #44464A;
+	}
+}
+
+.flex th {
+	background-color: #eaecf0;
+}
+
+@media (prefers-color-scheme: dark) {
+	.flex th {
+		background-color: #27292D;
+	}
+}

@@ -8,7 +8,9 @@ templates.mojination = (items) => {
 		link.setAttribute('href', item.link);
 		link.innerText = item.moji;
 		wrapper.appendChild(link);
-		link.addEventListener('click', item.callback);
+		if (item.callback) {
+			link.addEventListener('click', item.callback);
+		}
 		link.classList.add('mojination__moji');
 	}
 	document.addEventListener('wheel', (e) => {

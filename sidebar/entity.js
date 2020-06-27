@@ -6,7 +6,8 @@ if (window.location.search) {
 	let currentEntity = window.location.search.match(/^\?(\w\d+)/, '')[1];
 	let nocache = window.location.search.match(/nocache/, '');
 	if (currentEntity.match(/[QMPL]\d+/)) {
-		updateView(currentEntity, nocache === null);
+		console.log(nocache === null);
+		updateView(currentEntity, nocache !== null);
 	}
 }
 
@@ -340,7 +341,13 @@ function updateView(id, useCache = true) {
 					revid: e.lastrevid,
 					id: id,
 					label: labels.join(' ‧ '),
-					description: {text: lexemeDescription},
+					description: { text: lexemeDescription },
+				}));
+			}
+
+			if (e.forms) {
+				wrapper.appendChild(templates.flex({
+					forms: e.forms,
 				}));
 			}
 			if (e.labels || e.descriptions) {
@@ -373,7 +380,15 @@ function updateView(id, useCache = true) {
 							entity: id,
 						});
 					}
-				} 
+				},
+				{
+					link: '#nocache',
+					moji: '🔄',
+					callback: (e) => {
+						location.hash = '#nocache';
+						location.reload();
+					}
+				},
 			]));
 
 			let identifiers = document.createElement('div');

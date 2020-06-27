@@ -5,7 +5,13 @@ async function wikidataGetEntity(id, usecache = true) {
 		'L': 'www.wikidata.org',
 		'M': 'commons.wikimedia.org',
 	};
-	let url = `https://${ endpoints[id.charAt(0)] }/wiki/Special:EntityData/${ id }.json`;
+
+	let suffix = '';
+	if (!usecache) {
+		suffix = '?action=purge';
+	}
+
+	let url = `https://${ endpoints[id.charAt(0)] }/wiki/Special:EntityData/${ id }.json` + suffix;
 	try {
 		const response = await fetch(url, {
 			cache: usecache ? 'default' : 'reload',
