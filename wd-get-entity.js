@@ -8,7 +8,7 @@ async function wikidataGetEntity(id, usecache = true) {
 
 	let suffix = '';
 	if (!usecache) {
-		suffix = '?action=purge';
+		suffix = '?' + Date.now();
 	}
 
 	let url = `https://${ endpoints[id.charAt(0)] }/wiki/Special:EntityData/${ id }.json` + suffix;
