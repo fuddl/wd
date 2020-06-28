@@ -373,7 +373,7 @@ function updateView(id, useCache = true) {
 			wrapper.appendChild(templates.mojination([
 				{
 					link: 'add.html?' + id,
-					moji: '⊕',
+					moji: '➕',
 					callback: (e) => {
 						browser.runtime.sendMessage({
 							type: 'open_adder',

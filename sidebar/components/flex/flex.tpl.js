@@ -75,6 +75,9 @@ templates.flex = (vars) => {
 		Q22716: {
 			// imperative
 		},
+		Q625420: {
+			// perfect
+		}
 	}
 
 	let hasYAxis = false;
