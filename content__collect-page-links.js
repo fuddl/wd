@@ -15,6 +15,13 @@ function getClosestID(element) {
     	if (thisId === null) {
 			thisId = element.querySelector('[id]').getAttribute('id');
     	}
+
+    	// removing the edit section link from mediawiki articles
+    	let editSectionLink = element.querySelector('a[href*="action=edit"][href*="&section="]');
+    	if (editSectionLink) {
+    		editSectionLink.remove();
+    	}
+
         return {
           section: element.innerText,
           hash: thisId,
@@ -98,12 +105,17 @@ async function collectPageLinks() {
 
 						let search = oldId ? '?oldid=' + oldId : location.search;
 
+						let pageTitle = document.querySelector('title');
+						let pageLanguage = document.querySelector('html').lang;
+
 						let message = {
 							type: 'use_in_statement',
 							wdEntityId: id,
 							reference: {
 								url: location.protocol + '//' + location.host + location.pathname + search + hash,
 								section: sectionData.section ? sectionData.section : null,
+								title: pageTitle ? pageTitle.innerText : null,
+								language: pageLanguage ? pageLanguage : 'zxx',
 							}
 						};
 

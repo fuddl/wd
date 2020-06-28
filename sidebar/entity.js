@@ -373,7 +373,6 @@ function updateView(id, useCache = true) {
 					link: 'add.html?' + id,
 					moji: '➕',
 					callback: (e) => {
-						console.log('asdasd');
 						browser.runtime.sendMessage({
 							type: 'open_adder',
 							entity: id,

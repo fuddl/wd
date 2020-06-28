@@ -87,6 +87,12 @@ content.innerHTML = '';
 			if (data.reference.section) {
 				target.setAttribute('data-reference-section', data.reference.section);
 			}
+			if (data.reference.title) {
+				target.setAttribute('data-reference-title', data.reference.title);
+			}
+			if (data.reference.language) {
+				target.setAttribute('data-reference-language', data.reference.language);
+			}
 		}
 	});
 
@@ -134,6 +140,22 @@ content.innerHTML = '';
 						"datatype": "url"
 					});
 				}
+
+				if (selected.getAttribute('data-reference-title')) {
+					reference.push({
+						"snaktype": "value",
+						"property": "P1476",
+						"datavalue": {
+							"value": {
+								text: selected.getAttribute('data-reference-title'),
+								language: selected.getAttribute('data-reference-language'),
+							},
+							"type": "monolingualtext"
+						},
+						"datatype": "string"
+					});
+				}
+
 				if (selected.getAttribute('data-reference-section')) {
 					reference.push({
 						"snaktype": "value",
