@@ -56,7 +56,7 @@ templates.ensign = (vars) => {
 	}
 	if (typeof vars.description.text === 'string') {
 		description.innerText = vars.description.text;
-	} else {
+	} else if (typeof vars.description.text === 'object') {
 		description.appendChild(vars.description.text);
 	}
 
