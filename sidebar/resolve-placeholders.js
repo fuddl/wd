@@ -15,6 +15,7 @@ function resolvePlaceholders() {
 		(async () => {
 			let id = placeholder.getAttribute('data-entity');
 			let entity = await wikidataGetEntity(id);
+			console.log(entity);
 			let link = document.createElement('a');
 			link.setAttribute('href', getLink(id));
 			if (entity[id].labels || entity[id].descriptions) {
@@ -32,6 +33,20 @@ function resolvePlaceholders() {
 					labels.push(entity[id].representations[lang].value)
 				}
 				link.innerText = labels.join(' ‧ ');
+			} else if (entity[id].glosses) {
+				let baseEntityId = id.replace(/-.+/, '');
+				let baseEntity = await wikidataGetEntity(baseEntityId);
+				let labels = [];
+				for (let lang in baseEntity[baseEntityId].lemmas) {
+					labels.push(baseEntity[baseEntityId].lemmas[lang].value)
+				}
+				link.innerText = labels.join(' ‧ ');
+				let gloss = document.createElement('small');
+				gloss.innerText = getValueByLang(entity[id], 'glosses', id);
+				gloss.style.display = 'block';
+				link.style.display = 'inline-block';
+				link.appendChild(gloss);
+
 			}
 			link.addEventListener('click', (e) => {
 				e.preventDefault();

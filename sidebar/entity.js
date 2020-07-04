@@ -103,7 +103,7 @@ function renderStatements(snak, references, type, target, scope) {
 				}));
 			}
 		}
-		if (valueType === "wikibase-item" || valueType === "wikibase-entityid" || valueType === "wikibase-lexeme" || valueType === "wikibase-form") {
+		if (valueType === "wikibase-item" || valueType === "wikibase-entityid" || valueType === "wikibase-lexeme" || valueType === "wikibase-form"  || valueType === "wikibase-sense") {
 			let vid = snak.datavalue.value.id;
 			target.appendChild(templates.placeholder({
 				entity: vid,
