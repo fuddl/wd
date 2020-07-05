@@ -111,6 +111,7 @@ function groupClaims(claims) {
 				'P4584',  // first appearance
 				'P840',   // narrative location
 				'P2913',  // date depicted
+				'P8411',  // environment
 			]
 		},
 		{
@@ -119,6 +120,8 @@ function groupClaims(claims) {
 				'P4675',  // appears in the form of
 				'P3828',  // wears
 				'P462',   // color
+				'P1340',  // eye color
+				'P1884',  // hair color
 			]
 		},
 	];
@@ -134,7 +137,13 @@ function groupClaims(claims) {
 	}
 
 	for (prop of Object.keys(claims)) {
-		if (!sorted.includes(prop)) {
+		if (!sorted.includes(prop) && claims[prop][0].mainsnak.datatype !== "external-id") {
+			remaining.push(prop);
+		}
+	}
+
+	for (prop of Object.keys(claims)) {
+		if (claims[prop][0].mainsnak.datatype === "external-id") {
 			remaining.push(prop);
 		}
 	}
