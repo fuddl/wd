@@ -63,6 +63,12 @@ video {
   word-wrap: anywhere;
 }
 
+h2 {
+  font-size: 1.7em;
+  font-family: "Linux Libertine", "Georgia", "Times", serif;
+  font-weight: normal;
+}
+
 ol {
   padding-left: 2.25em;
 }

@@ -15,7 +15,6 @@ function resolvePlaceholders() {
 		(async () => {
 			let id = placeholder.getAttribute('data-entity');
 			let entity = await wikidataGetEntity(id);
-			console.log(entity);
 			let link = document.createElement('a');
 			link.setAttribute('href', getLink(id));
 			if (entity[id].labels || entity[id].descriptions) {

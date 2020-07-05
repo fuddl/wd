@@ -2,6 +2,12 @@ const lang = navigator.language.substr(0,2);
 const footnoteStorage = {};
 let refCounter = {};
 
+function checkNested(obj, level,  ...rest) {
+  if (obj === undefined) return false
+  if (rest.length == 0 && obj.hasOwnProperty(level)) return true
+  return checkNested(obj[level], ...rest)
+}
+
 if (window.location.search) {
 	let currentEntity = window.location.search.match(/^\?(\w\d+)/, '')[1];
 	if (currentEntity.match(/[QMPL]\d+/)) {
@@ -416,6 +422,8 @@ function updateView(id, useCache = true) {
 						let setWrapper = document.createElement('div');
 						setWrapper.setAttribute('id', thisSet.id);
 						content.appendChild(setWrapper);
+				    
+				    let isPlaceholder = false;
 				    for (let titleType of ['glosses', 'representations']) {
 				    	let title = false;
 				    	if (titleType === 'representations' && thisSet.representations) {
@@ -426,11 +434,29 @@ function updateView(id, useCache = true) {
 				    		}
 				    	} else {
 								title = getValueByLang(thisSet, titleType, false);
+								if (!title && titleType === 'glosses' && thisSet.claims.P5137) {
+									let descriptions = [];
+								  for (item of thisSet.claims.P5137) {
+								  	if (checkNested(item, 'mainsnak', 'datavalue', 'value', 'id')) {
+								  		let itemId = item.mainsnak.datavalue.value.id;
+								  		let itemEntity = await wikidataGetEntity(itemId);
+								  		let description = getValueByLang(itemEntity[itemId], 'descriptions', false);
+								  		if (description) {
+								  			descriptions.push(description)
+								  		}
+								  	}
+								  	title = descriptions.join(', ');
+								  	isPlaceholder = true;
+								  }
+								}
 				    	}
 							if (title) {
-								let headline = document.createElement('h3');
+								let headline = document.createElement('h2');
 								headline.innerText = title;
 								setWrapper.appendChild(headline);
+								if (isPlaceholder) {
+									headline.style.opacity = .75;
+								}
 							}
 				    }
 
