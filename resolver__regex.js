@@ -23,6 +23,7 @@ resolvers.regex = {
 		P4477: /^https:\/\/www\.humblebundle\.com\/store\/([^#\?\/]+)/,
 		P1933: /^https:\/\/www\.mobygames\.com\/game\/([^#\?\/]+)/,
 		P8376: /^https:\/\/www\.duden\.de\/(?:rechtschreibung|synonyme)\/([_0-9A-Za-z]+)/,
+		P1274: /^http:\/\/www\.isfdb\.org\/cgi-bin\/title.cgi\?(\d+)/,
 	},
 	applicable: async function(location) {
 		for (prop in this.patterns) {
