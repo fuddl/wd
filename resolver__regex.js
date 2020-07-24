@@ -10,6 +10,7 @@ resolvers.regex = {
 		P2969: /^https:\/\/www\.goodreads\.com\/book\/show\/(\d+)/,
 		P6327: /^https:\/\/www\.goodreads\.com\/characters\/(\d+)/,
 		P6947: /^https:\/\/www\.goodreads\.com\/series\/(\d+)/,
+		P2963: /^https:\/\/www\.goodreads\.com\/author\/show\/(\d+)/,
 		P1651: /^https:\/\/www\.youtube\.com\/watch\?v=([-_0-9A-Za-z]{11})/,
 		P1821: /^https:\/\/\w+\.openfoodfacts\.org\/category\/((?:[a-z]{2,3}:)?[a-z-]+)/,
 		P5930: /^https:\/\/\w+\.openfoodfacts\.org\/ingredient\/((?:[a-z]{2,3}:)?[a-z-]+)/,
@@ -23,7 +24,9 @@ resolvers.regex = {
 		P4477: /^https:\/\/www\.humblebundle\.com\/store\/([^#\?\/]+)/,
 		P1933: /^https:\/\/www\.mobygames\.com\/game\/([^#\?\/]+)/,
 		P8376: /^https:\/\/www\.duden\.de\/(?:rechtschreibung|synonyme)\/([_0-9A-Za-z]+)/,
-		P1274: /^http:\/\/www\.isfdb\.org\/cgi-bin\/title.cgi\?(\d+)/,
+		P1274: /^http:\/\/www\.isfdb\.org\/cgi-bin\/title\.cgi\?(\d+)/,
+		P1235: /^http:\/\/www\.isfdb\.org\/cgi-bin\/pe\.cgi\?(\d+)/,
+		P1233: /^http:\/\/www\.isfdb\.org\/cgi-bin\/ea\.cgi\?(\d+)/,
 	},
 	applicable: async function(location) {
 		for (prop in this.patterns) {
