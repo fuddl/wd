@@ -1,5 +1,5 @@
 resolvers.wikipedia = {
-	regex: /^https:\/\/([\w]+)(\.m)?\.(wik(?:ipedia|iquote|tionary|isource))\.org\/wiki\/([\w%\.\:\(\)]+)$/,
+	regex: /^https?:\/\/([\w]+)(\.m)?\.(wik(?:ipedia|iquote|tionary|isource))\.org\/wiki\/([\w%\.\:\(\)]+)$/,
 	applicable: function(location) {
 		return location.href.match(this.regex) !== null;
 	},
