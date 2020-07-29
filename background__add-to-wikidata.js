@@ -9,8 +9,18 @@ async function processJobs(jobs) {
 			answer = await createEntity(job.label, job.lang);
 			if (answer.success && answer.success == 1) {
 				lastCreated = answer.entity.id;
+
 				if (job.fromTab) {
 					pushEnitiyToSidebar(lastCreated, job.fromTab);
+				}
+
+				if (job.fromUrl) {
+					let cache = await browser.storage.local.get();
+					if (!('mapCache' in cache)) {
+						cache.mapCache = {};
+					}
+					cache.mapCache[job.fromUrl] = lastCreated;
+					browser.storage.local.set(cache);
 				}
 			}
 

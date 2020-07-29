@@ -69,6 +69,8 @@ function getPropertyScope(property) {
 	  attributes: true,
 	});
 
+	console.log(proposals);
+
 	saveButton.addEventListener('click', async function() {
 		if (selectedEntity && !saveButton.hasAttribute('disabled')) {
 			saveButton.setAttribute('disabled', 'disabled');
@@ -82,6 +84,7 @@ function getPropertyScope(property) {
 					label: labelField.getAttribute('data-selected-label'),
 					lang: lang,
 					fromTab: proposals.fromTab,
+					fromUrl: proposals.source.url,
 				});
 				selectedEntity = 'LAST'; 
 			}
@@ -138,14 +141,17 @@ function getPropertyScope(property) {
 				data: jobs,
 			});
 
-			let cache = await browser.storage.local.get();
-			if (!('mapCache' in cache)) {
-				cache.mapCache = {};
-			}
-			cache.mapCache[proposals.source.url] = selectedEntity;
-			browser.storage.local.set(cache);
 
 			if (selectedEntity.match(/\w\d+/)) {
+
+				let cache = await browser.storage.local.get();
+				if (!('mapCache' in cache)) {
+					cache.mapCache = {};
+				}
+				cache.mapCache[proposals.source.url] = selectedEntity;
+				browser.storage.local.set(cache);
+
+
 				window.location = 'entity.html?' + selectedEntity;
 			}
 		}
