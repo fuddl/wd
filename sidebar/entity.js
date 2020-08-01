@@ -189,7 +189,7 @@ function renderStatements(snak, references, type, target, scope) {
 		target.appendChild(document.createTextNode('?'));
 	}
 	if (target) {
-		target.appendChild(document.createTextNode(' '));
+		target.appendChild(document.createTextNode('\xa0'));
 		let sup = document.createElement('sup');
 		let c = 0;
 		for (reference of references) {
