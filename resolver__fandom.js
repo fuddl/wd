@@ -45,7 +45,7 @@ resolvers.fandom = {
 		gamepedia: 'P6623',
 		fandom: 'P6262'
 	},
-	fandomRegex: /https?:\/\/([a-z0-9\.-]+).((gamepedia)\.com|(fandom)\.com(\/([\w]+))?\/wiki)\/([^\s]+)/,
+	fandomRegex: /https?:\/\/([a-z0-9\.-]+).((gamepedia)\.com|(fandom)\.com(\/([\w]+))?\/wiki)\/([^\s#\?]+)/,
   getEntityByFandomId: async function(domain, id) {
 		let query = `
 			SELECT ?item
