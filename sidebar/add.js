@@ -1,3 +1,19 @@
+async function askIfStatementExists(subject, verb, object) {
+	let question = `
+		ASK {
+  			wd:${subject} p:${verb} ?stmt .
+  			?stmt ps:${verb} wd:${object} .
+		}
+	`;
+
+	let answer = await sparqlQuery(question);
+	if (answer.boolean) {
+		return answer.boolean;
+	} else {
+		return false;
+	}
+}
+
 let currentEntity = window.location.search.match(/^\?(\w\d+)/, '')[1];
 
 browser.runtime.sendMessage({
@@ -79,7 +95,15 @@ content.innerHTML = '';
 
 			target.toggle();
 
-			console.log(data);
+			(async () => {
+				let flipped = direction.hasAttribute('data-flipped');
+				let prop = propPicker.element.getAttribute('data-prop');
+				let exists = await askIfStatementExists(flipped ? data.wdEntityId : currentEntity, prop , flipped ? currentEntity : data.wdEntityId);
+
+				if (exists) {
+					target.setAttribute('data-statement-exists', true);
+				}
+			})();
 
 			if (data.reference.url) {
 				target.setAttribute('data-reference-url', data.reference.url);

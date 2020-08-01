@@ -25,6 +25,7 @@ async function processJobs(jobs) {
 			}
 
 		} else if (job.type === 'set_claim') {
+			
 			answer = await setClaim(job.subject !== 'LAST' ? job.subject : lastCreated, job.verb, job.object);
 			if (job.references && answer.success && answer.success == 1) {
 				for (reference of job.references) {

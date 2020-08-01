@@ -69,8 +69,6 @@ function getPropertyScope(property) {
 	  attributes: true,
 	});
 
-	console.log(proposals);
-
 	saveButton.addEventListener('click', async function() {
 		if (selectedEntity && !saveButton.hasAttribute('disabled')) {
 			saveButton.setAttribute('disabled', 'disabled');

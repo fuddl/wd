@@ -53,6 +53,10 @@
   line-height: 1.2;
 }
 
+.express__tag[data-statement-exists] {
+	opacity: .5;
+}
+
 @media (prefers-color-scheme: dark) {
   .express__tag {
     background-color: #55595D;
