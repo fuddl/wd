@@ -39,7 +39,6 @@ async function processJobs(jobs) {
 				}
 			}
 
-
 			if (job.references && answer.success && answer.success == 1) {
 				for (reference of job.references) {
 					refAnswer = await addReference(answer.claim.id, reference);
@@ -131,7 +130,7 @@ async function getExistingStatement(object, verb, subject) {
 		SELECT ?stmt WHERE {
 			wd:${subject} p:${verb} ?stmt.
 			?stmt ps:${verb} wd:${object}.
-		}#asd
+		}
 	`);
 	if (answer[0]) {
 		let output = answer[0].stmt.value.replace("http://www.wikidata.org/entity/statement/", '').replace(/\-/, '$');

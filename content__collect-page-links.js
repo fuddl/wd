@@ -113,8 +113,8 @@ async function collectPageLinks() {
 							wdEntityId: id,
 							reference: {
 								url: location.protocol + '//' + location.host + location.pathname + search + hash,
-								section: sectionData.section ? sectionData.section : null,
-								title: pageTitle ? pageTitle.innerText : null,
+								section: sectionData.section ? sectionData.section.trim() : null,
+								title: pageTitle ? pageTitle.innerText.trim() : null,
 								language: pageLanguage ? pageLanguage : 'zxx',
 							}
 						};
