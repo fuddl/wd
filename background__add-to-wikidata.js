@@ -26,11 +26,23 @@ async function processJobs(jobs) {
 
 		} else if (job.type === 'set_claim') {
 			
-			answer = await setClaim(job.subject !== 'LAST' ? job.subject : lastCreated, job.verb, job.object);
+			let extistingStatement = await getExistingStatement('Q' + job.object['numeric-id'], job.verb, job.subject);
+
+			if (!extistingStatement) {
+				answer = await setClaim(job.subject !== 'LAST' ? job.subject : lastCreated, job.verb, job.object);			
+			} else {
+				answer = {
+					success: 1,
+					claim: {
+						id: extistingStatement
+					}
+				}
+			}
+
+
 			if (job.references && answer.success && answer.success == 1) {
 				for (reference of job.references) {
-					refAnswer = await addReference(answer.claim.id, answer.pageinfo.lastrevid, reference);
-					console.log(refAnswer);
+					refAnswer = await addReference(answer.claim.id, reference);
 				}
 			}
 		}
@@ -94,7 +106,7 @@ async function setClaim(subjectId, property, value) {
   return JSON.parse(await response.text());
 }
 
-async function addReference(claimId, lastrevid, references) {
+async function addReference(claimId, references) {
 	let token = await getTokens();
 
 	let data = new FormData();
@@ -103,7 +115,6 @@ async function addReference(claimId, lastrevid, references) {
 	data.append('snaks', JSON.stringify(references));
 	data.append('summary', 'added with Wikidata for Firefox');
 	data.append('token', token);
-	data.append('baserevid', lastrevid);
 	data.append('bot', '1');
 	data.append('format', "json");
 
@@ -113,4 +124,19 @@ async function addReference(claimId, lastrevid, references) {
 	});
 
   return JSON.parse(await response.text());
+}
+
+async function getExistingStatement(object, verb, subject) {
+	let answer = await sparqlQuery(`
+		SELECT ?stmt WHERE {
+			wd:${subject} p:${verb} ?stmt.
+			?stmt ps:${verb} wd:${object}.
+		}#asd
+	`);
+	if (answer[0]) {
+		let output = answer[0].stmt.value.replace("http://www.wikidata.org/entity/statement/", '').replace(/\-/, '$');
+		return output;
+	} else {
+		return false;
+	}
 }

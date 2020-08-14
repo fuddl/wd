@@ -81,6 +81,12 @@ li:target {
   background-color: #eaf3ff;
 }
 
+@media (prefers-color-scheme: dark) {
+  li:target {
+    background-color: #27292D;
+  }
+}
+
 figure {
   margin: 0;
 }
