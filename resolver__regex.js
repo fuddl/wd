@@ -27,6 +27,9 @@ resolvers.regex = {
 		P1274: /^http:\/\/www\.isfdb\.org\/cgi-bin\/title\.cgi\?(\d+)/,
 		P1235: /^http:\/\/www\.isfdb\.org\/cgi-bin\/pe\.cgi\?(\d+)/,
 		P1233: /^http:\/\/www\.isfdb\.org\/cgi-bin\/ea\.cgi\?(\d+)/,
+		P5646: /^https:\/\/anidb\.net\/anime\/(\d+)/,
+		P5648: /^https:\/\/anidb\.net\/character\/(\d+)/,
+		P5649: /^https:\/\/anidb\.net\/creator\/(\d+)/,
 	},
 	applicable: async function(location) {
 		for (prop in this.patterns) {
