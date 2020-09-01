@@ -2,6 +2,8 @@ templates.express = (vars) => {
 	let wrapper = document.createElement('div');
 	wrapper.classList.add('express');
 
+	let progress = document.createElement('progress');
+	progress.classList.add('express__progress');
 
 	let main = document.createElement('div');
 	main.classList.add('express__main');
@@ -12,6 +14,7 @@ templates.express = (vars) => {
 	input.setAttribute('type', 'search');
 	input.setAttribute('list', 'all-properties');
 	main.appendChild(input);
+	main.appendChild(progress);
 
 	let style = document.createElement('link');
 	style.setAttribute('rel',  "stylesheet");
@@ -81,6 +84,10 @@ templates.express = (vars) => {
 		element: wrapper,
 		selection: selection,
 		options: options,
+		loadingFinished: function() {
+			progress.remove();
+			input.focus();
+		}
 	}
 }
 

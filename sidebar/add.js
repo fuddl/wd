@@ -43,6 +43,9 @@ content.innerHTML = '';
 
 	content.appendChild(direction);
 
+	let propPicker = templates.express();
+	content.appendChild(propPicker.element);
+
 	(async () => {
 		let allProperties = await getAllProperties();
 		let propList = document.createElement('datalist');
@@ -55,10 +58,9 @@ content.innerHTML = '';
 			propList.appendChild(propListItem);
 		}
 		content.appendChild(propList);
+		propPicker.loadingFinished();
 	})();
 
-	let propPicker = templates.express();
-	content.appendChild(propPicker.element);
 
 
 	let receivedEntities = [];
