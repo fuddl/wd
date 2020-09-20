@@ -100,9 +100,12 @@ const templates = {
 		  return Math.floor(Math.random() * (max - min)) + min;
 		}
 		let tag = document.createElement('span');
-		tag.classList.add('placeholder')
+		tag.classList.add('placeholder');
 		tag.setAttribute('data-entity', vars.entity);
 		let words = [];
+		if (vars.lazy) {
+			tag.setAttribute('data-lazy', true);
+		}
 		for (var i = 0; i <= rand(1,2); i++) {
 			words.push("█".repeat(rand(5,10)))
 		}

@@ -29,6 +29,8 @@
 	grid-column: 1;
 	grid-row: span 2;
 	font-weight: bold;
+	position: sticky;
+	top: 7px;
 }
 
 @media (max-width: 299px) {
