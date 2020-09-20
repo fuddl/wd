@@ -11,6 +11,7 @@ resolvers.regex = {
 		P6327: /^https:\/\/www\.goodreads\.com\/characters\/(\d+)/,
 		P6947: /^https:\/\/www\.goodreads\.com\/series\/(\d+)/,
 		P2963: /^https:\/\/www\.goodreads\.com\/author\/show\/(\d+)/,
+		P8383: /^https:\/\/www\.goodreads\.com\/work\/editions\/(\d+)/,
 		P1651: /^https:\/\/www\.youtube\.com\/watch\?v=([-_0-9A-Za-z]{11})/,
 		P1821: /^https:\/\/\w+\.openfoodfacts\.org\/category\/((?:[a-z]{2,3}:)?[a-z-]+)/,
 		P5930: /^https:\/\/\w+\.openfoodfacts\.org\/ingredient\/((?:[a-z]{2,3}:)?[a-z-]+)/,
@@ -43,6 +44,8 @@ resolvers.regex = {
 		P7595: /^https:\/\/www\.disneyplus\.com\/movies\/wd\/([0-9A-Za-z]{12})/,
 		P7596: /^https:\/\/www\.disneyplus\.com\/series\/wd\/([0-9A-Za-z]{12})/,
 		P6181: /^https:\/\/d23\.com\/a-to-z\/([^\s\/]+)/,
+		P7772: /^https:\/\/www\.atlasobscura\.com\/places\/([a-z\-]+)/,
+		P8525: /^https:\/\/edit\.tosdr\.org\/services\/(\d+)/,
 	},
 	applicable: async function(location) {
 		for (prop in this.patterns) {
