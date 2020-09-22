@@ -53,6 +53,9 @@ resolvers.regex = {
 		P1955: /^https:\/\/www\.discogs\.com\/(?:[a-z]+\/)?label\/([1-9][0-9]*)/,
 		P1954: /^https:\/\/www\.discogs\.com\/(?:[a-z]+\/)?(?:[^\/]+\/)?master\/([1-9][0-9]*)/,
 		P2206: /^https:\/\/www\.discogs\.com\/(?:[a-z]+\/)?(?:[^\/]+\/)?release\/([1-9][0-9]*)/,
+		P7512: /^https:\/\/[a-z]+\.startrek\.com\/database_article\/([\d\w\-_]+)/,
+		P5905: /^https:\/\/comicvine\.gamespot\.com\/wd\/(40(?:00|05|10|15|20|25|40|45|50|55|60|70|75)-\d+)/,
+		P4933: /^https:\/\/www\.bcdb\.com\/bcdb\/cartoon\.cgi\?film=([1-9]\d*)/,
 	},
 	applicable: async function(location) {
 		for (prop in this.patterns) {
