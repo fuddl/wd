@@ -46,6 +46,13 @@ resolvers.regex = {
 		P6181: /^https:\/\/d23\.com\/a-to-z\/([^\s\/]+)/,
 		P7772: /^https:\/\/www\.atlasobscura\.com\/places\/([a-z\-]+)/,
 		P8525: /^https:\/\/edit\.tosdr\.org\/services\/(\d+)/,
+		P2638: /^http:\/\/www\.tv\.com\/((?:shows|movies|people|web)\/[a-z\d][a-z\d-/]*[a-z\d-])/,
+		P3283: /^https:\/\/([A-Za-z0-9](?:[A-Za-z0-9\-]{0,61}[A-Za-z0-9]))\.bandcamp\.com/,
+		P3040: /^https:\/\/soundcloud.com\/([0-9A-Za-z/_-]+)/,
+		P1953: /^https:\/\/www\.discogs\.com\/(?:[a-z]+\/)?artist\/([1-9][0-9]*)/,
+		P1955: /^https:\/\/www\.discogs\.com\/(?:[a-z]+\/)?label\/([1-9][0-9]*)/,
+		P1954: /^https:\/\/www\.discogs\.com\/(?:[a-z]+\/)?(?:[^\/]+\/)?master\/([1-9][0-9]*)/,
+		P2206: /^https:\/\/www\.discogs\.com\/(?:[a-z]+\/)?(?:[^\/]+\/)?release\/([1-9][0-9]*)/,
 	},
 	applicable: async function(location) {
 		for (prop in this.patterns) {
