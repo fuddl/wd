@@ -4,6 +4,7 @@ resolvers.wikies = {
 		P8344: /^https\:\/\/wikitrek\.org\/index\.php\/([^?#]+)/,
 		P6812: /^https\:\/\/(?:www\.)?antwiki\.org\/wiki\/([^?#]+)/,
 		P7824: /^https\:\/\/www\.cpcwiki\.eu\/index\.php\/([^?#]+)/,
+		P2390: /^https:\/\/ballotpedia\.org\/([^?#]+)/,
 	},
 	applicable: async function(location) {
 		for (prop in this.patterns) {
