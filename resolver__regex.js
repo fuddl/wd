@@ -58,7 +58,7 @@ resolvers.regex = {
 		P4933: /^https:\/\/www\.bcdb\.com\/bcdb\/cartoon\.cgi\?film=([1-9]\d*)/,
 		P6472: /^https:\/\/gamefaqs\.gamespot\.com\/games\/franchise\/([1-9]\d*)/,
 		P4769: /^https:\/\/gamefaqs\.gamespot\.com\/[^\/]+\/([1-9]\d*)/,
-		P5842: /^https:\/\/(?:overcast\.fm\/itunes|podcasts\.apple\.com\/podcast\/id)([1-9][0-9]*)/,
+		P5842: /^https:\/\/(?:overcast\.fm\/itunes|podcasts\.apple\.com\/(?:[a-z]+\/)?podcast(?:[^\/]+\/)?\/id)([1-9][0-9]*)/,
 		P7998: /^https:\/\/www\.podchaser\.com\/podcasts\/[a-z\-]+([1-9]\d*)/,
 	},
 	applicable: async function(location) {
