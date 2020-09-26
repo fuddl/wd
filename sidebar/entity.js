@@ -512,10 +512,9 @@ function updateView(id, useCache = true) {
 					entity: referrer.prop.value.replace('http://www.wikidata.org/entity/', ''),
 				}));
 				label.appendChild(document.createElement('br'));
-				let empathy = document.createElement('em');
-				label.appendChild(empathy);
-				empathy.appendChild(templates.placeholder({
+				label.appendChild(templates.placeholder({
 					entity: id,
+					type: 'em',
 				}));
 				reverseProps[prop].label = label;
 				reverseProps[prop].values = [];

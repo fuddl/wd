@@ -56,6 +56,10 @@ resolvers.regex = {
 		P7512: /^https:\/\/[a-z]+\.startrek\.com\/database_article\/([\d\w\-_]+)/,
 		P5905: /^https:\/\/comicvine\.gamespot\.com\/wd\/(40(?:00|05|10|15|20|25|40|45|50|55|60|70|75)-\d+)/,
 		P4933: /^https:\/\/www\.bcdb\.com\/bcdb\/cartoon\.cgi\?film=([1-9]\d*)/,
+		P6472: /^https:\/\/gamefaqs\.gamespot\.com\/games\/franchise\/([1-9]\d*)/,
+		P4769: /^https:\/\/gamefaqs\.gamespot\.com\/[^\/]+\/([1-9]\d*)/,
+		P5842: /^https:\/\/(?:overcast\.fm\/itunes|podcasts\.apple\.com\/podcast\/id)([1-9][0-9]*)/,
+		P7998: /^https:\/\/www\.podchaser\.com\/podcasts\/[a-z\-]+([1-9]\d*)/,
 	},
 	applicable: async function(location) {
 		for (prop in this.patterns) {
