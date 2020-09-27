@@ -590,24 +590,28 @@ browser.runtime.onMessage.addListener( async (data, sender) => {
 async function enrichStatements(statements) {
 	for (let prop in statements) {
 		for (let value of statements[prop]) {
-			if (['P31', 'P279', 'P1647', 'P171', 'P1074'].includes(prop)) {
+			if (['P31', 'P279', 'P1647', 'P171', 'P1074', 'P1889'].includes(prop)) {
 				let vid = value.mainsnak.datavalue.value.id;
 				let parents = await getParents(vid);
 				let crumbs = new Breadcrumbs(vid, parents);
 				value.mainsnak.datavalue.parents = [];
-				for (let crumb of crumbs) {
-					if (crumb != vid) {
-						value.mainsnak.datavalue.parents.push(crumb);
+				if (Symbol.iterator in crumbs) {
+					for (let crumb of crumbs) {
+						if (crumb != vid) {
+							value.mainsnak.datavalue.parents.push(crumb);
+						}
 					}
 				}
 				value.mainsnak.datavalue.parents.reverse();
 			}
 			if(value.mainsnak.datatype === 'external-id') {
-				let urls = await getFormatterUrls(prop);
-				let id = value.mainsnak.datavalue.value;
-				value.mainsnak.datavalue.formatted = [];
-				for (let template of urls) {
-					value.mainsnak.datavalue.formatted.push(template.form.value.replace('$1', id));
+				if (value.mainsnak.datavalue) {
+					let urls = await getFormatterUrls(prop);
+					let id = value.mainsnak.datavalue.value;
+					value.mainsnak.datavalue.formatted = [];
+					for (let template of urls) {
+						value.mainsnak.datavalue.formatted.push(template.form.value.replace('$1', id));
+					}
 				}
 			}
 		}
