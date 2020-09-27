@@ -610,7 +610,19 @@ async function enrichStatements(statements) {
 					let id = value.mainsnak.datavalue.value;
 					value.mainsnak.datavalue.formatted = [];
 					for (let template of urls) {
-						value.mainsnak.datavalue.formatted.push(template.form.value.replace('$1', id));
+						if (template.exp) {
+							let regex = new RegExp(template.exp.value);
+							let match = id.match(regex);
+							if (match !== null) {
+								if (match.length > 1) {
+									value.mainsnak.datavalue.formatted.push(id.replace(regex, template.form.value));
+								} else {
+									value.mainsnak.datavalue.formatted.push(template.form.value.replace('$1', id));
+								}
+							}
+						} else {
+							value.mainsnak.datavalue.formatted.push(template.form.value.replace('$1', id));
+						}
 					}
 				}
 			}
