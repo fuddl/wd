@@ -11,7 +11,9 @@ async function getFormatterUrls(prop) {
 		    wd:${prop} p:P7250 ?s.
 		    ?s ps:P7250 ?form.
 		  }
-		  ?s pq:P8460 ?exp.
+		  OPTIONAL { 
+		  	?s pq:P8460 ?exp.
+		  }
 		}
 	`;
 	return await sparqlQuery(query);

@@ -60,6 +60,8 @@ resolvers.regex = {
 		P4769: /^https:\/\/gamefaqs\.gamespot\.com\/[^\/]+\/([1-9]\d*)/,
 		P5842: /^https:\/\/(?:overcast\.fm\/itunes|podcasts\.apple\.com\/(?:[a-z]+\/)?podcast(?:[^\/]+\/)?\/id)([1-9][0-9]*)/,
 		P7998: /^https:\/\/www\.podchaser\.com\/podcasts\/[a-z\-]+([1-9]\d*)/,
+		P4818: /^https:\/\/panoptikum\.io\/podcasts\/([1-9]\d*)/,
+		P7849: /^https:\/\/panoptikum\.io\/episodes\/([1-9]\d*)/,
 	},
 	applicable: async function(location) {
 		for (prop in this.patterns) {
