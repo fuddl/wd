@@ -1,0 +1,11 @@
+.breadcrumbs {
+	font-size: .5em;
+	white-space: nowrap;
+	overflow: auto;
+	scrollbar-width: none;
+	line-height: 1;
+	direction: rtl;
+	width: max-content;
+	max-width: 100%;
+  text-overflow: ellipsis;
+}

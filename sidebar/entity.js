@@ -111,6 +111,15 @@ function renderStatements(snak, references, type, target, scope) {
 		}
 		if (valueType === "wikibase-item" || valueType === "wikibase-entityid" || valueType === "wikibase-lexeme" || valueType === "wikibase-form"  || valueType === "wikibase-sense") {
 			let vid = snak.datavalue.value.id;
+			if (snak.datavalue.parents) {
+				let trail = [];
+				for (let crumb of snak.datavalue.parents) {
+					trail.push(templates.placeholder({
+						entity: crumb,
+					}));
+				}
+				target.appendChild(templates.breadcrumbs(trail));
+			}
 			target.appendChild(templates.placeholder({
 				entity: vid,
 			}));
@@ -403,7 +412,7 @@ function updateView(id, useCache = true) {
 			content.appendChild(wrapper);
 
 			if (e.claims || e.statements) {
-				let statements = e.claims ? e.claims : e.statements;
+				let statements = await enrichStatements(e.claims ? e.claims : e.statements);
 				for (prop of groupClaims(statements)) {
 					let statement = renderStatement(statements[prop]);
 					if (statement) {
@@ -528,6 +537,8 @@ function updateView(id, useCache = true) {
 				reverseProps[prop].more++;
 			}
 		}
+		
+		resolvePlaceholders();
 
 		for (let prop of Object.keys(reverseProps)) {
 			if (reverseProps[prop].more > 0) {
@@ -546,9 +557,9 @@ function updateView(id, useCache = true) {
 				vals: reverseProps[prop].values,
 			});
 			whatLinksHere.appendChild(statement);
+			resolvePlaceholders();
 		}
 
-		resolvePlaceholders();
 
 		let proxies = content.querySelectorAll('.proxy');
 
@@ -569,4 +580,26 @@ browser.runtime.onMessage.addListener( async (data, sender) => {
 		const result = await getEntityByAuthorityId(data.prop, data.id);
 		updateView(result[0].item.value);
 	}
-})
+});
+
+async function enrichStatements(statements) {
+	console.log(statements);
+	for (let prop in statements) {
+		if (['P31', 'P279', 'P1647', 'P171', 'P1074'].includes(prop)) {
+			for (let value of statements[prop]) {
+				let vid = value.mainsnak.datavalue.value.id;
+				let parents = await getParents(vid);
+				let crumbs = new Breadcrumbs(vid, parents);
+				value.mainsnak.datavalue.parents = [];
+				for (let crumb of crumbs) {
+					if (crumb != vid) {
+						value.mainsnak.datavalue.parents.push(crumb);
+					}
+				}
+				value.mainsnak.datavalue.parents.reverse();
+			}
+		}
+	}
+	return statements;
+}
+

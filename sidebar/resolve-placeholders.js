@@ -52,7 +52,9 @@ function resolvePlaceholders() {
 				e.preventDefault();
 				window.location = '?' + id;
 			});
-			placeholder.parentNode.replaceChild(link, placeholder);
+			if (placeholder.parentNode) {
+				placeholder.parentNode.replaceChild(link, placeholder);
+			}
 		})();
 	}, 0);
 }
