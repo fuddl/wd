@@ -24,6 +24,15 @@ const templates = {
 		tag.innerText = readable;
 		return tag;
 	},
+	idLink: (url) => {
+		let wrapper = document.createElement('div');
+		wrapper.style.fontSize = '.5em';
+		wrapper.style.lineHeight = 1;
+		let prefix = document.createTextNode('↳ ');
+		wrapper.appendChild(prefix);
+		wrapper.appendChild(templates.urlLink(url));
+		return wrapper;
+	},
 	time: (vars) => {
 		let tag = document.createElement('time');
 		tag.appendChild(vars.text);

@@ -126,6 +126,11 @@ function renderStatements(snak, references, type, target, scope) {
 		}
 		if (valueType === "external-id") {
 			target.appendChild(templates.code(snak.datavalue.value));
+			if (snak.datavalue.formatted) {
+				for (let format of snak.datavalue.formatted) {
+					target.appendChild(templates.idLink(format));
+				}
+			}
 		}
 		if (valueType === "string") {
 			target.appendChild(document.createTextNode(snak.datavalue.value));
@@ -583,10 +588,9 @@ browser.runtime.onMessage.addListener( async (data, sender) => {
 });
 
 async function enrichStatements(statements) {
-	console.log(statements);
 	for (let prop in statements) {
-		if (['P31', 'P279', 'P1647', 'P171', 'P1074'].includes(prop)) {
-			for (let value of statements[prop]) {
+		for (let value of statements[prop]) {
+			if (['P31', 'P279', 'P1647', 'P171', 'P1074'].includes(prop)) {
 				let vid = value.mainsnak.datavalue.value.id;
 				let parents = await getParents(vid);
 				let crumbs = new Breadcrumbs(vid, parents);
@@ -597,6 +601,14 @@ async function enrichStatements(statements) {
 					}
 				}
 				value.mainsnak.datavalue.parents.reverse();
+			}
+			if(value.mainsnak.datatype === 'external-id') {
+				let urls = await getFormatterUrls(prop);
+				let id = value.mainsnak.datavalue.value;
+				value.mainsnak.datavalue.formatted = [];
+				for (let template of urls) {
+					value.mainsnak.datavalue.formatted.push(template.form.value.replace('$1', id));
+				}
 			}
 		}
 	}

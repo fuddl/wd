@@ -14,7 +14,7 @@ async function getRelatedItems(item) {
 		{
 		  hint:Query hint:optimizer "None".
 		  INCLUDE %test
-		} ORDER BY ASC(?prop)
+		} ORDER BY ASC(?prop) LIMIT 100
 	`;
 	return sparqlQuery(query);
 }
