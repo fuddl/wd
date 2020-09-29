@@ -590,7 +590,7 @@ browser.runtime.onMessage.addListener( async (data, sender) => {
 async function enrichStatements(statements) {
 	for (let prop in statements) {
 		for (let value of statements[prop]) {
-			if (['P31', 'P279', 'P1647', 'P171', 'P1074', 'P1889'].includes(prop)) {
+			if (['P31', 'P279', 'P1647', 'P171', 'P1074', 'P1889', 'P5137', 'P136'].includes(prop)) {
 				let vid = value.mainsnak.datavalue.value.id;
 				let parents = await getParents(vid);
 				let crumbs = new Breadcrumbs(vid, parents);
