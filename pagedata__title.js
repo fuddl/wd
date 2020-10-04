@@ -1,5 +1,15 @@
 function findTitles() {
 	let titles = [];
+
+	// extract the lemma of mediawiki based pages
+	let scriptBlocks = document.querySelectorAll('script');
+	for (s of scriptBlocks) {
+		let match = s.innerText.match(/"wgTitle":"((?:[^"\\]|\\.)+)"/);
+		if (match) {
+			titles.push(match[1]);
+		}
+	}
+
 	let ogTitle = document.querySelector('meta[property="og:title"]');
 	if (ogTitle) {
 		titles.push(ogTitle.getAttribute('content'));
