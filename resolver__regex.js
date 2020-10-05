@@ -63,6 +63,8 @@ resolvers.regex = {
 		P4818: /^https?:\/\/panoptikum\.io\/podcasts\/([1-9]\d*)/,
 		P7849: /^https?:\/\/panoptikum\.io\/episodes\/([1-9]\d*)/,
 		P4110: /^https?:\/\/www\.crunchyroll\.com\/([^\/#?]+)/,
+		P3134: /^https?:\/\/www\.tripadvisor\.com\/[\w-]+(?:g|d)(\d+)/,
+		P3108: /^https?:\/\/www\.yelp\.com\/biz\/([^\/]+)/,
 	},
 	applicable: async function(location) {
 		for (prop in this.patterns) {

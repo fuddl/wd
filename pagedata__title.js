@@ -6,7 +6,7 @@ function findTitles() {
 	for (s of scriptBlocks) {
 		let match = s.innerText.match(/"wgTitle":"((?:[^"\\]|\\.)+)"/);
 		if (match) {
-			titles.push(match[1]);
+			titles.push(match[1].replace(/\\(.)/g, "$1"));
 		}
 	}
 
