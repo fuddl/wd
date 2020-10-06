@@ -1,4 +1,4 @@
-resolvers.wikidata = {
+resolvers.hash = {
 	applicable: function(location) {
 		return location.hash.match(/#wd:[QMPL]\d+/) !== null;
 	},
