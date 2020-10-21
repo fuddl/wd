@@ -9,7 +9,7 @@ function getLink(entityId) {
 }
 
 function resolvePlaceholders() {
-	let placeholders = document.querySelectorAll('.placeholder');
+	let placeholders = document.querySelectorAll('.placeholder[data-entity]');
 
 	Array.from(placeholders).reduce((k, placeholder) => {
 		(async () => {

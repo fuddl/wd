@@ -112,13 +112,7 @@ function renderStatements(snak, references, type, target, scope) {
 		if (valueType === "wikibase-item" || valueType === "wikibase-entityid" || valueType === "wikibase-lexeme" || valueType === "wikibase-form"  || valueType === "wikibase-sense") {
 			let vid = snak.datavalue.value.id;
 			if (snak.datavalue.parents) {
-				let trail = [];
-				for (let crumb of snak.datavalue.parents) {
-					trail.push(templates.placeholder({
-						entity: crumb,
-					}));
-				}
-				target.appendChild(templates.breadcrumbs(trail));
+				target.appendChild(templates.breadcrumbsPlaceholder(snak.datavalue.parents));
 			}
 			target.appendChild(templates.placeholder({
 				entity: vid,
@@ -543,6 +537,7 @@ function updateView(id, useCache = true) {
 			}
 		}
 		
+		resolveBreadcrumbs();
 		resolvePlaceholders();
 
 		for (let prop of Object.keys(reverseProps)) {
@@ -587,45 +582,37 @@ browser.runtime.onMessage.addListener( async (data, sender) => {
 	}
 });
 
+let breadcrumbProperties = ['P31', 'P279', 'P1647', 'P171', 'P1074', 'P1889', 'P5137', 'P136'];
+
 async function enrichStatements(statements) {
 	for (let prop in statements) {
 		for (let value of statements[prop]) {
-			if (['P31', 'P279', 'P1647', 'P171', 'P1074', 'P1889', 'P5137', 'P136'].includes(prop)) {
+			if (breadcrumbProperties.includes(prop)) {
 				let vid = value.mainsnak.datavalue.value.id;
-				let parents = await getParents(vid);
-				let crumbs = new Breadcrumbs(vid, parents);
-				value.mainsnak.datavalue.parents = [];
-				if (Symbol.iterator in crumbs) {
-					for (let crumb of crumbs) {
-						if (crumb != vid) {
-							value.mainsnak.datavalue.parents.push(crumb);
-						}
-					}
-				}
-				value.mainsnak.datavalue.parents.reverse();
+				value.mainsnak.datavalue.parents = vid;
 			}
-			if(value.mainsnak.datatype === 'external-id') {
-				if (value.mainsnak.datavalue) {
-					let urls = await getFormatterUrls(prop);
-					let id = value.mainsnak.datavalue.value;
-					value.mainsnak.datavalue.formatted = [];
-					for (let template of urls) {
-						if (template.exp) {
-							let regex = new RegExp(template.exp.value);
-							let match = id.match(regex);
-							if (match !== null) {
-								if (match.length > 1) {
-									value.mainsnak.datavalue.formatted.push(id.replace(regex, template.form.value));
-								} else {
-									value.mainsnak.datavalue.formatted.push(template.form.value.replace('$1', id));
-								}
-							}
-						} else {
-							value.mainsnak.datavalue.formatted.push(template.form.value.replace('$1', id));
-						}
-					}
-				}
-			}
+			// if(value.mainsnak.datatype === 'external-id') {
+			// 	if (value.mainsnak.datavalue) {
+			// 		let urls = await getFormatterUrls(prop);
+			// 		let id = value.mainsnak.datavalue.value;
+			// 		value.mainsnak.datavalue.formatted = [];
+			// 		for (let template of urls) {
+			// 			if (template.exp) {
+			// 				let regex = new RegExp(template.exp.value);
+			// 				let match = id.match(regex);
+			// 				if (match !== null) {
+			// 					if (match.length > 1) {
+			// 						value.mainsnak.datavalue.formatted.push(id.replace(regex, template.form.value));
+			// 					} else {
+			// 						value.mainsnak.datavalue.formatted.push(template.form.value.replace('$1', id));
+			// 					}
+			// 				}
+			// 			} else {
+			// 				value.mainsnak.datavalue.formatted.push(template.form.value.replace('$1', id));
+			// 			}
+			// 		}
+			// 	}
+			// }
 		}
 	}
 	return statements;

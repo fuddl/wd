@@ -110,7 +110,9 @@ const templates = {
 		}
 		let tag = document.createElement('span');
 		tag.classList.add('placeholder');
-		tag.setAttribute('data-entity', vars.entity);
+		if (vars.entity) {
+			tag.setAttribute('data-entity', vars.entity);
+		}
 		if (vars.type) {
 			tag.setAttribute('data-type', vars.type);
 		}
