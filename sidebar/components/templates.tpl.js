@@ -30,8 +30,23 @@ const templates = {
 		wrapper.style.lineHeight = 1;
 		let prefix = document.createTextNode('↳ ');
 		wrapper.appendChild(prefix);
-		wrapper.appendChild(templates.urlLink(url));
+		if (url) {
+			wrapper.appendChild(templates.urlLink(url));
+		}
+		else {
+			wrapper.appendChild(templates.placeholder({}));
+		}
 		return wrapper;
+	},
+	idLinksPlaceholder: (prop, id) => {
+		let o = document.createElement('div');
+		o.classList.add('id-links-placeholder')
+		o.setAttribute('data-prop', prop);
+		o.setAttribute('data-id', prop);
+		for (var i = 0; i <= 4; i++) {
+			o.appendChild(templates.idLink(false))
+		}
+		return o;
 	},
 	time: (vars) => {
 		let tag = document.createElement('time');

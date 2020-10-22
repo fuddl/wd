@@ -120,11 +120,7 @@ function renderStatements(snak, references, type, target, scope) {
 		}
 		if (valueType === "external-id") {
 			target.appendChild(templates.code(snak.datavalue.value));
-			if (snak.datavalue.formatted) {
-				for (let format of snak.datavalue.formatted) {
-					target.appendChild(templates.idLink(format));
-				}
-			}
+			target.appendChild(templates.idLinksPlaceholder(snak.property, snak.datavalue.value));
 		}
 		if (valueType === "string") {
 			target.appendChild(document.createTextNode(snak.datavalue.value));
@@ -539,6 +535,7 @@ function updateView(id, useCache = true) {
 		
 		resolveBreadcrumbs();
 		resolvePlaceholders();
+		resolveIdLinksPlaceholder();
 
 		for (let prop of Object.keys(reverseProps)) {
 			if (reverseProps[prop].more > 0) {
@@ -591,28 +588,6 @@ async function enrichStatements(statements) {
 				let vid = value.mainsnak.datavalue.value.id;
 				value.mainsnak.datavalue.parents = vid;
 			}
-			// if(value.mainsnak.datatype === 'external-id') {
-			// 	if (value.mainsnak.datavalue) {
-			// 		let urls = await getFormatterUrls(prop);
-			// 		let id = value.mainsnak.datavalue.value;
-			// 		value.mainsnak.datavalue.formatted = [];
-			// 		for (let template of urls) {
-			// 			if (template.exp) {
-			// 				let regex = new RegExp(template.exp.value);
-			// 				let match = id.match(regex);
-			// 				if (match !== null) {
-			// 					if (match.length > 1) {
-			// 						value.mainsnak.datavalue.formatted.push(id.replace(regex, template.form.value));
-			// 					} else {
-			// 						value.mainsnak.datavalue.formatted.push(template.form.value.replace('$1', id));
-			// 					}
-			// 				}
-			// 			} else {
-			// 				value.mainsnak.datavalue.formatted.push(template.form.value.replace('$1', id));
-			// 			}
-			// 		}
-			// 	}
-			// }
 		}
 	}
 	return statements;
