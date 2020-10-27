@@ -42,7 +42,7 @@ const templates = {
 		let o = document.createElement('div');
 		o.classList.add('id-links-placeholder')
 		o.setAttribute('data-prop', prop);
-		o.setAttribute('data-id', prop);
+		o.setAttribute('data-id', id);
 		for (var i = 0; i <= 4; i++) {
 			o.appendChild(templates.idLink(false))
 		}
