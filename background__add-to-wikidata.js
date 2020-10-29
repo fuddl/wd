@@ -62,7 +62,7 @@ async function createEntity(label, lang) {
 	data.append('new', 'item');
 	data.append('data', JSON.stringify(labels));
 
-	data.append('summary', 'created with Wikidata for Firefox');
+	data.append('summary', 'created with [[Wikidata:Tools/Wikidata for Firefox|Wikidata for Firefox 🦊]]');
 	data.append('token', token);
 	data.append('bot', '1');
 	data.append('format', "json");
@@ -91,7 +91,7 @@ async function setClaim(subjectId, property, value) {
 		data.append('value', JSON.stringify(value));
 	}
 
-	data.append('summary', 'connected with Wikidata for Firefox');
+	data.append('summary', 'connected with [[Wikidata:Tools/Wikidata for Firefox|Wikidata for Firefox 🦊]]');
 	data.append('token', token);
 	data.append('baserevid', subject[subjectId].lastrevid);
 	data.append('bot', '1');
@@ -112,7 +112,7 @@ async function addReference(claimId, references) {
 	data.append('action', 'wbsetreference');
 	data.append('statement', claimId);
 	data.append('snaks', JSON.stringify(references));
-	data.append('summary', 'added with Wikidata for Firefox');
+	data.append('summary', 'added with [[Wikidata:Tools/Wikidata for Firefox|Wikidata for Firefox 🦊]]');
 	data.append('token', token);
 	data.append('bot', '1');
 	data.append('format', "json");
