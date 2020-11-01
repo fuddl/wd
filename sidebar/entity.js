@@ -318,6 +318,7 @@ function renderStatement(value) {
 
 function updateView(id, useCache = true) {
 	let content = document.getElementById('content');
+	let footer = document.getElementById('footer');
 	content.innerHTML = '';
 	(async () => {
 		let entities = await wikidataGetEntity(id, useCache);
@@ -378,10 +379,12 @@ function updateView(id, useCache = true) {
 				}));
 			}
 
-			wrapper.appendChild(templates.mojination([
+			footer.appendChild(templates.actions('Actions', [
 				{
 					link: 'add.html?' + id,
-					moji: '➕',
+					moji: './icons/u270Eu002B-addStatement.svg',
+					title: 'Add a statement',
+					desc: 'Extract data from this website',
 					callback: (e) => {
 						browser.runtime.sendMessage({
 							type: 'open_adder',
@@ -391,11 +394,19 @@ function updateView(id, useCache = true) {
 				},
 				{
 					link: '#nocache',
-					moji: '🔄',
+					moji: './icons/u2B6E-refresh.svg',
+					title: 'Reload data',
+					desc: 'Display an uncached version',
 					callback: (e) => {
 						location.hash = '#nocache';
 						location.reload();
-					}
+					},
+				},
+				{
+					link: 'links.html?' + id,
+					moji: './icons/u2BA9u1F4C4uFE0E-articleRedirect.svg',
+					title: 'What links here',
+					desc: 'A list of item that link to this',
 				},
 			]));
 
@@ -496,67 +507,10 @@ function updateView(id, useCache = true) {
 				footnote.setAttribute('title', referenceItem.innerText);
 			});
 		}, 0);
-
-		let whatLinksHere = document.createElement('div');
-		content.appendChild(whatLinksHere);
-
-		let referrers = await getRelatedItems(id);
-
-		let reverseProps = {};
-		for (let referrer of referrers) {
-			let prop = referrer.prop.value.replace('http://www.wikidata.org/entity/', '');
-
-			if (!reverseProps[prop]) {
-				reverseProps[prop] = {
-					more: 0,
-				};
-				let label = document.createDocumentFragment();
-	
-				label.appendChild(templates.placeholder({
-					entity: referrer.prop.value.replace('http://www.wikidata.org/entity/', ''),
-				}));
-				label.appendChild(document.createElement('br'));
-				label.appendChild(templates.placeholder({
-					entity: id,
-					type: 'em',
-				}));
-				reverseProps[prop].label = label;
-				reverseProps[prop].values = [];
-			}
-
-			if (reverseProps[prop].values.length < 20) {
-				reverseProps[prop].values.push(templates.placeholder({
-					entity: referrer.item.value.replace('http://www.wikidata.org/entity/', ''),
-				}));
-			} else {
-				reverseProps[prop].more++;
-			}
-		}
 		
 		resolveBreadcrumbs();
 		resolvePlaceholders();
 		resolveIdLinksPlaceholder();
-
-		for (let prop of Object.keys(reverseProps)) {
-			if (reverseProps[prop].more > 0) {
-				let queryMore = document.createElement('a');
-				let query = `SELECT ?item ?itemLabel WHERE {
-				  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
-				  ?item wdt:${prop} wd:${id}.
-				}`
-				queryMore.setAttribute('href', 'https://query.wikidata.org/embed.html');
-				queryMore.hash = encodeURIComponent(query);
-				queryMore.innerText = '⋯';
-				reverseProps[prop].values.push(queryMore);
-			}
-			let statement = templates.remark({
-				prop: reverseProps[prop].label,
-				vals: reverseProps[prop].values,
-			});
-			whatLinksHere.appendChild(statement);
-			resolvePlaceholders();
-		}
-
 
 		let proxies = content.querySelectorAll('.proxy');
 
