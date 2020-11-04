@@ -14,7 +14,9 @@ resolvers.fandom = {
 			return false;
 		}
 	},
-	getEntityId: async function() {
+	getEntityId: async function(location) {
+		this.applicable(location);
+		
 		let domain = this.getDomain();
 		let id = this.makeId();
 		let entity = await this.getEntityByFandomId(domain, id);

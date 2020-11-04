@@ -22,10 +22,10 @@ function getClosestID(element) {
     		editSectionLink.remove();
     	}
 
-        return {
-          section: element.innerText,
-          hash: thisId,
-        };    	
+      return {
+        section: element.innerText,
+        hash: thisId,
+      };    	
     }
 
     let IDwrapper = subject.closest('[id]');
@@ -157,6 +157,11 @@ async function collectPageLinks() {
 						browser.runtime.sendMessage(message);
 					});
 				}
+			// if there is no qid clean up the selectors
+	 		} else {
+	 			for (let selector of this.selectors) {
+	 				selector.remove();
+	 			}
 	 		}
 		}
 	}
@@ -167,4 +172,7 @@ async function collectPageLinks() {
 			uniqueLinks[key].init();
 		}
 	}
+	setTimeout(() => {
+		console.log(uniqueLinks);
+	}, 5000);
 }
