@@ -2,34 +2,32 @@
 	cursor: pointer;
 }
 
-.entity-selector::before {
-	content: '(';
-}
-
+.entity-selector::before,
 .entity-selector::after {
-	content: ')';
+	display: none !important;
 }
 
 .entity-selector--selectable {
   display: inline-block !important;
   height: auto !important;
   width: auto !important;
-  background: #339966;
-  border: 1px solid;
-  padding: .25em 1em;
-  margin: 0 .5em .5em 0;
-  border-radius: 1em;
-  cursor: pointer;
-  font-size: .75em;
-  user-select: none;
-  line-height: 1.2;
+  background: #339966 !important;
+  border: 1px solid !important;
+  padding: .25em 1em !important;
+  margin: 0 .5em .5em 0 !important; 
+  border-radius: 1em !important;
+  cursor: pointer !important;
+  font-size: .75em !important;
+  user-select: none !important;
+  line-height: 1.2 !important;
   text-decoration: none !important;
+  font-family: sans-serif !important;
   color: white !important;
   -moz-appearance: button;
 }
 
 .entity-selector--selected {
-  background-color: #006699;
+  background-color: #006699 !important;
 }
 
 .entity-selector--selectable::before,

@@ -52,52 +52,87 @@ function getOldid() {
 }
 
 async function collectPageLinks() {
-	let uniqueLinks = {};
+	let uniqueLinks = [];
 	let foundEntities = [];
 	for (let link of document.links) {
-		if (!uniqueLinks[link.href]) {
-			uniqueLinks[link.href] = link;
+
+		if (!uniqueLinks.some((e) => { return e.location === link.href })) {
+			uniqueLinks.push({
+				location: link.href,
+				links: [link],
+			});
+		} else {
+			uniqueLinks
+				.find(e => e.location === link.href)
+				.links.push(link)
 		}
 	}
-	for (let url in uniqueLinks) {
-		let id = await findApplicables(uniqueLinks[url], false);
 
-		if (id && !foundEntities.includes(id)) {
-			foundEntities.push(id);
-			for (let matchingLink of getLinksByHref(uniqueLinks[url].href)) {
-				if (matchingLink) {
-					let wbAppend = document.createDocumentFragment();;
-					wbAppend.appendChild(document.createTextNode(' '));
-					
-					let wpLink = null;
-					if (matchingLink.nextElementSibling && matchingLink.nextElementSibling.classList.contains('entity-selector')) {
-						wpLink = matchingLink.nextElementSibling;
-						if (wpLink.classList.contains('entity-selector--selected')) {
-							browser.runtime.sendMessage({
-								type: 'entity_add',
-								id: id,
-							});
-							browser.runtime.sendMessage({
-								type: 'use_in_statement',
-								wdEntityId: id,
-							});
-						}
-					} else {
-						wpLink = document.createElement('a');
-					}
+	// sort linksets on whether if they are visible or not
+	// visible links should go first
+	uniqueLinks.sort((a, b) => {
+	  let aVisible = false;
+	  let bVisible = false;
+		for (let link of a.links) {
+	    const aRect = link.getBoundingClientRect();
+	    if (aRect.top >= 0 && aRect.bottom <= window.innerHeight) {
+	    	aVisible = true;
+	    }
+	  }
+	  for (let link of b.links) {
+	    const bRect = link.getBoundingClientRect();
+	    if (bRect.top >= 0 && bRect.bottom <= window.innerHeight) {
+	    	bVisible = true;
+	    }
+	  }
+    if (aVisible && !bVisible) {
+    	return -1;
+    }
+    if (!aVisible && bVisible) {
+    	return 1;
+    }
+   	return 0;
+	});
 
-					wpLink.setAttribute('href', 'https://www.wikidata.org/wiki/' + id);
-					wpLink.classList.add('entity-selector');
-					wpLink.classList.add('entity-selector--selectable');
-					
-					wpLink.innerText = id;
-					wbAppend.appendChild(wpLink);
-					matchingLink.parentNode.insertBefore(wbAppend, matchingLink.nextSibling);
-					wpLink.addEventListener('click', (e) => {
+	// mark  links that are not applicable to wikidata as not-applicable
+	for (let key in uniqueLinks) {
+		let applicableTo = null;
+		for (id of Object.keys(resolvers)) {
+			let resolverApplicable = await resolvers[id].applicable(uniqueLinks[key].links[0]);
+			if (resolverApplicable) {
+				applicableTo = id;
+			}
+		}
+		uniqueLinks[key].applicable = applicableTo;
+		uniqueLinks[key].init = async function() {
+			this.resolver = resolvers[this.applicable];
+			this.selectors = [];
+			this.selected = false;
+			for (let link of this.links) {
+				let selector = document.createElement('a');
+				selector.classList.add('entity-selector');
+				selector.innerText = '…';
+				link.parentNode.insertBefore(selector, link.nextSibling);
+				this.selectors.push(selector);
+			}
+			this.entityId = await this.resolver.getEntityId(this.links[0]);
+	 		if (this.entityId) {
+		 		browser.runtime.sendMessage({
+	 				type: 'entity_add',
+	 				id: this.entityId,
+	 			});
+				for (let selector of this.selectors) {
+					selector.setAttribute('href', 'https://www.wikidata.org/wiki/' + this.entityId);
+					selector.innerText = this.entityId;
+					selector.classList.add('entity-selector--selectable');
+					selector.addEventListener('click', (e) => {
 						e.preventDefault();
-						wpLink.classList.toggle('entity-selector--selected');
+						this.selected = !this.selected;
+						for (let otherSelector of this.selectors) {
+							otherSelector.classList.toggle('entity-selector--selected', this.selected);
+						}
 						
-						let sectionData = getClosestID(wpLink);
+						let sectionData = getClosestID(e.target);
 
 						let hash = sectionData.hash ? '#' + sectionData.hash : ''; 
 
@@ -110,7 +145,7 @@ async function collectPageLinks() {
 
 						let message = {
 							type: 'use_in_statement',
-							wdEntityId: id,
+							wdEntityId: this.entityId,
 							reference: {
 								url: location.protocol + '//' + location.host + location.pathname + search + hash,
 								section: sectionData.section ? sectionData.section.trim().replace("\n", '␤') : null,
@@ -122,17 +157,14 @@ async function collectPageLinks() {
 						browser.runtime.sendMessage(message);
 					});
 				}
-			}
+	 		}
 		}
 	}
-}
 
-function getLinksByHref(href) {
-	let output = [];
-	for (let link of document.links) {
-		if (link.href === href) {
-			output.push(link);
+
+	for (let key in uniqueLinks) {
+		if (uniqueLinks[key].applicable) {
+			uniqueLinks[key].init();
 		}
 	}
-	return output;
 }

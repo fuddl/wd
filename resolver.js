@@ -3,7 +3,7 @@ const resolvers = {
 		applicable: function(location) {
 			return location.href.match(/https:\/\/[\w]+.wikidata.org\/wiki\/(?:\w+\:)?[QMPL]\d+/) !== null;
 		},
-		getEntityId: function() {
+		getEntityId: function(location) {
 			return location.href.match(/https:\/\/[\w]+.wikidata.org\/wiki\/(?:\w+\:)?([QMPL]\d+)/)[1];
 		}
 	}
