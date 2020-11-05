@@ -65,6 +65,10 @@ resolvers.regex = {
 		P4110: /^https?:\/\/www\.crunchyroll\.com\/([^\/#?]+)/,
 		P3134: /^https?:\/\/www\.tripadvisor\.com\/[\w-]+(?:g|d)(\d+)/,
 		P3108: /^https?:\/\/www\.yelp\.com\/biz\/([^\/]+)/,
+		P4085: /^https?:\/\/(?:myanimelist\.net|shikimori\.one)\/characters?\/z?([1-9]\d{0,5})/,
+		P4086: /^https?:\/\/(?:myanimelist\.net|shikimori\.one)\/animes?\/z?([1-9]\d{0,5})/,
+		P4087: /^https?:\/\/(?:myanimelist\.net|shikimori\.one)\/mangas?\/z?([1-9]\d{0,5})/,
+		P4084: /^https?:\/\/(?:myanimelist\.net|shikimori\.one)\/people\/z?([1-9]\d{0,5})/,
 	},
 	applicable: async function(location) {
 		for (prop in this.patterns) {
