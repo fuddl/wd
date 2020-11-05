@@ -2,19 +2,66 @@ templates.express = (vars) => {
 	let wrapper = document.createElement('div');
 	wrapper.classList.add('express');
 
-	let progress = document.createElement('progress');
-	progress.classList.add('express__progress');
-
 	let main = document.createElement('div');
 	main.classList.add('express__main');
 	wrapper.appendChild(main);
 
+	let autocomplete = document.createElement('ul');
+	autocomplete.classList.add('express__autocomplete')
+
 	let input = document.createElement('input');
 	input.classList.add('express__pick');
 	input.setAttribute('type', 'search');
-	input.setAttribute('list', 'all-properties');
+
+	let desc = document.createElement('div');
+	desc.classList.add('express__desc');
+
+	const updateAutocomplete = async function(e) {
+		let response = await fetch(`https://www.wikidata.org/w/api.php?action=wbsgetsuggestions&search=${e.target.value}&context=item&format=json&language=en&entity=${vars.entity}`);
+		response = await response.json();
+		autocomplete.innerText = '';
+		for (let suggestion of response.search) {
+			let title = document.createElement('strong');
+			title.innerText = suggestion.label;
+			let itemDesc = document.createElement('div');
+			itemDesc.innerText = suggestion.description;
+			let item = document.createElement('li');
+			item.classList.add('express__autocomplete-option');
+			item.appendChild(title);
+			item.appendChild(itemDesc);
+			if (typeof suggestion.datatype !== 'undefined' && !["wikibase-item", "wikibase-lexeme", "wikibase-property"].includes(suggestion.datatype)) {
+				item.classList.add('express__autocomplete-option--unsupported');
+				item.setAttribute('title', 'Data type not supported')
+			} else {
+				item.addEventListener('click', () => {
+					input.value = suggestion.label;
+					desc.innerText = suggestion.description;
+					wrapper.setAttribute('data-prop', suggestion.id);
+
+					browser.storage.local.set({
+					  lastUsedProp:  {
+					  	prop: suggestion.id,
+					  	name: suggestion.label,
+					  	desc: suggestion.description,
+					  },
+					});
+					wrapper.dispatchEvent(new Event('change'));
+					autocomplete.innerText = '';
+				});
+			}
+			autocomplete.appendChild(item);
+		}
+	}
+
+	input.addEventListener('keyup', updateAutocomplete);
+	input.addEventListener('focus', updateAutocomplete);
+	window.addEventListener('click', () => {
+		if (event.target !== input || !autocomplete.contains(event.target)) {
+			autocomplete.innerText = '';
+		}
+	});
+
 	main.appendChild(input);
-	main.appendChild(progress);
 
 	let style = document.createElement('link');
 	style.setAttribute('rel',  "stylesheet");
@@ -22,8 +69,7 @@ templates.express = (vars) => {
 
 	wrapper.appendChild(style);
 
-	let desc = document.createElement('div');
-	desc.classList.add('express__desc');
+	main.appendChild(autocomplete);
 	main.appendChild(desc);
 
 	(async () => {
@@ -44,30 +90,8 @@ templates.express = (vars) => {
 		}
 		desc.innerText = storage.lastUsedProp.desc;
 		input.value = storage.lastUsedProp.name;
-		wrapper.setAttribute('data-prop', 'P' + storage.lastUsedProp.prop);
+		wrapper.setAttribute('data-prop', storage.lastUsedProp.prop);
 	})();
-
-	let aqureDescription = () => {
-		let list = document.querySelector('datalist#all-properties');
-		for (let item of list.childNodes) {
-			if (item.innerText === input.value) {
-				let propId = item.getAttribute('data-prop');
-				let propDesc = item.getAttribute('data-description');
-				desc.innerText = propDesc;
-				wrapper.setAttribute('data-prop', 'P' + propId);
-				wrapper.dispatchEvent(new Event('change'));
-
-				browser.storage.local.set({
-				  lastUsedProp:  {
-				  	prop: propId,
-				  	name: input.value,
-				  	desc: propDesc,
-				  },
-				});
-				continue;
-			}
-		}
-	}	
 
 	let selection = document.createElement('div');
 	selection.classList.add('express__selection');
@@ -76,9 +100,6 @@ templates.express = (vars) => {
 	let options = document.createElement('details');
 	options.classList.add('express__options');
 	wrapper.appendChild(options);
-
-	input.addEventListener('change', aqureDescription);
-	input.addEventListener('keyup', aqureDescription);
 
 	return {
 		element: wrapper,

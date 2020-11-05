@@ -43,24 +43,8 @@ content.innerHTML = '';
 
 	content.appendChild(direction);
 
-	let propPicker = templates.express();
+	let propPicker = templates.express({entity: currentEntity});
 	content.appendChild(propPicker.element);
-
-	(async () => {
-		let allProperties = await getAllProperties();
-		let propList = document.createElement('datalist');
-		propList.setAttribute('id', 'all-properties');
-		for (let prop of allProperties) {
-			let propListItem = document.createElement('option');
-			propListItem.innerText = prop.propLabel.value;
-			propListItem.setAttribute('data-description', prop.propDescription ? prop.propDescription.value : '');
-			propListItem.setAttribute('data-prop', prop.pid ? prop.pid.value : '');
-			propList.appendChild(propListItem);
-		}
-		content.appendChild(propList);
-		propPicker.loadingFinished();
-	})();
-
 
 
 	let receivedEntities = [];
@@ -206,6 +190,7 @@ content.innerHTML = '';
 				});
 
 			}
+			console.log(jobs);
 			browser.runtime.sendMessage({
 				type: 'send_to_wikidata',
 				data: jobs,

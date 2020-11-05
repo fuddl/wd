@@ -78,6 +78,35 @@
   }
 }
 
-.express__progress {
-	width: 100%;
+.express__autocomplete {
+	border: 1px solid #C9C9C9;
+	list-style: none;
+	margin: 0 -1px;
+	padding: 0;
+	background: white;
+}
+
+.express__autocomplete-option--unsupported {
+	opacity: .5;
+	pointer-events: none;
+}
+
+.express__autocomplete-option {
+	padding: 0.4em 0.2em;
+	cursor: pointer;
+	font-size: 13px;
+	line-height: 1.2;
+}
+
+.express__autocomplete-option:nth-child(n+2) {
+	border-top: 1px solid #C9C9C9;
+}
+
+.express__autocomplete > li:hover {
+	background: #4c59a6;
+	color: white;
+}
+
+.express__autocomplete:empty {
+	display: none;
 }

@@ -172,7 +172,4 @@ async function collectPageLinks() {
 			uniqueLinks[key].init();
 		}
 	}
-	setTimeout(() => {
-		console.log(uniqueLinks);
-	}, 5000);
 }
