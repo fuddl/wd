@@ -123,10 +123,14 @@ async function collectPageLinks() {
 			this.selected = false;
 			this.entityId = await this.resolver.getEntityId(this.links[0]);
 	 		if (this.entityId) {
-		 		browser.runtime.sendMessage({
-	 				type: 'entity_add',
-	 				id: this.entityId,
-	 			});
+				browser.runtime.sendMessage({
+					type: 'match_event',
+					wdEntityId: this.entityId,
+					openInSidebar: false,
+					url: this.links[0].href,
+					cache: !this.resolver.noCache,
+				});
+
 				for (let selector of this.selectors) {
 					selector.setAttribute('href', 'https://www.wikidata.org/wiki/' + this.entityId);
 					selector.innerText = this.entityId;
