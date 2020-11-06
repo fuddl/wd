@@ -109,7 +109,7 @@ function getPropertyScope(property) {
 			      "property": "P1476",
 			      "datavalue": {
 			        "value": {
-			          "text": proposals.source.title,
+			          "text": proposals.source.title.trim(),
 			          "language": proposals.source.lang ? proposals.source.lang : 'zxx',
 			        },
 			        "type": "monolingualtext"
@@ -138,7 +138,6 @@ function getPropertyScope(property) {
 				type: 'send_to_wikidata',
 				data: jobs,
 			});
-
 
 			if (selectedEntity.match(/\w\d+/)) {
 
