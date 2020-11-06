@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Wikidata",
-  "version": "0.98",
+  "version": "0.100",
   "description": "Display information from wikidata.",
   "icons": {
     "48": "icons/wd.svg",

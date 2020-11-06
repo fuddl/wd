@@ -56,6 +56,10 @@ async function collectPageLinks() {
 	let foundEntities = [];
 	for (let link of document.links) {
 
+		if (link.href.startsWith('javascript:')) {
+			continue;
+		}
+
 		if (!uniqueLinks.some((e) => { return e.location === link.href })) {
 			uniqueLinks.push({
 				location: link.href,
@@ -104,10 +108,8 @@ async function collectPageLinks() {
 			}
 		}
 		uniqueLinks[key].applicable = applicableTo;
-		uniqueLinks[key].init = async function() {
-			this.resolver = resolvers[this.applicable];
+		uniqueLinks[key].setup = async function() {
 			this.selectors = [];
-			this.selected = false;
 			for (let link of this.links) {
 				let selector = document.createElement('a');
 				selector.classList.add('entity-selector');
@@ -115,6 +117,10 @@ async function collectPageLinks() {
 				link.parentNode.insertBefore(selector, link.nextSibling);
 				this.selectors.push(selector);
 			}
+		}
+		uniqueLinks[key].init = async function() {
+			this.resolver = resolvers[this.applicable];
+			this.selected = false;
 			this.entityId = await this.resolver.getEntityId(this.links[0]);
 	 		if (this.entityId) {
 		 		browser.runtime.sendMessage({
@@ -166,10 +172,16 @@ async function collectPageLinks() {
 		}
 	}
 
-
-	for (let key in uniqueLinks) {
-		if (uniqueLinks[key].applicable) {
-			uniqueLinks[key].init();
+	(async () => {
+		for (let key in uniqueLinks) {
+			if (uniqueLinks[key].applicable) {
+				await uniqueLinks[key].setup();
+			}
 		}
-	}
+		for (let key in uniqueLinks) {
+			if (uniqueLinks[key].applicable) {
+				await uniqueLinks[key].init();
+			}
+		}
+	})();
 }
