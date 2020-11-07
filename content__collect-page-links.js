@@ -102,10 +102,11 @@ async function collectPageLinks() {
 	for (let key in uniqueLinks) {
 		let applicableTo = null;
 		for (id of Object.keys(resolvers)) {
-			let resolverApplicable = await resolvers[id].applicable(uniqueLinks[key].links[0]);
-			if (resolverApplicable) {
-				applicableTo = id;
-				continue;
+			if (!applicableTo) {
+				let resolverApplicable = await resolvers[id].applicable(uniqueLinks[key].links[0]);
+				if (resolverApplicable) {
+					applicableTo = id;
+				}
 			}
 		}
 		uniqueLinks[key].applicable = applicableTo;
