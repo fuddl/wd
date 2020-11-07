@@ -141,13 +141,11 @@ function getPropertyScope(property) {
 
 			if (selectedEntity.match(/\w\d+/)) {
 
-				let cache = await browser.storage.local.get();
-				if (!('mapCache' in cache)) {
-					cache.mapCache = {};
-				}
-				cache.mapCache[proposals.source.url] = selectedEntity;
-				browser.storage.local.set(cache);
-
+				browser.runtime.sendMessage({
+					type: 'add_map_cache',
+					url: proposals.source.url,
+					id: selectedEntity,
+				});
 
 				window.location = 'entity.html?' + selectedEntity;
 			}

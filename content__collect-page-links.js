@@ -105,6 +105,7 @@ async function collectPageLinks() {
 			let resolverApplicable = await resolvers[id].applicable(uniqueLinks[key].links[0]);
 			if (resolverApplicable) {
 				applicableTo = id;
+				continue;
 			}
 		}
 		uniqueLinks[key].applicable = applicableTo;
