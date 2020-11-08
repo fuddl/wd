@@ -17,7 +17,7 @@ function getClosestID(element) {
     	}
 
     	// removing the edit section link from mediawiki articles
-    	let editSectionLink = element.querySelector('a[href*="action=edit"][href*="&section="]');
+    	let editSectionLink = element.querySelector('.mw-editsection');
     	if (editSectionLink) {
     		editSectionLink.remove();
     	}
@@ -190,4 +190,10 @@ async function collectPageLinks() {
 			}
 		}
 	})();
+}
+
+function clearPageLinks() {
+	for (let selector of document.querySelectorAll('.entity-selector')) {
+		selector.parentNode.removeChild(selector);
+	}
 }

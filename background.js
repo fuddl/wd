@@ -168,6 +168,24 @@ browser.runtime.onMessage.addListener(
 				 	console.log(v);
 				});
 		  }
+			if(data.type === 'clear_pagelinks') {
+			  browser.tabs.query({
+			    currentWindow: true,
+			    active: true
+			  }).then((tabs) => {
+				  for (let tab of tabs) {
+				  					    browser.tabs.sendMessage(
+				      tab.id,
+				      { action: "clear_pagelinks" }
+				    ).then(response => {
+				    }).catch((v) => {
+				    	console.log(JSON.stringify(v));
+				    });
+				  }
+				}).catch((v) => {
+				 	console.log(v);
+				});
+		  }
 		}
 		return Promise.resolve('done');
 });

@@ -46,6 +46,8 @@ browser.runtime.onMessage.addListener(async function(msg, sender, sendResponse) 
     findApplicables(location);
   } else if (msg.action === 'collect_pagelinks') {
   	return await collectPageLinks();
+  } else if (msg.action === 'clear_pagelinks') {
+  	clearPageLinks();
   }
 });
 

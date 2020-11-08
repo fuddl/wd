@@ -115,8 +115,6 @@ content.innerHTML = '';
 
 	document.body.appendChild(templates.footer(saveButton));
 
-
-
 	propPicker.element.addEventListener('change', function() {
 		checkSaveButton();
 	});
@@ -198,6 +196,10 @@ content.innerHTML = '';
 			browser.runtime.sendMessage({
 				type: 'unlock_sidebar',
 			});
+			browser.runtime.sendMessage({
+				type: 'clear_pagelinks',
+			});
+
 
 			window.location = 'entity.html?' + currentEntity;
 		}
@@ -208,5 +210,8 @@ content.innerHTML = '';
 window.addEventListener('unload', (event) => {
 	browser.runtime.sendMessage({
 		type: 'unlock_sidebar',
+	});
+	browser.runtime.sendMessage({
+		type: 'clear_pagelinks',
 	});
 });
