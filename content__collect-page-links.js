@@ -115,7 +115,7 @@ async function collectPageLinks() {
 			for (let link of this.links) {
 				let selector = document.createElement('a');
 				selector.classList.add('entity-selector');
-				selector.innerText = '…';
+				selector.innerText = '···';
 				link.parentNode.insertBefore(selector, link.nextSibling);
 				this.selectors.push(selector);
 			}
