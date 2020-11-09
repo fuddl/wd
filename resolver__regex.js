@@ -69,6 +69,10 @@ resolvers.regex = {
 		P4086: /^https?:\/\/(?:myanimelist\.net|shikimori\.one)\/animes?\/z?([1-9]\d{0,5})/,
 		P4087: /^https?:\/\/(?:myanimelist\.net|shikimori\.one)\/mangas?\/z?([1-9]\d{0,5})/,
 		P4084: /^https?:\/\/(?:myanimelist\.net|shikimori\.one)\/people\/z?([1-9]\d{0,5})/,
+		P1984: /^https?:\/\/(?:www\.)animenewsnetwork\.com\/encyclopedia\/manga\.php\?id=([1-9]\d*)/,
+		P1985: /^https?:\/\/(?:www\.)animenewsnetwork\.com\/encyclopedia\/anime\.php\?id=([1-9]\d*)/,
+		P1982: /^https?:\/\/(?:www\.)animenewsnetwork\.com\/encyclopedia\/people\.php\?id=([1-9]\d*)/,
+		P1983: /^https?:\/\/(?:www\.)animenewsnetwork\.com\/encyclopedia\/company\.php\?id=([1-9]\d*)/,
 	},
 	applicable: async function(location) {
 		for (prop in this.patterns) {
