@@ -158,8 +158,6 @@ form input {
   border-top: 1px solid #eaecf0;
   background: white;
   padding: 1em;
-  margin-left: -1rem;
-  margin-right: -1rem;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -194,4 +192,9 @@ form input {
   #footer {
     border-top-color: #44464A;
   }
+}
+
+summary {
+  outline: none;
+  user-select: none;
 }

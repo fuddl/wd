@@ -111,7 +111,7 @@ content.innerHTML = '';
 	});
 
 	saveButton.setAttribute('disabled', 'disabled');
-	saveButton.innerText = '💾';
+	saveButton.innerText = 'Send to Wikidata';
 
 	document.body.appendChild(templates.footer(saveButton));
 

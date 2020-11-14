@@ -100,6 +100,11 @@ templates.express = (vars) => {
 	let options = document.createElement('details');
 	options.classList.add('express__options');
 	wrapper.appendChild(options);
+	
+	let summary = document.createElement('summary');
+	summary.innerText = 'Links on this page';
+	options.appendChild(summary);
+
 
 	return {
 		element: wrapper,

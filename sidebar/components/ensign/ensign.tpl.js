@@ -121,7 +121,7 @@ templates.ensignEditDescription = async (vars, description) => {
 	};
 
 	let button = document.createElement('button');
-	button.innerText = '💾';
+	button.innerText = 'Set description';
 
 	let valInput =  document.createElement('input');
 	valInput.setAttribute('name', 'value');

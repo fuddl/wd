@@ -44,7 +44,7 @@ function getPropertyScope(property) {
 
 	let saveButton = document.createElement('button');
 	saveButton.setAttribute('disabled', 'disabled');
-	saveButton.innerText = '💾';
+	saveButton.innerText = 'Connect to Wikidata';
 
 
 	let form = document.createElement('div');

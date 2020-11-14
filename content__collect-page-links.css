@@ -16,6 +16,7 @@
   color: white !important;
   -moz-appearance: button;
   transition: background .5s !important;
+  text-indent: 0 !important;
 }
 
 .entity-selector::before,

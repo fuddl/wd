@@ -31,6 +31,7 @@ resolvers.regex = {
 		P5646: /^https?:\/\/anidb\.net\/anime\/(\d+)/,
 		P5648: /^https?:\/\/anidb\.net\/character\/(\d+)/,
 		P5649: /^https?:\/\/anidb\.net\/creator\/(\d+)/,
+		P8785: /^https?:\/\/anidb\.net\/tag\/(\d+)/,
 		P6011: /^https?:\/\/www\.ipdb\.org\/machine\.cgi\?id=(\d+)/,
 		P5916: /^https?:\/\/open\.spotify\.com\/show\/([0-9A-Za-z]{22})/,
 		P6517: /^https?:\/\/www\.whosampled\.com\/([^ \/]{1,100})/,
