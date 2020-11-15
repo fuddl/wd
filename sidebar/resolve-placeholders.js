@@ -91,33 +91,31 @@ function resolveBreadcrumbs() {
 
 function resolveIdLinksPlaceholder() {
 	let placeholders = document.querySelectorAll('.id-links-placeholder');
-	Array.from(placeholders).reduce((k, placeholder) => {
-		(async () => {
-			let prop = placeholder.getAttribute('data-prop');
-			let urls = await getFormatterUrls(prop);
-			let id = placeholder.getAttribute('data-id');
-			let formatted = [];
-			for (let template of urls) {
-				if (template.exp) {
-					let regex = new RegExp(template.exp.value);
-					let match = id.match(regex);
-					if (match !== null) {
-						if (match.length > 1) {
-							formatted.push(id.replace(regex, template.form.value));
-						} else {
-							formatted.push(template.form.value.replace('$1', id));
-						}
+	Array.from(placeholders).reduce( async (k, placeholder) => {
+		let prop = placeholder.getAttribute('data-prop');
+		let urls = await getFormatterUrls(prop);
+		let id = placeholder.getAttribute('data-id');
+		let formatted = [];
+		for (let template of urls) {
+			if (template.exp) {
+				let regex = new RegExp(template.exp.value);
+				let match = id.match(regex);
+				if (match !== null) {
+					if (match.length > 1) {
+						formatted.push(id.replace(regex, template.form.value));
+					} else {
+						formatted.push(template.form.value.replace('$1', id));
 					}
-				} else {
-					formatted.push(template.form.value.replace('$1', id));
 				}
+			} else {
+				formatted.push(template.form.value.replace('$1', id));
 			}
-			let target = new DocumentFragment;
-			for (let item of formatted) {
-				target.appendChild(templates.idLink(item));
-			}
-			placeholder.parentNode.replaceChild(target, placeholder);
-			resolvePlaceholders(placeholder.parentNode);
-		})();
+		}
+		let target = new DocumentFragment;
+		for (let item of formatted) {
+			target.appendChild(templates.idLink(item));
+		}
+		placeholder.parentNode.replaceChild(target, placeholder);
+		resolvePlaceholders(placeholder.parentNode);
 	}, 0);
 }

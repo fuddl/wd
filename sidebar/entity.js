@@ -120,7 +120,7 @@ function renderStatements(snak, references, type, target, scope) {
 		}
 		if (valueType === "external-id") {
 			target.appendChild(templates.code(snak.datavalue.value));
-			target.appendChild(templates.idLinksPlaceholder(snak.property, snak.datavalue.value));
+			//target.appendChild(templates.idLinksPlaceholder(snak.property, snak.datavalue.value));
 		}
 		if (valueType === "string") {
 			target.appendChild(document.createTextNode(snak.datavalue.value));
