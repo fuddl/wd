@@ -508,8 +508,8 @@ function updateView(id, useCache = true) {
 			});
 		}, 0);
 		
-		resolveBreadcrumbs();
 		resolvePlaceholders();
+		resolveBreadcrumbs();
 		resolveIdLinksPlaceholder();
 
 		let proxies = content.querySelectorAll('.proxy');

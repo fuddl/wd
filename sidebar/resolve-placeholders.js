@@ -8,8 +8,9 @@ function getLink(entityId) {
 	return prefixes[ns] + entityId;
 }
 
-function resolvePlaceholders() {
-	let placeholders = document.querySelectorAll('.placeholder[data-entity]');
+function resolvePlaceholders(scope) {
+	scope = scope ? scope : document;
+	let placeholders = scope.querySelectorAll('.placeholder[data-entity]');
 
 	Array.from(placeholders).reduce((k, placeholder) => {
 		(async () => {
@@ -83,7 +84,7 @@ function resolveBreadcrumbs() {
 				}));
 			}
 			placeholder.parentNode.replaceChild(templates.breadcrumbs(trail), placeholder);
-			resolvePlaceholders();
+			resolvePlaceholders(placeholder.parentNode);
 		})();
 	}, 0);
 }
@@ -116,7 +117,7 @@ function resolveIdLinksPlaceholder() {
 				target.appendChild(templates.idLink(item));
 			}
 			placeholder.parentNode.replaceChild(target, placeholder);
-			resolvePlaceholders();
+			resolvePlaceholders(placeholder.parentNode);
 		})();
 	}, 0);
 }
