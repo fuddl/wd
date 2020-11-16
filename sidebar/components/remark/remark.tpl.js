@@ -6,6 +6,9 @@ templates.remark = (vars) => {
 	} else {
 		dl.classList.add('remark--inline');
 	}
+	if (vars.id) {
+		dl.setAttribute('id', vars.id);
+	}
 
 	let dt = document.createElement('dt');
 	dt.classList.add('remark__verb');

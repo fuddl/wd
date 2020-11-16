@@ -18,3 +18,14 @@ function getValueByLang(e, key, fallback) {
 		return fallback;
 	}
 }
+
+function getAliasesByLang(e) {
+	const lang = navigator.language.substr(0,2);
+	if (e.hasOwnProperty('aliases')) {
+		if (e['aliases'].hasOwnProperty(lang)) {
+			return e['aliases'][lang].map((o) => { return o.value });
+		}
+	} else {
+		return [];
+	}
+}

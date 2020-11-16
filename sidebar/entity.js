@@ -303,6 +303,7 @@ function renderStatement(value) {
 				entity: pid,
 			}),
 			vals: values,
+			id: pid,
 		});
 
 		let firstValue = value.find(x=>x!==undefined);
@@ -359,13 +360,25 @@ function updateView(id, useCache = true) {
 					forms: e.forms,
 				}));
 			}
+
+			let metaCanon = document.createElement('meta');
+			metaCanon.setAttribute('name', 'canonical');
+			metaCanon.setAttribute('content', 'https://www.wikidata.org/wiki/' + id);
+			document.head.appendChild(metaCanon);
+
 			if (e.labels || e.descriptions) {
 				
-				document.querySelector('title').innerText = getValueByLang(e, 'labels', e.title);
+				document.title = getValueByLang(e, 'labels', e.title);
 				let description = getValueByLang(e, 'descriptions', false);
+
 				let hasDescription = description != false;
 				if (!description) {
 					description = await getAutodesc(id);
+				} else {
+					let metaDesc = document.createElement('meta');
+					metaDesc.setAttribute('name', 'description');
+					metaDesc.setAttribute('content', description);
+					document.head.appendChild(metaDesc);
 				}
 
 				wrapper.appendChild(templates.ensign({
@@ -377,6 +390,14 @@ function updateView(id, useCache = true) {
 						provisional: !hasDescription
 					},
 				}));
+			}
+
+			let aliases = getAliasesByLang(e);
+			if (aliases) {
+				let metaKeys = document.createElement('meta');
+				metaKeys.setAttribute('name', 'keywords');
+				metaKeys.setAttribute('content', aliases.join(', '));
+				document.head.appendChild(metaKeys);
 			}
 
 			footer.appendChild(templates.actions('Actions', [

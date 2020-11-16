@@ -79,7 +79,7 @@ async function collectPageLinks() {
 	  let bVisible = false;
 		for (let link of a.links) {
 	    const aRect = link.getBoundingClientRect();
-	    if (aRect.top >= 0 && aRect.bottom <= window.innerHeight) {
+	    if (aRect.top >= 0) {
 	    	aVisible = true;
 	    }
 	  }
@@ -114,8 +114,7 @@ async function collectPageLinks() {
 			this.selectors = [];
 			for (let link of this.links) {
 				let selector = document.createElement('a');
-				selector.classList.add('entity-selector');
-				selector.innerText = '···';
+				selector.classList.add('entity-selector', 'entity-selector--queued');
 				link.parentNode.insertBefore(selector, link.nextSibling);
 				this.selectors.push(selector);
 			}
@@ -136,6 +135,7 @@ async function collectPageLinks() {
 				for (let selector of this.selectors) {
 					selector.setAttribute('href', 'https://www.wikidata.org/wiki/' + this.entityId);
 					selector.innerText = this.entityId;
+					selector.classList.remove('entity-selector--queued');
 					selector.classList.add('entity-selector--selectable');
 					selector.addEventListener('click', (e) => {
 						e.preventDefault();
