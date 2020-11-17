@@ -74,6 +74,7 @@ resolvers.regex = {
 		P1985: /^https?:\/\/(?:www\.)animenewsnetwork\.com\/encyclopedia\/anime\.php\?id=([1-9]\d*)/,
 		P1982: /^https?:\/\/(?:www\.)animenewsnetwork\.com\/encyclopedia\/people\.php\?id=([1-9]\d*)/,
 		P1983: /^https?:\/\/(?:www\.)animenewsnetwork\.com\/encyclopedia\/company\.php\?id=([1-9]\d*)/,
+		P6839: /^https?:\/\/tvtropes\.org\/pmwiki\/pmwiki\.php\/([a-zA-Z]+\/[a-zA-Z\d]+)/,
 	},
 	applicable: async function(location) {
 		for (prop in this.patterns) {
