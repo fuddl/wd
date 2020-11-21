@@ -123,9 +123,11 @@
   }
 }
 
-.express__autocomplete > li:hover {
+.express__autocomplete > li:hover,
+.express__autocomplete > li:focus {
 	background: #4c59a6;
 	color: white;
+	outline: none;
 }
 
 .express__autocomplete:empty {

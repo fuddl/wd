@@ -111,6 +111,13 @@ code {
   user-select: all;
 }
 
+@media (prefers-color-scheme: dark) {
+  code {
+    border-color: #55595D;
+  }
+}
+
+
 sup {
   font-size: 10px;
   line-height: 1;

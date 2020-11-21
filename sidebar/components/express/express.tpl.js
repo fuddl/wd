@@ -33,7 +33,8 @@ templates.express = (vars) => {
 				item.classList.add('express__autocomplete-option--unsupported');
 				item.setAttribute('title', 'Data type not supported')
 			} else {
-				item.addEventListener('click', () => {
+				item.setAttribute('tabindex', '0')
+				let activationEvent = () => {
 					input.value = suggestion.label;
 					desc.innerText = suggestion.description;
 					wrapper.setAttribute('data-prop', suggestion.id);
@@ -47,6 +48,12 @@ templates.express = (vars) => {
 					});
 					wrapper.dispatchEvent(new Event('change'));
 					autocomplete.innerText = '';
+				};
+				item.addEventListener('click', activationEvent);
+				item.addEventListener('keydown', (e) => {
+					if (e.key === "Enter") { 
+						activationEvent();
+					}
 				});
 			}
 			autocomplete.appendChild(item);
@@ -105,6 +112,9 @@ templates.express = (vars) => {
 	summary.innerText = 'Links on this page';
 	options.appendChild(summary);
 
+	wrapper.addEventListener('keydown', (e) => {
+		console.log(e);
+	});
 
 	return {
 		element: wrapper,
