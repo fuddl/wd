@@ -19,6 +19,14 @@
 	box-sizing: border-box;
 }
 
+@media (prefers-color-scheme: dark) {
+	.join__field {
+		background-color: #44464A;
+		color: white;
+		border-color: #26292D;
+	}
+}
+
 .join__id {
 	position: absolute;
 	right: 0;
@@ -51,6 +59,13 @@
 	padding-top: 2px;
 }
 
+@media (prefers-color-scheme: dark) {
+	.join__proposals {
+		background-color: #44464A;
+		border-color: #26292D;
+	}
+}
+
 .join__field:focus + .join__proposals {
 	padding-left: 0;
 	padding-right: 0;
@@ -73,6 +88,13 @@
 	margin: 2px;
 	cursor: pointer;
 	box-sizing: border-box;
+}
+
+@media (prefers-color-scheme: dark) {
+	.join__proposal {
+		color: white;
+		border-color: #26292D;
+	}
 }
 
 .join__proposal:hover,

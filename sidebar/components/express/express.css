@@ -30,6 +30,12 @@
 	padding: .5em;
 }
 
+@media (prefers-color-scheme: dark) {
+	.express__pick:focus {
+		outline-color: #55595D;
+	}
+}
+
 .express__desc {
 	font-size: .5em;
 	min-height: 2em;
@@ -86,6 +92,15 @@
 	background: white;
 }
 
+@media (prefers-color-scheme: dark) {
+	.express__autocomplete {
+		color: white;
+		background: #44464A;
+		border-color: #26292D;
+	}
+}
+
+
 .express__autocomplete-option--unsupported {
 	opacity: .5;
 	pointer-events: none;
@@ -100,6 +115,12 @@
 
 .express__autocomplete-option:nth-child(n+2) {
 	border-top: 1px solid #C9C9C9;
+}
+
+@media (prefers-color-scheme: dark) {
+	.express__autocomplete-option:nth-child(n+2) {
+		border-top-color: #27292D;
+  }
 }
 
 .express__autocomplete > li:hover {
