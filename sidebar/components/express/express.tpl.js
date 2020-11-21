@@ -113,7 +113,31 @@ templates.express = (vars) => {
 	options.appendChild(summary);
 
 	wrapper.addEventListener('keydown', (e) => {
-		console.log(e);
+		let allOptions = autocomplete.querySelectorAll('[tabindex]');
+		let currentIndex = 0;
+		if (allOptions) {
+			currentIndex = Array.prototype.indexOf.call(allOptions, document.activeElement);
+		}
+		switch (e.key) {
+			case "ArrowUp":
+				e.preventDefault();
+				if (document.activeElement === autocomplete.firstChild) {
+					input.focus();
+				} else {
+					allOptions.item(currentIndex - 1).focus();
+				}
+			break;
+			case "ArrowDown":
+				e.preventDefault();
+				if (document.activeElement === input) {
+					autocomplete.firstChild.focus();
+				} else if (document.activeElement === autocomplete.lastChild) {
+					input.focus();
+				} else {
+					allOptions.item(currentIndex + 1).focus();
+				}
+			break;
+		}
 	});
 
 	return {
