@@ -50,9 +50,10 @@
       "resolver__fandom.js",
       "resolver__wikis.js",
       "resolver__doi.js",
-
       "resolver__official-website.js",
+
       "content__collect-page-links.js",
+      "content__collect-strings.js",
       "content.js"
     ]
   }

@@ -152,16 +152,17 @@ async function collectPageLinks() {
 
 						let search = oldId ? '?oldid=' + oldId : location.search;
 
-						let pageTitle = document.querySelector('title');
+						let pageTitle = document.title;
 						let pageLanguage = document.querySelector('html').lang;
 
 						let message = {
 							type: 'use_in_statement',
+							dataype: 'wikibase-item',
 							wdEntityId: this.entityId,
 							reference: {
 								url: location.protocol + '//' + location.host + location.pathname + search + hash,
 								section: sectionData.section ? sectionData.section.trim().replace("\n", '␤') : null,
-								title: pageTitle ? pageTitle.innerText.trim() : null,
+								title: pageTitle ? pageTitle.trim() : null,
 								language: pageLanguage ? pageLanguage : 'zxx',
 							}
 						};

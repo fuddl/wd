@@ -44,6 +44,13 @@
 
 .express__selection {
 	margin-top: 1em;
+	display: none;
+}
+
+[data-datatype="wikibase-item"] .express__selection,
+[data-datatype="wikibase-lexeme"] .express__selection,
+[data-datatype="wikibase-property"] .express__selection {
+	display: block;
 }
 
 .express__tag {
@@ -132,4 +139,27 @@
 
 .express__autocomplete:empty {
 	display: none;
+}
+
+.express__composer {
+	padding: 1em;
+	width: 100%;
+	height: 6em;
+	resize: none;
+	display: none;
+	border: 1px solid;
+	margin-top: 1em;
+}
+
+@media (prefers-color-scheme: dark) {
+	.express__composer {
+		background-color: #44464A;
+		color: white;
+		border-color: #26292D;
+  }
+}
+
+[data-datatype="string"] .express__composer,
+[data-datatype="monolingualtext"]  .express__composer {
+	display: block;
 }

@@ -1,4 +1,13 @@
 templates.express = (vars) => { 
+
+	const supportedProperties = [
+//		"monolingualtext",
+		"string",
+		"wikibase-item",
+		"wikibase-lexeme",
+		"wikibase-property",
+	];
+
 	let wrapper = document.createElement('div');
 	wrapper.classList.add('express');
 
@@ -17,19 +26,19 @@ templates.express = (vars) => {
 	desc.classList.add('express__desc');
 
 	const updateAutocomplete = async function(e) {
-		let response = await fetch(`https://www.wikidata.org/w/api.php?action=wbsgetsuggestions&search=${e.target.value}&context=item&format=json&language=en&entity=${vars.entity}`);
+		let response = await fetch(`https://www.wikidata.org/w/api.php?action=wbsearchentities&search=${e.target.value}&format=json&errorformat=plaintext&language=en&uselang=en&type=property`);
 		response = await response.json();
 		autocomplete.innerText = '';
 		for (let suggestion of response.search) {
 			let title = document.createElement('strong');
 			title.innerText = suggestion.label;
 			let itemDesc = document.createElement('div');
-			itemDesc.innerText = suggestion.description;
+			itemDesc.innerText = suggestion.description + ' ' + suggestion.datatype;
 			let item = document.createElement('li');
 			item.classList.add('express__autocomplete-option');
 			item.appendChild(title);
 			item.appendChild(itemDesc);
-			if (typeof suggestion.datatype !== 'undefined' && !["wikibase-item", "wikibase-lexeme", "wikibase-property"].includes(suggestion.datatype)) {
+			if (!supportedProperties.includes(suggestion.datatype)) {
 				item.classList.add('express__autocomplete-option--unsupported');
 				item.setAttribute('title', 'Data type not supported')
 			} else {
@@ -38,12 +47,14 @@ templates.express = (vars) => {
 					input.value = suggestion.label;
 					desc.innerText = suggestion.description;
 					wrapper.setAttribute('data-prop', suggestion.id);
+					wrapper.setAttribute('data-datatype', suggestion.datatype);
 
 					browser.storage.local.set({
 					  lastUsedProp:  {
 					  	prop: suggestion.id,
 					  	name: suggestion.label,
 					  	desc: suggestion.description,
+					  	datatype: suggestion.datatype,
 					  },
 					});
 					wrapper.dispatchEvent(new Event('change'));
@@ -90,6 +101,7 @@ templates.express = (vars) => {
 			  	prop: firstPropId,
 			  	name: getValueByLang(firstProp[firstPropId], 'labels', firstPropId),
 			  	desc: getValueByLang(firstProp[firstPropId], 'descriptions', ''),
+			  	datatype: firstProp[firstPropId].datatype,
 			  },
 			});
 
@@ -98,6 +110,7 @@ templates.express = (vars) => {
 		desc.innerText = storage.lastUsedProp.desc;
 		input.value = storage.lastUsedProp.name;
 		wrapper.setAttribute('data-prop', storage.lastUsedProp.prop);
+		wrapper.setAttribute('data-datatype', storage.lastUsedProp.datatype);
 	})();
 
 	let selection = document.createElement('div');
@@ -107,6 +120,10 @@ templates.express = (vars) => {
 	let options = document.createElement('details');
 	options.classList.add('express__options');
 	wrapper.appendChild(options);
+
+	let composer = document.createElement('textarea');
+	composer.classList.add('express__composer');
+	main.appendChild(composer);
 	
 	let summary = document.createElement('summary');
 	summary.innerText = 'Links on this page';
@@ -144,6 +161,7 @@ templates.express = (vars) => {
 		element: wrapper,
 		selection: selection,
 		options: options,
+		composer: composer,
 		loadingFinished: function() {
 			progress.remove();
 			input.focus();

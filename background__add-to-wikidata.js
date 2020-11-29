@@ -26,10 +26,12 @@ async function processJobs(jobs) {
 
 		} else if (job.type === 'set_claim') {
 			
+			console.log(job);
 			let extistingStatement = await getExistingStatement('Q' + job.object['numeric-id'], job.verb, job.subject);
 
 			if (!extistingStatement) {
 				answer = await setClaim(job.subject !== 'LAST' ? job.subject : lastCreated, job.verb, job.object);			
+				console.log(answer);
 			} else {
 				answer = {
 					success: 1,
@@ -85,6 +87,7 @@ async function setClaim(subjectId, property, value) {
 	data.append('snaktype', 'value');
 	data.append('property', property);
 
+	console.log(value);
 	if (typeof value === "string") {
 		data.append('value', '"' + value + '"');
 	} else {

@@ -144,7 +144,9 @@ browser.runtime.onMessage.addListener(
 		  if (data.type === 'use_in_statement') {
 			browser.runtime.sendMessage({
 				type: 'use_in_statement',
-				wdEntityId: data.entityId,
+				dataype: data.dataype,
+				value: data.value ? data.value : null,
+				wdEntityId: data.entityId ? data.entityId : null,
 				reference: data.reference ? data.reference : null,
 			});
 		  }
