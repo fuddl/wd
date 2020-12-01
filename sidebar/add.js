@@ -66,7 +66,7 @@ content.innerHTML = '';
 		let selectedEntities = propPicker.selection.querySelectorAll(`[data-selected]`);
 		if (
 			selectedEntities.length > 0 &&
-			ppropertSelected &&
+			propertSelected &&
 			itemTypes.includes(datatype)
 		) {
 			saveButton.removeAttribute('disabled');
@@ -99,8 +99,9 @@ content.innerHTML = '';
 		}
 
 		if (data.type === 'use_in_statement') {
+			let target = {};
 			if (data.dataype === 'wikibase-item') {
-				let target = propPicker.element.querySelector(`[data-entity="${ data.wdEntityId }"]`);
+				target = propPicker.element.querySelector(`[data-entity="${ data.wdEntityId }"]`);
 
 				target.toggle();
 
@@ -113,24 +114,25 @@ content.innerHTML = '';
 						target.setAttribute('data-statement-exists', true);
 					}
 				})();
+			} else if (data.dataype === 'string') {
+				target = propPicker.composer;
+				target.innerText = data.value;
 
-				if (data.reference.url) {
-					target.setAttribute('data-reference-url', data.reference.url);
-				}
-				if (data.reference.section) {
-					target.setAttribute('data-reference-section', data.reference.section);
-				}
-				if (data.reference.title) {
-					target.setAttribute('data-reference-title', data.reference.title);
-				}
-				if (data.reference.language) {
-					target.setAttribute('data-reference-language', data.reference.language);
-				}
-			}
-			if (data.dataype === 'string') {
-				propPicker.composer.innerText = data.value;
 				checkSaveButton();
 			}
+			if (data.reference.url) {
+				target.setAttribute('data-reference-url', data.reference.url);
+			}
+			if (data.reference.section) {
+				target.setAttribute('data-reference-section', data.reference.section);
+			}
+			if (data.reference.title) {
+				target.setAttribute('data-reference-title', data.reference.title);
+			}
+			if (data.reference.language) {
+				target.setAttribute('data-reference-language', data.reference.language);
+			}
+
 		}
 	});
 
@@ -162,16 +164,53 @@ content.innerHTML = '';
 			let jobs = [];
 
 			let currentEntityNummericId = parseInt(currentEntity.replace(/\w/,''));
-			
 			if (stringTypes.includes(propPicker.element.getAttribute('data-datatype'))) {
+				let reference = [];
+				if (propPicker.composer.getAttribute('data-reference-url')) {
+					reference.push({
+						"snaktype": "value",
+						"property": "P854",
+						"datavalue": {
+							"value": propPicker.composer.getAttribute('data-reference-url'),
+							"type": "string"
+						},
+						"datatype": "url"
+					});
+				}
+
+				if (propPicker.composer.getAttribute('data-reference-title')) {
+					reference.push({
+						"snaktype": "value",
+						"property": "P1476",
+						"datavalue": {
+							"value": {
+								text: propPicker.composer.getAttribute('data-reference-title'),
+								language: propPicker.composer.getAttribute('data-reference-language'),
+							},
+							"type": "monolingualtext"
+						},
+						"datatype": "string"
+					});
+				}
+
+				if (propPicker.composer.getAttribute('data-reference-section')) {
+					reference.push({
+						"snaktype": "value",
+						"property": "P958",
+						"datavalue": {
+							"value": propPicker.composer.getAttribute('data-reference-section'),
+							"type": "string"
+						},
+						"datatype": "string"
+					});
+				}
+
 				jobs.push({
 					type: 'set_claim',
 					subject: currentEntity,
 					verb: propPicker.element.getAttribute('data-prop'),
-					object: {
-						value: propPicker.composer.value,
-						type: 'string',
-					},
+					object: propPicker.composer.value,
+					references: reference ? [reference] : null,
 				});
 			}
 
@@ -234,19 +273,22 @@ content.innerHTML = '';
 
 				}
 			}
-
-			browser.runtime.sendMessage({
-				type: 'send_to_wikidata',
-				data: jobs,
+      
+      
+			Promise.all([
+				browser.runtime.sendMessage({
+					type: 'send_to_wikidata',
+					data: jobs,
+				}), 
+				browser.runtime.sendMessage({
+					type: 'unlock_sidebar',
+				}),
+				browser.runtime.sendMessage({
+					type: 'clear_pagelinks',
+				})
+			]).then((values) => {
+			  window.location = 'entity.html?' + currentEntity;
 			});
-			browser.runtime.sendMessage({
-				type: 'unlock_sidebar',
-			});
-			browser.runtime.sendMessage({
-				type: 'clear_pagelinks',
-			});
-
-			window.location = 'entity.html?' + currentEntity;
 		}
 	});
 
