@@ -158,7 +158,7 @@ function renderStatements(snak, references, type, target, scope) {
 		if (valueType === "monolingualtext") {
 			target.appendChild(templates.title({
 				text: snak.datavalue.value.text,
-				lang: snak.datavalue.value.lang
+				lang: snak.datavalue.value.language
 			}));
 		}
 		if (valueType === "commonsMedia") {

@@ -1,9 +1,22 @@
+function getElementLanguage(element) {
+	while (typeof element.closest === 'undefined') {
+		element = element.parentElement;
+	}
+  let closest = element.closest('[lang]');
+  if (closest) {
+	  let lang = closest.lang;
+	  if (lang) {
+	  	return lang;
+	  }
+  }
+  return 'zxx';
+}
+
 document.addEventListener('selectionchange', (e) => {
-	let text = document.getSelection().toString();
+	let text = document.getSelection().toString().trim();
 	if (text) {
 
-		let sectionData = getClosestID(document.getSelection().focusNode.parentElement);
-
+		let sectionData = getClosestID(document.getSelection().focusNode);
 
 		let hash = sectionData.hash ? '#' + sectionData.hash : ''; 
 
@@ -20,6 +33,7 @@ document.addEventListener('selectionchange', (e) => {
 			type: 'use_in_statement',
 			dataype: 'string',
 			value: text,
+			valueLang: getElementLanguage(document.getSelection().focusNode),
 			reference: {
 				url: url,
 				section: sectionData.section ? sectionData.section.trim().replace("\n", '␤') : null,

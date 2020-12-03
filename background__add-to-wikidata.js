@@ -30,6 +30,8 @@ async function processJobs(jobs) {
 
 			if (!extistingStatement) {
 				answer = await setClaim(job.subject !== 'LAST' ? job.subject : lastCreated, job.verb, job.object);			
+				console.log(JSON.stringify(job.object, true));
+				console.log(JSON.stringify(answer, true));
 			} else {
 				answer = {
 					success: 1,

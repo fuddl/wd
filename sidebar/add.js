@@ -6,6 +6,7 @@ const itemTypes = [
 
 const stringTypes = [
 	'string',
+	'monolingualtext',
 ];
 
 async function askIfStatementExists(subject, verb, object) {
@@ -132,6 +133,9 @@ content.innerHTML = '';
 			if (data.reference.language) {
 				target.setAttribute('data-reference-language', data.reference.language);
 			}
+			if (data.valueLang) {
+				propPicker.languagePicker.value = data.valueLang.toLowerCase();
+			}
 
 		}
 	});
@@ -205,13 +209,22 @@ content.innerHTML = '';
 					});
 				}
 
-				jobs.push({
+				const setClaim = {
 					type: 'set_claim',
 					subject: currentEntity,
 					verb: propPicker.element.getAttribute('data-prop'),
-					object: propPicker.composer.value,
+					object: {},
 					references: reference ? [reference] : null,
-				});
+				};
+				if (propPicker.element.getAttribute('data-datatype') === 'monolingualtext') {
+					setClaim.object.language = propPicker.languagePicker.value;
+					setClaim.object.text = propPicker.composer.value;
+				}
+				if (propPicker.element.getAttribute('data-datatype') === 'string') {
+					setClaim.object = propPicker.composer.value;
+				}
+
+				jobs.push(setClaim);
 			}
 
 			if (itemTypes.includes(propPicker.element.getAttribute('data-datatype'))) {

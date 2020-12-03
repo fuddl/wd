@@ -107,7 +107,6 @@
 	}
 }
 
-
 .express__autocomplete-option--unsupported {
 	opacity: .5;
 	pointer-events: none;
@@ -160,6 +159,19 @@
 }
 
 [data-datatype="string"] .express__composer,
-[data-datatype="monolingualtext"]  .express__composer {
+[data-datatype="monolingualtext"] .express__composer {
+	display: block;
+}
+
+[data-datatype="monolingualtext"] .express__composer {
+	font-style: italic;
+	font-family: inherit;
+}
+
+.express__lang {
+	display: none;
+}
+
+[data-datatype="monolingualtext"] .express__lang {
 	display: block;
 }

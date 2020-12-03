@@ -28,12 +28,14 @@ function getClosestID(element) {
       };    	
     }
 
-    let IDwrapper = subject.closest('[id]');
-    if (IDwrapper) {
-        return {
-          section: null,
-          hash: IDwrapper.getAttribute('id'),
-        }; 	
+    if (subject.closest) {
+	    let IDwrapper = subject.closest('[id]');
+	    if (IDwrapper) {
+	        return {
+	          section: null,
+	          hash: IDwrapper.getAttribute('id'),
+	        }; 	
+	    }
     }
 
     return {

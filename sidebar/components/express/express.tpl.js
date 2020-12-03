@@ -1,7 +1,7 @@
 templates.express = (vars) => { 
 
 	const supportedProperties = [
-//		"monolingualtext",
+		"monolingualtext",
 		"string",
 		"wikibase-item",
 		"wikibase-lexeme",
@@ -124,6 +124,21 @@ templates.express = (vars) => {
 	let composer = document.createElement('textarea');
 	composer.classList.add('express__composer');
 	main.appendChild(composer);
+
+	let languagePicker = document.createElement('select');
+	languagePicker.classList.add('express__lang');
+	(async () => {
+		let response = await fetch('https://www.wikidata.org/w/api.php?action=query&meta=wbcontentlanguages&wbclcontext=monolingualtext&wbclprop=code%7Cautonym&format=json', {cache: "force-cache"});
+		response = await response.json();
+		response = response.query.wbcontentlanguages;
+		for (key in response) {
+			let option = document.createElement('option');
+			option.setAttribute('value', response[key].code);
+			option.innerText = response[key].autonym;
+			languagePicker.appendChild(option);
+		}		
+	})();
+	main.appendChild(languagePicker);
 	
 	let summary = document.createElement('summary');
 	summary.innerText = 'Links on this page';
@@ -162,6 +177,7 @@ templates.express = (vars) => {
 		selection: selection,
 		options: options,
 		composer: composer,
+		languagePicker: languagePicker,
 		loadingFinished: function() {
 			progress.remove();
 			input.focus();
