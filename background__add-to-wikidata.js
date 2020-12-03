@@ -29,9 +29,7 @@ async function processJobs(jobs) {
 			let extistingStatement = await getExistingStatement('Q' + job.object['numeric-id'], job.verb, job.subject);
 
 			if (!extistingStatement) {
-				answer = await setClaim(job.subject !== 'LAST' ? job.subject : lastCreated, job.verb, job.object);			
-				console.log(JSON.stringify(job.object, true));
-				console.log(JSON.stringify(answer, true));
+				answer = await setClaim(job.subject !== 'LAST' ? job.subject : lastCreated, job.verb, job.object);
 			} else {
 				answer = {
 					success: 1,
