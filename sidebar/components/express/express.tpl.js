@@ -134,7 +134,7 @@ templates.express = (vars) => {
 		for (key in response) {
 			let option = document.createElement('option');
 			option.setAttribute('value', response[key].code);
-			option.innerText = response[key].autonym;
+			option.innerText = response[key].code;
 			languagePicker.appendChild(option);
 		}		
 	})();
