@@ -1,4 +1,5 @@
-function getElementLanguage(element) {
+function getElementLanguage(selection) {
+	element = selection.focusNode;
 	while (typeof element.closest === 'undefined') {
 		element = element.parentElement;
 	}
@@ -9,7 +10,20 @@ function getElementLanguage(element) {
 	  	return lang;
 	  }
   }
-  return 'zxx';
+  return guessLanguage(selection.toString());
+}
+
+function guessLanguage(string) {
+	// if it contains kana, let's assume its japanese
+	if (string.match(/[ァアィイゥウェエォオカガキギクグケゲコゴサザシジスズセゼソゾタダチヂッツヅテデトドナニヌネノハバパヒビピフブプヘベペホボポマミムメモャヤュユョヨラリルレロヮワヰヱヲンヴヵヶヷヸヹヺ・ーヽヾヿぁあぃいぅうぇえぉおかがきぎくぐけげこごさざしじすずせぜそぞただちぢっつづてでとどなにぬねのはばぱひびぴふぶぷへべぺほぼぽまみむめもゃやゅゆょよらりるれろゎわゐゑをんゔゕゖ゛゜ゝゞゟ]/)) {
+		return 'ja';
+	}
+	// if it contains a sharp s, let's assume its german
+	if (string.match(/[ßẞ]/)) {
+		return 'de';
+	}
+	// if all else fails, let's assume it is something the user can read
+  return navigator.language.substr(0,2);
 }
 
 document.addEventListener('selectionchange', (e) => {
@@ -33,7 +47,7 @@ document.addEventListener('selectionchange', (e) => {
 			type: 'use_in_statement',
 			dataype: 'string',
 			value: text,
-			valueLang: getElementLanguage(document.getSelection().focusNode),
+			valueLang: getElementLanguage(document.getSelection()),
 			reference: {
 				url: url,
 				section: sectionData.section ? sectionData.section.trim().replace("\n", '␤') : null,
