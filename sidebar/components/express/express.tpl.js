@@ -123,6 +123,7 @@ templates.express = (vars) => {
 
 	let composer = document.createElement('textarea');
 	composer.classList.add('express__composer');
+	composer.setAttribute('placeholder', 'Type here or select text in the page…')
 	main.appendChild(composer);
 
 	let languagePicker = document.createElement('select');
