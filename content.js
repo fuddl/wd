@@ -45,6 +45,7 @@ browser.runtime.onMessage.addListener(async function(msg, sender, sendResponse) 
   if (msg.action == 'find_applicables') {
     findApplicables(location);
   } else if (msg.action === 'collect_pagelinks') {
+  	displayMetadata();
   	return await collectPageLinks();
   } else if (msg.action === 'clear_pagelinks') {
   	clearPageLinks();
