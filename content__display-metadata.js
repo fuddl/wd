@@ -169,6 +169,5 @@ function displayMetadata() {
 		} else {
 			snipped.parentNode.insertBefore(container, snipped.nextSibling);
 		}
-		addLink(code, 'http');
 	}
 }

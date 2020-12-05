@@ -54,6 +54,7 @@ function getOldid() {
 }
 
 async function collectPageLinks() {
+	displayMetadata();
 	let uniqueLinks = [];
 	let foundEntities = [];
 	for (let link of document.links) {
