@@ -496,10 +496,8 @@ function updateView(id, useCache = true) {
 							}
 				    }
 
-						let setEntity = await wikidataGetEntity(thisSet.id);
-
-						for (let prop of groupClaims(setEntity[thisSet.id].claims)) {
-							let statement = renderStatement(setEntity[thisSet.id].claims[prop]);
+						for (let prop of groupClaims(thisSet.claims)) {
+							let statement = renderStatement(thisSet.claims[prop]);
 							setWrapper.appendChild(statement.rendered);
 							
 						}
