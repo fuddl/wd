@@ -2,7 +2,7 @@ resolvers.regex = {
 	location: '',
 	patterns: {
 		P345:  /^https?:\/\/(?:www|m)\.imdb\.com\/(?:(?:search\/)?title(?:\?companies=|\/)|name\/|event\/|news\/)(\w{2}\d+)/,
-		P8013: /^https?:\/\/trakt\.tv\/(people\/[^\/]+|movies\/[^\/]+|shows\/[^\/]+\/seasons\/\d+$|shows\/[^\/]+\/seasons\/\d+\/episodes\/\d+)/,
+		P8013: /^https?:\/\/trakt\.tv\/(people\/[^\/?]+|movies\/[^\/?]+|shows\/[^\/]+\/seasons\/\d+$|shows\/[^\/?]+\/seasons\/\d+\/episodes\/\d+)/,
 		P2002: /^https?:\/\/(?:(?:mobile\.)?twitter\.com\/(?:intent\/user\?screen_name\=)?(?!hashtag)([0-9A-Za-z_]{1,15})|scholia\.toolforge\.org\/twitter\/([0-9A-Za-z_]{1,15}))/,
 		P434:  /^https?:\/\/(?:musicbrainz\.org\/artist\/|www\.bbc\.co\.uk\/music\/artists\/)([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/,
 		P436:  /^https?:\/\/musicbrainz\.org\/release-group\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/,
@@ -19,7 +19,7 @@ resolvers.regex = {
 		P4198: /^https?:\/\/play\.google\.com\/(?:store\/music\/artist\?id=|music\/listen\#\/(?:wst\/)?artist\/)(([A-Z]|[a-z]|[0-9]){27})/,
 		P4300: /^https?:\/\/(?:music|www)\.youtube\.com\/playlist\?list=((?:PL|OLAK|RDCLAK)[-_0-9A-Za-z]+)/,
 		P5327: /^https?:\/\/www\.fernsehserien\.de\/([^?#]+)/,
-		P3984: /^https?:\/\/www\.reddit\.com\/r\/([^\/?#]+)\//,
+		P3984: /^https?:\/\/(?:(?:www|old|np|beta|m)\.)?reddit\.com\/r\/([^\/?#]+)\//,
 		P1733: /^https?:\/\/(?:store\.)?steam(?:community|powered)\.com\/app\/(\d+)/,
 		P2725: /^https?:\/\/www\.gog\.com\/([^#?]+)/,
 		P4477: /^https?:\/\/www\.humblebundle\.com\/store\/([^#\?\/]+)/,
@@ -76,10 +76,14 @@ resolvers.regex = {
 		P1982: /^https?:\/\/(?:www\.)animenewsnetwork\.com\/encyclopedia\/people\.php\?id=([1-9]\d*)/,
 		P1983: /^https?:\/\/(?:www\.)animenewsnetwork\.com\/encyclopedia\/company\.php\?id=([1-9]\d*)/,
 		P6839: /^https?:\/\/tvtropes\.org\/pmwiki\/pmwiki\.php\/([a-zA-Z]+\/[a-zA-Z\d]+)/,
-		P1874: /^https?\:\/\/www\.netflix\.com\/(?:(?:[a-z-]+\/)?title|watch)\/(\d{6,8})/,
-		P5749: /^https?\:\/\/www\.amazon\.[a-z]+\/dp\/([A-Z\d]{10})/,
-		P3180: /^https?\:\/\/vndb\.org\/((?:c|g|i|p|r|s|u|v)[1-9]\d*)/,
-
+		P1874: /^https?:\/\/www\.netflix\.com\/(?:(?:[a-z-]+\/)?title|watch)\/(\d{6,8})/,
+		P5749: /^https?:\/\/www\.amazon\.[a-z]+\/dp\/([A-Z\d]{10})/,
+		P3180: /^https?:\/\/vndb\.org\/((?:c|g|i|p|r|s|u|v)[1-9]\d*)/,
+		P4933: /^https?:\/\/www\.bcdb\.com\/cartoon\/([1-9]\d*)/,
+		P2339: /^https?:\/\/(?:www\.)?boardgamegeek\.com\/boardgame\/([1-9]\d{0,5})/,
+		P8675: /^https?:\/\/(?:www\.)?boardgamegeek\.com\/boardgamefamily\/([1-9]\d{0,5})/,
+		P3528: /^https?:\/\/(?:www\.)?luding\.org\/(?:cgi-bin|Skripte)\/GameData\.py(?:\/(?:DE|EN)gameid\/|.*(?:\?|\&)gameid=)(\d+)/,
+		P8895: /^https?:\/\/allthetropes\.org\/wiki\/([^?#]+)/,
 	},
 	applicable: async function(location) {
 		for (prop in this.patterns) {
