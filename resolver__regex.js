@@ -83,7 +83,6 @@ resolvers.regex = {
 		P2339: /^https?:\/\/(?:www\.)?boardgamegeek\.com\/boardgame\/([1-9]\d{0,5})/,
 		P8675: /^https?:\/\/(?:www\.)?boardgamegeek\.com\/boardgamefamily\/([1-9]\d{0,5})/,
 		P3528: /^https?:\/\/(?:www\.)?luding\.org\/(?:cgi-bin|Skripte)\/GameData\.py(?:\/(?:DE|EN)gameid\/|.*(?:\?|\&)gameid=)(\d+)/,
-		P8895: /^https?:\/\/allthetropes\.org\/wiki\/([^?#]+)/,
 	},
 	applicable: async function(location) {
 		for (prop in this.patterns) {
