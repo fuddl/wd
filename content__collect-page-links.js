@@ -166,7 +166,7 @@ async function collectPageLinks() {
 								url: location.protocol + '//' + location.host + location.pathname + search + hash,
 								section: sectionData.section ? sectionData.section.trim().replace("\n", '␤') : null,
 								title: pageTitle ? pageTitle.trim() : null,
-								language: pageLanguage ? pageLanguage : 'zxx',
+								language: pageLanguage ? pageLanguage : 'und',
 							}
 						};
 

@@ -35,11 +35,6 @@ resolvers.p8966 = {
 		for (prop of this.patterns) {
 			let match = location.href.match(prop.s);
 			if (match) {
-				console.log(prop.s.toString())
-				console.log(location.href)
-				console.log(JSON.stringify(match))
-				console.log(prop.replace)
-				console.log(location.href.replace(prop.s, prop.r))
 				return [{
 					prop: prop.p,
 					value: location.href.replace(prop.s, prop.r),
