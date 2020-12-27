@@ -129,9 +129,7 @@ templates.express = (vars) => {
 	let languagePicker = document.createElement('select');
 	languagePicker.classList.add('express__lang');
 	(async () => {
-		let response = await fetch('https://www.wikidata.org/w/api.php?action=query&meta=wbcontentlanguages&wbclcontext=monolingualtext&wbclprop=code%7Cautonym&format=json', {cache: "force-cache"});
-		response = await response.json();
-		response = response.query.wbcontentlanguages;
+		let response = await getValidStringLanguages();
 		for (key in response) {
 			let option = document.createElement('option');
 			option.setAttribute('value', response[key].code);

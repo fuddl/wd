@@ -31,7 +31,7 @@ async function findApplicables(location, openInSidebar = true) {
 				source: {
 					url: location.toString(),
 					title: document.querySelector('title').innerText,
-					lang: document.querySelector('html').lang,
+					lang: await makeLanguageValid(document.querySelector('html').lang),
 				}
 			},
 		});

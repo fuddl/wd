@@ -27,35 +27,37 @@ function guessLanguage(string) {
 }
 
 document.addEventListener('selectionchange', (e) => {
-	let text = document.getSelection().toString().trim();
-	if (text) {
+	(async () => {
+		let text = document.getSelection().toString().trim();
+		if (text) {
 
-		let sectionData = getClosestID(document.getSelection().focusNode);
+			let sectionData = getClosestID(document.getSelection().focusNode);
 
-		let hash = sectionData.hash ? '#' + sectionData.hash : ''; 
+			let hash = sectionData.hash ? '#' + sectionData.hash : ''; 
 
-		let oldId = getOldid();
+			let oldId = getOldid();
 
-		let search = oldId ? '?oldid=' + oldId : location.search;
+			let search = oldId ? '?oldid=' + oldId : location.search;
 
-		let pageTitle = document.title;
-		let pageLanguage = document.querySelector('html').lang;
+			let pageTitle = document.title;
+			let pageLanguage = document.querySelector('html').lang;
 
-		let url = location.protocol + '//' + location.host + location.pathname + search + hash;
+			let url = location.protocol + '//' + location.host + location.pathname + search + hash;
 
-		let message = {
-			type: 'use_in_statement',
-			dataype: 'string',
-			value: text,
-			valueLang: getElementLanguage(document.getSelection()),
-			reference: {
-				url: url,
-				section: sectionData.section ? sectionData.section.trim().replace("\n", '␤') : null,
-				title: pageTitle ? pageTitle.trim() : null,
-				language: pageLanguage ? pageLanguage : 'zxx',
+			let message = {
+				type: 'use_in_statement',
+				dataype: 'string',
+				value: text,
+				valueLang: await makeLanguageValid(getElementLanguage(document.getSelection())),
+				reference: {
+					url: url,
+					section: sectionData.section ? sectionData.section.trim().replace("\n", '␤') : null,
+					title: pageTitle ? pageTitle.trim() : null,
+					language: pageLanguage ? await makeLanguageValid(pageLanguage) : 'und',
+				}
 			}
-		}
 
-		browser.runtime.sendMessage(message);
-	}
+			browser.runtime.sendMessage(message);
+		}
+	})()
 });
