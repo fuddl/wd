@@ -4,9 +4,11 @@ function findTitles() {
 	// extract the lemma of mediawiki based pages
 	let scriptBlocks = document.querySelectorAll('script');
 	for (s of scriptBlocks) {
-		let match = s.innerText.match(/"wgTitle":"((?:[^"\\]|\\.)+)"/);
-		if (match) {
-			titles.push(match[1].replace(/\\(.)/g, "$1"));
+		let mediawikiTitle = s.innerText.match(/"wgTitle":"((?:[^"\\]|\\.)+)"/);
+		let isWikibaseItem = s.innerText.match(/"wgPageContentModel":"wikibase-item"/);
+		// since the title is not very useful in a wikibase item
+		if (mediawikiTitle && !isWikibaseItem) {
+			titles.push(mediawikiTitle[1].replace(/\\(.)/g, "$1"));
 		}
 	}
 
