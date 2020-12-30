@@ -67,8 +67,21 @@ async function addToMapCache(id, url) {
 	browser.storage.local.set(cache);
 }
 
+async function openInSidebarIfSidebarIsOpen(entityId, tab, setPanel) {
+	if (await browser.sidebarAction.isOpen({})) {
+		pushEnitiyToSidebar(entityId, tab, setPanel);
+	}
+};
+
 browser.runtime.onMessage.addListener(
 	(data, sender) => {
+
+		if(data.type === 'open_in_sidebar') {
+			(async () => {
+				pushEnitiyToSidebar(data.wdEntityId, data.tid);
+			})()
+		}
+
 		if (sender.tab) {
 			if (!tabStates[sender.tab.id]) {
 				tabStates[sender.tab.id] = {};
@@ -87,10 +100,8 @@ browser.runtime.onMessage.addListener(
 					});
 				}
 				(async () => {
-					if (await browser.sidebarAction.isOpen({})) {
-						let tabDest = sender.tab.id ? sender.tab.id : await browser.tabs.getCurrent();
-						pushEnitiyToSidebar(data.wdEntityId, tabDest, data.openInSidebar);
-					}
+					let tabDest = sender.tab.id ? sender.tab.id : await browser.tabs.getCurrent();
+					openInSidebarIfSidebarIsOpen(data.wdEntityId, tabDest, data.openInSidebar);
 				})();
 
 			  addToMapCache(data.wdEntityId, data.url);

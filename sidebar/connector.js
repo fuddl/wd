@@ -12,7 +12,6 @@ function getPropertyScope(property) {
 		}
 	}
 	return 'item';
-
 }
 
 (async () => {
@@ -147,7 +146,12 @@ function getPropertyScope(property) {
 					id: selectedEntity,
 				});
 
-				window.location = 'entity.html?' + selectedEntity;
+				browser.runtime.sendMessage({
+					type: 'open_in_sidebar',
+					tid: await getCurrentTab(),
+					wdEntityId: selectedEntity,
+				});
+				
 			}
 		}
 	});
