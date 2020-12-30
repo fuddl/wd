@@ -31,13 +31,13 @@ resolvers.p8966 = {
 	},
 	applicable: async function(location) {
 		this.patterns = await this.aquireRegexes();
-		this.location = location;
+		let href = decodeURIComponent(location.href);
 		for (prop of this.patterns) {
-			let match = location.href.match(prop.s);
+			let match = href.match(prop.s);
 			if (match) {
 				return [{
 					prop: prop.p,
-					value: location.href.replace(prop.s, prop.r),
+					value: href.replace(prop.s, prop.r),
 					recommended: true,
 				}];
 			}
