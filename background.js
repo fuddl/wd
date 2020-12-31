@@ -58,12 +58,12 @@ browser.browserAction.onClicked.addListener((tab) => {
 	}
 });
 
-async function addToMapCache(id, url) {
+async function addToUrlCache(id, url) {
 	let cache = await browser.storage.local.get();
-	if (!('mapCache' in cache)) {
-		cache.mapCache = {};
+	if (!('urlCache' in cache)) {
+		cache.urlCache = {};
 	}
-	cache.mapCache[url] = id;
+	cache.urlCache[url] = id;
 	browser.storage.local.set(cache);
 }
 
@@ -104,7 +104,7 @@ browser.runtime.onMessage.addListener(
 					openInSidebarIfSidebarIsOpen(data.wdEntityId, tabDest, data.openInSidebar);
 				})();
 
-			  addToMapCache(data.wdEntityId, data.url);
+			  addToUrlCache(data.wdEntityId, data.url);
 			} else if(data.type === 'match_proposal') {
 				tabStates[sender.tab.id].mode = 'propose_match';
 				tabStates[sender.tab.id].proposals = data.proposals;
@@ -137,8 +137,8 @@ browser.runtime.onMessage.addListener(
 				});
 			}
 		} else {
-			if(data.type === 'add_map_cache') {
-				addToMapCache(data.id, data.url);	
+			if(data.type === 'add_url_cache') {
+				addToUrlCache(data.id, data.url);	
 			}
 			if(data.type === 'send_to_wikidata') {
 			  processJobs(data.data);

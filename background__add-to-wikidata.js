@@ -16,10 +16,10 @@ async function processJobs(jobs) {
 
 				if (job.fromUrl) {
 					let cache = await browser.storage.local.get();
-					if (!('mapCache' in cache)) {
-						cache.mapCache = {};
+					if (!('urlCache' in cache)) {
+						cache.urlCache = {};
 					}
-					cache.mapCache[job.fromUrl] = lastCreated;
+					cache.urlCache[job.fromUrl] = lastCreated;
 					browser.storage.local.set(cache);
 				}
 			}

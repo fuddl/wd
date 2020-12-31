@@ -135,6 +135,12 @@ async function collectPageLinks() {
 					cache: !this.resolver.noCache,
 				});
 
+				browser.runtime.sendMessage({
+					type: 'add_url_cache',
+					url: this.links[0].href,
+					id: this.entityId,
+				});
+
 				for (let selector of this.selectors) {
 					selector.setAttribute('href', 'https://www.wikidata.org/wiki/' + this.entityId);
 					selector.innerText = this.entityId;

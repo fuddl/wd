@@ -141,7 +141,7 @@ function getPropertyScope(property) {
 			if (selectedEntity.match(/\w\d+/)) {
 
 				browser.runtime.sendMessage({
-					type: 'add_map_cache',
+					type: 'add_url_cache',
 					url: proposals.source.url,
 					id: selectedEntity,
 				});
