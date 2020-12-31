@@ -53,7 +53,7 @@ function getOldid() {
 	return null;
 }
 
-async function collectPageLinks() {
+async function collectPageLinks(subject) {
 	displayMetadata();
 	let uniqueLinks = [];
 	let foundEntities = [];
@@ -126,7 +126,7 @@ async function collectPageLinks() {
 			this.resolver = resolvers[this.applicable];
 			this.selected = false;
 			this.entityId = await this.resolver.getEntityId(this.links[0]);
-	 		if (this.entityId) {
+	 		if (this.entityId && this.entityId !== subject) {
 				browser.runtime.sendMessage({
 					type: 'match_event',
 					wdEntityId: this.entityId,

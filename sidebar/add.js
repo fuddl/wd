@@ -142,6 +142,7 @@ content.innerHTML = '';
 
 	browser.runtime.sendMessage({
 		type: 'collect_pagelinks',
+		subject: currentEntity,
 	});
 
 	saveButton.setAttribute('disabled', 'disabled');

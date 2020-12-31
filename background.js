@@ -171,7 +171,10 @@ browser.runtime.onMessage.addListener(
 				  	
 				    browser.tabs.sendMessage(
 				      tab.id,
-				      { action: "collect_pagelinks" }
+				      {
+				      	action: "collect_pagelinks",
+				      	subject: data.subject
+				      }
 				    ).then(response => {
 				    }).catch((v) => {
 				    	console.log(JSON.stringify(v));
