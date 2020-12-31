@@ -86,6 +86,7 @@ async function setClaim(subjectId, property, value) {
 	data.append('property', property);
 
 	if (typeof value === "string") {
+		await resolvers.p8966.addToExternalIDCache(property, value, subject[subjectId].id);
 		data.append('value', '"' + value + '"');
 	} else {
 		data.append('value', JSON.stringify(value));

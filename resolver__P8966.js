@@ -49,21 +49,47 @@ resolvers.p8966 = {
 
 		let prop = applicable[0].prop;
 		let id = applicable[0].value;
-		let entity = await this.getEntityByRegexedId(prop, id);
-		if (entity[0]) {
-			let entityId = entity[0].item.value.match(/https?:\/\/www\.wikidata\.org\/entity\/(\w\d+)/)[1]
-			return entityId;
-		} else {
-			return false;
-		}
+		return await this.getEntityByRegexedId(prop, id);
 	},
 	getEntityByRegexedId: async function(prop, id) {
+		let cached = await this.checkIfCached(prop, id);
+		if (cached) {
+			return cached;
+		}
 		let query = `
 			SELECT ?item
 			WHERE {
 				?item wdt:${ prop } "${ id }".
 			}
 		`;
-		return sparqlQuery(query);
+		let result = await sparqlQuery(query);
+		if (result[0]) {
+			let entityId = result[0].item.value.match(/https?:\/\/www\.wikidata\.org\/entity\/(\w\d+)/)[1];
+			await this.addToExternalIDCache(prop, id, entityId);
+			return entityId;
+		} else {
+			return false;
+		}
 	},
+	formCacheKey: function(prop, id) {
+		return `${prop}:${id}`;
+	},
+	checkIfCached: async function(prop, id) {
+		let cache = await browser.storage.local.get('externalIDCache');
+		let cacheKey = this.formCacheKey(prop, id);
+		if ('externalIDCache' in cache && cacheKey in cache.externalIDCache) {
+			console.debug(`Found ${cacheKey} in externalIDCache`);
+			return cache.externalIDCache[cacheKey];
+		} else {
+			return false;
+		}
+	},
+	addToExternalIDCache: async function(prop, id, entityId) {
+		let cache = await browser.storage.local.get();
+		if (!('externalIDCache' in cache)) {
+			cache.externalIDCache = {};
+		}
+		cache.externalIDCache[this.formCacheKey(prop, id)] = entityId;
+		browser.storage.local.set(cache);
+	}
 };

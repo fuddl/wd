@@ -29,6 +29,8 @@
       "wd-get-entity.js",
       "sidebar/wd-get-token.js",
       "background__add-to-wikidata.js",
+      "resolver.js",
+      "resolver__P8966.js",
       "background.js"
     ]
   },
