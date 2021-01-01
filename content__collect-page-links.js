@@ -107,6 +107,7 @@ async function collectPageLinks(subject) {
 		for (id of Object.keys(resolvers)) {
 			if (!applicableTo) {
 				let resolverApplicable = await resolvers[id].applicable(uniqueLinks[key].links[0]);
+				console.log(resolverApplicable)
 				if (resolverApplicable) {
 					applicableTo = id;
 				}
@@ -127,21 +128,32 @@ async function collectPageLinks(subject) {
 			this.selected = false;
 			this.entityId = await this.resolver.getEntityId(this.links[0]);
 	 		if (this.entityId && this.entityId !== subject) {
-				browser.runtime.sendMessage({
-					type: 'match_event',
-					wdEntityId: this.entityId,
-					openInSidebar: false,
-					url: this.links[0].href,
-					cache: !this.resolver.noCache,
-				});
 
-				browser.runtime.sendMessage({
-					type: 'add_url_cache',
-					url: this.links[0].href,
-					id: this.entityId,
-				});
+				let existing = uniqueLinks.findIndex((item) => item.entityId === this.entityId)
+				let selectors = null;
+				if (existing != key) {
+					uniqueLinks[existing].selectors = [].concat(uniqueLinks[existing].selectors, this.selectors);
+					selectors = uniqueLinks[existing].selectors;
+					uniqueLinks[key] = [];
 
-				for (let selector of this.selectors) {
+					Object.assign(uniqueLinks[existing], uniqueLinks[key])
+				} else {
+					browser.runtime.sendMessage({
+						type: 'match_event',
+						wdEntityId: this.entityId,
+						openInSidebar: false,
+						url: this.links[0].href,
+						cache: !this.resolver.noCache,
+					});
+
+					browser.runtime.sendMessage({
+						type: 'add_url_cache',
+						url: this.links[0].href,
+						id: this.entityId,
+					});
+					selectors = this.selectors;
+				}
+				for (let selector of selectors) {
 					selector.setAttribute('href', 'https://www.wikidata.org/wiki/' + this.entityId);
 					selector.innerText = this.entityId;
 					selector.classList.remove('entity-selector--queued');
@@ -149,7 +161,7 @@ async function collectPageLinks(subject) {
 					selector.addEventListener('click', (e) => {
 						e.preventDefault();
 						this.selected = !this.selected;
-						for (let otherSelector of this.selectors) {
+						for (let otherSelector of selectors) {
 							otherSelector.classList.toggle('entity-selector--selected', this.selected);
 						}
 						
@@ -179,6 +191,7 @@ async function collectPageLinks(subject) {
 						browser.runtime.sendMessage(message);
 					});
 				}
+
 			// if there is no qid clean up the selectors
 	 		} else {
 	 			for (let selector of this.selectors) {
