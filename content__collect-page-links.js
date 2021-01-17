@@ -53,10 +53,38 @@ function getOldid() {
 	return null;
 }
 
+let selectedEntities = [];
+let uniqueLinks = [];
+
+function highlightSelected(id, add = true) {
+	this.selected = !this.selected;
+	for (let uLink of uniqueLinks) {
+		if (uLink.entityId === id) {
+			for (let selector of uLink.selectors) {
+				if (add) {
+					selector.classList.add('entity-selector--selected');
+				} else {
+					selector.classList.remove('entity-selector--selected');
+				}
+			}	
+		}
+	}
+}
+
+function toggleSelectedEntities(id) {
+	if(selectedEntities.includes(id)) {
+		selectedEntities.splice(selectedEntities.indexOf(id), 1);
+		highlightSelected(id, false);
+	} else {
+		selectedEntities.push(id)
+		highlightSelected(id);
+	}
+}
+
 async function collectPageLinks(subject) {
 	displayMetadata();
-	let uniqueLinks = [];
 	let foundEntities = [];
+
 	for (let link of document.links) {
 
 		if (link.href.startsWith('javascript:')) {
@@ -127,32 +155,46 @@ async function collectPageLinks(subject) {
 			this.selected = false;
 			this.entityId = await this.resolver.getEntityId(this.links[0]);
 	 		if (this.entityId && this.entityId !== subject) {
-				browser.runtime.sendMessage({
-					type: 'match_event',
-					wdEntityId: this.entityId,
-					openInSidebar: false,
-					url: this.links[0].href,
-					cache: !this.resolver.noCache,
-				});
 
-				browser.runtime.sendMessage({
-					type: 'add_url_cache',
-					url: this.links[0].href,
-					id: this.entityId,
-				});
+				let existing = uniqueLinks.findIndex((item) => item.entityId === this.entityId)
+				let selectors = null;
+				if (existing != key) {
+					uniqueLinks[existing].selectors = [
+					  ...uniqueLinks[existing].selectors,
+					  ...this.selectors
+					 ];
+					uniqueLinks[key] = [];
+
+					Object.assign(uniqueLinks[existing], uniqueLinks[key])
+				} else {
+					browser.runtime.sendMessage({
+						type: 'match_event',
+						wdEntityId: this.entityId,
+						openInSidebar: false,
+						url: this.links[0].href,
+						cache: !this.resolver.noCache,
+					});
+
+					browser.runtime.sendMessage({
+						type: 'add_url_cache',
+						url: this.links[0].href,
+						id: this.entityId,
+					});
+				}
 
 				for (let selector of this.selectors) {
+
 					selector.setAttribute('href', 'https://www.wikidata.org/wiki/' + this.entityId);
 					selector.innerText = this.entityId;
 					selector.classList.remove('entity-selector--queued');
 					selector.classList.add('entity-selector--selectable');
+					if (selectedEntities.includes(this.entityId)) {
+						selector.classList.add('entity-selector--selected');
+					}
 					selector.addEventListener('click', (e) => {
+						toggleSelectedEntities(this.entityId);
 						e.preventDefault();
-						this.selected = !this.selected;
-						for (let otherSelector of this.selectors) {
-							otherSelector.classList.toggle('entity-selector--selected', this.selected);
-						}
-						
+
 						let sectionData = getClosestID(e.target);
 
 						let hash = sectionData.hash ? '#' + sectionData.hash : ''; 
@@ -179,6 +221,7 @@ async function collectPageLinks(subject) {
 						browser.runtime.sendMessage(message);
 					});
 				}
+
 			// if there is no qid clean up the selectors
 	 		} else {
 	 			for (let selector of this.selectors) {
