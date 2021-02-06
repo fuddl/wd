@@ -51,7 +51,7 @@ function resolvePlaceholders(scope) {
 			}
 			link.addEventListener('click', (e) => {
 				e.preventDefault();
-				window.location = '?' + id;
+				window.location = 'entity.html?' + id;
 			});
 			if (placeholder.parentNode) {
 				placeholder.parentNode.replaceChild(link, placeholder);

@@ -7,8 +7,8 @@ if (window.location.search) {
 
 
 async function updateView(id, useCache = true) {
-
 	let content = document.getElementById('content');
+	let footer = document.getElementById('footer');
 
 	let whatLinksHere = document.createElement('div');
 	content.appendChild(whatLinksHere);
@@ -64,4 +64,13 @@ async function updateView(id, useCache = true) {
 		whatLinksHere.appendChild(statement);
 		resolvePlaceholders();
 	}
+	
+	footer.appendChild(templates.actions('Actions', [
+		{
+			link: 'entity.html?' + id,
+			moji: './icons/u2BA9u1F4C4uFE0E-articleRedirect.svg', // TODO: find appropriate icon
+			title: 'Entity’s statements',
+			desc: 'A list of statements for this item',
+		},
+	]));
 }
