@@ -59,6 +59,10 @@ window.addEventListener('hashchange', function() {
   findApplicables(window.location);
 }, false);
 
+document.addEventListener('focus', function() {
+	findApplicables(window.location);
+})
+
 let head = document.querySelector('head');
 
 let title = head.querySelector('title').innerText;

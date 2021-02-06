@@ -68,7 +68,7 @@ async function updateView(id, useCache = true) {
 	footer.appendChild(templates.actions('Actions', [
 		{
 			link: 'entity.html?' + id,
-			moji: './icons/u2BA9u1F4C4uFE0E-articleRedirect.svg', // TODO: find appropriate icon
+			moji: './icons/u1F5CF-article.svg',
 			title: 'Entity’s statements',
 			desc: 'A list of statements for this item',
 		},
