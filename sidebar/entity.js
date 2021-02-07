@@ -373,7 +373,7 @@ function updateView(id, useCache = true) {
 
 				let hasDescription = description != false;
 				if (!description) {
-					if ('P31' in e?.claims) {
+					if ('claims' in e && 'P31' in e.claims) {
 						description = await getAutodesc(id);
 					} else {
 						description = '???';
