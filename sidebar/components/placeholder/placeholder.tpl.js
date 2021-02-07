@@ -3,10 +3,10 @@ let cache = {}
 templates.placeholder = (vars) => {
 
 	// don't create a placeholder if the label is already in cache
-	if (vars.entity && cache.labels[vars.entity] && !vars.type) {
+	if (vars.entity && 'labels' in cache && cache.labels[vars.entity] && !vars.type) {
 		let link = document.createElement('a')
 		link.innerText = cache.labels[vars.entity];
-		if (cache.descriptions[vars.entity]) {
+		if ('descriptions' in cache && cache.descriptions[vars.entity]) {
 			link.setAttribute('title', cache.descriptions[vars.entity]);
 		}
 		link.setAttribute('href', getLink(vars.entity));
