@@ -6,7 +6,8 @@ async function getAutodesc(id) {
 		if (!json.result.match(/<i>/)) {
 			return json.result;
 		}
-	} finally {
-		return '???';
+	} catch (ex) {
+		console.log(ex);
 	}
+	return '???';
 }
