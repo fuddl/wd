@@ -373,7 +373,11 @@ function updateView(id, useCache = true) {
 
 				let hasDescription = description != false;
 				if (!description) {
-					description = await getAutodesc(id);
+					if ('P31' in e?.claims) {
+						description = await getAutodesc(id);
+					} else {
+						description = '???';
+					}
 				} else {
 					let metaDesc = document.createElement('meta');
 					metaDesc.setAttribute('name', 'description');
