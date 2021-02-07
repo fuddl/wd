@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Wikidata",
-  "version": "0.137",
+  "version": "0.139",
   "description": "Display information from wikidata.",
   "icons": {
     "48": "icons/wd.svg",
@@ -26,6 +26,7 @@
   "background": {
     "scripts": [
       "sqarql-query.js",
+      "sidebar/get-value-by-lang.js",
       "wd-get-entity.js",
       "sidebar/wd-get-token.js",
       "background__add-to-wikidata.js",
