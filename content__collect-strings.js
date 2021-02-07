@@ -23,7 +23,7 @@ function guessLanguage(string) {
 		return 'de';
 	}
 	// if all else fails, let's assume it is something the user can read
-  return navigator.language.substr(0,2);
+  return navigator.language.split("-")[0];
 }
 
 document.addEventListener('selectionchange', (e) => {
