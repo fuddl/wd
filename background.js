@@ -1,11 +1,11 @@
 let tabStates = {};
 let sidebarLocked = false;
 
-function pushEnitiyToSidebar(id, tid, setPanel = true) {
+function pushEnitiyToSidebar(id, tid, setPanel = true, nocache = false) {
 	if (!sidebarLocked && setPanel) {
 		browser.sidebarAction.setPanel({
 			tabId: tid,
-			panel: browser.runtime.getURL('sidebar/entity.html') + '?' + id,
+			panel: browser.runtime.getURL('sidebar/entity.html') + '?' + id + (nocache ? '#nocache' : ''),
 		});
 	} else {
 		browser.runtime.sendMessage({
@@ -79,6 +79,15 @@ browser.runtime.onMessage.addListener(
 		if(data.type === 'open_in_sidebar') {
 			(async () => {
 				pushEnitiyToSidebar(data.wdEntityId, data.tid);
+			})()
+		}
+
+		if(data.type === 'wait') {
+			(async () => {
+				browser.sidebarAction.setPanel({
+					tabId: data.tid,
+					panel: browser.runtime.getURL('sidebar/wait.html'),
+				});
 			})()
 		}
 

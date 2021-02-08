@@ -2,34 +2,26 @@
 
 async function processJobs(jobs) {
 	let lastCreated = null;
+	let lastEdit = null;
 	let answer = null;
 	let refAnswer = null;
 	for (job of jobs) {
 		if (job.type === 'create') {
 			answer = await createEntity(job.label, job.lang);
 			if (answer.success && answer.success == 1) {
-				lastCreated = answer.entity.id;
-
-				if (job.fromTab) {
-					pushEnitiyToSidebar(lastCreated, job.fromTab);
-				}
-
-				if (job.fromUrl) {
-					let cache = await browser.storage.local.get();
-					if (!('urlCache' in cache)) {
-						cache.urlCache = {};
-					}
-					cache.urlCache[job.fromUrl] = lastCreated;
-					browser.storage.local.set(cache);
+				lastCreated = {
+					id: answer.entity.id,
+					job: job,
 				}
 			}
 
 		} else if (job.type === 'set_claim') {
 			
 			let extistingStatement = await getExistingStatement('Q' + job.object['numeric-id'], job.verb, job.subject);
+			let subject = job.subject !== 'LAST' ? job.subject : lastCreated.id;
 
 			if (!extistingStatement) {
-				answer = await setClaim(job.subject !== 'LAST' ? job.subject : lastCreated, job.verb, job.object);
+				answer = await setClaim(subject, job.verb, job.object);
 			} else {
 				answer = {
 					success: 1,
@@ -44,6 +36,29 @@ async function processJobs(jobs) {
 					refAnswer = await addReference(answer.claim.id, reference);
 				}
 			}
+			lastEdit = {
+				id: subject,
+				job: job,
+			}
+		}
+	}
+
+  if (lastEdit == null) {
+		lastEdit = lastCreated;
+  }
+
+	if (lastEdit) {
+		if (lastEdit.job.fromTab) {
+			pushEnitiyToSidebar(lastEdit.id, lastEdit.job.fromTab, true, true);
+		}
+
+		if (lastEdit.job.fromUrl) {
+			let cache = await browser.storage.local.get();
+			if (!('urlCache' in cache)) {
+				cache.urlCache = {};
+			}
+			cache.urlCache[lastEdit.job.fromUrl] = lastEdit.id;
+			browser.storage.local.set(cache);
 		}
 	}
 }

@@ -17,6 +17,7 @@ function getPropertyScope(property) {
 (async () => {
 	let proposals = JSON.parse(decodeURIComponent(window.location.search.replace(/^\?/, '')));
 	let content = document.getElementById('content');
+	let currentTab = await getCurrentTab()
 
 	let property = await wikidataGetEntity(proposals.ids[0][0].prop);
 
@@ -93,6 +94,7 @@ function getPropertyScope(property) {
 				subject: selectedEntity,
 				verb: proposals.ids[0][0].prop,
 				object: proposals.ids[0][0].value,
+				fromTab: currentTab,
 				references: [{
 				  "P854": [{
 			      "snaktype": "value",
@@ -138,21 +140,10 @@ function getPropertyScope(property) {
 				data: jobs,
 			});
 
-			if (selectedEntity.match(/\w\d+/)) {
-
-				browser.runtime.sendMessage({
-					type: 'add_url_cache',
-					url: proposals.source.url,
-					id: selectedEntity,
-				});
-
-				browser.runtime.sendMessage({
-					type: 'open_in_sidebar',
-					tid: await getCurrentTab(),
-					wdEntityId: selectedEntity,
-				});
-				
-			}
+			browser.runtime.sendMessage({
+				type: 'wait',
+				tid: currentTab,
+			});
 		}
 	});
 })()
