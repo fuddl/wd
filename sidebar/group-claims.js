@@ -4,8 +4,6 @@ function groupClaims(claims) {
 			name: 'Classification',
 			properties: [
 				'P31',   // Instance of
-				'P279',  // Subclass of
-				'P1074', // fictional analog of
 			]
 		},
 		{
@@ -83,6 +81,8 @@ function groupClaims(claims) {
 				'P1442', // image of grave
 				'P576',  // dissolved, abolished or demolished
 				'P2669', // discontinued date
+				'P580',  // start date
+				'P582',  // end date
 				'P7888', // merged into
 			]
 		},
@@ -118,13 +118,16 @@ function groupClaims(claims) {
 			name: 'Appearance',
 			properties: [
 				'P4675',  // appears in the form of
-				'P3828',  // wears
 				'P462',   // color
 				'P1340',  // eye color
 				'P1884',  // hair color
+				'P8839',  // hair style
+				'P8852',  // facial hair
+				'P3828',  // wears
 			]
 		},
 	];
+
 
 	let sorted = [];
 	let remaining = [];
@@ -136,13 +139,29 @@ function groupClaims(claims) {
 		}
 	}
 
-	for (prop of Object.keys(claims)) {
+	let sortLabels = function (a, b) {
+		if (typeof cache != 'undefined' && 'labels' in cache) {
+			if (a in cache.labels && b in cache.labels) {
+				return cache.labels[a].toUpperCase() > cache.labels[b].toUpperCase();
+			} else if (a in cache.labels) {
+				return -1;
+			} else if (b in cache.labels) {
+				return 1;
+			} else {
+				return 2;
+			}
+		} else {
+			return 0;
+		}
+	}
+
+	for (prop of Object.keys(claims).sort(sortLabels)) {
 		if (!sorted.includes(prop) && claims[prop][0].mainsnak.datatype !== "external-id") {
 			remaining.push(prop);
 		}
 	}
 
-	for (prop of Object.keys(claims)) {
+	for (prop of Object.keys(claims).sort(sortLabels)) {
 		if (claims[prop][0].mainsnak.datatype === "external-id") {
 			remaining.push(prop);
 		}
