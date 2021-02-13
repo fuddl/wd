@@ -22,6 +22,13 @@ templates.remark = (vars) => {
 		dl.appendChild(dd);
 	}
 
+	if (vars.check) {
+		let check = document.createElement('dd');
+		check.classList.add('remark__check');
+		check.appendChild(vars.check);
+		dl.appendChild(check);
+	}
+
 	let style = document.createElement('link');
 	style.setAttribute('rel',  "stylesheet");
 	style.setAttribute('href', "components/remark/remark.css");

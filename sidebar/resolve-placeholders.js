@@ -47,12 +47,17 @@ function resolvePlaceholders(scope) {
 				gloss.style.display = 'block';
 				link.style.display = 'inline-block';
 				link.appendChild(gloss);
-
 			}
-			link.addEventListener('click', (e) => {
-				e.preventDefault();
-				window.location = 'entity.html?' + id;
-			});
+			if (link.tagName === 'A') {
+				link.addEventListener('click', (e) => {
+					e.preventDefault();
+					window.location = 'entity.html?' + id;
+				});
+			}
+			let value = placeholder.getAttribute('value');
+			if (value) {
+				link.setAttribute('value', placeholder.getAttribute('value'));
+			}
 			if (placeholder.parentNode) {
 				placeholder.parentNode.replaceChild(link, placeholder);
 			}
