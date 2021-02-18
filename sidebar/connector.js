@@ -17,6 +17,10 @@ function getPropertyScope(property) {
 (async () => {
 	let proposals = JSON.parse(decodeURIComponent(window.location.search.replace(/^\?/, '')));
 	let content = document.getElementById('content');
+	let propform = document.createElement('form');
+	content.appendChild(propform);
+
+	let currentTab = await getCurrentTab()
 
 	let property = await wikidataGetEntity(proposals.ids[0][0].prop);
 
@@ -27,19 +31,121 @@ function getPropertyScope(property) {
 		vals: [templates.code(proposals.ids[0][0].value)],
 	});
 
+
+	propform.appendChild(preview);
+
+	if(property[proposals.ids[0][0].prop]?.claims?.P2302) {
+		let counter = 0;
+		const contraints = property[proposals.ids[0][0].prop].claims.P2302;
+		for (const contraint of contraints) {
+			const contraintType = contraint.mainsnak.datavalue.value.id;
+			switch (contraintType) {
+				case 'Q21503250':
+					if (contraint?.qualifiers?.P2309[0]?.datavalue?.value?.id === 'Q21503252') {
+						let value = null;
+						let check = null;
+						if(contraint?.qualifiers?.P2308.length > 1) {
+							value = document.createElement('select');
+							value.setAttribute('name', counter);
+							let emptyOption = document.createElement('option');
+							value.appendChild(emptyOption);
+							for (let entity of contraint?.qualifiers?.P2308) {
+								let option = document.createElement('option');
+								option.innerText = entity.datavalue?.value?.id;
+								option.classList.add('placeholder');
+								option.setAttribute('data-entity', entity.datavalue?.value?.id);
+								option.setAttribute('data-type', 'option');
+								value.appendChild(option);
+								let job = {
+									type: 'set_claim',
+									verb: 'P31',
+									object: {
+										'entity-type': "item",
+										'numeric-id': entity.datavalue?.value['numeric-id'],
+									},
+								}
+								option.setAttribute('value', JSON.stringify(job))
+							}
+						} else {
+							check = document.createElement('input');
+							check.setAttribute('type', 'checkbox');
+							check.setAttribute('name', counter);
+							let job = {
+								type: 'set_claim',
+								verb: 'P31',
+								object: {
+									'entity-type': "item",
+									'numeric-id': contraint?.qualifiers?.P2308[0]?.datavalue?.value['numeric-id'],
+								},
+							}
+							check.setAttribute('value', JSON.stringify(job))
+							check.checked = true;
+							value = templates.placeholder({
+								entity: contraint?.qualifiers?.P2308[0]?.datavalue?.value?.id,
+							})
+						}
+						let instanceOfPreview = templates.remark({
+							check: check ? check : null,
+							prop: templates.placeholder({
+								entity: 'P31',
+							}),
+							vals: [value],
+						});
+
+						propform.appendChild(instanceOfPreview);
+					}
+				  break;
+				case 'Q21503247':
+					if (contraint?.qualifiers?.P2305) {
+						let check = document.createElement('input');
+						check.setAttribute('type', 'checkbox');
+						check.setAttribute('name', counter);
+						check.checked = true;
+
+						let job = {
+							type: 'set_claim',
+							verb: contraint?.qualifiers?.P2306[0]?.datavalue?.value?.id,
+							object: {
+								'entity-type': "item",
+								'numeric-id': contraint?.qualifiers?.P2305[0]?.datavalue?.value['numeric-id'],
+							},
+						}
+
+						check.setAttribute('value', JSON.stringify(job))
+
+						let requiredStatementPreview = templates.remark({
+							check: check,
+							prop: templates.placeholder({
+								entity: contraint?.qualifiers?.P2306[0]?.datavalue?.value?.id,
+							}),
+							vals: [templates.placeholder({
+								entity: contraint?.qualifiers?.P2305[0]?.datavalue?.value?.id,
+							})],
+						});
+
+						propform.appendChild(requiredStatementPreview);
+					}
+				  break;
+			}
+			counter++;
+		}
+	}
+
+
+	resolvePlaceholders();
+
 	let labelField = templates.join({
 	  human: proposals.titles[0],
 	  scope: getPropertyScope(property[proposals.ids[0][0].prop]),
 	});
-
-	content.appendChild(preview);
-	resolvePlaceholders();
-
 	let direction = templates.direction();
 
 	content.appendChild(direction);
 
 	content.appendChild(labelField);
+
+
+
 
 	let saveButton = document.createElement('button');
 	saveButton.setAttribute('disabled', 'disabled');
@@ -93,6 +199,7 @@ function getPropertyScope(property) {
 				subject: selectedEntity,
 				verb: proposals.ids[0][0].prop,
 				object: proposals.ids[0][0].value,
+				fromTab: currentTab,
 				references: [{
 				  "P854": [{
 			      "snaktype": "value",
@@ -133,26 +240,30 @@ function getPropertyScope(property) {
 				}],
 			});
 
+
+			const formData = new FormData(propform)
+			for (let pair of formData.entries()) {
+				if (pair[1] != '') {
+				 	let job = JSON.parse(pair[1]);
+				 	if (!job.subject) {
+				 		job.subject = selectedEntity;
+				 	}
+			 		job.fromTab = currentTab;
+				 	jobs.push(job);
+				}
+			}
+
+			console.debug(jobs);
+
 			browser.runtime.sendMessage({
 				type: 'send_to_wikidata',
 				data: jobs,
 			});
 
-			if (selectedEntity.match(/\w\d+/)) {
-
-				browser.runtime.sendMessage({
-					type: 'add_url_cache',
-					url: proposals.source.url,
-					id: selectedEntity,
-				});
-
-				browser.runtime.sendMessage({
-					type: 'open_in_sidebar',
-					tid: await getCurrentTab(),
-					wdEntityId: selectedEntity,
-				});
-				
-			}
+			browser.runtime.sendMessage({
+				type: 'wait',
+				tid: currentTab,
+			});
 		}
 	});
 })()

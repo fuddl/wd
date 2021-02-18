@@ -21,7 +21,7 @@
 @media (min-width: 300px) {
 	.remark--inline {
 		display: grid;
-		grid-template-columns: 1fr 2fr;
+		grid-template-columns: 1fr 2fr auto;
 	}
 }
 
@@ -44,6 +44,12 @@
 	margin-bottom: .5em;
   padding: 0;
   min-width: 0;
+}
+
+.remark__check {
+	grid-column: 3;
+	margin: auto;
+	padding: 0;
 }
 
 .remark--block > .remark__object {

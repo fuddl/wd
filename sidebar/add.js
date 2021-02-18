@@ -36,6 +36,7 @@ content.innerHTML = '';
 (async () => {
 	let entities = await wikidataGetEntity(currentEntity);
 	let e = entities[currentEntity];
+	let currentTab = await getCurrentTab();
 
 	let description = getValueByLang(e, 'descriptions', false);
 	let hasDescription = description != false;
@@ -216,6 +217,7 @@ content.innerHTML = '';
 					verb: propPicker.element.getAttribute('data-prop'),
 					object: {},
 					references: reference ? [reference] : null,
+					fromTab: currentTab,
 				};
 				if (propPicker.element.getAttribute('data-datatype') === 'monolingualtext') {
 					setClaim.object.language = propPicker.languagePicker.value;
@@ -282,6 +284,7 @@ content.innerHTML = '';
 							'entity-type': "item",
 							'numeric-id': !flipped ? selectedNummericId : currentEntityNummericId,
 						},
+						fromTab: currentTab,
 						references: reference ? [reference] : null,
 					});
 
@@ -301,7 +304,14 @@ content.innerHTML = '';
 					type: 'clear_pagelinks',
 				})
 			]).then((values) => {
-			  window.location = 'entity.html?' + currentEntity;
+				if (!flipped) {
+					browser.runtime.sendMessage({
+						type: 'wait',
+						tid: currentTab,
+					});
+				} else {
+					window.location = 'entity.html?' + currentEntity;
+				}
 			});
 		}
 	});
