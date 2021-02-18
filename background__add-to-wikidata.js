@@ -43,9 +43,9 @@ async function processJobs(jobs) {
 		}
 	}
 
-  if (lastEdit == null) {
+	if (lastEdit == null) {
 		lastEdit = lastCreated;
-  }
+	}
 
 	if (lastEdit) {
 		if (lastEdit.job.fromTab) {
@@ -87,7 +87,7 @@ async function createEntity(label, lang) {
 		body: new URLSearchParams(data),
 	});
 
-  return JSON.parse(await response.text());
+	return JSON.parse(await response.text());
 }
 
 async function setClaim(subjectId, property, value) {
@@ -118,7 +118,7 @@ async function setClaim(subjectId, property, value) {
 		body: new URLSearchParams(data),
 	});
 
-  return JSON.parse(await response.text());
+	return JSON.parse(await response.text());
 }
 
 async function addReference(claimId, references) {
@@ -138,7 +138,7 @@ async function addReference(claimId, references) {
 		body: new URLSearchParams(data),
 	});
 
-  return JSON.parse(await response.text());
+	return JSON.parse(await response.text());
 }
 
 async function getExistingStatement(object, verb, subject) {

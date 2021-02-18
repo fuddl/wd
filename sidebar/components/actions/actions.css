@@ -6,11 +6,11 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  .actions__actions {
-    background: #2E3136;
-    border-top-color: #44464A;
-    border-bottom-color: #44464A;
-  }
+	.actions__actions {
+		background: #2E3136;
+		border-top-color: #44464A;
+		border-bottom-color: #44464A;
+	}
 }
 
 .actions__action {
@@ -59,10 +59,10 @@
 
 @media (prefers-color-scheme: dark) {
 	.actions__headline,
-  .actions__title,
-  .actions__action {
-    color: white;
-  }
+	.actions__title,
+	.actions__action {
+		color: white;
+	}
 }
 
 .actions__actions__desc {

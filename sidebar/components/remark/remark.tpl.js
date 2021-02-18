@@ -30,7 +30,7 @@ templates.remark = (vars) => {
 	}
 
 	let style = document.createElement('link');
-	style.setAttribute('rel',  "stylesheet");
+	style.setAttribute('rel',	"stylesheet");
 	style.setAttribute('href', "components/remark/remark.css");
 
 	dl.appendChild(style);

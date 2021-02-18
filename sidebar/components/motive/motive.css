@@ -30,7 +30,7 @@
 
 .motive__field:focus {
 	outline: 1px solid #36c;
-  outline-offset: -2px;
-  border-color: #36c;
-  box-shadow: inset 0 0 0 1px #36c;
+	outline-offset: -2px;
+	border-color: #36c;
+	box-shadow: inset 0 0 0 1px #36c;
 }

@@ -54,16 +54,16 @@
 }
 
 .express__tag {
-  display: inline-block;
-  background-color: #EAECF0;
-  border: 1px solid #EAECF0;
-  padding: .25em 1em;
-  margin: 0 .5em .5em 0;
-  border-radius: 1em;
-  cursor: pointer;
-  font-size: .75em;
-  user-select: none;
-  line-height: 1.2;
+	display: inline-block;
+	background-color: #EAECF0;
+	border: 1px solid #EAECF0;
+	padding: .25em 1em;
+	margin: 0 .5em .5em 0;
+	border-radius: 1em;
+	cursor: pointer;
+	font-size: .75em;
+	user-select: none;
+	line-height: 1.2;
 }
 
 .express__tag[data-statement-exists] {
@@ -71,24 +71,24 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  .express__tag {
-    background-color: #55595D;
-    border-color: #55595D;
-  }
+	.express__tag {
+		background-color: #55595D;
+		border-color: #55595D;
+	}
 }
 
 .express__tag__desc {
-  display: block;
+	display: block;
 }
 
 .express__tag--selected {
-  border: 1px solid #01257D;
-  background: #EBF2FE;
+	border: 1px solid #01257D;
+	background: #EBF2FE;
 }
 @media (prefers-color-scheme: dark) {
-  .express__tag--selected {
-    background: #273863;
-  }
+	.express__tag--selected {
+		background: #273863;
+	}
 }
 
 .express__autocomplete {
@@ -126,7 +126,7 @@
 @media (prefers-color-scheme: dark) {
 	.express__autocomplete-option:nth-child(n+2) {
 		border-top-color: #27292D;
-  }
+	}
 }
 
 .express__autocomplete > li:hover,
@@ -155,7 +155,7 @@
 		background-color: #44464A;
 		color: white;
 		border-color: #26292D;
-  }
+	}
 }
 
 [data-datatype="string"] .express__composer,

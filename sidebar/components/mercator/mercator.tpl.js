@@ -2,8 +2,8 @@ templates.mercator = (vars) => {
 	let tag = document.createElement('img');
 	let zoom = parseInt((vars.pre + 4) * 4);
 	let maps = {
-    '1x': `https://maps.wikimedia.org/img/osm-intl,${ zoom },${ vars.lat },${ vars.lon },${ vars.width }x${ vars.height }.png`,
-    '2x': `https://maps.wikimedia.org/img/osm-intl,${ zoom },${ vars.lat },${ vars.lon },${ vars.width }x${ vars.height }@2x.png`
+		'1x': `https://maps.wikimedia.org/img/osm-intl,${ zoom },${ vars.lat },${ vars.lon },${ vars.width }x${ vars.height }.png`,
+		'2x': `https://maps.wikimedia.org/img/osm-intl,${ zoom },${ vars.lat },${ vars.lon },${ vars.width }x${ vars.height }@2x.png`
 	};
 
 	let srcset = []

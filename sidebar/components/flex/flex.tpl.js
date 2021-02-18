@@ -131,18 +131,18 @@ templates.flex = (vars) => {
 					row.appendChild(dCell);
 					for (let form of vars.forms) {
 						if (form.grammaticalFeatures.includes(x) && (form.grammaticalFeatures.includes(y) || !hasYAxis)) {
-								let formLink = document.createElement('a');
-								formLink.setAttribute('href', '#' + form.id);
-								if (dCell.hasChildNodes()) {
-									dCell.appendChild(document.createElement('br'));
-								}
-								dCell.appendChild(formLink);
-								for (let rep in form.representations) {
-									let repSpan = document.createElement('span');
-									repSpan.setAttribute('lang', form.representations[rep]);
-									repSpan.innerText = form.representations[rep].value;
-									formLink.appendChild(repSpan);
-								}
+							let formLink = document.createElement('a');
+							formLink.setAttribute('href', '#' + form.id);
+							if (dCell.hasChildNodes()) {
+								dCell.appendChild(document.createElement('br'));
+							}
+							dCell.appendChild(formLink);
+							for (let rep in form.representations) {
+								let repSpan = document.createElement('span');
+								repSpan.setAttribute('lang', form.representations[rep]);
+								repSpan.innerText = form.representations[rep].value;
+								formLink.appendChild(repSpan);
+							}
 						}
 					}
 				}

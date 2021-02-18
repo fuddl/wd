@@ -1,47 +1,47 @@
 function getClosestID(element) {
-    let subject = element;
-    let referenceHeadlineQuery = 'h1[id],h1 [id],h2[id],h2 [id],h3[id],h3 [id],h4[id],h4 [id],h5[id],h5 [id],h6[id],h6 [id]';
-    let headlineQuery = 'h1, h2, h3, h4, h5, h6';
+	let subject = element;
+	let referenceHeadlineQuery = 'h1[id],h1 [id],h2[id],h2 [id],h3[id],h3 [id],h4[id],h4 [id],h5[id],h5 [id],h6[id],h6 [id]';
+	let headlineQuery = 'h1, h2, h3, h4, h5, h6';
 
-    while (element.parentElement != null && !element.parentElement.querySelector(referenceHeadlineQuery)) {
-        element = element.parentNode;
-    }
-    while (element.previousElementSibling && !element.matches('h1, h2, h3, h4, h5, h6')) {
-        element = element.previousElementSibling;
-    }
+	while (element.parentElement != null && !element.parentElement.querySelector(referenceHeadlineQuery)) {
+		element = element.parentNode;
+	}
+	while (element.previousElementSibling && !element.matches('h1, h2, h3, h4, h5, h6')) {
+		element = element.previousElementSibling;
+	}
 
-    if (element.matches(headlineQuery) && (element.getAttribute('id') || element.querySelector('[id]'))) {
-    	let thisId = element.getAttribute('id');
-    	if (thisId === null) {
+	if (element.matches(headlineQuery) && (element.getAttribute('id') || element.querySelector('[id]'))) {
+			let thisId = element.getAttribute('id');
+			if (thisId === null) {
 			thisId = element.querySelector('[id]').getAttribute('id');
-    	}
+			}
 
-    	// removing the edit section link from mediawiki articles
-    	let editSectionLink = element.querySelector('.mw-editsection');
-    	if (editSectionLink) {
-    		editSectionLink.remove();
-    	}
+			// removing the edit section link from mediawiki articles
+			let editSectionLink = element.querySelector('.mw-editsection');
+			if (editSectionLink) {
+				editSectionLink.remove();
+			}
 
-      return {
-        section: element.innerText,
-        hash: thisId,
-      };    	
-    }
+		return {
+			section: element.innerText,
+			hash: thisId,
+		};			
+	}
 
-    if (subject.closest) {
-	    let IDwrapper = subject.closest('[id]');
-	    if (IDwrapper) {
-	        return {
-	          section: null,
-	          hash: IDwrapper.getAttribute('id'),
-	        }; 	
-	    }
-    }
+	if (subject.closest) {
+			let IDwrapper = subject.closest('[id]');
+			if (IDwrapper) {
+					return {
+						section: null,
+						hash: IDwrapper.getAttribute('id'),
+					}; 	
+			}
+	}
 
-    return {
-    	section: null,
-    	hash: null
-    };
+	return {
+			section: null,
+			hash: null
+	};
 }
 
 function getOldid() {
@@ -106,30 +106,30 @@ async function collectPageLinks(subject) {
 	// sort linksets on whether if they are visible or not
 	// visible links should go first
 	uniqueLinks.sort((a, b) => {
-	  let aVisible = false;
-	  let bVisible = false;
+		let aVisible = false;
+		let bVisible = false;
 		for (let link of a.links) {
-	    const aRect = link.getBoundingClientRect();
-	    if (aRect.top >= 0) {
-	    	aVisible = true;
-	    }
-	  }
-	  for (let link of b.links) {
-	    const bRect = link.getBoundingClientRect();
-	    if (bRect.top >= 0 && bRect.bottom <= window.innerHeight) {
-	    	bVisible = true;
-	    }
-	  }
-    if (aVisible && !bVisible) {
-    	return -1;
-    }
-    if (!aVisible && bVisible) {
-    	return 1;
-    }
-   	return 0;
+			const aRect = link.getBoundingClientRect();
+			if (aRect.top >= 0) {
+				aVisible = true;
+			}
+		}
+		for (let link of b.links) {
+			const bRect = link.getBoundingClientRect();
+			if (bRect.top >= 0 && bRect.bottom <= window.innerHeight) {
+				bVisible = true;
+			}
+		}
+		if (aVisible && !bVisible) {
+			return -1;
+		}
+		if (!aVisible && bVisible) {
+			return 1;
+		}
+	 	return 0;
 	});
 
-	// mark  links that are not applicable to wikidata as not-applicable
+	// mark	links that are not applicable to wikidata as not-applicable
 	for (let key in uniqueLinks) {
 		let applicableTo = null;
 		for (id of Object.keys(resolvers)) {
@@ -160,8 +160,8 @@ async function collectPageLinks(subject) {
 				let selectors = null;
 				if (existing != key) {
 					uniqueLinks[existing].selectors = [
-					  ...uniqueLinks[existing].selectors,
-					  ...this.selectors
+						...uniqueLinks[existing].selectors,
+						...this.selectors
 					 ];
 					uniqueLinks[key] = [];
 

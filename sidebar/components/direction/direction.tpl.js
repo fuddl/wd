@@ -14,7 +14,7 @@ templates.direction = (vars) => {
 	}
 
 	let style = document.createElement('link');
-	style.setAttribute('rel',  "stylesheet");
+	style.setAttribute('rel',	"stylesheet");
 	style.setAttribute('href', "components/direction/direction.css");
 
 	wrapper.appendChild(style);

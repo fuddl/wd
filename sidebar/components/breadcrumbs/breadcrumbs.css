@@ -7,5 +7,5 @@
 	direction: rtl;
 	width: max-content;
 	max-width: 100%;
-  text-overflow: ellipsis;
+	text-overflow: ellipsis;
 }

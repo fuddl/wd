@@ -17,8 +17,8 @@ function pushEnitiyToSidebar(id, tid, setPanel = true, nocache = false) {
 
 async function openEnitiyInNewTab(id) {
 	await browser.tabs.create({
-    url: browser.runtime.getURL('sidebar/entity.html') + '?' + id
-  });
+		url: browser.runtime.getURL('sidebar/entity.html') + '?' + id
+	});
 }
 
 function pushProposalToSidebar(proposals, tid) {
@@ -113,7 +113,7 @@ browser.runtime.onMessage.addListener(
 					openInSidebarIfSidebarIsOpen(data.wdEntityId, tabDest, data.openInSidebar);
 				})();
 
-			  addToUrlCache(data.wdEntityId, data.url);
+				addToUrlCache(data.wdEntityId, data.url);
 			} else if(data.type === 'match_proposal') {
 				tabStates[sender.tab.id].mode = 'propose_match';
 				tabStates[sender.tab.id].proposals = data.proposals;
@@ -150,70 +150,70 @@ browser.runtime.onMessage.addListener(
 				addToUrlCache(data.id, data.url);	
 			}
 			if(data.type === 'send_to_wikidata') {
-			  processJobs(data.data);
-		  }
-		  if (data.type === 'open_adder') {
-			  	sidebarLocked = true;
-		  			browser.sidebarAction.setPanel({
+				processJobs(data.data);
+			}
+			if (data.type === 'open_adder') {
+					sidebarLocked = true;
+						browser.sidebarAction.setPanel({
 					panel: browser.runtime.getURL('sidebar/add.html') + '?' + data.entity,
 				});
-		  }
-		  if (data.type === 'unlock_sidebar') {
-			  sidebarLocked = false;
-		  }
-		  if (data.type === 'use_in_statement') {
-			browser.runtime.sendMessage({
-				type: 'use_in_statement',
-				dataype: data.dataype,
-				value: data.value ? data.value : null,
-				wdEntityId: data.entityId ? data.entityId : null,
-				reference: data.reference ? data.reference : null,
-			});
-		  }
+			}
+			if (data.type === 'unlock_sidebar') {
+				sidebarLocked = false;
+			}
+			if (data.type === 'use_in_statement') {
+				browser.runtime.sendMessage({
+					type: 'use_in_statement',
+					dataype: data.dataype,
+					value: data.value ? data.value : null,
+					wdEntityId: data.entityId ? data.entityId : null,
+					reference: data.reference ? data.reference : null,
+				});
+			}
 			if(data.type === 'collect_pagelinks') {
-			  browser.tabs.query({
-			    currentWindow: true,
-			    active: true
-			  }).then((tabs) => {
-				  for (let tab of tabs) {
-				  	browser.tabs.insertCSS({file: "content__collect-page-links.css"});
-				  	
-				    browser.tabs.sendMessage(
-				      tab.id,
-				      {
-				      	action: "collect_pagelinks",
-				      	subject: data.subject
-				      }
-				    ).then(response => {
-				    }).catch((v) => {
-				    	console.log(JSON.stringify(v));
-				    });
-				  }
+				browser.tabs.query({
+					currentWindow: true,
+					active: true
+				}).then((tabs) => {
+					for (let tab of tabs) {
+						browser.tabs.insertCSS({file: "content__collect-page-links.css"});
+						
+						browser.tabs.sendMessage(
+							tab.id,
+							{
+								action: "collect_pagelinks",
+								subject: data.subject
+							}
+						).then(response => {
+						}).catch((v) => {
+							console.log(JSON.stringify(v));
+						});
+					}
 				}).catch((v) => {
 				 	console.log(v);
 				});
-		  }
+			}
 			if(data.type === 'clear_pagelinks') {
-			  browser.tabs.query({
-			    currentWindow: true,
-			    active: true
-			  }).then((tabs) => {
-				  for (let tab of tabs) {
-				  					    browser.tabs.sendMessage(
-				      tab.id,
-				      { action: "clear_pagelinks" }
-				    ).then(response => {
-				    }).catch((v) => {
-				    	console.log(JSON.stringify(v));
-				    });
-				  }
+				browser.tabs.query({
+					currentWindow: true,
+					active: true
+				}).then((tabs) => {
+					for (let tab of tabs) {
+												browser.tabs.sendMessage(
+							tab.id,
+							{ action: "clear_pagelinks" }
+						).then(response => {
+						}).catch((v) => {
+							console.log(JSON.stringify(v));
+						});
+					}
 				}).catch((v) => {
 				 	console.log(v);
 				});
-		  }
+			}
 		}
 		return Promise.resolve('done');
-});
+	});
 
 browser.webNavigation.onHistoryStateUpdated.addListener(function(e) {
 	browser.tabs.sendMessage(e.tabId, { action: "find_applicables" });

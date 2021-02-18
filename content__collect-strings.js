@@ -3,14 +3,14 @@ function getElementLanguage(selection) {
 	while (typeof element.closest === 'undefined') {
 		element = element.parentElement;
 	}
-  let closest = element.closest('[lang]');
-  if (closest) {
-	  let lang = closest.lang;
-	  if (lang) {
-	  	return lang;
-	  }
-  }
-  return guessLanguage(selection.toString());
+	let closest = element.closest('[lang]');
+	if (closest) {
+		let lang = closest.lang;
+		if (lang) {
+			return lang;
+		}
+	}
+	return guessLanguage(selection.toString());
 }
 
 function guessLanguage(string) {
@@ -23,7 +23,7 @@ function guessLanguage(string) {
 		return 'de';
 	}
 	// if all else fails, let's assume it is something the user can read
-  return navigator.language.split("-")[0];
+	return navigator.language.split("-")[0];
 }
 
 document.addEventListener('selectionchange', (e) => {

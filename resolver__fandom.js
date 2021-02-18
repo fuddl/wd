@@ -48,7 +48,7 @@ resolvers.fandom = {
 		fandom: 'P6262'
 	},
 	fandomRegex: /https?:\/\/([a-z0-9\.-]+).((gamepedia)\.com|(fandom)\.com(\/([\w]+))?\/wiki)\/([^\s#\?]+)/,
-  getEntityByFandomId: async function(domain, id) {
+	getEntityByFandomId: async function(domain, id) {
 		let query = `
 			SELECT ?item
 			WHERE {

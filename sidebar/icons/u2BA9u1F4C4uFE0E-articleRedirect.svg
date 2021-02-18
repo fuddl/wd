@@ -1,9 +1,9 @@
 <svg width="20" height="20" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <style>
-      path {fill: #73777C}
-      @media (prefers-color-scheme: dark) {
-      	path { fill: #C7CCD0 }
-      }
-    </style>
-    <path d="M5 1a2 2 0 00-2 2v1c0 5 2 8 7 8V9l5 4-5 4v-3c-3.18 0-5.51-.85-7-2.68V17a2 2 0 002 2h10a2 2 0 002-2V3a2 2 0 00-2-2H5z" />
+		<style>
+			path {fill: #73777C}
+			@media (prefers-color-scheme: dark) {
+				path { fill: #C7CCD0 }
+			}
+		</style>
+		<path d="M5 1a2 2 0 00-2 2v1c0 5 2 8 7 8V9l5 4-5 4v-3c-3.18 0-5.51-.85-7-2.68V17a2 2 0 002 2h10a2 2 0 002-2V3a2 2 0 00-2-2H5z" />
 </svg>

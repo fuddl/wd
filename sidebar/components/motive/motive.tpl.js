@@ -18,7 +18,7 @@ templates.motive = (vars) => {
 	let proposalId = 'motive-proposals-' + motiveCounter;
 
 	if (vars.proposals[0]) {
-	  field.value = vars.proposals[0];
+		field.value = vars.proposals[0];
 		field.setAttribute('list', proposalId);
 	}
 
@@ -27,9 +27,9 @@ templates.motive = (vars) => {
 
 
 	for (text of vars.proposals) {
-	  let option = document.createElement('option');
-	  option.setAttribute('value', text);
-	  proposals.appendChild(option);
+		let option = document.createElement('option');
+		option.setAttribute('value', text);
+		proposals.appendChild(option);
 	}
 
 	wrapper.appendChild(field);
@@ -37,7 +37,7 @@ templates.motive = (vars) => {
 	wrapper.appendChild(proposals);
 
 	let style = document.createElement('link');
-	style.setAttribute('rel',  "stylesheet");
+	style.setAttribute('rel',	"stylesheet");
 	style.setAttribute('href', "components/motive/motive.css");
 
 	wrapper.appendChild(style);

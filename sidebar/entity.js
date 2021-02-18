@@ -2,10 +2,10 @@ const lang = navigator.language.substr(0,2);
 const footnoteStorage = {};
 let refCounter = {};
 
-function checkNested(obj, level,  ...rest) {
-  if (obj === undefined) return false
-  if (rest.length == 0 && obj.hasOwnProperty(level)) return true
-  return checkNested(obj[level], ...rest)
+function checkNested(obj, level,	...rest) {
+	if (obj === undefined) return false
+	if (rest.length == 0 && obj.hasOwnProperty(level)) return true
+	return checkNested(obj[level], ...rest)
 }
 
 if (window.location.search) {
@@ -32,11 +32,11 @@ function dateToString(value) {
 	let suffix = wiso.startsWith('-') ? ' BCE' : '';
 
 	let pad = function (i) {
-    if (i < 10) {
-      return '0' + i;
-    }
-    return i;
-  }
+		if (i < 10) {
+			return '0' + i;
+		}
+		return i;
+	}
 
 	let iso = wiso
 		.replace(/^(\+|-)/, '')
@@ -52,29 +52,29 @@ function dateToString(value) {
 		return templates.proxy({
 			query: `
 				SELECT ?innerText WHERE {
-				  ?century wdt:P31 wd:Q578.
-				  ?century wdt:P585 "${ iso }Z"^^xsd:dateTime.
-				  SERVICE wikibase:label
-				  { 
-				    bd:serviceParam wikibase:language "[AUTO_LANGUAGE],${ lang }". 
-				    ?century rdfs:label ?innerText.
-				  }
+					?century wdt:P31 wd:Q578.
+					?century wdt:P585 "${ iso }Z"^^xsd:dateTime.
+					SERVICE wikibase:label
+					{ 
+						bd:serviceParam wikibase:language "[AUTO_LANGUAGE],${ lang }". 
+						?century rdfs:label ?innerText.
+					}
 				}
 				LIMIT 1`,
 			text: text,
 		});
 	} else if (prec === 8) {
-		let text =  date.getFullYear().toString().slice(0, -1) + 'X';
+		let text =	date.getFullYear().toString().slice(0, -1) + 'X';
 		return templates.proxy({
 			query: `
 				SELECT ?innerText WHERE {
-				  ?decade wdt:P31 wd:Q39911.
-				  ?decade wdt:P585 "${ iso }Z"^^xsd:dateTime.
-				  SERVICE wikibase:label
-				  { 
-				    bd:serviceParam wikibase:language "[AUTO_LANGUAGE],${ lang }". 
-				    ?decade rdfs:label ?innerText.
-				  }
+					?decade wdt:P31 wd:Q39911.
+					?decade wdt:P585 "${ iso }Z"^^xsd:dateTime.
+					SERVICE wikibase:label
+					{ 
+						bd:serviceParam wikibase:language "[AUTO_LANGUAGE],${ lang }". 
+						?decade rdfs:label ?innerText.
+					}
 				}
 				LIMIT 1`,
 			text: text,
@@ -95,7 +95,7 @@ function dateToString(value) {
 }
 
 function insertAfter(referenceNode, newNode) {
-  referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
+	referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
 }
 
 function renderStatements(snak, references, type, target, scope) {
@@ -109,7 +109,7 @@ function renderStatements(snak, references, type, target, scope) {
 				}));
 			}
 		}
-		if (valueType === "wikibase-item" || valueType === "wikibase-entityid" || valueType === "wikibase-lexeme" || valueType === "wikibase-form"  || valueType === "wikibase-sense") {
+		if (valueType === "wikibase-item" || valueType === "wikibase-entityid" || valueType === "wikibase-lexeme" || valueType === "wikibase-form"	|| valueType === "wikibase-sense") {
 			let vid = snak.datavalue.value.id;
 			if (snak.datavalue.parents) {
 				target.appendChild(templates.breadcrumbsPlaceholder(snak.datavalue.parents));
@@ -140,13 +140,13 @@ function renderStatements(snak, references, type, target, scope) {
 				target.appendChild(templates.proxy({
 					query: `
 						SELECT ?innerText WHERE {
-    					<${ snak.datavalue.value.unit }> wdt:P5061 ?innerText.
-    					FILTER(LANG(?innerText) = "${ lang }").
+							<${ snak.datavalue.value.unit }> wdt:P5061 ?innerText.
+							FILTER(LANG(?innerText) = "${ lang }").
 						}`
 				}));
 			}
 		}
-		if (valueType === "globe-coordinate" || valueType ===  'globecoordinate') {
+		if (valueType === "globe-coordinate" || valueType ===	'globecoordinate') {
 			target.appendChild(templates.mercator({
 				lat: snak.datavalue.value.latitude,
 				lon: snak.datavalue.value.longitude,
@@ -203,9 +203,9 @@ function renderStatements(snak, references, type, target, scope) {
 			sup.appendChild(reference);
 			c++;
 		}
-	  if (sup.hasChildNodes()) {
+		if (sup.hasChildNodes()) {
 			target.appendChild(sup);
-	  }
+		}
 	}
 	if (scope === 'statement' && delta.hasOwnProperty('qualifiers')) {
 		let qualifiers = [];
@@ -462,34 +462,34 @@ function updateView(id, useCache = true) {
 						let setWrapper = document.createElement('div');
 						setWrapper.setAttribute('id', thisSet.id);
 						content.appendChild(setWrapper);
-				    
-				    let isPlaceholder = false;
-				    for (let titleType of ['glosses', 'representations']) {
-				    	let title = false;
-				    	if (titleType === 'representations' && thisSet.representations) {
-				    		let titleParts = [];
-				    		for (let lang in thisSet.representations) {
-				    			titleParts.push(thisSet.representations[lang].value);
-				    			title = titleParts.join('/');
-				    		}
-				    	} else {
+						
+						let isPlaceholder = false;
+						for (let titleType of ['glosses', 'representations']) {
+							let title = false;
+							if (titleType === 'representations' && thisSet.representations) {
+								let titleParts = [];
+								for (let lang in thisSet.representations) {
+									titleParts.push(thisSet.representations[lang].value);
+									title = titleParts.join('/');
+								}
+							} else {
 								title = getValueByLang(thisSet, titleType, false);
 								if (!title && titleType === 'glosses' && thisSet.claims.P5137) {
 									let descriptions = [];
-								  for (item of thisSet.claims.P5137) {
-								  	if (checkNested(item, 'mainsnak', 'datavalue', 'value', 'id')) {
-								  		let itemId = item.mainsnak.datavalue.value.id;
-								  		let itemEntity = await wikidataGetEntity(itemId);
-								  		let description = getValueByLang(itemEntity[itemId], 'descriptions', false);
-								  		if (description) {
-								  			descriptions.push(description)
-								  		}
-								  	}
-								  	title = descriptions.join(', ');
-								  	isPlaceholder = true;
-								  }
+									for (item of thisSet.claims.P5137) {
+										if (checkNested(item, 'mainsnak', 'datavalue', 'value', 'id')) {
+											let itemId = item.mainsnak.datavalue.value.id;
+											let itemEntity = await wikidataGetEntity(itemId);
+											let description = getValueByLang(itemEntity[itemId], 'descriptions', false);
+											if (description) {
+												descriptions.push(description)
+											}
+										}
+										title = descriptions.join(', ');
+										isPlaceholder = true;
+									}
 								}
-				    	}
+							}
 							if (title) {
 								let headline = document.createElement('h2');
 								headline.innerText = title;
@@ -498,7 +498,7 @@ function updateView(id, useCache = true) {
 									headline.style.opacity = .75;
 								}
 							}
-				    }
+						}
 
 						for (let prop of groupClaims(thisSet.claims)) {
 							let statement = renderStatement(thisSet.claims[prop]);

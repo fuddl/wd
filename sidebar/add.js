@@ -12,8 +12,8 @@ const stringTypes = [
 async function askIfStatementExists(subject, verb, object) {
 	let question = `
 		ASK {
-  		wd:${subject} p:${verb} ?stmt .
-  		?stmt ps:${verb} wd:${object} .
+			wd:${subject} p:${verb} ?stmt .
+			?stmt ps:${verb} wd:${object} .
 		}
 	`;
 
@@ -63,7 +63,7 @@ content.innerHTML = '';
 	let saveButton = document.createElement('button');
 
 	let checkSaveButton = function() {
-		let datatype =  propPicker.element.getAttribute('data-datatype');
+		let datatype =	propPicker.element.getAttribute('data-datatype');
 		let propertSelected = propPicker.element.hasAttribute('data-prop');
 		let selectedEntities = propPicker.selection.querySelectorAll(`[data-selected]`);
 		if (
@@ -290,8 +290,8 @@ content.innerHTML = '';
 
 				}
 			}
-      
-      
+			
+			
 			Promise.all([
 				browser.runtime.sendMessage({
 					type: 'send_to_wikidata',

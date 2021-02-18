@@ -14,10 +14,10 @@ const templates = {
 	},
 	urlLink: (url) => {
 		let readable = url
-		  .replace(/^[a-z]+\:\/\//, '')
-		  .replace(/^www\./, '')
-		  .replace(/\/index\.(php|html?)$/, '')
-		  .replace(/\/$/, '');
+			.replace(/^[a-z]+\:\/\//, '')
+			.replace(/^www\./, '')
+			.replace(/\/index\.(php|html?)$/, '')
+			.replace(/\/$/, '');
 		let tag = document.createElement('a');
 		tag.setAttribute('href', url)
 		tag.classList.add('url')

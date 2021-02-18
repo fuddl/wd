@@ -94,7 +94,7 @@ function getPropertyScope(property) {
 
 						propform.appendChild(instanceOfPreview);
 					}
-				  break;
+					break;
 				case 'Q21503247':
 					if (contraint?.qualifiers?.P2305) {
 						let check = document.createElement('input');
@@ -125,7 +125,7 @@ function getPropertyScope(property) {
 
 						propform.appendChild(requiredStatementPreview);
 					}
-				  break;
+					break;
 			}
 			counter++;
 		}
@@ -135,8 +135,8 @@ function getPropertyScope(property) {
 	resolvePlaceholders();
 
 	let labelField = templates.join({
-	  human: proposals.titles[0],
-	  scope: getPropertyScope(property[proposals.ids[0][0].prop]),
+		human: proposals.titles[0],
+		scope: getPropertyScope(property[proposals.ids[0][0].prop]),
 	});
 	let direction = templates.direction();
 
@@ -160,18 +160,18 @@ function getPropertyScope(property) {
 	let selectedEntity = '';
 
 	var observer = new MutationObserver(function(mutations) {
-	  mutations.forEach(function(mutation) {
-	    if (mutation.type == "attributes") {
-	      if (labelField.hasAttribute('data-selected-entity')) {
-	      	saveButton.removeAttribute('disabled');
-	      	selectedEntity = labelField.getAttribute('data-selected-entity');
-	      }
-	    }
-	  });
+		mutations.forEach(function(mutation) {
+			if (mutation.type == "attributes") {
+				if (labelField.hasAttribute('data-selected-entity')) {
+					saveButton.removeAttribute('disabled');
+					selectedEntity = labelField.getAttribute('data-selected-entity');
+				}
+			}
+		});
 	});
 
 	observer.observe(labelField, {
-	  attributes: true,
+		attributes: true,
 	});
 
 	saveButton.addEventListener('click', async function() {
@@ -201,42 +201,42 @@ function getPropertyScope(property) {
 				object: proposals.ids[0][0].value,
 				fromTab: currentTab,
 				references: [{
-				  "P854": [{
-			      "snaktype": "value",
-			      "property": "P854",
-			      "datavalue": {
-			        "value": proposals.source.url,
-			        "type": "string"
-			      },
-			      "datatype": "url"
-				  }],
-				  "P1476": [{
-			      "snaktype": "value",
-			      "property": "P1476",
-			      "datavalue": {
-			        "value": {
-			          "text": proposals.source.title.trim(),
-			          "language": proposals.source.lang ? proposals.source.lang : 'zxx',
-			        },
-			        "type": "monolingualtext"
-			      },
-			      "datatype": "string"
-				  }],
-				  "P813": [{
-			      "snaktype": "value",
-			      "property": "P813",
-			      "datavalue": {
-			        "type": "time",
-			        "value": {
-			          "after": 0,
-			          "before": 0,
-			          "calendarmodel": "http://www.wikidata.org/entity/Q1985727",
-			          "precision": 11,
-			          "time": `+${ now.toISOString().substr(0,10) }T00:00:00Z`,
-			          "timezone": 0
-			        }
-			      }
-			    }]
+					"P854": [{
+						"snaktype": "value",
+						"property": "P854",
+						"datavalue": {
+							"value": proposals.source.url,
+							"type": "string"
+						},
+						"datatype": "url"
+					}],
+					"P1476": [{
+						"snaktype": "value",
+						"property": "P1476",
+						"datavalue": {
+							"value": {
+								"text": proposals.source.title.trim(),
+								"language": proposals.source.lang ? proposals.source.lang : 'zxx',
+							},
+							"type": "monolingualtext"
+						},
+						"datatype": "string"
+					}],
+					"P813": [{
+						"snaktype": "value",
+						"property": "P813",
+						"datavalue": {
+							"type": "time",
+							"value": {
+								"after": 0,
+								"before": 0,
+								"calendarmodel": "http://www.wikidata.org/entity/Q1985727",
+								"precision": 11,
+								"time": `+${ now.toISOString().substr(0,10) }T00:00:00Z`,
+								"timezone": 0
+							}
+						}
+					}]
 				}],
 			});
 

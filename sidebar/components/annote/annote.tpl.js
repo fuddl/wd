@@ -18,7 +18,7 @@ templates.annote = (qualifiers) => {
 	}
 
 	let style = document.createElement('link');
-	style.setAttribute('rel',  "stylesheet");
+	style.setAttribute('rel',	"stylesheet");
 	style.setAttribute('href', "components/annote/annote.css");
 
 	dl.appendChild(style);

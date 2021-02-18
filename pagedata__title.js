@@ -33,7 +33,7 @@ function findTitles() {
 		titles.push(titleElement.innerText);
 	}
 	titles = titles.filter(function (title) {
-  	return title != '';
+		return title != '';
 	});
 
 	return titles;

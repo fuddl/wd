@@ -6,7 +6,7 @@ templates.ensign = (vars) => {
 	let description = document.createElement('p');
 	
 	let style = document.createElement('link');
-	style.setAttribute('rel',  "stylesheet");
+	style.setAttribute('rel',	"stylesheet");
 	style.setAttribute('href', "components/ensign/ensign.css");
 	
 	header.classList.add('ensign');
@@ -31,10 +31,10 @@ templates.ensign = (vars) => {
 	link.innerText = vars.id;
 	link.addEventListener('click', (e) => {
 		e.preventDefault();
-    const range = document.createRange();
-    range.selectNode(link);
-    window.getSelection().removeAllRanges();
-    window.getSelection().addRange(range);
+		const range = document.createRange();
+		range.selectNode(link);
+		window.getSelection().removeAllRanges();
+		window.getSelection().addRange(range);
 	});
 	id.appendChild(link);
 
@@ -103,8 +103,8 @@ templates.ensignEditDescription = async (vars, description) => {
 			type: 'hidden',
 		},
 		'token': {
-	    value: token,
-		  type: 'hidden',
+			value: token,
+			type: 'hidden',
 		},
 		'errorformat': {
 			value: 'plaintext',
@@ -123,14 +123,14 @@ templates.ensignEditDescription = async (vars, description) => {
 	let button = document.createElement('button');
 	button.innerText = 'Set description';
 
-	let valInput =  document.createElement('input');
+	let valInput =	document.createElement('input');
 	valInput.setAttribute('name', 'value');
 	valInput.setAttribute('type', 'text');
 	valInput.setAttribute('value', vars.description.text);
 	descriptionEditForm.appendChild(valInput);
 
-  for (let [name, input] of Object.entries(inputs)) {
-		let newInput =  document.createElement('input');
+	for (let [name, input] of Object.entries(inputs)) {
+		let newInput =	document.createElement('input');
 		newInput.setAttribute('name', name);
 		newInput.setAttribute('type', input.type);
 		newInput.setAttribute('value', input.value);

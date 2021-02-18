@@ -52,9 +52,9 @@ resolvers.isbn = {
 
 		let query = `
 			SELECT ?item WHERE{
-			  ?item wdt:${ prop } ?isbn.
-			  BIND(REPLACE(?isbn, "-", "") AS ?plain_isbn)
-			  FILTER(?plain_isbn in ("${ plain }")) 
+				?item wdt:${ prop } ?isbn.
+				BIND(REPLACE(?isbn, "-", "") AS ?plain_isbn)
+				FILTER(?plain_isbn in ("${ plain }")) 
 			}
 		`;
 		return sparqlQuery(query);

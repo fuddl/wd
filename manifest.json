@@ -1,67 +1,67 @@
 {
-  "manifest_version": 2,
-  "name": "Wikidata",
-  "version": "0.145",
-  "description": "Display information from wikidata.",
-  "icons": {
-    "48": "icons/wd.svg",
-    "96": "icons/wd.svg"
-  },  
-  "browser_action": {
-    "default_icon": "icons/inactive.svg",
-    "default_title": "Wikidata"
-  },
-  "sidebar_action": {
-    "default_icon": "icons/wd.svg",
-    "default_title": "Wikidata",
-    "default_panel": "sidebar/entity.html",
-    "open_at_install": false
-  },
-  "permissions": [
-    "activeTab",
-    "storage",
-    "webNavigation",
-    "<all_urls>"
-  ],
-  "background": {
-    "scripts": [
-      "sqarql-query.js",
-      "sidebar/get-value-by-lang.js",
-      "wd-get-entity.js",
-      "sidebar/wd-get-token.js",
-      "background__add-to-wikidata.js",
-      "resolver.js",
-      "resolver__P8966.js",
-      "background.js"
-    ]
-  },
-  "content_scripts": [
-  {
-    "matches": ["<all_urls>"],
-    "js": [
-      "sqarql-query.js",
-      "wd-get-entity.js",
-      "resolver.js",
-      "get-valid-string-languages.js",
-      "pagedata__title.js",
-      "pagedata__description.js",
-      "resolver__hash.js",
-      "resolver__cache.js",
-      "resolver__wikipedia.js",
-      "resolver__commons.js",
-      "resolver__inventaire.js",
-      "resolver__P8966.js",
-      "resolver__regex.js",
-      "resolver__fandom.js",
-      "resolver__wikis.js",
-      "resolver__doi.js",
-      "resolver__official-website.js",
+	"manifest_version": 2,
+	"name": "Wikidata",
+	"version": "0.145",
+	"description": "Display information from wikidata.",
+	"icons": {
+		"48": "icons/wd.svg",
+		"96": "icons/wd.svg"
+	},	
+	"browser_action": {
+		"default_icon": "icons/inactive.svg",
+		"default_title": "Wikidata"
+	},
+	"sidebar_action": {
+		"default_icon": "icons/wd.svg",
+		"default_title": "Wikidata",
+		"default_panel": "sidebar/entity.html",
+		"open_at_install": false
+	},
+	"permissions": [
+		"activeTab",
+		"storage",
+		"webNavigation",
+		"<all_urls>"
+	],
+	"background": {
+		"scripts": [
+			"sqarql-query.js",
+			"sidebar/get-value-by-lang.js",
+			"wd-get-entity.js",
+			"sidebar/wd-get-token.js",
+			"background__add-to-wikidata.js",
+			"resolver.js",
+			"resolver__P8966.js",
+			"background.js"
+		]
+	},
+	"content_scripts": [
+	{
+		"matches": ["<all_urls>"],
+		"js": [
+			"sqarql-query.js",
+			"wd-get-entity.js",
+			"resolver.js",
+			"get-valid-string-languages.js",
+			"pagedata__title.js",
+			"pagedata__description.js",
+			"resolver__hash.js",
+			"resolver__cache.js",
+			"resolver__wikipedia.js",
+			"resolver__commons.js",
+			"resolver__inventaire.js",
+			"resolver__P8966.js",
+			"resolver__regex.js",
+			"resolver__fandom.js",
+			"resolver__wikis.js",
+			"resolver__doi.js",
+			"resolver__official-website.js",
 
-      "content__collect-page-links.js",
-      "content__collect-strings.js",
-      "content__display-metadata.js",
-      "content.js"
-    ]
-  }
+			"content__collect-page-links.js",
+			"content__collect-strings.js",
+			"content__display-metadata.js",
+			"content.js"
+		]
+	}
 ]
 }

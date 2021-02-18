@@ -50,12 +50,12 @@ templates.express = (vars) => {
 					wrapper.setAttribute('data-datatype', suggestion.datatype);
 
 					browser.storage.local.set({
-					  lastUsedProp:  {
-					  	prop: suggestion.id,
-					  	name: suggestion.label,
-					  	desc: suggestion.description,
-					  	datatype: suggestion.datatype,
-					  },
+						lastUsedProp:	{
+							prop: suggestion.id,
+							name: suggestion.label,
+							desc: suggestion.description,
+							datatype: suggestion.datatype,
+						},
 					});
 					wrapper.dispatchEvent(new Event('change'));
 					autocomplete.innerText = '';
@@ -82,7 +82,7 @@ templates.express = (vars) => {
 	main.appendChild(input);
 
 	let style = document.createElement('link');
-	style.setAttribute('rel',  "stylesheet");
+	style.setAttribute('rel',	"stylesheet");
 	style.setAttribute('href', "components/express/express.css");
 
 	wrapper.appendChild(style);
@@ -97,12 +97,12 @@ templates.express = (vars) => {
 			let firstProp = await wikidataGetEntity(firstPropId);
 
 			browser.storage.local.set({
-			  lastUsedProp:  {
-			  	prop: firstPropId,
-			  	name: getValueByLang(firstProp[firstPropId], 'labels', firstPropId),
-			  	desc: getValueByLang(firstProp[firstPropId], 'descriptions', ''),
-			  	datatype: firstProp[firstPropId].datatype,
-			  },
+				lastUsedProp:	{
+					prop: firstPropId,
+					name: getValueByLang(firstProp[firstPropId], 'labels', firstPropId),
+					desc: getValueByLang(firstProp[firstPropId], 'descriptions', ''),
+					datatype: firstProp[firstPropId].datatype,
+				},
 			});
 
 			storage = await browser.storage.local.get('lastUsedProp');
@@ -157,7 +157,7 @@ templates.express = (vars) => {
 				} else {
 					allOptions.item(currentIndex - 1).focus();
 				}
-			break;
+				break;
 			case "ArrowDown":
 				e.preventDefault();
 				if (document.activeElement === input) {
@@ -167,7 +167,7 @@ templates.express = (vars) => {
 				} else {
 					allOptions.item(currentIndex + 1).focus();
 				}
-			break;
+				break;
 		}
 	});
 
@@ -202,7 +202,7 @@ templates.express__tag = (vars) => {
 	wrapper.postProcess = async function () {
 		let e = await wikidataGetEntity(vars.id);
 		title.innerText = getValueByLang(e[vars.id], 'labels', vars.id);
-		let desc =  getValueByLang(e[vars.id], 'descriptions', false);
+		let desc =	getValueByLang(e[vars.id], 'descriptions', false);
 		if (desc) {
 			description.innerText = desc;
 		} else {

@@ -42,21 +42,21 @@ async function findApplicables(location, openInSidebar = true) {
 findApplicables(location);
 
 browser.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
-  if (msg.action == 'find_applicables') {
-    findApplicables(location);
-  } else if (msg.action === 'collect_pagelinks') {
-  	return await collectPageLinks(msg.subject);
-  } else if (msg.action === 'clear_pagelinks') {
-  	clearPageLinks();
-  }
+	if (msg.action == 'find_applicables') {
+		findApplicables(location);
+	} else if (msg.action === 'collect_pagelinks') {
+		return await collectPageLinks(msg.subject);
+	} else if (msg.action === 'clear_pagelinks') {
+		clearPageLinks();
+	}
 });
 
 window.onpopstate = function(event) {
-  findApplicables(window.location);
+	findApplicables(window.location);
 };
 
 window.addEventListener('hashchange', function() {
-  findApplicables(window.location);
+	findApplicables(window.location);
 }, false);
 
 document.addEventListener('focus', function() {
@@ -67,7 +67,7 @@ let head = document.querySelector('head');
 
 let title = head.querySelector('title').innerText;
 let titleObserver = new MutationObserver(function() {
-  let newTitle = head.querySelector('title').innerText;
+	let newTitle = head.querySelector('title').innerText;
 	if (newTitle != title) {
 		findApplicables(window.location);
 		title = newTitle;

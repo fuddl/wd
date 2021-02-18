@@ -42,8 +42,8 @@
 .remark__object {
 	grid-column: 2;
 	margin-bottom: .5em;
-  padding: 0;
-  min-width: 0;
+	padding: 0;
+	min-width: 0;
 }
 
 .remark__check {
@@ -57,9 +57,9 @@
 }
 
 @media (max-width: 299px) {
-  .remark__object {
-  	margin: 0;
-  }
+	.remark__object {
+		margin: 0;
+	}
 }
 
 small {

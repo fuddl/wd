@@ -49,8 +49,8 @@ async function updateView(id, useCache = true) {
 		if (reverseProps[prop].more > 0) {
 			let queryMore = document.createElement('a');
 			let query = `SELECT ?item ?itemLabel WHERE {
-			  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
-			  ?item wdt:${prop} wd:${id}.
+				SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+				?item wdt:${prop} wd:${id}.
 			}`
 			queryMore.setAttribute('href', 'https://query.wikidata.org/embed.html');
 			queryMore.hash = encodeURIComponent(query);

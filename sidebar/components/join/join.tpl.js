@@ -30,7 +30,7 @@ templates.join = (vars) => {
 	wrapper.appendChild(proposals);
 
 	let style = document.createElement('link');
-	style.setAttribute('rel',  "stylesheet");
+	style.setAttribute('rel',	"stylesheet");
 	style.setAttribute('href', "components/join/join.css");
 
 	wrapper.appendChild(style);

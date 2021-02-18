@@ -1,6 +1,6 @@
 templates.breadcrumbs = (crumbs, childId = false) => {
 	let style = document.createElement('link');
-	style.setAttribute('rel',  "stylesheet");
+	style.setAttribute('rel',	"stylesheet");
 	style.setAttribute('href', "components/breadcrumbs/breadcrumbs.css");
 
 	let nav = document.createElement('nav');
