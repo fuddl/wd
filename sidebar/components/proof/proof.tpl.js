@@ -1,4 +1,4 @@
-templates.proof = (vars) => { 
+const proof = (vars) => { 
 	let dl = document.createElement('dl');
 	dl.classList.add('proof');
 
@@ -22,3 +22,5 @@ templates.proof = (vars) => {
 	dl.appendChild(style);
 	return dl;
 }
+
+export { proof };

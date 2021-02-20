@@ -1,6 +1,6 @@
-let cache = {}
+import { getLink } from '../../resolve-placeholders.js';
 
-templates.placeholder = (vars) => {
+const placeholder = (vars, cache) => {
 
 	// don't create a placeholder if the label is already in cache
 	if (vars.entity && 'labels' in cache && cache.labels[vars.entity] && !vars.type) {
@@ -42,6 +42,5 @@ templates.placeholder = (vars) => {
 	return tag;
 }
 
-(async () => {
-	cache = await browser.storage.local.get();
-})();
+export { placeholder }
+

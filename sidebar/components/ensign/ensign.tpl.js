@@ -1,4 +1,4 @@
-templates.ensign = (vars) => { 
+const ensign = (vars) => { 
 	let header = document.createElement('header');
 	let title = document.createElement('h1');
 	let id = document.createElement('small');
@@ -48,7 +48,7 @@ templates.ensign = (vars) => {
 		description.addEventListener('click', async () => {
 			if (!descriptionEditFormAppended) {
 				description.setAttribute('hidden', true);
-				let descriptionEditForm = await templates.ensignEditDescription(vars, description);
+				let descriptionEditForm = await ensignEditDescription(vars, description);
 				header.appendChild(descriptionEditForm);
 				descriptionEditFormAppended = true;
 			}
@@ -69,7 +69,7 @@ templates.ensign = (vars) => {
 	return header;
 }
 
-templates.ensignEditDescription = async (vars, description) => { 
+async function ensignEditDescription(vars, description) {
 	let descriptionEditForm = document.createElement('form');
 	descriptionEditForm.setAttribute('method', 'post');
 	descriptionEditForm.setAttribute('action', 'https://www.wikidata.org/w/api.php');
@@ -163,3 +163,5 @@ templates.ensignEditDescription = async (vars, description) => {
 	
 	return descriptionEditForm;
 }
+
+export { ensign }

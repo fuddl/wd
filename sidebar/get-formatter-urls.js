@@ -18,3 +18,5 @@ async function getFormatterUrls(prop) {
 	`;
 	return await sparqlQuery(query);
 } 
+
+export { getFormatterUrls }

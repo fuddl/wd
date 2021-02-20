@@ -22,6 +22,8 @@ resolvers.officialWebsite = {
 	},
 	indexPageRegex: /^https?:\/\/[^\/]+(\/(\?.*|index\.php(\?.*)?)?)?$/,
 	getEntityByOfficialWebsite: async function(domain) {
+		const { sparqlQuery } = await import(browser.extension.getURL("sqarql-query.js"));
+		
 		let query = `
 			SELECT ?item
 			WHERE {

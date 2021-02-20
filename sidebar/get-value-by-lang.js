@@ -26,3 +26,5 @@ function getAliasesByLang(e) {
 		return [];
 	}
 }
+
+export { getValueByLang, getAliasesByLang }

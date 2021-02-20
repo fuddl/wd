@@ -1,4 +1,4 @@
-templates.remark = (vars) => { 
+const remark = (vars) => { 
 	let dl = document.createElement('dl');
 	dl.classList.add('remark');
 	if (vars.block) {
@@ -15,7 +15,7 @@ templates.remark = (vars) => {
 	dt.appendChild(vars.prop);
 	dl.appendChild(dt);
 	
-	for (item of vars.vals) {
+	for (let item of vars.vals) {
 		let dd = document.createElement('dd');
 		dd.classList.add('remark__object');
 		dd.appendChild(item);
@@ -36,3 +36,5 @@ templates.remark = (vars) => {
 	dl.appendChild(style);
 	return dl;
 }
+
+export { remark };

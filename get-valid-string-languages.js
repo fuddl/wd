@@ -19,3 +19,5 @@ async function makeLanguageValid(invalidLang) {
 	}
 	return 'xxz';
 }
+
+export { getValidStringLanguages, makeLanguageValid }

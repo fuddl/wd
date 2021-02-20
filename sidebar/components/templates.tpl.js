@@ -1,4 +1,24 @@
+import { placeholder } from './placeholder/placeholder.tpl.js';
+import { annote } from './annote/annote.tpl.js';
+import { ensign } from './ensign/ensign.tpl.js';
+import { breadcrumbs, breadcrumbsPlaceholder } from './breadcrumbs/breadcrumbs.tpl.js';
+import { mercator } from './mercator/mercator.tpl.js';
+import { remark } from './remark/remark.tpl.js';
+import { proof } from './proof/proof.tpl.js';
+import { flex } from './flex/flex.tpl.js';
+import { actions } from './actions/actions.tpl.js';
+
 const templates = {
+	actions: actions,
+	annote: annote,
+	breadcrumbs: breadcrumbs,
+	breadcrumbsPlaceholder: breadcrumbsPlaceholder,
+	ensign: ensign,
+	flex: flex,
+	mercator: mercator,
+	placeholder: placeholder,
+	proof: proof,
+	remark: remark,
 	br: () => { return document.createElement('br') },
 	code: (text) => {
 		let tag = document.createElement('code');
@@ -69,7 +89,7 @@ const templates = {
 	picture: (vars) => {
 		let tag = document.createElement('img');
 		let srcset = [];
-		for (key in vars.srcSet) {
+		for (let key in vars.srcSet) {
 			srcset.push(`${ vars.srcSet[key] } ${ key }w`);
 		}
 		tag.setAttribute('srcset', srcset.join(','));
@@ -135,3 +155,6 @@ const templates = {
 		return wrapper;
 	}
 };
+
+export { templates }
+

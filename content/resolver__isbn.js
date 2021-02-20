@@ -49,7 +49,8 @@ resolvers.isbn = {
 	getEntityByIsbn: async function(isbn) {
 		let plain = isbn.replace(/[^\d]/g, '');
 		let prop = plain.length === 13 ? 'P212' : 'P957';
-
+		const { sparqlQuery } = await import(browser.extension.getURL("sqarql-query.js"));
+		
 		let query = `
 			SELECT ?item WHERE{
 				?item wdt:${ prop } ?isbn.

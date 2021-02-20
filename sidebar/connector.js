@@ -137,6 +137,7 @@ function getPropertyScope(property) {
 	let labelField = templates.join({
 		human: proposals.titles[0],
 		scope: getPropertyScope(property[proposals.ids[0][0].prop]),
+		id: 'joiner',
 	});
 	let direction = templates.direction();
 

@@ -2,7 +2,7 @@ async function findApplicables(location, openInSidebar = true) {
 	let applicables = [];
 
 	let foundMatch = false;
-	for (id of Object.keys(resolvers)) {
+	for (let id of Object.keys(resolvers)) {
 		let isApplicable = await resolvers[id].applicable(location);
 		if (isApplicable) {
 			let entityId = await resolvers[id].getEntityId(location);
@@ -50,7 +50,6 @@ browser.runtime.onMessage.addListener(async function(msg, sender, sendResponse) 
 		clearPageLinks();
 	}
 });
-
 window.onpopstate = function(event) {
 	findApplicables(window.location);
 };

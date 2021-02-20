@@ -1,6 +1,19 @@
+import { Breadcrumbs, getParents } from './get-parents.js';
+import { getAutodesc } from './get-autodesc.js';
+import { getFormatterUrls } from './get-formatter-urls.js';
+import { getLink, resolvePlaceholders, resolveIdLinksPlaceholder, resolveBreadcrumbs } from './resolve-placeholders.js';
+import { getRelatedItems } from './get-related-items.js';
+import { getValueByLang, getAliasesByLang } from './get-value-by-lang.js';
+import { groupClaims } from './group-claims.js';
+import { templates } from './components/templates.tpl.js';
+import { wikidataGetEditToken, getTokens } from './wd-get-token.js';
+import { wikidataGetEntity } from '../wd-get-entity.js';
+
 const lang = navigator.language.substr(0,2);
 const footnoteStorage = {};
 let refCounter = {};
+
+let cache = {}
 
 function checkNested(obj, level,	...rest) {
 	if (obj === undefined) return false
@@ -13,12 +26,6 @@ if (window.location.search) {
 	if (currentEntity.match(/[QMPL]\d+/)) {
 		updateView(currentEntity, window.location.hash !== '#nocache');
 	}
-}
-
-async function getTokens() {
-	let response = await fetch('https://www.wikidata.org/w/api.php?action=query&meta=tokens&type=csrf&format=json');
-	let json = JSON.parse(await response.text());
-	return json.query.tokens.csrftoken;
 }
 
 function dateToString(value) {
@@ -116,7 +123,7 @@ function renderStatements(snak, references, type, target, scope) {
 			}
 			target.appendChild(templates.placeholder({
 				entity: vid,
-			}));
+			}, cache));
 		}
 		if (valueType === "external-id") {
 			target.appendChild(templates.code(snak.datavalue.value));
@@ -207,7 +214,7 @@ function renderStatements(snak, references, type, target, scope) {
 			target.appendChild(sup);
 		}
 	}
-	if (scope === 'statement' && delta.hasOwnProperty('qualifiers')) {
+	if (scope === 'statement' && typeof delta != 'undefined' && delta.hasOwnProperty('qualifiers')) {
 		let qualifiers = [];
 		for (prop of Object.keys(delta.qualifiers)) {
 			let qvalues = [];
@@ -231,11 +238,11 @@ function renderStatement(value) {
 		let pid = value[0].mainsnak.property;
 		let label = templates.placeholder({
 			entity: pid,
-		});
+		}, cache);
 
 		let values = [];
 		let hasPreferred = false;
-		for (delta of value) {
+		for (let delta of value) {
 			if (delta.rank == "preferred") {
 				hasPreferred = true;
 			}
@@ -245,7 +252,7 @@ function renderStatement(value) {
 				delete value[key];
 			}
 		}
-		for (delta of value) {
+		for (let delta of value) {
 			if (delta && delta.hasOwnProperty('mainsnak') && delta.mainsnak) {
 				let thisvalue = new DocumentFragment();
 				let type = delta.mainsnak.snaktype;
@@ -271,7 +278,7 @@ function renderStatement(value) {
 								let refStatement = templates.proof({
 									prop: templates.placeholder({
 										entity: key,
-									}),
+									}, cache),
 									vals: refvalues,
 								});
 								listItem.appendChild(refStatement);
@@ -301,7 +308,7 @@ function renderStatement(value) {
 		let statement = templates.remark({
 			prop: templates.placeholder({
 				entity: pid,
-			}),
+			}, cache),
 			vals: values,
 			id: pid,
 		});
@@ -323,6 +330,7 @@ function updateView(id, useCache = true) {
 	content.innerHTML = '';
 	(async () => {
 		let entities = await wikidataGetEntity(id, useCache);
+		cache = await browser.storage.local.get();
 
 		for (id of Object.keys(entities)) {
 			let e = entities[id];
@@ -339,13 +347,13 @@ function updateView(id, useCache = true) {
 
 				lexemeDescription.appendChild(templates.placeholder({
 					entity: e.language
-				}));
+				}, cache));
 
 				lexemeDescription.appendChild(document.createTextNode(', '));
 
 				lexemeDescription.appendChild(templates.placeholder({
 					entity: e.lexicalCategory
-				}));
+				}, cache));
 
 				wrapper.appendChild(templates.ensign({
 					revid: e.lastrevid,
@@ -444,7 +452,7 @@ function updateView(id, useCache = true) {
 
 			if (e.claims || e.statements) {
 				let statements = await enrichStatements(e.claims ? e.claims : e.statements);
-				for (prop of groupClaims(statements)) {
+				for (let prop of groupClaims(statements)) {
 					let statement = renderStatement(statements[prop]);
 					if (statement) {
 						if (statement.type !== "external-id") {
@@ -532,7 +540,7 @@ function updateView(id, useCache = true) {
 		}, 0);
 		
 		resolvePlaceholders();
-		resolveBreadcrumbs();
+		resolveBreadcrumbs(cache);
 		resolveIdLinksPlaceholder();
 
 		let proxies = content.querySelectorAll('.proxy');

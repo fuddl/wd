@@ -7,7 +7,9 @@ async function getAutodesc(id) {
 			return json.result;
 		}
 	} catch (ex) {
-		console.log(ex);
+		console.warn(ex);
 	}
 	return '???';
 }
+
+export { getAutodesc }

@@ -1,4 +1,4 @@
-templates.direction = (vars) => { 
+const direction = (vars) => { 
 	let wrapper = document.createElement('div');
 	wrapper.classList.add('direction');
 	let arrow = document.createElement('span');
@@ -21,3 +21,5 @@ templates.direction = (vars) => {
 
 	return wrapper;
 }
+
+return { direction }

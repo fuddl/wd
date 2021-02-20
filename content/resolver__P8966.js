@@ -1,5 +1,7 @@
 resolvers.p8966 = {
 	aquireRegexes: async function() {
+		const { sparqlQuery } = await import(browser.extension.getURL("sqarql-query.js"));
+		
 		let query = `
 			SELECT ?p ?s ?r WHERE {
 				?stat ps:P8966 ?s.
