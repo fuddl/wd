@@ -1,4 +1,4 @@
-templates.proof = (vars) => { 
+const proof = (vars) => { 
 	let dl = document.createElement('dl');
 	dl.classList.add('proof');
 
@@ -8,7 +8,7 @@ templates.proof = (vars) => {
 	dl.appendChild(dt);
 	dl.appendChild(document.createTextNode(' '));
 	
-	for (item of vars.vals) {
+	for (let item of vars.vals) {
 		let dd = document.createElement('dd');
 		dd.classList.add('proof__object');
 		dd.appendChild(item);
@@ -22,3 +22,5 @@ templates.proof = (vars) => {
 	dl.appendChild(style);
 	return dl;
 }
+
+export { proof };

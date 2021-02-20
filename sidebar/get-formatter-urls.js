@@ -1,3 +1,5 @@
+import { sparqlQuery } from '../sqarql-query.js';
+
 async function getFormatterUrls(prop) {
 	const query = `
 		SELECT ?form ?exp WHERE {
@@ -18,3 +20,5 @@ async function getFormatterUrls(prop) {
 	`;
 	return await sparqlQuery(query);
 } 
+
+export { getFormatterUrls }

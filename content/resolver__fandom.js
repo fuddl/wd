@@ -49,6 +49,7 @@ resolvers.fandom = {
 	},
 	fandomRegex: /https?:\/\/([a-z0-9\.-]+).((gamepedia)\.com|(fandom)\.com(\/([\w]+))?\/wiki)\/([^\s#\?]+)/,
 	getEntityByFandomId: async function(domain, id) {
+		const { sparqlQuery } = await import(browser.extension.getURL("sqarql-query.js"));
 		let query = `
 			SELECT ?item
 			WHERE {

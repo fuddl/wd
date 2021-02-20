@@ -1,4 +1,4 @@
-templates.mercator = (vars) => { 
+const mercator = (vars) => { 
 	let tag = document.createElement('img');
 	let zoom = parseInt((vars.pre + 4) * 4);
 	let maps = {
@@ -34,3 +34,5 @@ templates.mercator = (vars) => {
 
 	return wrapper;
 }
+
+export { mercator }

@@ -1,3 +1,5 @@
+import { getValueByLang } from './sidebar/get-value-by-lang.js';
+
 async function wikidataGetEntity(id, usecache = true) {
 	const endpoints = {
 		'Q': 'www.wikidata.org',
@@ -57,3 +59,5 @@ async function addToLabelCache(id, entity) {
 		return false;
 	}
 }
+
+export { wikidataGetEntity };

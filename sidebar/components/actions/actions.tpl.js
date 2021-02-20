@@ -1,4 +1,4 @@
-templates.actions = (title, items) => {
+const actions = (title, items) => {
 	let wrapper = document.createElement('nav');
 	wrapper.classList.add('actions');
 
@@ -42,3 +42,5 @@ templates.actions = (title, items) => {
 
 	return wrapper;
 }
+
+export { actions }

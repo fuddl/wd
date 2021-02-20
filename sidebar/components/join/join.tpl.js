@@ -1,14 +1,11 @@
-let joinCounter = 0;
-
-templates.join = (vars) => { 
+const join = (vars) => { 
 	let wrapper = document.createElement('div');
 	wrapper.classList.add('join');
-	let joinId = 'join-' + joinCounter;
 	
 	let humanField = document.createElement('input');
 	humanField.classList.add('join__field');
 	humanField.setAttribute('type', 'search');
-	humanField.setAttribute('id', joinId);
+	humanField.setAttribute('id', vars.id);
 
 	if (vars.human) {
 		humanField.value = vars.human;
@@ -87,3 +84,5 @@ templates.join = (vars) => {
 	joinCounter++;
 	return wrapper;
 }
+
+export { join }

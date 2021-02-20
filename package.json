@@ -1,5 +1,8 @@
 {
 	"devDependencies": {
-		"eslint": "^7.20.0"
+		"eslint": "7.20.0"
+	},
+	"dependencies": {
+		"wikibase-sdk": "7.9.0"
 	}
 }

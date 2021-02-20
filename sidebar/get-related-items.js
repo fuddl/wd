@@ -18,3 +18,5 @@ async function getRelatedItems(item) {
 	`;
 	return sparqlQuery(query);
 }
+
+export { getRelatedItems }

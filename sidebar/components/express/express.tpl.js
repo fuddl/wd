@@ -1,4 +1,4 @@
-templates.express = (vars) => { 
+const express = (vars) => { 
 
 	const supportedProperties = [
 		"monolingualtext",
@@ -229,3 +229,5 @@ templates.express__tag = (vars) => {
 
 	return wrapper;
 }
+
+export { express }

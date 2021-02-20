@@ -4,6 +4,8 @@ resolvers.wikipedia = {
 		return location.href.match(this.regex) !== null;
 	},
 	getEntityId: async function(location) {
+		const { sparqlQuery } = await import(browser.extension.getURL("sqarql-query.js"));
+		
 		let parts = location.href.match(this.regex);
 		let title = decodeURIComponent(parts[4]).replace(/_/g, ' ');
 		let query = `
