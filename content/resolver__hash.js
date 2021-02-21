@@ -1,4 +1,4 @@
-resolvers.hash = {
+const hash = {
 	applicable: function(location) {
 		return location.hash.match(/#wd:[QMPL]\d+/) !== null;
 	},
@@ -6,3 +6,5 @@ resolvers.hash = {
 		return location.href.match(/#wd:([QMPL]\d+)/)[1];
 	}
 }
+
+export { hash }

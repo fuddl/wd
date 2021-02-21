@@ -8,7 +8,7 @@ const proof = (vars) => {
 	dl.appendChild(dt);
 	dl.appendChild(document.createTextNode(' '));
 	
-	for (item of vars.vals) {
+	for (let item of vars.vals) {
 		let dd = document.createElement('dd');
 		dd.classList.add('proof__object');
 		dd.appendChild(item);

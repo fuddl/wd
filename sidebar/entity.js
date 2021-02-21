@@ -5,6 +5,7 @@ import { getLink, resolvePlaceholders, resolveIdLinksPlaceholder, resolveBreadcr
 import { getRelatedItems } from './get-related-items.js';
 import { getValueByLang, getAliasesByLang } from './get-value-by-lang.js';
 import { groupClaims } from './group-claims.js';
+import { sparqlQuery } from '../sqarql-query.js';
 import { templates } from './components/templates.tpl.js';
 import { wikidataGetEditToken, getTokens } from './wd-get-token.js';
 import { wikidataGetEntity } from '../wd-get-entity.js';
@@ -203,7 +204,7 @@ function renderStatements(snak, references, type, target, scope) {
 		target.appendChild(document.createTextNode('\xa0'));
 		let sup = document.createElement('sup');
 		let c = 0;
-		for (reference of references) {
+		for (let reference of references) {
 			if (c > 0) {
 				sup.appendChild(document.createTextNode('/'));
 			}
@@ -216,9 +217,9 @@ function renderStatements(snak, references, type, target, scope) {
 	}
 	if (scope === 'statement' && typeof delta != 'undefined' && delta.hasOwnProperty('qualifiers')) {
 		let qualifiers = [];
-		for (prop of Object.keys(delta.qualifiers)) {
+		for (let prop of Object.keys(delta.qualifiers)) {
 			let qvalues = [];
-			for (qv of delta.qualifiers[prop]) {
+			for (let qv of delta.qualifiers[prop]) {
 				let qualvalue = new DocumentFragment();
 				renderStatements(qv,[], qv.snaktype, qualvalue, 'qualifier');
 				qvalues.push(qualvalue);
@@ -258,7 +259,7 @@ function renderStatement(value) {
 				let type = delta.mainsnak.snaktype;
 				let refs = [];
 				if (delta.references) {
-					for (ref of delta.references) {
+					for (let ref of delta.references) {
 						let listItem;
 						let refvalues = [];
 						if (typeof refCounter[ref.hash] === 'undefined') {
@@ -266,8 +267,8 @@ function renderStatement(value) {
 							refCounter[ref.hash] = {
 								item: listItem,
 							}
-							for (key in ref.snaks) {
-								for (refthing of ref.snaks[key]) {
+							for (let key in ref.snaks) {
+								for (let refthing of ref.snaks[key]) {
 									if (refthing.datavalue) {
 										let refvalue = new DocumentFragment();
 
@@ -332,7 +333,7 @@ function updateView(id, useCache = true) {
 		let entities = await wikidataGetEntity(id, useCache);
 		cache = await browser.storage.local.get();
 
-		for (id of Object.keys(entities)) {
+		for (let id of Object.keys(entities)) {
 			let e = entities[id];
 
 			let wrapper = document.createElement('div');

@@ -1,11 +1,11 @@
-resolvers.wikipedia = {
+import { sparqlQuery } from "../sqarql-query.js";
+
+const wikipedia = {
 	regex: /^https?:\/\/([\w]+)(\.m)?\.(wik(?:ipedia|iquote|tionary|isource))\.org\/wiki\/([^?#]+)/,
 	applicable: function(location) {
 		return location.href.match(this.regex) !== null;
 	},
 	getEntityId: async function(location) {
-		const { sparqlQuery } = await import(browser.extension.getURL("sqarql-query.js"));
-		
 		let parts = location.href.match(this.regex);
 		let title = decodeURIComponent(parts[4]).replace(/_/g, ' ');
 		let query = `
@@ -24,3 +24,5 @@ resolvers.wikipedia = {
 		}
 	}
 };
+
+export { wikipedia }

@@ -171,3 +171,5 @@ function displayMetadata() {
 		}
 	}
 }
+
+export { displayMetadata }

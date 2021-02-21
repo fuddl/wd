@@ -1,3 +1,5 @@
+import { displayMetadata } from './content__display-metadata.js';
+
 function getClosestID(element) {
 	let subject = element;
 	let referenceHeadlineQuery = 'h1[id],h1 [id],h2[id],h2 [id],h3[id],h3 [id],h4[id],h4 [id],h5[id],h5 [id],h6[id],h6 [id]';
@@ -250,3 +252,5 @@ function clearPageLinks() {
 		selector.parentNode.removeChild(selector);
 	}
 }
+
+export { collectPageLinks, clearPageLinks }

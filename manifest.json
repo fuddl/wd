@@ -30,23 +30,7 @@
 		{
 			"matches": ["<all_urls>"],
 			"js": [
-				"content/resolver.js",
-				"content/resolver__hash.js",
-				"content/resolver__cache.js",
-				"content/resolver__wikipedia.js",
-				"content/resolver__commons.js",
-				"content/resolver__inventaire.js",
-				"content/resolver__P8966.js",
-				"content/resolver__fandom.js",
-				"content/resolver__wikis.js",
-				"content/resolver__doi.js",
-				"content/resolver__official-website.js",
-				"content/content.js",
-				"content/pagedata__title.js",
-				"content/pagedata__description.js",
-				"content/content__collect-page-links.js",
-				"content/content__collect-strings.js",
-				"content/content__display-metadata.js"
+				"content.js"
 			]
 		}
 	],

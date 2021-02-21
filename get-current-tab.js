@@ -5,3 +5,5 @@ async function getCurrentTab() {
 	});
 	return result[0].id;
 }
+
+export { getCurrentTab }

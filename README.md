@@ -13,11 +13,11 @@
 ## Development-Setup
 
 ```
-[sudo] npm install --global web-ext
+[sudo] npm install
 
 git clone git@github.com:fuddl/wd.git
 
 cd wd
 
-web-ext run --start-url https://www.wikidata.org/wiki/Q42
+npm run dev && web-ext run --start-url https://www.wikidata.org/wiki/Q16276
 ```

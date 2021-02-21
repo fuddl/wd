@@ -25,39 +25,3 @@ function guessLanguage(string) {
 	// if all else fails, let's assume it is something the user can read
 	return navigator.language.split("-")[0];
 }
-
-document.addEventListener('selectionchange', (e) => {
-	(async () => {
-		let text = document.getSelection().toString().trim();
-		if (text) {
-
-			let sectionData = getClosestID(document.getSelection().focusNode);
-
-			let hash = sectionData.hash ? '#' + sectionData.hash : ''; 
-
-			let oldId = getOldid();
-
-			let search = oldId ? '?oldid=' + oldId : location.search;
-
-			let pageTitle = document.title;
-			let pageLanguage = document.querySelector('html').lang;
-
-			let url = location.protocol + '//' + location.host + location.pathname + search + hash;
-
-			let message = {
-				type: 'use_in_statement',
-				dataype: 'string',
-				value: text,
-				valueLang: await makeLanguageValid(getElementLanguage(document.getSelection())),
-				reference: {
-					url: url,
-					section: sectionData.section ? sectionData.section.trim().replace("\n", '␤') : null,
-					title: pageTitle ? pageTitle.trim() : null,
-					language: pageLanguage ? await makeLanguageValid(pageLanguage) : 'und',
-				}
-			}
-
-			browser.runtime.sendMessage(message);
-		}
-	})()
-});
