@@ -1,3 +1,7 @@
+import { getValidStringLanguages, makeLanguageValid } from '../../../get-valid-string-languages.js';
+import { wikidataGetEntity } from '../../../wd-get-entity.js';
+import { getValueByLang } from '../../get-value-by-lang.js';
+
 const express = (vars) => { 
 
 	const supportedProperties = [
@@ -130,7 +134,7 @@ const express = (vars) => {
 	languagePicker.classList.add('express__lang');
 	(async () => {
 		let response = await getValidStringLanguages();
-		for (key in response) {
+		for (let key in response) {
 			let option = document.createElement('option');
 			option.setAttribute('value', response[key].code);
 			option.innerText = response[key].code;
@@ -184,7 +188,7 @@ const express = (vars) => {
 	}
 }
 
-templates.express__tag = (vars) => {
+const express__tag = (vars) => {
 	let wrapper = document.createElement('label');
 	wrapper.setAttribute('data-entity', vars.id);
 	wrapper.classList.add('express__tag');
@@ -230,4 +234,4 @@ templates.express__tag = (vars) => {
 	return wrapper;
 }
 
-export { express }
+export { express, express__tag }

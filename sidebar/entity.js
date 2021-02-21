@@ -219,9 +219,9 @@ function renderStatements(snak, references, type, target, scope) {
 	}
 	if (scope === 'statement' && typeof delta != 'undefined' && delta.hasOwnProperty('qualifiers')) {
 		let qualifiers = [];
-		for (prop of Object.keys(delta.qualifiers)) {
+		for (let prop of Object.keys(delta.qualifiers)) {
 			let qvalues = [];
-			for (qv of delta.qualifiers[prop]) {
+			for (let qv of delta.qualifiers[prop]) {
 				let qualvalue = new DocumentFragment();
 				renderStatements(qv,[], qv.snaktype, qualvalue, 'qualifier');
 				qvalues.push(qualvalue);
@@ -335,7 +335,7 @@ function updateView(id, useCache = true) {
 		let entities = await wikidataGetEntity(id, useCache);
 		cache = await browser.storage.local.get();
 
-		for (id of Object.keys(entities)) {
+		for (let id of Object.keys(entities)) {
 			let e = entities[id];
 
 			let wrapper = document.createElement('div');

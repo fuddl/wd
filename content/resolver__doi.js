@@ -1,4 +1,6 @@
-resolvers.doi = {
+import { sparqlQuery } from "../sqarql-query.js";
+
+const doi = {
 	applicable: async function(location) {
 
 		if (location === window.location) {
@@ -46,8 +48,6 @@ resolvers.doi = {
 		}
 	},
 	getEntityByDOI: async function(doi) {
-		const { sparqlQuery } = await import(browser.extension.getURL("sqarql-query.js"));
-
 		let query = `
 			SELECT ?item
 			WHERE {
@@ -57,3 +57,5 @@ resolvers.doi = {
 		return sparqlQuery(query);
 	},
 };
+
+export { doi }

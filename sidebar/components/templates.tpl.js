@@ -1,6 +1,8 @@
 import { placeholder } from './placeholder/placeholder.tpl.js';
 import { annote } from './annote/annote.tpl.js';
+import { direction } from './direction/direction.tpl.js';
 import { ensign } from './ensign/ensign.tpl.js';
+import { express, express__tag } from './express/express.tpl.js';
 import { breadcrumbs, breadcrumbsPlaceholder } from './breadcrumbs/breadcrumbs.tpl.js';
 import { mercator } from './mercator/mercator.tpl.js';
 import { remark } from './remark/remark.tpl.js';
@@ -14,11 +16,14 @@ const templates = {
 	breadcrumbs: breadcrumbs,
 	breadcrumbsPlaceholder: breadcrumbsPlaceholder,
 	ensign: ensign,
+	express: express, 
+	express__tag: express__tag,
 	flex: flex,
 	mercator: mercator,
 	placeholder: placeholder,
 	proof: proof,
 	remark: remark,
+	direction: direction,
 	br: () => { return document.createElement('br') },
 	code: (text) => {
 		let tag = document.createElement('code');

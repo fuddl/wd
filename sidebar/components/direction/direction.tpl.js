@@ -22,4 +22,4 @@ const direction = (vars) => {
 	return wrapper;
 }
 
-return { direction }
+export { direction }

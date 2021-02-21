@@ -1,3 +1,7 @@
+import { collectPageLinks, clearPageLinks } from './content__collect-page-links.js';
+import { resolvers } from './resolver.js';
+import { getClosestID, getElementLanguage } from './content__collect-strings.js';
+
 async function findApplicables(location, openInSidebar = true) {
 	let applicables = [];
 
@@ -74,3 +78,39 @@ let titleObserver = new MutationObserver(function() {
 });
 
 titleObserver.observe(head, { characterData: true });
+
+document.addEventListener('selectionchange', (e) => {
+	(async () => {
+		let text = document.getSelection().toString().trim();
+		if (text) {
+
+			let sectionData = getClosestID(document.getSelection().focusNode);
+
+			let hash = sectionData.hash ? '#' + sectionData.hash : ''; 
+
+			let oldId = getOldid();
+
+			let search = oldId ? '?oldid=' + oldId : location.search;
+
+			let pageTitle = document.title;
+			let pageLanguage = document.querySelector('html').lang;
+
+			let url = location.protocol + '//' + location.host + location.pathname + search + hash;
+
+			let message = {
+				type: 'use_in_statement',
+				dataype: 'string',
+				value: text,
+				valueLang: await makeLanguageValid(getElementLanguage(document.getSelection())),
+				reference: {
+					url: url,
+					section: sectionData.section ? sectionData.section.trim().replace("\n", '␤') : null,
+					title: pageTitle ? pageTitle.trim() : null,
+					language: pageLanguage ? await makeLanguageValid(pageLanguage) : 'und',
+				}
+			}
+
+			browser.runtime.sendMessage(message);
+		}
+	})()
+});
