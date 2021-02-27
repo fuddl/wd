@@ -144,9 +144,6 @@ function getPropertyScope(property) {
 
 	content.appendChild(labelField);
 
-
-
-
 	let saveButton = document.createElement('button');
 	saveButton.setAttribute('disabled', 'disabled');
 	saveButton.innerText = 'Connect to Wikidata';
@@ -253,8 +250,6 @@ function getPropertyScope(property) {
 				}
 			}
 
-			console.debug(jobs);
-
 			browser.runtime.sendMessage({
 				type: 'send_to_wikidata',
 				data: jobs,
@@ -266,4 +261,39 @@ function getPropertyScope(property) {
 			});
 		}
 	});
+	let token = await getTokens();
+	if (token === "+\\") {
+		let warning = document.createElement('p');
+
+		warning.style['background-color'] = '#ffe5e5';
+		warning.style['color'] = 'red';
+		warning.style['padding'] = '1em';
+
+		let text1 = document.createTextNode(`
+			It appears that you are not logged into a wikidata account. Please note 
+			that some of your edits might fail, because of wikidata's spam protection. 
+			Also note that your public IP address will be publicly visible in the edit
+			history. It is strongly advised that you `);
+		warning.appendChild(text1);
+
+		let loginLink = document.createElement('a');
+		loginLink.innerText = ' log in ';
+		loginLink.setAttribute('href', 'https://www.wikidata.org/wiki/Special:UserLogin');
+		warning.appendChild(loginLink);
+		
+		let text2 = document.createTextNode(' or ');
+		warning.appendChild(text2);
+
+		let createAccountLink = document.createElement('a');
+		createAccountLink.innerText = ' create an account ';
+		createAccountLink.setAttribute('href', 'https://www.wikidata.org/wiki/Special:CreateAccount');
+		warning.appendChild(createAccountLink);
+		
+		let text3 = document.createTextNode(`
+			. Among other benefits, your edits will be attributed to a user name.
+		`);
+		warning.appendChild(text3);
+		
+		content.insertBefore(warning, labelField);
+	}
 })()
