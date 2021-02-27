@@ -7,14 +7,27 @@
 		"48": "icons/wd.svg",
 		"96": "icons/wd.svg"
 	},	
-	"browser_action": {
-		"default_icon": "icons/inactive.svg",
+	"page_action": {
+		"browser_style": true,
+		"default_icon": {
+	    "19": "icons/inactive--light.svg",
+	    "38": "icons/inactive--light.svg"
+	  },
+		"theme_icons": [{
+	    "light": "icons/inactive--light.svg",
+	    "dark": "icons/inactive--dark.svg",
+	    "size": 16
+	  }, {
+	    "light": "icons/inactive-light.svg",
+	    "dark": "icons/inactive--dark.svg",
+	    "size": 32
+	  }],
 		"default_title": "Wikidata"
 	},
 	"sidebar_action": {
 		"default_icon": "icons/wd.svg",
 		"default_title": "Wikidata",
-		"default_panel": "sidebar/entity.html",
+		"default_panel": "sidebar.html",
 		"open_at_install": false
 	},
 	"permissions": [
@@ -30,7 +43,7 @@
 		{
 			"matches": ["<all_urls>"],
 			"js": [
-				"content.js"
+				"content.dist.js"
 			]
 		}
 	],
