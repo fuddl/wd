@@ -17,6 +17,8 @@ const templates = {
 			.replace(/^[a-z]+\:\/\//, '')
 			.replace(/^www\./, '')
 			.replace(/\/index\.(php|html?)$/, '')
+			.replace(/web\.archive.org\/web\/.\//, '')
+			.replace(/wikidata-externalid-url\./, '')
 			.replace(/\/$/, '');
 		let tag = document.createElement('a');
 		tag.setAttribute('href', url)
@@ -41,9 +43,10 @@ const templates = {
 	},
 	idLink: (url, id) => {
 		let wrapper = document.createElement('div');
-		wrapper.style.fontSize = '.5em';
+		wrapper.style.fontSize = '.75em';
+		wrapper.style.margin = '1em 0';
 		wrapper.style.lineHeight = 1;
-		let prefix = document.createTextNode('↳ ');
+		let prefix = document.createTextNode('↳\u00a0');
 		wrapper.appendChild(prefix);
 		if (url) {
 			wrapper.appendChild(templates.urlLink(url, id));

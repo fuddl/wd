@@ -99,8 +99,8 @@ function insertAfter(referenceNode, newNode) {
 }
 
 function renderStatements(snak, references, type, target, scope) {
+	let valueType = snak.datatype ? snak.datatype : snak.datavalue.type ;
 	if (type === 'value' || scope === 'reference') {
-		let valueType = snak.datatype ? snak.datatype : snak.datavalue.type ;
 		if (valueType === "time") {	
 			let date = dateToString(snak.datavalue.value);
 			if (date) {		
@@ -120,7 +120,6 @@ function renderStatements(snak, references, type, target, scope) {
 		}
 		if (valueType === "external-id") {
 			target.appendChild(templates.code(snak.datavalue.value));
-			target.appendChild(templates.idLinksPlaceholder(snak.property, snak.datavalue.value));
 		}
 		if (valueType === "string") {
 			target.appendChild(document.createTextNode(snak.datavalue.value));
@@ -206,6 +205,9 @@ function renderStatements(snak, references, type, target, scope) {
 		if (sup.hasChildNodes()) {
 			target.appendChild(sup);
 		}
+	}
+	if (valueType === "external-id") {
+		target.appendChild(templates.idLinksPlaceholder(snak.property, snak.datavalue.value));
 	}
 	if (scope === 'statement' && delta.hasOwnProperty('qualifiers')) {
 		let qualifiers = [];
@@ -544,7 +546,7 @@ function updateView(id, useCache = true) {
 				}
 			})();
 		}, 0);
-		
+
 		resolveIdLinksPlaceholder();
 	})();
 }

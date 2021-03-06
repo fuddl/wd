@@ -121,6 +121,5 @@ function resolveIdLinksPlaceholder() {
 			target.appendChild(templates.idLink(item, id));
 		}
 		placeholder.parentNode.replaceChild(target, placeholder);
-		resolvePlaceholders(placeholder.parentNode);
 	}, 0);
 }
