@@ -12,7 +12,7 @@ const templates = {
 		tag.innerText = vars.text;
 		return tag;
 	},
-	urlLink: (url) => {
+	urlLink: (url, id) => {
 		let readable = url
 			.replace(/^[a-z]+\:\/\//, '')
 			.replace(/^www\./, '')
@@ -21,17 +21,32 @@ const templates = {
 		let tag = document.createElement('a');
 		tag.setAttribute('href', url)
 		tag.classList.add('url')
-		tag.innerText = readable;
+		if (readable.includes(id)) {
+			let parts = readable.split(id);
+			let readableMarked = new DocumentFragment();
+			readableMarked.appendChild(document.createTextNode(parts[0]));
+			let markedId = document.createElement('strong');
+			markedId.style.textDecoration = 'underline';
+			markedId.style.fontWeight = 'inherit';
+			markedId.innerText = id;
+			readableMarked.appendChild(markedId);
+			if (parts[1]) {
+				readableMarked.appendChild(document.createTextNode(parts[1]));
+			}
+			tag.appendChild(readableMarked);
+		} else {
+			tag.innerText = readable;
+		}
 		return tag;
 	},
-	idLink: (url) => {
+	idLink: (url, id) => {
 		let wrapper = document.createElement('div');
 		wrapper.style.fontSize = '.5em';
 		wrapper.style.lineHeight = 1;
 		let prefix = document.createTextNode('↳ ');
 		wrapper.appendChild(prefix);
 		if (url) {
-			wrapper.appendChild(templates.urlLink(url));
+			wrapper.appendChild(templates.urlLink(url, id));
 		}
 		else {
 			wrapper.appendChild(templates.placeholder({}));

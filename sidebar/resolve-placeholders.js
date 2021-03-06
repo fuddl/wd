@@ -118,7 +118,7 @@ function resolveIdLinksPlaceholder() {
 		}
 		let target = new DocumentFragment;
 		for (let item of formatted) {
-			target.appendChild(templates.idLink(item));
+			target.appendChild(templates.idLink(item, id));
 		}
 		placeholder.parentNode.replaceChild(target, placeholder);
 		resolvePlaceholders(placeholder.parentNode);
