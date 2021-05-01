@@ -36,5 +36,10 @@
 	],
 	"web_accessible_resources": [
 		"sqarql-query.js"
-	]
+	],
+	"browser_specific_settings": {
+		"gecko": {
+			"strict_min_version": "89.0"
+		}
+	}
 }
