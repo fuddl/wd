@@ -1,6 +1,7 @@
-import { collectPageLinks, clearPageLinks } from './content__collect-page-links.js';
+import { collectPageLinks, clearPageLinks, getClosestID, getOldid } from './content__collect-page-links.js';
 import { resolvers } from './resolver.js';
-import { getClosestID, getElementLanguage } from './content__collect-strings.js';
+import { getElementLanguage } from './content__collect-strings.js';
+import { makeLanguageValid } from '../get-valid-string-languages.js';
 
 async function findApplicables(location, openInSidebar = true) {
 	let applicables = [];
@@ -43,74 +44,79 @@ async function findApplicables(location, openInSidebar = true) {
 	return false;
 };
 
-findApplicables(location);
+function main() {
+	findApplicables(location);
 
-browser.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
-	if (msg.action == 'find_applicables') {
-		findApplicables(location);
-	} else if (msg.action === 'collect_pagelinks') {
-		return await collectPageLinks(msg.subject);
-	} else if (msg.action === 'clear_pagelinks') {
-		clearPageLinks();
-	}
-});
-window.onpopstate = function(event) {
-	findApplicables(window.location);
-};
-
-window.addEventListener('hashchange', function() {
-	findApplicables(window.location);
-}, false);
-
-document.addEventListener('focus', function() {
-	findApplicables(window.location);
-})
-
-let head = document.querySelector('head');
-
-let title = head.querySelector('title').innerText;
-let titleObserver = new MutationObserver(function() {
-	let newTitle = head.querySelector('title').innerText;
-	if (newTitle != title) {
-		findApplicables(window.location);
-		title = newTitle;
-	}
-});
-
-titleObserver.observe(head, { characterData: true });
-
-document.addEventListener('selectionchange', (e) => {
-	(async () => {
-		let text = document.getSelection().toString().trim();
-		if (text) {
-
-			let sectionData = getClosestID(document.getSelection().focusNode);
-
-			let hash = sectionData.hash ? '#' + sectionData.hash : ''; 
-
-			let oldId = getOldid();
-
-			let search = oldId ? '?oldid=' + oldId : location.search;
-
-			let pageTitle = document.title;
-			let pageLanguage = document.querySelector('html').lang;
-
-			let url = location.protocol + '//' + location.host + location.pathname + search + hash;
-
-			let message = {
-				type: 'use_in_statement',
-				dataype: 'string',
-				value: text,
-				valueLang: await makeLanguageValid(getElementLanguage(document.getSelection())),
-				reference: {
-					url: url,
-					section: sectionData.section ? sectionData.section.trim().replace("\n", '␤') : null,
-					title: pageTitle ? pageTitle.trim() : null,
-					language: pageLanguage ? await makeLanguageValid(pageLanguage) : 'und',
-				}
-			}
-
-			browser.runtime.sendMessage(message);
+	browser.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
+		if (msg.action == 'find_applicables') {
+			findApplicables(location);
+		} else if (msg.action === 'collect_pagelinks') {
+			return await collectPageLinks(msg.subject);
+		} else if (msg.action === 'clear_pagelinks') {
+			clearPageLinks();
 		}
-	})()
-});
+	});
+
+	window.onpopstate = function(event) {
+		findApplicables(window.location);
+	};
+
+	window.addEventListener('hashchange', function() {
+		findApplicables(window.location);
+	}, false);
+
+	document.addEventListener('focus', function() {
+		findApplicables(window.location);
+	})
+
+	let head = document.querySelector('head');
+
+	let title = head.querySelector('title').innerText;
+	let titleObserver = new MutationObserver(function() {
+		let newTitle = head.querySelector('title').innerText;
+		if (newTitle != title) {
+			findApplicables(window.location);
+			title = newTitle;
+		}
+	});
+
+	titleObserver.observe(head, { characterData: true });
+
+	document.addEventListener('selectionchange', (e) => {
+		(async () => {
+			let text = document.getSelection().toString().trim();
+			if (text) {
+
+				let sectionData = getClosestID(document.getSelection().focusNode);
+
+				let hash = sectionData.hash ? '#' + sectionData.hash : ''; 
+
+				let oldId = getOldid();
+
+				let search = oldId ? '?oldid=' + oldId : location.search;
+
+				let pageTitle = document.title;
+				let pageLanguage = document.querySelector('html').lang;
+
+				let url = location.protocol + '//' + location.host + location.pathname + search + hash;
+
+				let message = {
+					type: 'use_in_statement',
+					dataype: 'string',
+					value: text,
+					valueLang: await makeLanguageValid(getElementLanguage(document.getSelection())),
+					reference: {
+						url: url,
+						section: sectionData.section ? sectionData.section.trim().replace("\n", '␤') : null,
+						title: pageTitle ? pageTitle.trim() : null,
+						language: pageLanguage ? await makeLanguageValid(pageLanguage) : 'und',
+					}
+				}
+
+				browser.runtime.sendMessage(message);
+			}
+		})()
+	});
+}
+
+export { main }

@@ -1,4 +1,5 @@
 import { displayMetadata } from './content__display-metadata.js';
+import { resolvers } from './resolver.js';
 
 function getClosestID(element) {
 	let subject = element;
@@ -59,7 +60,6 @@ let selectedEntities = [];
 let uniqueLinks = [];
 
 function highlightSelected(id, add = true) {
-	this.selected = !this.selected;
 	for (let uLink of uniqueLinks) {
 		if (uLink.entityId === id) {
 			for (let selector of uLink.selectors) {
@@ -134,7 +134,7 @@ async function collectPageLinks(subject) {
 	// mark	links that are not applicable to wikidata as not-applicable
 	for (let key in uniqueLinks) {
 		let applicableTo = null;
-		for (id of Object.keys(resolvers)) {
+		for (let id of Object.keys(resolvers)) {
 			if (!applicableTo) {
 				let resolverApplicable = await resolvers[id].applicable(uniqueLinks[key].links[0]);
 				if (resolverApplicable) {
@@ -231,6 +231,7 @@ async function collectPageLinks(subject) {
 	 			}
 	 		}
 		}
+		
 	}
 
 	(async () => {
@@ -247,10 +248,11 @@ async function collectPageLinks(subject) {
 	})();
 }
 
+
 function clearPageLinks() {
 	for (let selector of document.querySelectorAll('.entity-selector')) {
 		selector.parentNode.removeChild(selector);
 	}
 }
 
-export { collectPageLinks, clearPageLinks }
+export { collectPageLinks, clearPageLinks, getClosestID, getOldid }

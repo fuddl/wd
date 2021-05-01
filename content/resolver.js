@@ -24,8 +24,8 @@ const resolvers = {
 	commons: commons,
 	URL_match_pattern: URL_match_pattern,
 	doi: doi,
-	officialWebsite: officialWebsite,
-	isbn: isbn,
+	// officialWebsite: officialWebsite,
+	// isbn: isbn,
 };
 
 export { resolvers }

@@ -1,5 +1,5 @@
 function getElementLanguage(selection) {
-	element = selection.focusNode;
+	let element = selection.focusNode;
 	while (typeof element.closest === 'undefined') {
 		element = element.parentElement;
 	}
@@ -25,3 +25,5 @@ function guessLanguage(string) {
 	// if all else fails, let's assume it is something the user can read
 	return navigator.language.split("-")[0];
 }
+
+export { getElementLanguage }

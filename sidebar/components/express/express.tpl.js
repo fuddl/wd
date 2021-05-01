@@ -1,6 +1,8 @@
 import { getValidStringLanguages, makeLanguageValid } from '../../../get-valid-string-languages.js';
 import { wikidataGetEntity } from '../../../wd-get-entity.js';
 import { getValueByLang } from '../../get-value-by-lang.js';
+import { getAutodesc } from '../../get-autodesc.js';
+
 
 const express = (vars) => { 
 

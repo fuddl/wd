@@ -2,6 +2,7 @@ import { wikidataGetEntity } from '../wd-get-entity.js';
 import { getCurrentTab } from '../get-current-tab.js';
 import { getValueByLang, getAliasesByLang } from './get-value-by-lang.js';
 import { templates } from './components/templates.tpl.js';
+import { sparqlQuery } from '../sqarql-query.js';
 
 const itemTypes = [
 	"wikibase-item",
