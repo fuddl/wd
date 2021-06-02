@@ -1,0 +1,25 @@
+.title:lang(ja),
+.title:lang(ko),
+.title:lang(zh) {
+	font-style: normal;
+}
+
+.title:lang(ja) {
+	quotes: "「" "」" "『" "』";
+}
+
+.title:lang(zh) {
+	quotes: "《" "》" "〈" "〉";
+}
+
+.title:lang(ja)::before,
+.title:lang(ko)::before,
+.title:lang(zh)::before {
+	content: open-quote;
+}
+
+.title:lang(ja)::after,
+.title:lang(ko)::after,
+.title:lang(zh)::after {
+	content: close-quote;
+}

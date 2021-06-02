@@ -9,6 +9,7 @@ import { remark } from './remark/remark.tpl.js';
 import { proof } from './proof/proof.tpl.js';
 import { flex } from './flex/flex.tpl.js';
 import { actions } from './actions/actions.tpl.js';
+import { title } from './title/title.tpl.js';
 
 const templates = {
 	actions: actions,
@@ -24,17 +25,11 @@ const templates = {
 	proof: proof,
 	remark: remark,
 	direction: direction,
+	title: title,
 	br: () => { return document.createElement('br') },
 	code: (text) => {
 		let tag = document.createElement('code');
 		tag.innerText = text;
-		return tag;
-	},
-	link: (vars) => {
-		let tag = document.createElement('a');
-		tag.setAttribute('href', vars.href)
-		tag.setAttribute('title', vars.title)
-		tag.innerText = vars.text;
 		return tag;
 	},
 	urlLink: (url, id) => {
@@ -99,14 +94,6 @@ const templates = {
 	small: (text) => {
 		let tag = document.createElement('small');
 		tag.innerText = text;
-		return tag;
-	},
-	title: (vars) => {
-		let tag = document.createElement('em');
-		tag.innerText = vars.text;
-		if (vars.lang) {
-			tag.setAttribute('lang', vars.lang);
-		}
 		return tag;
 	},
 	picture: (vars) => {
