@@ -1,4 +1,4 @@
-resolvers.commons = {
+const commons = {
 	applicable: function(location) {
 		return location.href.match(/^https:\/\/commons(\.m)?\.wikimedia\.org\/wiki\/File\:/) !== null;
 	},
@@ -8,3 +8,5 @@ resolvers.commons = {
 		return href.match(/https\:\/\/commons\.wikimedia\.org\/wiki\/Special:EntityData\/(M\d+)\.json/)[1];
 	}
 };
+
+export { commons }

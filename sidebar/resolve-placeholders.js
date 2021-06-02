@@ -1,3 +1,11 @@
+import { wikidataGetEntity } from '../wd-get-entity.js';
+import { getParents, Breadcrumbs } from './get-parents.js';
+import { templates } from './components/templates.tpl.js';
+import { getFormatterUrls } from './get-formatter-urls.js';
+import { sparqlQuery } from '../sqarql-query.js';
+import { breadcrumbs } from './components/breadcrumbs/breadcrumbs.tpl.js';
+import { getValueByLang } from './get-value-by-lang.js';
+
 function getLink(entityId) {
 	let ns = entityId.charAt(0);
 	let prefixes = {
@@ -65,7 +73,7 @@ function resolvePlaceholders(scope) {
 	}, 0);
 }
 
-function resolveBreadcrumbs() {
+function resolveBreadcrumbs(cache) {
 	let placeholders = document.querySelectorAll('.breadcrumbs[data-child-id]');
 
 	Array.from(placeholders).reduce((k, placeholder) => {
@@ -86,9 +94,9 @@ function resolveBreadcrumbs() {
 			for (let crumb of crumbItems) {
 				trail.push(templates.placeholder({
 					entity: crumb,
-				}));
+				}, cache));
 			}
-			placeholder.parentNode.replaceChild(templates.breadcrumbs(trail), placeholder);
+			placeholder.parentNode.replaceChild(breadcrumbs(trail), placeholder);
 			resolvePlaceholders(placeholder.parentNode);
 		})();
 	}, 0);
@@ -123,3 +131,5 @@ function resolveIdLinksPlaceholder() {
 		placeholder.parentNode.replaceChild(target, placeholder);
 	}, 0);
 }
+
+export { getLink, resolvePlaceholders, resolveIdLinksPlaceholder, resolveBreadcrumbs }

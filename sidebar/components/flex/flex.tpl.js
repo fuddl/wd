@@ -1,4 +1,4 @@
-templates.flex = (vars) => { 
+const flex = (vars) => { 
 	let table = document.createElement('table');
 	table.classList.add('flex');
 
@@ -155,3 +155,5 @@ templates.flex = (vars) => {
 
 	return table;
 }
+
+export { flex }

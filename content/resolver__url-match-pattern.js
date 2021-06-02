@@ -1,5 +1,8 @@
-resolvers.p8966 = {
+import { sparqlQuery } from "../sqarql-query.js";
+
+const URL_match_pattern = {
 	aquireRegexes: async function() {
+		
 		let query = `
 			SELECT ?p ?s ?r WHERE {
 				?stat ps:P8966 ?s.
@@ -9,8 +12,8 @@ resolvers.p8966 = {
 			} ORDER BY STRLEN(str(?s))
 		`;
 		let patterns = await sparqlQuery(query);
-		output = [];
-		for (prop of patterns) {
+		let output = [];
+		for (let prop of patterns) {
 			let isValid = true;
 			let regexp = false;
 			try {
@@ -23,7 +26,7 @@ resolvers.p8966 = {
 				output.push({
 					p: prop.p.value,
 					s: regexp,
-					r: prop?.r?.value ? prop.r.value.replace(/\\(\d+)/g, "$$$1") : "$1",
+					r: 'r' in prop ? prop.r.value.replace(/\\(\d+)/g, "$$$1") : "$1",
 				});
 			}
 		}
@@ -32,7 +35,7 @@ resolvers.p8966 = {
 	applicable: async function(location) {
 		this.patterns = await this.aquireRegexes();
 		let href = decodeURIComponent(location.href);
-		for (prop of this.patterns) {
+		for (let prop of this.patterns) {
 			let match = href.match(prop.s);
 			if (match) {
 				return [{
@@ -93,3 +96,5 @@ resolvers.p8966 = {
 		browser.storage.local.set(cache);
 	}
 };
+
+export { URL_match_pattern }

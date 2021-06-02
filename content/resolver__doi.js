@@ -1,4 +1,6 @@
-resolvers.doi = {
+import { sparqlQuery } from "../sqarql-query.js";
+
+const doi = {
 	applicable: async function(location) {
 
 		if (location === window.location) {
@@ -55,3 +57,5 @@ resolvers.doi = {
 		return sparqlQuery(query);
 	},
 };
+
+export { doi }

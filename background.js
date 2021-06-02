@@ -176,7 +176,7 @@ browser.runtime.onMessage.addListener(
 					active: true
 				}).then((tabs) => {
 					for (let tab of tabs) {
-						browser.tabs.insertCSS({file: "content__collect-page-links.css"});
+						browser.tabs.insertCSS({file: "content/content__collect-page-links.css"});
 						
 						browser.tabs.sendMessage(
 							tab.id,

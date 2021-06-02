@@ -1,4 +1,6 @@
-resolvers.wikipedia = {
+import { sparqlQuery } from "../sqarql-query.js";
+
+const wikipedia = {
 	regex: /^https?:\/\/([\w]+)(\.m)?\.(wik(?:ipedia|iquote|tionary|isource))\.org\/wiki\/([^?#]+)/,
 	applicable: function(location) {
 		return location.href.match(this.regex) !== null;
@@ -22,3 +24,5 @@ resolvers.wikipedia = {
 		}
 	}
 };
+
+export { wikipedia }

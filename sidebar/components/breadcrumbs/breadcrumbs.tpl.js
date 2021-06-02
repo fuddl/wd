@@ -1,4 +1,6 @@
-templates.breadcrumbs = (crumbs, childId = false) => {
+import { placeholder } from '../placeholder/placeholder.tpl.js';
+
+const breadcrumbs = (crumbs, childId = false) => {
 	let style = document.createElement('link');
 	style.setAttribute('rel',	"stylesheet");
 	style.setAttribute('href', "components/breadcrumbs/breadcrumbs.css");
@@ -20,10 +22,13 @@ templates.breadcrumbs = (crumbs, childId = false) => {
 	}
 	return nav;
 }
-templates.breadcrumbsPlaceholder = (childId) => {
+
+function breadcrumbsPlaceholder(childId) {
 	let crumbs = [];
 	for (var i = 0; i <= 10; i++) {
-		crumbs.push(templates.placeholder({}))
+		crumbs.push(placeholder({}))
 	}
-	return templates.breadcrumbs(crumbs, childId);
+	return breadcrumbs(crumbs, childId);
 }
+
+export { breadcrumbs, breadcrumbsPlaceholder }

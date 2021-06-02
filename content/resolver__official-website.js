@@ -1,4 +1,6 @@
-resolvers.officialWebsite = {
+import { sparqlQuery } from "../sqarql-query.js";
+
+const officialWebsite = {
 	applicable: function(location) {
 		let isIndex = location.href.match(this.indexPageRegex) !== null;
 		if (isIndex) {
@@ -22,6 +24,7 @@ resolvers.officialWebsite = {
 	},
 	indexPageRegex: /^https?:\/\/[^\/]+(\/(\?.*|index\.php(\?.*)?)?)?$/,
 	getEntityByOfficialWebsite: async function(domain) {
+		
 		let query = `
 			SELECT ?item
 			WHERE {
@@ -47,3 +50,5 @@ resolvers.officialWebsite = {
 		return sparqlQuery(query);
 	},
 };
+
+export { officialWebsite }

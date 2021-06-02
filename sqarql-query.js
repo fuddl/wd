@@ -1,5 +1,4 @@
 async function sparqlQuery(query) {
-	//console.log(query);
 	let url = 'https://query.wikidata.org/sparql?format=json&query=' + encodeURIComponent(query.split(/\s+/).join(' '));
 	try {
 		const response = await fetch(url);
@@ -19,3 +18,5 @@ async function sparqlQuery(query) {
 		throw ['Fetch Error :-S', error];
 	}
 }
+
+export { sparqlQuery }

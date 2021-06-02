@@ -1,4 +1,4 @@
-resolvers.inventaire = {
+const inventaire = {
 	applicable: function(location) {
 		return this.getEntityId(location) !== null;
 	},
@@ -7,3 +7,5 @@ resolvers.inventaire = {
 	},
 	inventaireRegex: /https\:\/\/inventaire\.io\/entity\/wd\:(Q\d+)/,
 };
+
+export { inventaire }

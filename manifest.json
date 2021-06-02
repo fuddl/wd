@@ -24,44 +24,22 @@
 		"<all_urls>"
 	],
 	"background": {
-		"scripts": [
-			"sqarql-query.js",
-			"sidebar/get-value-by-lang.js",
-			"wd-get-entity.js",
-			"sidebar/wd-get-token.js",
-			"background__add-to-wikidata.js",
-			"resolver.js",
-			"resolver__P8966.js",
-			"background.js"
-		]
+		"page": "background.html"
 	},
 	"content_scripts": [
-	{
-		"matches": ["<all_urls>"],
-		"js": [
-			"sqarql-query.js",
-			"wd-get-entity.js",
-			"resolver.js",
-			"get-valid-string-languages.js",
-			"pagedata__title.js",
-			"pagedata__description.js",
-			"resolver__hash.js",
-			"resolver__cache.js",
-			"resolver__wikipedia.js",
-			"resolver__commons.js",
-			"resolver__inventaire.js",
-			"resolver__P8966.js",
-			"resolver__regex.js",
-			"resolver__fandom.js",
-			"resolver__wikis.js",
-			"resolver__doi.js",
-			"resolver__official-website.js",
-
-			"content__collect-page-links.js",
-			"content__collect-strings.js",
-			"content__display-metadata.js",
-			"content.js"
-		]
+		{
+			"matches": ["<all_urls>"],
+			"js": [
+				"content/index.js"
+			]
+		}
+	],
+	"web_accessible_resources": [
+		"sqarql-query.js"
+	],
+	"browser_specific_settings": {
+		"gecko": {
+			"strict_min_version": "89.0"
+		}
 	}
-]
 }

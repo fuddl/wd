@@ -1,3 +1,5 @@
+import { sparqlQuery } from '../sqarql-query.js';
+
 async function getParents (childID) {
 	let query = `
 		SELECT ?item ?linkTo {
@@ -69,3 +71,6 @@ class Breadcrumbs {
 		}
 	}
 }
+
+export { Breadcrumbs, getParents }
+

@@ -1,4 +1,4 @@
-templates.annote = (qualifiers) => { 
+const annote = (qualifiers) => { 
 	let dl = document.createElement('dl');
 	dl.classList.add('annote');
 
@@ -24,3 +24,5 @@ templates.annote = (qualifiers) => {
 	dl.appendChild(style);
 	return dl;
 }
+
+export { annote }

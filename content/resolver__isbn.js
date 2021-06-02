@@ -1,4 +1,6 @@
-resolvers.isbn = {
+import { sparqlQuery } from "../sqarql-query.js";
+
+const isbn = {
 	applicable: function(location) {
 		return this.findIsbn((found) => {
 			if (!found) {
@@ -49,7 +51,7 @@ resolvers.isbn = {
 	getEntityByIsbn: async function(isbn) {
 		let plain = isbn.replace(/[^\d]/g, '');
 		let prop = plain.length === 13 ? 'P212' : 'P957';
-
+		
 		let query = `
 			SELECT ?item WHERE{
 				?item wdt:${ prop } ?isbn.
@@ -60,3 +62,5 @@ resolvers.isbn = {
 		return sparqlQuery(query);
 	},
 };
+
+export { isbn };

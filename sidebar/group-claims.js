@@ -131,8 +131,8 @@ function groupClaims(claims) {
 
 	let sorted = [];
 	let remaining = [];
-	for (group of groups) {
-		for (prop of group.properties) {
+	for (let group of groups) {
+		for (let prop of group.properties) {
 			if (claims.hasOwnProperty(prop)) {
 				sorted.push(prop);
 			}
@@ -155,13 +155,13 @@ function groupClaims(claims) {
 		}
 	}
 
-	for (prop of Object.keys(claims).sort(sortLabels)) {
+	for (let prop of Object.keys(claims).sort(sortLabels)) {
 		if (!sorted.includes(prop) && claims[prop][0].mainsnak.datatype !== "external-id") {
 			remaining.push(prop);
 		}
 	}
 
-	for (prop of Object.keys(claims).sort(sortLabels)) {
+	for (let prop of Object.keys(claims).sort(sortLabels)) {
 		if (claims[prop][0].mainsnak.datatype === "external-id") {
 			remaining.push(prop);
 		}
@@ -169,3 +169,5 @@ function groupClaims(claims) {
 
 	return sorted.concat(remaining);
 }
+
+export { groupClaims }
