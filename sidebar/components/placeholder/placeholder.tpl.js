@@ -3,7 +3,7 @@ import { getLink } from '../../resolve-placeholders.js';
 const placeholder = (vars, cache) => {
 
 	// don't create a placeholder if the label is already in cache
-	if (vars.entity && 'labels' in cache && cache.labels[vars.entity] && !vars.type) {
+	if (vars.entity && cache && 'labels' in cache && cache.labels[vars.entity] && !vars.type) {
 		let link = document.createElement('a')
 		link.innerText = cache.labels[vars.entity];
 		if ('descriptions' in cache && cache.descriptions[vars.entity]) {

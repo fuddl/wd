@@ -3,7 +3,7 @@ function findTitles() {
 
 	// extract the lemma of mediawiki based pages
 	let scriptBlocks = document.querySelectorAll('script');
-	for (s of scriptBlocks) {
+	for (let s of scriptBlocks) {
 		let mediawikiTitle = s.innerText.match(/"wgTitle":"((?:[^"\\]|\\.)+)"/);
 		let isWikibaseItem = s.innerText.match(/"wgPageContentModel":"wikibase-item"/);
 		// since the title is not very useful in a wikibase item
@@ -17,15 +17,15 @@ function findTitles() {
 		titles.push(ogTitle.getAttribute('content'));
 	}
 	let hOnes = document.querySelectorAll('h1');
-	for (h of hOnes) {
+	for (let h of hOnes) {
 		titles.push(h.innerText);
 	}
 	let hTwos = document.querySelectorAll('h2');
-	for (h of hTwos) {
+	for (let h of hTwos) {
 		titles.push(h.innerText);
 	}
 	let hThrees = document.querySelectorAll('h3');
-	for (h of hThrees) {
+	for (let h of hThrees) {
 		titles.push(h.innerText);
 	}
 	let titleElement = document.querySelector('title');
@@ -38,3 +38,6 @@ function findTitles() {
 
 	return titles;
 }
+
+export { findTitles }
+

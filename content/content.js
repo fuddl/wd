@@ -2,6 +2,8 @@ import { collectPageLinks, clearPageLinks, getClosestID, getOldid } from './cont
 import { resolvers } from './resolver.js';
 import { getElementLanguage } from './content__collect-strings.js';
 import { makeLanguageValid } from '../get-valid-string-languages.js';
+import { findTitles } from './pagedata__title.js';
+import { findDescriptions } from './pagedata__description.js';
 
 async function findApplicables(location, openInSidebar = true) {
 	let applicables = [];

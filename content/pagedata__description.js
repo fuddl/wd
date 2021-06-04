@@ -10,3 +10,5 @@ function findDescriptions() {
 	}
 	return descs;
 }
+
+export { findDescriptions }

@@ -205,3 +205,12 @@ summary {
 	outline: none;
 	user-select: none;
 }
+
+blockquote {
+	border-left: 3px solid #c8ccd1;
+  font-family: 'Linux Libertine','Georgia','Times',serif;
+  font-size: 1.1em;
+  overflow: hidden;
+  margin: 1em 0;
+  padding: 0 1em;
+}

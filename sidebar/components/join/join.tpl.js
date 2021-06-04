@@ -1,3 +1,8 @@
+import { wikidataAutocomplete } from '../../wd-autocomplete.js';
+import { getAutodesc } from '../../get-autodesc.js';
+
+let joinCounter = 0;
+
 const join = (vars) => { 
 	let wrapper = document.createElement('div');
 	wrapper.classList.add('join');
@@ -46,7 +51,7 @@ const join = (vars) => {
 		}
 
 		if (suggestions) { 
-			for (suggestion of suggestions) {
+			for (let suggestion of suggestions) {
 				let item = document.createElement('button');
 				item.setAttribute('tabindex', '0');
 				item.classList.add('join__proposal');
@@ -71,7 +76,7 @@ const join = (vars) => {
 				});
 			}
 		}
-		for (placeholder of proposals.querySelectorAll('.join__proposal__desc--placeholder')) {	
+		for (let placeholder of proposals.querySelectorAll('.join__proposal__desc--placeholder')) {	
 			let entityWithoutDesc = placeholder.parentNode.getAttribute('data-entity');
 			placeholder.innerText = await getAutodesc(entityWithoutDesc);
 		}

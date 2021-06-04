@@ -1,11 +1,15 @@
-
+import { sparqlQuery } from "./sqarql-query.js"
+import { getTokens } from './sidebar/wd-get-token.js';
+import { wikidataGetEntity } from './wd-get-entity.js';
+import { resolvers } from './content/resolver.js';
+import { pushEnitiyToSidebar } from "./push-enitiy-to-sidebar.js"
 
 async function processJobs(jobs) {
 	let lastCreated = null;
 	let lastEdit = null;
 	let answer = null;
 	let refAnswer = null;
-	for (job of jobs) {
+	for (let job of jobs) {
 		if (job.type === 'create') {
 			answer = await createEntity(job.label, job.lang);
 			if (answer.success && answer.success == 1) {
@@ -32,7 +36,7 @@ async function processJobs(jobs) {
 			}
 			
 			if (job.references && answer.success && answer.success == 1) {
-				for (reference of job.references) {
+				for (let reference of job.references) {
 					refAnswer = await addReference(answer.claim.id, reference);
 				}
 			}
@@ -101,7 +105,7 @@ async function setClaim(subjectId, property, value) {
 	data.append('property', property);
 
 	if (typeof value === "string") {
-		await resolvers.p8966.addToExternalIDCache(property, value, subject[subjectId].id);
+		await resolvers.URL_match_pattern.addToExternalIDCache(property, value, subject[subjectId].id);
 		data.append('value', '"' + value + '"');
 	} else {
 		data.append('value', JSON.stringify(value));
@@ -155,3 +159,5 @@ async function getExistingStatement(object, verb, subject) {
 		return false;
 	}
 }
+
+export { processJobs }

@@ -14,3 +14,5 @@ async function wikidataAutocomplete(query, lang, scope = 'item') {
 		throw ['Fetch Error :-S', error];
 	}
 }
+
+export { wikidataAutocomplete }

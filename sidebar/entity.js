@@ -9,6 +9,8 @@ import { sparqlQuery } from '../sqarql-query.js';
 import { templates } from './components/templates.tpl.js';
 import { wikidataGetEditToken, getTokens } from './wd-get-token.js';
 import { wikidataGetEntity } from '../wd-get-entity.js';
+import { ApplyFormatters } from './formatters.js';
+
 
 const lang = navigator.language.substr(0,2);
 const footnoteStorage = {};
@@ -108,6 +110,9 @@ function insertAfter(referenceNode, newNode) {
 
 function renderStatements(snak, references, type, target, scope) {
 	let valueType = snak.datatype ? snak.datatype : snak.datavalue.type ;
+	if (type === 'preformatted') {
+		target.appendChild(snak.datavalue.value);
+	}
 	if (type === 'value' || scope === 'reference') {
 		if (valueType === "time") {	
 			let date = dateToString(snak.datavalue.value);
@@ -269,8 +274,12 @@ function renderStatement(value) {
 							refCounter[ref.hash] = {
 								item: listItem,
 							}
-							for (let key in ref.snaks) {
-								for (let refthing of ref.snaks[key]) {
+
+							let formatted = ApplyFormatters(ref.snaks, 'reference')
+							
+							
+							for (let key in formatted) {
+								for (let refthing of formatted[key]) {
 									if (refthing.datavalue) {
 										let refvalue = new DocumentFragment();
 
@@ -278,13 +287,19 @@ function renderStatement(value) {
 										refvalues.push(refvalue);
 									}
 								}
-								let refStatement = templates.proof({
-									prop: templates.placeholder({
-										entity: key,
-									}, cache),
-									vals: refvalues,
-								});
-								listItem.appendChild(refStatement);
+								if (key.match(/^P\d+/)) {
+									let refStatement = templates.proof({
+										prop: templates.placeholder({
+											entity: key,
+										}, cache),
+										vals: refvalues,
+									});
+									listItem.appendChild(refStatement);
+								} else {
+									for (let refvalue of refvalues) {
+										listItem.appendChild(refvalue)
+									}
+								}
 							}
 						} else {
 							listItem = refCounter[ref.hash].item;

@@ -1,3 +1,10 @@
+import { wikidataGetEntity } from '../wd-get-entity.js';
+import { getCurrentTab } from '../get-current-tab.js';
+import { getAutodesc } from './get-autodesc.js';
+import { resolvePlaceholders } from './resolve-placeholders.js';
+import { getTokens } from './wd-get-token.js';
+import { templates } from './components/templates.tpl.js';
+
 function getPropertyScope(property) {
 	let scopes = {
 		'Q54254515': 'lexeme',

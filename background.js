@@ -1,19 +1,8 @@
-let tabStates = {};
-let sidebarLocked = false;
+import { processJobs } from "./background__add-to-wikidata.js"
+import { pushEnitiyToSidebar } from "./push-enitiy-to-sidebar.js"
 
-function pushEnitiyToSidebar(id, tid, setPanel = true, nocache = false) {
-	if (!sidebarLocked && setPanel) {
-		browser.sidebarAction.setPanel({
-			tabId: tid,
-			panel: browser.runtime.getURL('sidebar/entity.html') + '?' + id + (nocache ? '#nocache' : ''),
-		});
-	} else {
-		browser.runtime.sendMessage({
-			type: 'entity_add',
-			id: id,
-		});
-	}
-}
+let tabStates = {};
+window.sidebarLocked = false;
 
 async function openEnitiyInNewTab(id) {
 	await browser.tabs.create({
