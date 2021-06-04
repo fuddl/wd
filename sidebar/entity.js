@@ -108,7 +108,7 @@ function insertAfter(referenceNode, newNode) {
 	referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
 }
 
-function renderStatements(snak, references, type, target, scope) {
+function renderStatements(snak, references, type, target, scope, delta) {
 	let valueType = snak.datatype ? snak.datatype : snak.datavalue.type ;
 	if (type === 'preformatted') {
 		target.appendChild(snak.datavalue.value);
@@ -316,7 +316,7 @@ function renderStatement(value) {
 					}
 				}
 
-				renderStatements(delta.mainsnak, refs, type, thisvalue, 'statement');
+				renderStatements(delta.mainsnak, refs, type, thisvalue, 'statement', delta);
 				
 				values.push(thisvalue);
 				
