@@ -36,7 +36,7 @@ async function findLinkedData(ids) {
 	const snippeds = document.querySelectorAll('script[type="application/ld+json"]');
 
 	if (snippeds.length < 1) {
-		return {}
+		return []
 	}
 
 	let parsed = []
