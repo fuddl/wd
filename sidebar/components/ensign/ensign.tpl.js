@@ -1,3 +1,7 @@
+import { getTokens } from "../../wd-get-token.js";
+
+const lang = navigator.language.substr(0,2);
+
 const ensign = (vars) => { 
 	let header = document.createElement('header');
 	let title = document.createElement('h1');
