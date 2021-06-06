@@ -7,6 +7,7 @@ import { isbn } from './resolver__isbn.js';
 import { officialWebsite } from './resolver__official-website.js';
 import { URL_match_pattern } from './resolver__url-match-pattern.js';
 import { wikipedia } from './resolver__wikipedia.js';
+import { schemaOrg } from './resolver__schema-org.js';
 
 const resolvers = {
 	wikidata: {
@@ -24,7 +25,8 @@ const resolvers = {
 	commons: commons,
 	URL_match_pattern: URL_match_pattern,
 	doi: doi,
-	// officialWebsite: officialWebsite,
+	schemaOrg: schemaOrg,
+	officialWebsite: officialWebsite,
 	// isbn: isbn,
 };
 
