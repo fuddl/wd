@@ -4,6 +4,7 @@ import { getElementLanguage } from './content__collect-strings.js';
 import { makeLanguageValid } from '../get-valid-string-languages.js';
 import { findTitles } from './pagedata__title.js';
 import { findDescriptions } from './pagedata__description.js';
+import { findLinkedData } from './content__collect-ld.js';
 
 async function findApplicables(location, openInSidebar = true) {
 	let applicables = [];
@@ -29,14 +30,16 @@ async function findApplicables(location, openInSidebar = true) {
 		}
 	}
 	if (applicables.length > 0 && !foundMatch && openInSidebar) {
+		const url = location.toString();
 		browser.runtime.sendMessage({
 			type: 'match_proposal',
 			proposals: {
 				ids: applicables,
 				titles: findTitles(),
 				desc: findDescriptions(),
+				ld: await findLinkedData(applicables[0]),
 				source: {
-					url: location.toString(),
+					url: url,
 					title: document.querySelector('title').innerText,
 					lang: await makeLanguageValid(document.querySelector('html').lang),
 				}

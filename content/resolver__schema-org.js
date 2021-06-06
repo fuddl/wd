@@ -11,7 +11,6 @@ const schemaOrg = {
 		}
 	},
 	getEntityId: async function(location) {
-		console.debug(location.href)
 		let query = `
 			SELECT ?item
 			WHERE {

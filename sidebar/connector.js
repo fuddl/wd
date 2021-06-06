@@ -3,6 +3,7 @@ import { getCurrentTab } from '../get-current-tab.js';
 import { getAutodesc } from './get-autodesc.js';
 import { resolvePlaceholders } from './resolve-placeholders.js';
 import { getTokens } from './wd-get-token.js';
+import { findMatchingClass, findConnections } from './ld-map-wd.js';
 import { templates } from './components/templates.tpl.js';
 
 function getPropertyScope(property) {
@@ -39,10 +40,73 @@ function getPropertyScope(property) {
 	});
 
 
+	let counter = 0;
+
 	propform.appendChild(preview);
 
+	if (proposals.ld) {
+		for (let d of proposals.ld) {
+			if (d.hasOwnProperty('isNeedle') && d.isNeedle) {
+				let matchingClass = await findMatchingClass(d);
+				if (matchingClass) {
+					counter++;
+					let check = document.createElement('input');
+					check.setAttribute('name', counter);
+					let job = {
+						type: 'set_claim',
+						verb: 'P31',
+						object: {
+							'entity-type': "item",
+							'numeric-id': matchingClass.match(/Q(\d+)/)[1],
+						},
+					}
+					check.setAttribute('type', 'checkbox')
+					check.setAttribute('value', JSON.stringify(job))
+					check.checked = true;
+					let instanceOfPreview = templates.remark({
+						check: check,
+						prop: templates.placeholder({
+							entity: 'P31',
+						}),
+						vals: [templates.placeholder({
+							entity: matchingClass,
+						})],
+					});
+					propform.appendChild(instanceOfPreview);
+				}
+				let connections = await findConnections(d);
+				for (let connection of connections) {
+					counter++;
+					let check = document.createElement('input');
+					check.setAttribute('name', counter);
+					let job = {
+						type: 'set_claim',
+						verb: connection.prop,
+						object: {
+							'entity-type': "item",
+							'numeric-id': connection.value.match(/Q(\d+)/)[1],
+						},
+					}
+					check.setAttribute('type', 'checkbox')
+					check.setAttribute('value', JSON.stringify(job));
+					check.checked = true;
+					let connectionPreview = templates.remark({
+						check: check,
+						prop: templates.placeholder({
+							entity: connection.prop,
+						}),
+						vals: [templates.placeholder({
+							entity: connection.value,
+						})],
+					});
+					propform.appendChild(connectionPreview);
+				}
+			}
+		}
+	}
+
 	if(property[proposals.ids[0][0].prop]?.claims?.P2302) {
-		let counter = 0;
+		
 		const contraints = property[proposals.ids[0][0].prop].claims.P2302;
 		for (const contraint of contraints) {
 			const contraintType = contraint.mainsnak.datavalue.value.id;
