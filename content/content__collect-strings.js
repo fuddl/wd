@@ -22,6 +22,14 @@ function guessLanguage(string) {
 	if (string.match(/[ßẞ]/)) {
 		return 'de';
 	}
+	// if it contains upside down punctuation, it's probably spanish
+	if (string.match(/[¿¡]/)) {
+		return 'es';
+	}
+	// if it contains a cyrillic Yo it might be russian
+	if (string.match(/[Ёё]/)) {
+		return 'ru';
+	}
 	// if all else fails, let's assume it is something the user can read
 	return navigator.language.split("-")[0];
 }
