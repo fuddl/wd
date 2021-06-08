@@ -11,10 +11,36 @@ function makeTypeAbsolute(data) {
 			if (data.hasOwnProperty('@context')) {
 				// so lets apply context
 				data['@type'] = `${data['@context']}/${data['@type']}`;
+			} else {
+				// there is no context and the type has a relative url.
+				// lets assume schema.org is used.
+				data['@type'] = `https://schema.org/${data['@type']}`;
 			}
 			return data;
 		}
 	}
+}
+
+function makeJobs (connections) {
+	for (const i in connections) {
+		if (connections[i].value.type === "WikibaseItem") {
+			connections[i].jobs = [];
+			for (const ii in connections[i].prop) {
+				connections[i].jobs.push({
+					label: connections[i].prop[ii],
+					instructions: {
+						type: 'set_claim',
+						verb: connections[i].prop[ii],
+						object: {
+							'entity-type': "item",
+							'numeric-id': connections[i].value.value.replace(/^Q/, ''),
+						},
+					}
+			  });
+			}
+		}
+	}
+	return connections
 }
 
 async function findMatchingClass(data) {
@@ -24,7 +50,11 @@ async function findMatchingClass(data) {
 		data = makeTypeAbsolute(data);
 		let query = `
 			SELECT ?item WHERE {
-				?item wdt:P1709 <${ data['@type'] }>;
+				{
+					?item wdt:P1709 <${ data['@type'] }>;
+				} UNION {
+					?item wdt:P1709 <${ data['@type'].replace(/^http\:/, 'https:') }>;
+				}
 			}
 		`;
 		let entity = await sparqlQuery(query);
@@ -36,16 +66,23 @@ async function findMatchingClass(data) {
 	}
 }
 
-async function findMatchingProp(prop, namespace) {
+async function findMatchingProp(prop, type, namespace) {
 
 	let query = `
-		SELECT ?item WHERE {
-			?item wdt:P1628 <${ namespace }/${ prop }>;
+		SELECT ?prop WHERE {
+			{
+				?item wdt:P1628 <${ namespace }/${ prop }>;
+			} UNION {
+				?item wdt:P1628 <${ namespace.replace(/^http\:/, 'https:') }/${ prop }>;
+			}
+			?item wikibase:propertyType wikibase:${type}.
+
+			BIND (replace(str(?item), 'http://www.wikidata.org/entity/', '') AS ?prop)
 		}
 	`;
-	let entity = await sparqlQuery(query);
-	if (entity[0]) {
-		return entity[0].item.value.match(/https?:\/\/www\.wikidata\.org\/entity\/(P\d+)/)[1];
+	let result = await sparqlQuery(query);
+	if (result.length > 0) {
+		return result.map((i) => { return i.prop.value })
 	} else {
 		return false;
 	}
@@ -68,36 +105,69 @@ async function findConnections(thing) {
 	}
 	let namespace = thing['@context'];
 	let connections = [];
+	let values = [];
 	for (let prop in thing) {
-		let qids = [];
+		if (prop.startsWith('@')) {
+			continue;
+		}
 		if (Array.isArray(thing[prop])) {
 			for (let i in thing[prop]) {
 				if (typeof thing[prop][i] === 'object' && thing[prop][i].hasOwnProperty('@type')) {
 					let qid = isSameAsWdEntity(thing[prop][i]);
 					if (qid) {
-						qids.push(qid)
+						values.push({
+							type: 'WikibaseItem',
+							value: qid,
+							prop: prop,
+						})
 					}
 				}
 			}
 		} else if (typeof thing[prop] === 'object' && thing[prop].hasOwnProperty('@type')) {
 			let qid = isSameAsWdEntity(thing[prop]);
 			if (qid) {
-				qids.push(qid)
+				values.push({
+					type: 'WikibaseItem',
+					value: qid,
+					prop: prop,
+				})
 			}
-		}
-		if (qids.length > 0) {
-			let property = await findMatchingProp(prop, namespace);
-			if (property) {
-				for (let qid of qids) {
-					connections.push({
-						prop: property,
-						value: qid,
-					});
-				}
+		} else if (typeof thing[prop] === 'string') {
+			if (thing[prop].match(/^https?:\/\/[^ ]$/)) {
+				values.push({
+					type: 'Url',
+					value: thing[prop],
+					prop: prop,
+				})
+			} else if (thing[prop].match(/^(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+)|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d)|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d)|(\d{4}-[01]\d-[0-3]\d)$/)) {
+				values.push({
+					type: 'Time',
+					value: thing[prop],
+					prop: prop,
+				})
+			} else {
+				values.push({
+					type: 'Monolingualtext',
+					value: thing[prop],
+					prop: prop,
+				})
 			}
 		}
 	}
-	return connections;
+	if (values.length > 0) {
+		for (let value of values) {
+
+			let property = await findMatchingProp(value.prop, value.type, namespace);
+			if (property) {
+				connections.push({
+					prop: property,
+					value: value,
+				});
+			}
+		}
+	}
+
+	return makeJobs(connections);
 }
 
 export { findMatchingClass, findConnections }

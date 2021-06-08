@@ -76,30 +76,43 @@ function getPropertyScope(property) {
 				}
 				let connections = await findConnections(d);
 				for (let connection of connections) {
-					counter++;
-					let check = document.createElement('input');
-					check.setAttribute('name', counter);
-					let job = {
-						type: 'set_claim',
-						verb: connection.prop,
-						object: {
-							'entity-type': "item",
-							'numeric-id': connection.value.match(/Q(\d+)/)[1],
-						},
+					if (connection.jobs) {
+						counter++;
+						let check, label, select;
+
+						if (connection.jobs.length === 1) {
+							check = document.createElement('input');
+							label = templates.placeholder({
+								entity: connection.jobs[0].label,
+							});
+							check.setAttribute('type', 'checkbox');
+							check.setAttribute('name', counter);
+							check.setAttribute('value', JSON.stringify(connection.jobs[0].instructions));
+							check.checked = true;
+						} else {
+							select = document.createElement('select');
+							select.setAttribute('name', counter);
+							let emptyOption = document.createElement('option');
+							select.appendChild(emptyOption);
+							for (let job of connection.jobs) {
+								let option = document.createElement('option');
+								option.innerText = job.label;
+								option.classList.add('placeholder');
+								option.setAttribute('data-entity', job.label);
+								option.setAttribute('data-type', 'option');
+								option.setAttribute('value', JSON.stringify(job.instructions))
+								select.appendChild(option);
+							}
+						}
+						let preview = templates.remark({
+							check: check ? check : document.createTextNode(''),
+							prop: label ? label : select,
+							vals: [templates.placeholder({
+								entity: connection.value.value,
+							})],
+						});
+						propform.appendChild(preview);					
 					}
-					check.setAttribute('type', 'checkbox')
-					check.setAttribute('value', JSON.stringify(job));
-					check.checked = true;
-					let connectionPreview = templates.remark({
-						check: check,
-						prop: templates.placeholder({
-							entity: connection.prop,
-						}),
-						vals: [templates.placeholder({
-							entity: connection.value,
-						})],
-					});
-					propform.appendChild(connectionPreview);
 				}
 			}
 		}

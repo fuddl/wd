@@ -7,7 +7,7 @@ const mercator = (vars) => {
 	};
 
 	let srcset = []
-	for (key in maps) {
+	for (let key in maps) {
 		srcset.push(`${ maps[key] } ${ key }`);
 	}
 	tag.setAttribute('srcset', srcset.join(','));
@@ -25,7 +25,7 @@ const mercator = (vars) => {
 		osmLink,
 		document.createTextNode(' contributors'),
 	];
-	for (fragment of attributaion) {
+	for (let fragment of attributaion) {
 		caption.appendChild(fragment);
 	}
 

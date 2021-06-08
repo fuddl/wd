@@ -32,6 +32,10 @@ async function parse(thing, ids) {
 	return thing;
 }
 
+function jsonParse(i) {
+	return JSON.parse(i.replace(/\/\*[\s\S]*?\*\//g, ''));
+}
+
 async function findLinkedData(ids) {
 	const snippeds = document.querySelectorAll('script[type="application/ld+json"]');
 
@@ -42,7 +46,7 @@ async function findLinkedData(ids) {
 	let parsed = []
 
 	for (let snipped of snippeds) {
-		parsed.push(await parse(JSON.parse(snipped.innerText), ids));
+		parsed.push(await parse(jsonParse(snipped.innerHTML), ids));
 	}
 	return parsed;
 }
