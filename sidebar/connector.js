@@ -22,6 +22,29 @@ function getPropertyScope(property) {
 	return 'item';
 }
 
+function addConstraintComment(value, constraintId, propId) {
+	let comment = templates.smallBlock(
+		templates.text(
+			[
+				document.createTextNode('Deduced from '),
+				templates.placeholder({
+					entity: constraintId,
+				}),
+				document.createTextNode(' of '),
+				templates.placeholder({
+					entity: propId,
+				}),
+			]
+		)
+	)
+	return [
+		templates.text([
+			value,
+			comment,
+		])
+	];
+}
+
 (async () => {
 	let proposals = JSON.parse(decodeURIComponent(window.location.search.replace(/^\?/, '')));
 	let content = document.getElementById('content');
@@ -45,6 +68,14 @@ function getPropertyScope(property) {
 	propform.appendChild(preview);
 
 	if (proposals.ld) {
+		let comment = templates.smallBlock(
+			templates.text(
+				[
+					document.createTextNode('Extracted from metadata of '),
+					templates.urlLink(proposals.source.url),
+				]
+			)
+		);
 		for (let d of proposals.ld) {
 			if (d.hasOwnProperty('isNeedle') && d.isNeedle) {
 				let matchingClass = await findMatchingClass(d);
@@ -63,14 +94,20 @@ function getPropertyScope(property) {
 					check.setAttribute('type', 'checkbox')
 					check.setAttribute('value', JSON.stringify(job))
 					check.checked = true;
+
 					let instanceOfPreview = templates.remark({
 						check: check,
 						prop: templates.placeholder({
 							entity: 'P31',
 						}),
-						vals: [templates.placeholder({
-							entity: matchingClass,
-						})],
+						vals: [
+							templates.text([
+								templates.placeholder({
+									entity: matchingClass,
+								}),
+								comment.cloneNode(true),
+							]),
+						],
 					});
 					propform.appendChild(instanceOfPreview);
 				}
@@ -107,9 +144,14 @@ function getPropertyScope(property) {
 						let preview = templates.remark({
 							check: check ? check : document.createTextNode(''),
 							prop: label ? label : select,
-							vals: [templates.placeholder({
-								entity: connection.value.value,
-							})],
+							vals: [
+								templates.text([
+									templates.placeholder({
+										entity: connection.value.value,
+									}),
+									comment.cloneNode(true),
+								]),
+							],
 						});
 						propform.appendChild(preview);					
 					}
@@ -173,7 +215,7 @@ function getPropertyScope(property) {
 							prop: templates.placeholder({
 								entity: 'P31',
 							}),
-							vals: [value],
+							vals: addConstraintComment(value, contraintType, proposals.ids[0][0].prop),
 						});
 
 						propform.appendChild(instanceOfPreview);
@@ -197,14 +239,16 @@ function getPropertyScope(property) {
 
 						check.setAttribute('value', JSON.stringify(job))
 
+						let value = templates.placeholder({
+							entity: contraint?.qualifiers?.P2305[0]?.datavalue?.value?.id,
+						});
+
 						let requiredStatementPreview = templates.remark({
 							check: check,
 							prop: templates.placeholder({
 								entity: contraint?.qualifiers?.P2306[0]?.datavalue?.value?.id,
 							}),
-							vals: [templates.placeholder({
-								entity: contraint?.qualifiers?.P2305[0]?.datavalue?.value?.id,
-							})],
+							vals: addConstraintComment(value, contraintType, proposals.ids[0][0].prop)
 						});
 
 						propform.appendChild(requiredStatementPreview);

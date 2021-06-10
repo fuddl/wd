@@ -110,6 +110,18 @@ const templates = {
 		tag.innerText = text;
 		return tag;
 	},
+	smallBlock: (text) => {
+		let tag = document.createElement('div');
+		tag.style.lineHeight = .5;
+		let small = document.createElement('small');
+		if (typeof text === 'string') {
+			small.innerText = text;
+		} else {
+			small.appendChild(text);
+		}
+		tag.appendChild(small);
+		return tag;
+	},
 	picture: (vars) => {
 		let tag = document.createElement('img');
 		let srcset = [];
@@ -177,7 +189,14 @@ const templates = {
 		wrapper.appendChild(content);
 		
 		return wrapper;
-	}
+	},
+	text: (children) => {
+		let node = document.createDocumentFragment();
+		for (let child of children) {
+			node.appendChild(child);
+		}
+		return node;
+	},
 };
 
 export { templates }
