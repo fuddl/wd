@@ -122,6 +122,7 @@ async function setClaim(subjectId, property, value) {
 		body: new URLSearchParams(data),
 	});
 
+
 	return JSON.parse(await response.text());
 }
 

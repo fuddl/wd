@@ -1,4 +1,5 @@
 import { sparqlQuery } from "../sqarql-query.js";
+import { makeLanguageValid } from '../get-valid-string-languages.js';
 
 function makeTypeAbsolute(data) {
 	if (data.hasOwnProperty('@type')) {
@@ -21,8 +22,24 @@ function makeTypeAbsolute(data) {
 	}
 }
 
-function makeJobs (connections) {
+async function makeJobs (connections, source) {
 	for (const i in connections) {
+		if (connections[i].value.type === "Monolingualtext") {
+			connections[i].jobs = [];
+			for (const ii in connections[i].prop) {
+				connections[i].jobs.push({
+					label: connections[i].prop[ii],
+					instructions: {
+						type: 'set_claim',
+						verb: connections[i].prop[ii],
+						object: {
+							'language': await makeLanguageValid(source.lang),
+							'text': connections[i].value.value,
+						},
+					}
+			  });
+			}
+		}
 		if (connections[i].value.type === "WikibaseItem") {
 			connections[i].jobs = [];
 			for (const ii in connections[i].prop) {
@@ -69,7 +86,7 @@ async function findMatchingClass(data) {
 async function findMatchingProp(prop, type, namespace) {
 
 	let query = `
-		SELECT ?prop WHERE {
+		SELECT DISTINCT ?prop WHERE {
 			{
 				?item wdt:P1628 <${ namespace }/${ prop }>;
 			} UNION {
@@ -99,7 +116,7 @@ function isSameAsWdEntity(thing) {
 	}
 }
 
-async function findConnections(thing) {
+async function findConnections(thing, source) {
 	if (!thing.hasOwnProperty('@context')) {
 		return [];
 	}
@@ -156,7 +173,6 @@ async function findConnections(thing) {
 	}
 	if (values.length > 0) {
 		for (let value of values) {
-
 			let property = await findMatchingProp(value.prop, value.type, namespace);
 			if (property) {
 				connections.push({
@@ -167,7 +183,7 @@ async function findConnections(thing) {
 		}
 	}
 
-	return makeJobs(connections);
+	return await makeJobs(connections, source);
 }
 
 export { findMatchingClass, findConnections }

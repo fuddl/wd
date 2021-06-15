@@ -111,7 +111,7 @@ function addConstraintComment(value, constraintId, propId) {
 					});
 					propform.appendChild(instanceOfPreview);
 				}
-				let connections = await findConnections(d);
+				let connections = await findConnections(d, proposals?.source);
 				for (let connection of connections) {
 					if (connection.jobs) {
 						counter++;
@@ -141,14 +141,23 @@ function addConstraintComment(value, constraintId, propId) {
 								select.appendChild(option);
 							}
 						}
+						let valuePreview;
+						switch (connection?.value?.type) {
+							case 'WikibaseItem':
+								valuePreview = templates.placeholder({
+									entity: connection.value.value,
+								});
+								break;
+							case 'Monolingualtext':
+								valuePreview = templates.title({text: connection.value.value});
+								break;
+						}
 						let preview = templates.remark({
 							check: check ? check : document.createTextNode(''),
 							prop: label ? label : select,
 							vals: [
 								templates.text([
-									templates.placeholder({
-										entity: connection.value.value,
-									}),
+									valuePreview,
 									comment.cloneNode(true),
 								]),
 							],

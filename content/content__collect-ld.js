@@ -1,6 +1,11 @@
 import { resolvers } from './resolver.js';
 
 async function parse(thing, ids) {
+
+	if (thing.hasOwnProperty('@type') && ['BreadcrumbList'].includes(thing['@type'])) {
+		return null;
+	}
+
 	if (thing.hasOwnProperty('url') && !thing?.sameAs?.startsWith('https://www.wikidata.org/wiki/Q')) {
 		let link = document.createElement('a');
 		link.setAttribute('href', thing['url']);
@@ -48,6 +53,17 @@ async function findLinkedData(ids) {
 	for (let snipped of snippeds) {
 		parsed.push(await parse(jsonParse(snipped.innerHTML), ids));
 	}
+
+	parsed = parsed.filter((v) => {
+		return v != null;
+	});
+
+	if (parsed.length === 1) {
+		parsed[parsed.findIndex(() => {
+			return true;
+		})].isNeedle = true;
+	}
+
 	return parsed;
 }
 
