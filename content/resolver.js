@@ -3,11 +3,12 @@ import { commons } from './resolver__commons.js';
 import { doi } from './resolver__doi.js';
 import { hash } from './resolver__hash.js';
 import { inventaire } from './resolver__inventaire.js';
-import { isbn } from './resolver__isbn.js';
-import { officialWebsite } from './resolver__official-website.js';
+//import { isbn } from './resolver__isbn.js';
+//import { officialWebsite } from './resolver__official-website.js';
 import { URL_match_pattern } from './resolver__url-match-pattern.js';
 import { wikipedia } from './resolver__wikipedia.js';
 import { schemaOrg } from './resolver__schema-org.js';
+import { url } from './resolver__url.js';
 
 const resolvers = {
 	wikidata: {
@@ -26,7 +27,8 @@ const resolvers = {
 	URL_match_pattern: URL_match_pattern,
 	doi: doi,
 	schemaOrg: schemaOrg,
-	officialWebsite: officialWebsite,
+	//officialWebsite: officialWebsite,
+	url: url,
 	// isbn: isbn,
 };
 

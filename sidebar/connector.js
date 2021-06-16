@@ -45,20 +45,41 @@ function addConstraintComment(value, constraintId, propId) {
 	];
 }
 
+
 (async () => {
 	let proposals = JSON.parse(decodeURIComponent(window.location.search.replace(/^\?/, '')));
+	const isMultiple = typeof proposals.ids[0][0].prop !== 'string'
+	let connectorProp = !isMultiple ? proposals.ids[0][0].prop : proposals.ids[0][0].prop[0];
+	let property = !isMultiple ? await wikidataGetEntity(proposals.ids[0][0].prop) : null;
 	let content = document.getElementById('content');
 	let propform = document.createElement('form');
 	content.appendChild(propform);
 
 	let currentTab = await getCurrentTab()
+	let propPreview;
 
-	let property = await wikidataGetEntity(proposals.ids[0][0].prop);
+	if (!isMultiple) {
+		propPreview = templates.placeholder({
+			entity: proposals.ids[0][0].prop,
+		})
+	} else {
+		propPreview = document.createElement('select');
+		for (let prop of proposals.ids[0][0].prop) {
+			let option = document.createElement('option');
+			option.innerText = prop;
+			option.classList.add('placeholder');
+			option.setAttribute('data-entity', prop);
+			option.setAttribute('value', prop);
+			option.setAttribute('data-type', 'option');
+			propPreview.appendChild(option);
+		}
+		propPreview.addEventListener('change', function(event) {
+			connectorProp = event.target.value;
+		});
+	}
 
 	let preview = templates.remark({
-		prop: templates.placeholder({
-			entity: proposals.ids[0][0].prop,
-		}),
+		prop: propPreview,
 		vals: [templates.code(proposals.ids[0][0].value)],
 	});
 
@@ -169,8 +190,7 @@ function addConstraintComment(value, constraintId, propId) {
 		}
 	}
 
-	if(property[proposals.ids[0][0].prop]?.claims?.P2302) {
-		
+	if(!isMultiple && property[proposals.ids[0][0].prop]?.claims?.P2302) {
 		const contraints = property[proposals.ids[0][0].prop].claims.P2302;
 		for (const contraint of contraints) {
 			const contraintType = contraint.mainsnak.datavalue.value.id;
@@ -273,7 +293,7 @@ function addConstraintComment(value, constraintId, propId) {
 
 	let labelField = templates.join({
 		human: proposals.titles[0],
-		scope: getPropertyScope(property[proposals.ids[0][0].prop]),
+		scope: !isMultiple ? getPropertyScope(property[proposals.ids[0][0].prop]) : 'item',
 		id: 'joiner',
 	});
 	let direction = templates.direction();
@@ -332,7 +352,7 @@ function addConstraintComment(value, constraintId, propId) {
 			jobs.push({
 				type: 'set_claim',
 				subject: selectedEntity,
-				verb: proposals.ids[0][0].prop,
+				verb: connectorProp,
 				object: proposals.ids[0][0].value,
 				fromTab: currentTab,
 				references: [{
