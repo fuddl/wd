@@ -6,7 +6,7 @@ async function parse(thing, ids) {
 		return null;
 	}
 
-	if (thing.hasOwnProperty('url') && !thing?.sameAs?.startsWith('https://www.wikidata.org/wiki/Q')) {
+	if (thing.hasOwnProperty('url')) {
 		let link = document.createElement('a');
 		link.setAttribute('href', thing['url']);
 		for (let id of Object.keys(resolvers)) {
@@ -14,7 +14,12 @@ async function parse(thing, ids) {
 			if (isApplicable) {
 				let entityId = await resolvers[id].getEntityId(link);
 				if (entityId) {
-					thing['sameAs'] = `https://www.wikidata.org/wiki/${entityId}`
+					let wdUrl = `https://www.wikidata.org/wiki/${entityId}`;
+					if (Array.isArray(thing['sameAs'])) {
+						thing['sameAs'].push(wdUrl);
+					} else {
+						thing['sameAs'] = wdUrl;
+					}
 				} else {
 					if (JSON.stringify(isApplicable) === JSON.stringify(ids)) {
 						thing.isNeedle = true;
