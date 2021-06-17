@@ -219,7 +219,7 @@ function renderStatements(snak, references, type, target, scope, delta) {
 			target.appendChild(sup);
 		}
 	}
-	if (valueType === "external-id") {
+	if (valueType === "external-id" && snak.snaktype === "value") {
 		target.appendChild(templates.idLinksPlaceholder(snak.property, snak.datavalue.value));
 	}
 	if (scope === 'statement' && typeof delta != 'undefined' && delta.hasOwnProperty('qualifiers')) {
