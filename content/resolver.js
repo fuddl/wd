@@ -9,6 +9,7 @@ import { URL_match_pattern } from './resolver__url-match-pattern.js';
 import { wikipedia } from './resolver__wikipedia.js';
 import { schemaOrg } from './resolver__schema-org.js';
 import { url } from './resolver__url.js';
+import { googleMaps } from './resolver__google-maps.js';
 
 const resolvers = {
 	wikidata: {
@@ -27,6 +28,7 @@ const resolvers = {
 	URL_match_pattern: URL_match_pattern,
 	doi: doi,
 	schemaOrg: schemaOrg,
+	googleMaps: googleMaps,
 	//officialWebsite: officialWebsite,
 	url: url,
 	// isbn: isbn,
