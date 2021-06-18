@@ -12,7 +12,7 @@ const googleMaps = {
 		}
 	},
 	convert: function(hex) {
-		return parseInt(hex, 16)
+		return String(parseInt(hex, 16));
 	},
 	getEntityId: async function(location) {
 		let id = this.convert(location.href.match(this.regex)[1]);
