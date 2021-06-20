@@ -384,6 +384,10 @@ function updateView(id, useCache = true) {
 			if (e.forms) {
 				wrapper.appendChild(templates.flex({
 					forms: e.forms,
+					category: e.lexicalCategory,
+					lang: e.language,
+					gender: typeof e.claims?.P5185 === 'object' ? e.claims?.P5185[0]?.mainsnak?.datavalue?.value?.id : null,
+					auxVerb: typeof e.claims?.P5401 === 'object' ? e.claims?.P5401[0]?.mainsnak?.datavalue?.value?.id : null,
 				}));
 			}
 
@@ -502,7 +506,7 @@ function updateView(id, useCache = true) {
 								title = getValueByLang(thisSet, titleType, false);
 								if (!title && titleType === 'glosses' && thisSet.claims.P5137) {
 									let descriptions = [];
-									for (item of thisSet.claims.P5137) {
+									for (let item of thisSet.claims.P5137) {
 										if (checkNested(item, 'mainsnak', 'datavalue', 'value', 'id')) {
 											let itemId = item.mainsnak.datavalue.value.id;
 											let itemEntity = await wikidataGetEntity(itemId);

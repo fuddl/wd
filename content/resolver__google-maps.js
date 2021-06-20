@@ -1,7 +1,7 @@
 import { sparqlQuery } from "../sqarql-query.js";
 
 const googleMaps = {
-	regex: /^https\:\/\/www\.google\.com\/maps\/place\/[^ #]*\/data=[^ #]*(0x[0-9a-f]+)/,
+	regex: /^https\:\/\/www\.google\.\w+\/maps\/place\/[^ #]*\/data=[^ #]*(0x[0-9a-f]+)/,
 	applicable: function(location) {
 		let matches = location.href.match(this.regex);
 		if (matches !== null) {
