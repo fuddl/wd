@@ -330,6 +330,29 @@ const flex = (vars) => {
 		}
 	}
 
+	// esperanto
+	if (vars.lang === 'Q143') {
+		// noun
+		if (vars.category === 'Q1084') {
+			xAxis = {
+				singular: {
+					features: ['Q110786']
+				},
+				plural: {
+					features: ['Q146786']
+				},
+			};
+			yAxis = {
+				nominative: {
+					features: ['Q131105']
+				},
+				accusative: {
+					features: ['Q146078']
+				},
+			};
+		}
+	}
+
 	let hasYAxis = false;
 	let tbody = document.createElement('tbody');
 	const oneColumn = xAxis ? false : true;

@@ -3,7 +3,7 @@ import { getCurrentTab } from '../get-current-tab.js';
 import { getAutodesc } from './get-autodesc.js';
 import { resolvePlaceholders } from './resolve-placeholders.js';
 import { getTokens } from './wd-get-token.js';
-import { findMatchingClass, findConnections } from './ld-map-wd.js';
+import { findMatchingClass, findConnections, makeReferences } from './ld-map-wd.js';
 import { templates } from './components/templates.tpl.js';
 
 function getPropertyScope(property) {
@@ -111,6 +111,7 @@ function addConstraintComment(value, constraintId, propId) {
 							'entity-type': "item",
 							'numeric-id': matchingClass.match(/Q(\d+)/)[1],
 						},
+						references: makeReferences(proposals?.source),
 					}
 					check.setAttribute('type', 'checkbox')
 					check.setAttribute('value', JSON.stringify(job))

@@ -1,6 +1,15 @@
 import { sparqlQuery } from "../sqarql-query.js";
 import { makeLanguageValid } from '../get-valid-string-languages.js';
 
+function convertHTMLentities(string) {
+	return string
+		.replace(/&apos;/gm, "'")
+		.replace(/&quot;/gm, '"')
+		.replace(/&lt;/gm, '<')
+		.replace(/&gt;/gm, '>')
+		.replace(/&amp;/gm, '&')
+}
+
 function makeTypeAbsolute(data) {
 	if (data.hasOwnProperty('@type')) {
 		let type = data['@type'];
@@ -22,6 +31,56 @@ function makeTypeAbsolute(data) {
 	}
 }
 
+function makeReferences(source) {
+	let references = [];
+	if (source?.url) {
+		references.push(
+			{
+				"snaktype": "value",
+				"property": "P854",
+				"datavalue": {
+					"value": source.url,
+					"type": "string"
+				},
+				"datatype": "url"
+			}
+		)
+		if (source?.title && source?.lang) {
+			references.push(
+				{
+					"snaktype": "value",
+					"property": "P1476",
+					"datavalue": {
+						"value": {
+							text: source.title,
+							language: source.lang,
+						},
+						"type": "monolingualtext"
+					},
+					"datatype": "string"
+				}
+			)
+		}
+	}
+	let now = new Date();
+	references.push({
+		"snaktype": "value",
+		"property": "P813",
+		"datavalue": {
+			"type": "time",
+			"value": {
+				"after": 0,
+				"before": 0,
+				"calendarmodel": "http://www.wikidata.org/entity/Q1985727",
+				"precision": 11,
+				"time": `+${ now.toISOString().substr(0,10) }T00:00:00Z`,
+				"timezone": 0
+			}
+		}
+	});
+	return [references];
+}
+
 async function makeJobs (connections, source) {
 	for (const i in connections) {
 		if (connections[i].value.type === "Monolingualtext") {
@@ -34,8 +93,9 @@ async function makeJobs (connections, source) {
 						verb: connections[i].prop[ii],
 						object: {
 							'language': await makeLanguageValid(source.lang),
-							'text': connections[i].value.value,
+							'text': convertHTMLentities(connections[i].value.value),
 						},
+						references: makeReferences(source),
 					}
 			  });
 			}
@@ -52,6 +112,7 @@ async function makeJobs (connections, source) {
 							'entity-type': "item",
 							'numeric-id': connections[i].value.value.replace(/^Q/, ''),
 						},
+						references: makeReferences(source),
 					}
 			  });
 			}
@@ -165,7 +226,7 @@ async function findConnections(thing, source) {
 			} else {
 				values.push({
 					type: 'Monolingualtext',
-					value: thing[prop],
+					value: convertHTMLentities(thing[prop]),
 					prop: prop,
 				})
 			}
@@ -186,4 +247,4 @@ async function findConnections(thing, source) {
 	return await makeJobs(connections, source);
 }
 
-export { findMatchingClass, findConnections }
+export { findMatchingClass, findConnections, makeReferences }
