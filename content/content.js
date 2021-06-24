@@ -4,10 +4,11 @@ import { getElementLanguage } from './content__collect-strings.js';
 import { makeLanguageValid } from '../get-valid-string-languages.js';
 import { findTitles } from './pagedata__title.js';
 import { findDescriptions } from './pagedata__description.js';
-import { findLinkedData } from './content__collect-ld.js';
+import { findLinkedData, enrichLinkedData } from './content__collect-ld.js';
 
 async function findApplicables(location, openInSidebar = true) {
 	let applicables = [];
+	let linkedData = findLinkedData()
 
 	let foundMatch = false;
 	for (let id of Object.keys(resolvers)) {
@@ -37,7 +38,7 @@ async function findApplicables(location, openInSidebar = true) {
 				ids: applicables,
 				titles: findTitles(),
 				desc: findDescriptions(),
-				ld: await findLinkedData(applicables[0]),
+				ld: await enrichLinkedData(linkedData, applicables[0]),
 				source: {
 					url: url,
 					title: document.querySelector('title').innerText,

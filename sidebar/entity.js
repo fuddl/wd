@@ -52,7 +52,8 @@ function dateToString(value) {
 		.replace(/^(\+|-)/, '')
 		.replace(/Z$/, '')
 		.replace(/^(\d+)-00/, '$1-01')
-		.replace(/^(\d+)-(\d+)-00/, '$1-$2-01');
+		.replace(/^(\d+)-(\d+)-00/, '$1-$2-01')
+		+ 'Z';
 
 	let date = new Date(iso);
 

@@ -46,13 +46,7 @@ function jsonParse(i) {
 	return JSON.parse(i.replace(/\/\*[\s\S]*?\*\//g, ''));
 }
 
-async function findLinkedData(ids) {
-	const snippeds = document.querySelectorAll('script[type="application/ld+json"]');
-
-	if (snippeds.length < 1) {
-		return []
-	}
-
+async function enrichLinkedData(snippeds, ids) {
 	let parsed = []
 
 	for (let snipped of snippeds) {
@@ -68,8 +62,18 @@ async function findLinkedData(ids) {
 			return true;
 		})].isNeedle = true;
 	}
-
 	return parsed;
+
 }
 
-export { findLinkedData }
+function findLinkedData() {
+	const snippeds = document.querySelectorAll('script[type="application/ld+json"]');
+
+	if (snippeds.length < 1) {
+		return []
+	}
+
+	return snippeds;
+}
+
+export { findLinkedData, enrichLinkedData }
