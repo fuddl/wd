@@ -118,27 +118,26 @@ async function makeJobs (connections, source) {
 			}
 		}
 		if (connections[i].value.type === "Time") {
-			if(connections[i].value.value.length === 10) {
-				connections[i].jobs = [];
-				let now = new Date();
-				for (const ii in connections[i].prop) {
-					connections[i].jobs.push({
-						label: connections[i].prop[ii],
-						instructions: {
-							type: 'set_claim',
-							verb: connections[i].prop[ii],
-							object: {
-								"after": 0,
-								"before": 0,
-								"calendarmodel": "http://www.wikidata.org/entity/Q1985727",
-								"precision": 11,
-								"time": `+${connections[i].value.value}T00:00:00Z`,
-								"timezone": 0,
-							},
-							references: makeReferences(source),
-						}
-				  });
-				}
+			connections[i].jobs = [];
+			let dayPreciseDate = connections[i].value.value.substr(0, 10);
+			let now = new Date();
+			for (const ii in connections[i].prop) {
+				connections[i].jobs.push({
+					label: connections[i].prop[ii],
+					instructions: {
+						type: 'set_claim',
+						verb: connections[i].prop[ii],
+						object: {
+							"after": 0,
+							"before": 0,
+							"calendarmodel": "http://www.wikidata.org/entity/Q1985727",
+							"precision": 11,
+							"time": `+${dayPreciseDate}T00:00:00Z`,
+							"timezone": 0,
+						},
+						references: makeReferences(source),
+					}
+			  });
 			}
 		}
 	}
