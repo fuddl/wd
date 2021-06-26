@@ -9,6 +9,7 @@ async function processJobs(jobs) {
 	let lastEdit = null;
 	let answer = null;
 	let refAnswer = null;
+	let qualAnswer = null;
 	for (let job of jobs) {
 		if (job.type === 'create') {
 			answer = await createEntity(job.label, job.lang);
@@ -35,9 +36,14 @@ async function processJobs(jobs) {
 				}
 			}
 			
-			if (job.references && answer.success && answer.success == 1) {
+			if (job?.references && answer.success && answer.success == 1) {
 				for (let reference of job.references) {
 					refAnswer = await addReference(answer.claim.id, reference);
+				}
+			}
+			if (job?.qualifiers && answer.success && answer.success == 1) {
+				for (let qualifier of job.qualifiers) {
+					qualAnswer = await addQualifier(answer.claim.id, qualifier);
 				}
 			}
 			lastEdit = {
@@ -133,6 +139,28 @@ async function addReference(claimId, references) {
 	data.append('action', 'wbsetreference');
 	data.append('statement', claimId);
 	data.append('snaks', JSON.stringify(references));
+	data.append('summary', 'added with [[Wikidata:Tools/Wikidata for Firefox|Wikidata for Firefox 🦊]]');
+	data.append('token', token);
+	data.append('bot', '1');
+	data.append('format', "json");
+
+	let response = await fetch('https://www.wikidata.org/w/api.php', {
+		method: 'post',
+		body: new URLSearchParams(data),
+	});
+
+	return JSON.parse(await response.text());
+}
+
+async function addQualifier(claimId, qualifier) {
+	let token = await getTokens();
+
+	let data = new FormData();
+	data.append('action', 'wbsetqualifier');
+	data.append('claim', claimId);
+	data.append('property', qualifier.property);
+	data.append('snaktype', 'value');
+	data.append('value', JSON.stringify(qualifier.value));
 	data.append('summary', 'added with [[Wikidata:Tools/Wikidata for Firefox|Wikidata for Firefox 🦊]]');
 	data.append('token', token);
 	data.append('bot', '1');

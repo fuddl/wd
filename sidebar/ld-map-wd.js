@@ -10,6 +10,15 @@ function convertHTMLentities(string) {
 		.replace(/&amp;/gm, '&')
 }
 
+const ratingProps = ['ratingCount', 'ratingValue'];
+
+function makeRating(props) {
+	const best = props?.bestRating ? parseFloat(props.bestRating) : 5;
+	const worst = props?.worstRating ? parseFloat(props.worstRating) : 1;
+	const value = props.ratingValue;
+	return `${props.ratingValue}/${best}`;
+}
+
 function makeTypeAbsolute(data) {
 	if (data.hasOwnProperty('@type')) {
 		let type = data['@type'];
@@ -100,6 +109,21 @@ async function makeJobs (connections, source) {
 			  });
 			}
 		}
+		if (connections[i].value.type === "String") {
+			connections[i].jobs = [];
+			for (const ii in connections[i].prop) {
+				connections[i].jobs.push({
+					label: connections[i].prop[ii],
+					instructions: {
+						type: 'set_claim',
+						verb: connections[i].prop[ii],
+						object: connections[i].value.value,
+						references: makeReferences(source),
+						qualifiers: connections[i].value?.qualifiers ? connections[i].value.qualifiers : null,
+					}
+			  });
+			}
+		}
 		if (connections[i].value.type === "WikibaseItem") {
 			connections[i].jobs = [];
 			for (const ii in connections[i].prop) {
@@ -172,9 +196,9 @@ async function findMatchingProp(prop, type, namespace) {
 	let query = `
 		SELECT DISTINCT ?prop WHERE {
 			{
-				?item wdt:P1628 <${ namespace }/${ prop }>;
+				?item wdt:P1628 <${ namespace }/${ prop }>.
 			} UNION {
-				?item wdt:P1628 <${ namespace.replace(/^http\:/, 'https:') }/${ prop }>;
+				?item wdt:P1628 <${ namespace.replace(/^http\:/, 'https:') }/${ prop }>.
 			}
 			?item wikibase:propertyType wikibase:${type}.
 
@@ -253,6 +277,32 @@ async function findConnections(thing, source) {
 					prop: prop,
 				})
 			}
+		}
+		if (prop === 'aggregateRating' && ratingProps.every(v => { return thing[prop].hasOwnProperty(v)})) {
+			let now = new Date();
+			values.push({
+				type: 'String',
+				value: makeRating(thing[prop]),
+				prop: 'AggregateRating',
+				qualifiers: [{
+					property: 'P7887',
+					value: {
+						amount: `+${thing[prop].ratingCount}`,
+						unit: "http://www.wikidata.org/entity/Q20058247",
+					},
+				},
+				{
+					property: "P585",
+					value: {
+						after: 0,
+						before: 0,
+						calendarmodel: "http://www.wikidata.org/entity/Q1985727",
+						precision: 11,
+						time: `+${ now.toISOString().substr(0,10) }T00:00:00Z`,
+						timezone: 0,
+					}
+				}],
+			})
 		}
 	}
 	if (values.length > 0) {

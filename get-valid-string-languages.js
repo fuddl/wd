@@ -17,7 +17,7 @@ async function makeLanguageValid(invalidLang) {
 			return invalidLang.substr(0,2);
 		}
 	}
-	return 'xxz';
+	return 'und';
 }
 
 export { getValidStringLanguages, makeLanguageValid }

@@ -173,6 +173,9 @@ function addConstraintComment(value, constraintId, propId) {
 							case 'Monolingualtext':
 								valuePreview = templates.title({text: connection.value.value});
 								break;
+							case 'String':
+								valuePreview = templates.code(connection.value.value);
+								break;
 							case 'Time':
 								valuePreview = templates.time({text: document.createTextNode(connection.value.value)});
 								break;
