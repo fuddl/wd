@@ -179,6 +179,12 @@ function addConstraintComment(value, constraintId, propId) {
 							case 'Time':
 								valuePreview = templates.time({text: document.createTextNode(connection.value.value)});
 								break;
+							case 'Quantity':
+								valuePreview = templates.unitNumber({
+									number: connection.value.value.amount,
+									unit: connection?.value.value?.unit,
+								});
+								break;
 						}
 						let preview = templates.remark({
 							check: check ? check : document.createTextNode(''),

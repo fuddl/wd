@@ -143,21 +143,10 @@ function renderStatements(snak, references, type, target, scope, delta) {
 			target.appendChild(templates.urlLink(snak.datavalue.value));
 		}
 		if (valueType === 'quantity') {
-			let number = document.createTextNode(parseFloat(snak.datavalue.value.amount));
-			target.appendChild(number);
-
-			if (snak.datavalue.value.unit) {
-				let space = document.createTextNode(' ');
-				target.appendChild(space);
-
-				target.appendChild(templates.proxy({
-					query: `
-						SELECT ?innerText WHERE {
-							<${ snak.datavalue.value.unit }> wdt:P5061 ?innerText.
-							FILTER(LANG(?innerText) = "${ lang }").
-						}`
-				}));
-			}
+			target.appendChild(templates.unitNumber({
+				number: snak.datavalue.value.amount,
+				unit: snak?.datavalue?.value?.unit,
+			}));
 		}
 		if (valueType === "globe-coordinate" || valueType ===	'globecoordinate') {
 			target.appendChild(templates.mercator({
@@ -564,17 +553,6 @@ function updateView(id, useCache = true) {
 		
 		resolvePlaceholders();
 		resolveBreadcrumbs(cache);
-
-		let proxies = content.querySelectorAll('.proxy');
-
-		Array.from(proxies).reduce((k, proxy) => {
-			(async () => {
-				let result = await sparqlQuery(proxy.getAttribute('data-query'));
-				if (result[0] && result[0].hasOwnProperty('innerText')) {
-					proxy.innerText = result[0].innerText.value;
-				}
-			})();
-		}, 0);
 
 		resolveIdLinksPlaceholder();
 	})();

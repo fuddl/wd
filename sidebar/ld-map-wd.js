@@ -19,6 +19,48 @@ function makeRating(props) {
 	return `${props.ratingValue}/${best}`;
 }
 
+function durationToQuantity(data) {
+	let h, m, s;
+	const hMatch = data.match(/(\d+)H/);
+	if (hMatch) {
+		h = parseInt(hMatch[1]);
+	}
+	const mMatch = data.match(/(\d+)M/);
+	if (mMatch) {
+		m = parseInt(mMatch[1]);
+	}
+	const sMatch = data.match(/(\d+)S/);
+	if (sMatch) {
+		s = parseInt(sMatch[1]);
+	}
+	if (s) {
+		if (m) {
+			s =+ m * 60;
+		}
+		if (h) {
+			s =+ h * 3600;
+		}
+		return {
+			amount: `+${s}`,
+			unit: "http://www.wikidata.org/entity/Q11574",
+		};
+	} else if (m) {
+		if (h) {
+			m =+ h * 60;
+		}
+		return {
+			amount: `+${m}`,
+			unit: "http://www.wikidata.org/entity/Q7727",
+		};
+	} else if (h) {
+		return {
+			amount: `+${h}`,
+			unit: "http://www.wikidata.org/entity/Q25235",
+		}
+	}
+	return false;
+}
+
 function makeTypeAbsolute(data) {
 	if (data.hasOwnProperty('@type')) {
 		let type = data['@type'];
@@ -109,7 +151,7 @@ async function makeJobs (connections, source) {
 			  });
 			}
 		}
-		if (connections[i].value.type === "String") {
+		if (connections[i].value.type === "String" || connections[i].value.type === "Quantity") {
 			connections[i].jobs = [];
 			for (const ii in connections[i].prop) {
 				connections[i].jobs.push({
@@ -268,6 +310,12 @@ async function findConnections(thing, source) {
 				values.push({
 					type: 'Time',
 					value: thing[prop],
+					prop: prop,
+				})
+			} else if (thing[prop].match(/^PT(\d+H)?(\d+M)?(\d+S)?$/)) {
+				values.push({
+					type: 'Quantity',
+					value: durationToQuantity(thing[prop]),
 					prop: prop,
 				})
 			} else {

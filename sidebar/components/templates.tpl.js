@@ -1,3 +1,5 @@
+import { sparqlQuery } from '../../sqarql-query.js';
+
 import { placeholder } from './placeholder/placeholder.tpl.js';
 import { annote } from './annote/annote.tpl.js';
 import { direction } from './direction/direction.tpl.js';
@@ -180,7 +182,15 @@ const templates = {
 		if (vars.text) {
 			tag.innerText = vars.text;
 		}
-		
+	
+		(async () => {
+			let result = await sparqlQuery(tag.getAttribute('data-query'));
+			if (result[0] && result[0].hasOwnProperty('innerText')) {
+				tag.innerText = result[0].innerText.value;
+				tag.classList.remove('proxy')
+			}
+		})();
+
 		return tag;
 	},
 	footer: (content) => {
@@ -197,6 +207,24 @@ const templates = {
 		}
 		return node;
 	},
+	unitNumber: ({number, unit}) => {
+		const lang = navigator.language.substr(0,2);
+		let o = document.createDocumentFragment();
+		o.appendChild(document.createTextNode(parseFloat(number)));
+		if (unit) {
+			let space = document.createTextNode(' ');
+			o.appendChild(space);
+
+			o.appendChild(templates.proxy({
+				query: `
+					SELECT ?innerText WHERE {
+						<${ unit }> wdt:P5061 ?innerText.
+						FILTER(LANG(?innerText) = "${ lang }").
+					}`
+			}));
+		}
+		return o;
+	}
 };
 
 export { templates }
