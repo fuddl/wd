@@ -1,6 +1,5 @@
 import { Breadcrumbs, getParents } from './get-parents.js';
 import { getAutodesc } from './get-autodesc.js';
-import { getFormatterUrls } from './get-formatter-urls.js';
 import { getLink, resolvePlaceholders, resolveIdLinksPlaceholder, resolveBreadcrumbs } from './resolve-placeholders.js';
 import { getRelatedItems } from './get-related-items.js';
 import { getValueByLang, getAliasesByLang } from './get-value-by-lang.js';
@@ -452,6 +451,12 @@ function updateView(id, useCache = true) {
 					moji: './icons/u2BA9u1F4C4uFE0E-articleRedirect.svg',
 					title: 'What links here',
 					desc: 'A list of item that link to this',
+				},
+				{
+					link: 'improve.html?' + id,
+					moji: './icons/u270Eu002B-addStatement.svg',
+					title: 'Improve',
+					desc: 'Automatic suggestions on how to imrove this item',
 				},
 			]));
 

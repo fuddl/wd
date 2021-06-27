@@ -3,8 +3,9 @@ import { getCurrentTab } from '../get-current-tab.js';
 import { getAutodesc } from './get-autodesc.js';
 import { resolvePlaceholders } from './resolve-placeholders.js';
 import { getTokens } from './wd-get-token.js';
-import { findMatchingClass, findConnections, makeReferences } from './ld-map-wd.js';
 import { templates } from './components/templates.tpl.js';
+import { constraintsToStatements } from './constraintsToStatements.js';
+import { ldToStatements } from './ldToStatements.js';
 
 function getPropertyScope(property) {
 	let scopes = {
@@ -21,30 +22,6 @@ function getPropertyScope(property) {
 	}
 	return 'item';
 }
-
-function addConstraintComment(value, constraintId, propId) {
-	let comment = templates.smallBlock(
-		templates.text(
-			[
-				document.createTextNode('Deduced from '),
-				templates.placeholder({
-					entity: constraintId,
-				}),
-				document.createTextNode(' of '),
-				templates.placeholder({
-					entity: propId,
-				}),
-			]
-		)
-	)
-	return [
-		templates.text([
-			value,
-			comment,
-		])
-	];
-}
-
 
 (async () => {
 	let proposals = JSON.parse(decodeURIComponent(window.location.search.replace(/^\?/, '')));
@@ -89,216 +66,11 @@ function addConstraintComment(value, constraintId, propId) {
 	propform.appendChild(preview);
 
 	if (proposals.ld) {
-		let comment = templates.smallBlock(
-			templates.text(
-				[
-					document.createTextNode('Extracted from metadata of '),
-					templates.urlLink(proposals.source.url),
-				]
-			)
-		);
-		for (let d of proposals.ld) {
-			if (d.hasOwnProperty('isNeedle') && d.isNeedle) {
-				let matchingClass = await findMatchingClass(d);
-				if (matchingClass) {
-					counter++;
-					let check = document.createElement('input');
-					check.setAttribute('name', counter);
-					let job = {
-						type: 'set_claim',
-						verb: 'P31',
-						object: {
-							'entity-type': "item",
-							'numeric-id': matchingClass.match(/Q(\d+)/)[1],
-						},
-						references: makeReferences(proposals?.source),
-					}
-					check.setAttribute('type', 'checkbox')
-					check.setAttribute('value', JSON.stringify(job))
-					check.checked = true;
-
-					let instanceOfPreview = templates.remark({
-						check: check,
-						prop: templates.placeholder({
-							entity: 'P31',
-						}),
-						vals: [
-							templates.text([
-								templates.placeholder({
-									entity: matchingClass,
-								}),
-								comment.cloneNode(true),
-							]),
-						],
-					});
-					propform.appendChild(instanceOfPreview);
-				}
-				let connections = await findConnections(d, proposals?.source);
-				for (let connection of connections) {
-					if (connection.jobs) {
-						counter++;
-						let check, label, select;
-
-						if (connection.jobs.length === 1) {
-							check = document.createElement('input');
-							label = templates.placeholder({
-								entity: connection.jobs[0].label,
-							});
-							check.setAttribute('type', 'checkbox');
-							check.setAttribute('name', counter);
-							check.setAttribute('value', JSON.stringify(connection.jobs[0].instructions));
-							check.checked = true;
-						} else {
-							select = document.createElement('select');
-							select.setAttribute('name', counter);
-							let emptyOption = document.createElement('option');
-							select.appendChild(emptyOption);
-							for (let job of connection.jobs) {
-								let option = document.createElement('option');
-								option.innerText = job.label;
-								option.classList.add('placeholder');
-								option.setAttribute('data-entity', job.label);
-								option.setAttribute('data-type', 'option');
-								option.setAttribute('value', JSON.stringify(job.instructions))
-								select.appendChild(option);
-							}
-						}
-						let valuePreview;
-						switch (connection?.value?.type) {
-							case 'WikibaseItem':
-								valuePreview = templates.placeholder({
-									entity: connection.value.value,
-								});
-								break;
-							case 'Monolingualtext':
-								valuePreview = templates.title({text: connection.value.value});
-								break;
-							case 'String':
-								valuePreview = templates.code(connection.value.value);
-								break;
-							case 'Time':
-								valuePreview = templates.time({text: document.createTextNode(connection.value.value)});
-								break;
-							case 'Quantity':
-								valuePreview = templates.unitNumber({
-									number: connection.value.value.amount,
-									unit: connection?.value.value?.unit,
-								});
-								break;
-						}
-						let preview = templates.remark({
-							check: check ? check : document.createTextNode(''),
-							prop: label ? label : select,
-							vals: [
-								templates.text([
-									valuePreview,
-									comment.cloneNode(true),
-								]),
-							],
-						});
-						propform.appendChild(preview);					
-					}
-				}
-			}
-		}
+		await ldToStatements(proposals.ld, propform, proposals.source.url);
 	}
 
 	if(!isMultiple && property[proposals.ids[0][0].prop]?.claims?.P2302) {
-		const contraints = property[proposals.ids[0][0].prop].claims.P2302;
-		for (const contraint of contraints) {
-			const contraintType = contraint.mainsnak.datavalue.value.id;
-			switch (contraintType) {
-				case 'Q21503250':
-					if (contraint?.qualifiers?.P2309[0]?.datavalue?.value?.id === 'Q21503252') {
-						let value = null;
-						let check = null;
-						if(contraint?.qualifiers?.P2308.length > 1) {
-							value = document.createElement('select');
-							value.setAttribute('name', counter);
-							let emptyOption = document.createElement('option');
-							value.appendChild(emptyOption);
-							for (let entity of contraint?.qualifiers?.P2308) {
-								let option = document.createElement('option');
-								option.innerText = entity.datavalue?.value?.id;
-								option.classList.add('placeholder');
-								option.setAttribute('data-entity', entity.datavalue?.value?.id);
-								option.setAttribute('data-type', 'option');
-								value.appendChild(option);
-								let job = {
-									type: 'set_claim',
-									verb: 'P31',
-									object: {
-										'entity-type': "item",
-										'numeric-id': entity.datavalue?.value['numeric-id'],
-									},
-								}
-								option.setAttribute('value', JSON.stringify(job))
-							}
-						} else {
-							check = document.createElement('input');
-							check.setAttribute('type', 'checkbox');
-							check.setAttribute('name', counter);
-							let job = {
-								type: 'set_claim',
-								verb: 'P31',
-								object: {
-									'entity-type': "item",
-									'numeric-id': contraint?.qualifiers?.P2308[0]?.datavalue?.value['numeric-id'],
-								},
-							}
-							check.setAttribute('value', JSON.stringify(job))
-							check.checked = true;
-							value = templates.placeholder({
-								entity: contraint?.qualifiers?.P2308[0]?.datavalue?.value?.id,
-							})
-						}
-						let instanceOfPreview = templates.remark({
-							check: check ? check : null,
-							prop: templates.placeholder({
-								entity: 'P31',
-							}),
-							vals: addConstraintComment(value, contraintType, proposals.ids[0][0].prop),
-						});
-
-						propform.appendChild(instanceOfPreview);
-					}
-					break;
-				case 'Q21503247':
-					if (contraint?.qualifiers?.P2305) {
-						let check = document.createElement('input');
-						check.setAttribute('type', 'checkbox');
-						check.setAttribute('name', counter);
-						check.checked = true;
-
-						let job = {
-							type: 'set_claim',
-							verb: contraint?.qualifiers?.P2306[0]?.datavalue?.value?.id,
-							object: {
-								'entity-type': "item",
-								'numeric-id': contraint?.qualifiers?.P2305[0]?.datavalue?.value['numeric-id'],
-							},
-						}
-
-						check.setAttribute('value', JSON.stringify(job))
-
-						let value = templates.placeholder({
-							entity: contraint?.qualifiers?.P2305[0]?.datavalue?.value?.id,
-						});
-
-						let requiredStatementPreview = templates.remark({
-							check: check,
-							prop: templates.placeholder({
-								entity: contraint?.qualifiers?.P2306[0]?.datavalue?.value?.id,
-							}),
-							vals: addConstraintComment(value, contraintType, proposals.ids[0][0].prop)
-						});
-
-						propform.appendChild(requiredStatementPreview);
-					}
-					break;
-			}
-			counter++;
-		}
+		constraintsToStatements(proposals.ids[0][0].prop, property[proposals.ids[0][0].prop].claims.P2302, propform)
 	}
 
 

@@ -64,6 +64,7 @@ function durationToQuantity(data) {
 function makeTypeAbsolute(data) {
 	if (data.hasOwnProperty('@type')) {
 		let type = data['@type'];
+		console.debug(data['@type'])
 		if (data['@type'].match(/^https?:\/\/./)) {
 			// seems to be a full url so its fine
 			return data;

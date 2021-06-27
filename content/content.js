@@ -8,7 +8,7 @@ import { findLinkedData, enrichLinkedData } from './content__collect-ld.js';
 
 async function findApplicables(location, openInSidebar = true) {
 	let applicables = [];
-	let linkedData = findLinkedData()
+	let linkedData = findLinkedData(document)
 
 	let foundMatch = false;
 	for (let id of Object.keys(resolvers)) {

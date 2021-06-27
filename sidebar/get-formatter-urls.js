@@ -1,6 +1,6 @@
 import { sparqlQuery } from '../sqarql-query.js';
 
-async function getFormatterUrls(prop) {
+async function getFormatterUrls(prop, id) {
 	const query = `
 		SELECT ?form ?exp WHERE {
 			{
@@ -18,7 +18,28 @@ async function getFormatterUrls(prop) {
 			}
 		}
 	`;
-	return await sparqlQuery(query);
+	const patterns = await sparqlQuery(query);
+	if (!id) {
+		return patterns;
+	} else {
+		let output = [];
+		for (let template of patterns) {
+			if (template.exp) {
+				let regex = new RegExp(template.exp.value);
+				let match = id.match(regex);
+				if (match !== null) {
+					if (match.length > 1) {
+						output.push(id.replace(regex, template.form.value));
+					} else {
+						output.push(template.form.value.replace('$1', id));
+					}
+				}
+			} else {
+				output.push(template.form.value.replace('$1', id));
+			}
+		}
+		return output;
+	}
 } 
 
 export { getFormatterUrls }

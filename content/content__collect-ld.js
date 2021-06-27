@@ -66,7 +66,7 @@ async function enrichLinkedData(snippeds, ids) {
 
 }
 
-function findLinkedData() {
+function findLinkedData(document) {
 	const snippeds = document.querySelectorAll('script[type="application/ld+json"]');
 
 	if (snippeds.length < 1) {

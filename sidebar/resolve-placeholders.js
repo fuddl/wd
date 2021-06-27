@@ -17,60 +17,7 @@ function getLink(entityId) {
 }
 
 function resolvePlaceholders(scope) {
-	scope = scope ? scope : document;
-	let placeholders = scope.querySelectorAll('.placeholder[data-entity]');
 
-	Array.from(placeholders).reduce((k, placeholder) => {
-		(async () => {
-			let id = placeholder.getAttribute('data-entity');
-			let entity = await wikidataGetEntity(id);
-			let type = placeholder.getAttribute('data-type');
-			let link = document.createElement(type ? type : 'a');
-			link.setAttribute('href', getLink(id));
-			if (entity[id].labels || entity[id].descriptions) {
-				link.setAttribute('title', getValueByLang(entity[id], 'descriptions'));
-				link.innerText = getValueByLang(entity[id], 'labels', id);
-			} else if (entity[id].lemmas) {
-				let labels = [];
-				for (let lang in entity[id].lemmas) {
-					labels.push(entity[id].lemmas[lang].value)
-				}
-				link.innerText = labels.join(' ‧ ');
-			} else if (entity[id].representations){
-				let labels = [];
-				for (let lang in entity[id].representations) {
-					labels.push(entity[id].representations[lang].value)
-				}
-				link.innerText = labels.join(' ‧ ');
-			} else if (entity[id].glosses) {
-				let baseEntityId = id.replace(/-.+/, '');
-				let baseEntity = await wikidataGetEntity(baseEntityId);
-				let labels = [];
-				for (let lang in baseEntity[baseEntityId].lemmas) {
-					labels.push(baseEntity[baseEntityId].lemmas[lang].value)
-				}
-				link.innerText = labels.join(' ‧ ');
-				let gloss = document.createElement('small');
-				gloss.innerText = getValueByLang(entity[id], 'glosses', id);
-				gloss.style.display = 'block';
-				link.style.display = 'inline-block';
-				link.appendChild(gloss);
-			}
-			if (link.tagName === 'A') {
-				link.addEventListener('click', (e) => {
-					e.preventDefault();
-					window.location = 'entity.html?' + id;
-				});
-			}
-			let value = placeholder.getAttribute('value');
-			if (value) {
-				link.setAttribute('value', placeholder.getAttribute('value'));
-			}
-			if (placeholder.parentNode) {
-				placeholder.parentNode.replaceChild(link, placeholder);
-			}
-		})();
-	}, 0);
 }
 
 function resolveBreadcrumbs(cache) {
