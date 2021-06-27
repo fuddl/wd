@@ -22,7 +22,7 @@ async function processJobs(jobs) {
 
 		} else if (job.type === 'set_claim') {
 			
-			let extistingStatement = await getExistingStatement('Q' + job.object['numeric-id'], job.verb, job.subject);
+			let extistingStatement = await getExistingStatement(job.object, job.verb, job.subject);
 			let subject = job.subject !== 'LAST' ? job.subject : lastCreated.id;
 
 			if (!extistingStatement) {
@@ -175,12 +175,31 @@ async function addQualifier(claimId, qualifier) {
 }
 
 async function getExistingStatement(object, verb, subject) {
-	let answer = await sparqlQuery(`
-		SELECT ?stmt WHERE {
-			wd:${subject} p:${verb} ?stmt.
-			?stmt ps:${verb} wd:${object}.
-		}
-	`);
+	let query;
+	if (object.hasOwnProperty('numeric-id')) {
+		query = `
+			SELECT ?stmt WHERE {
+				wd:${subject} p:${verb} ?stmt.
+				?stmt ps:${verb} wd:Q${object['numeric-id']}.
+			}
+		`
+	} else if (object.hasOwnProperty('language') && object.hasOwnProperty('text')) {
+		query = `
+			SELECT ?stmt WHERE {
+				wd:${subject} p:${verb} ?stmt.
+				?stmt ps:${verb} "${object.text}"@${object.language}.
+			}
+		`
+	}	else if (typeof object === 'string') {
+		query = `
+			SELECT ?stmt WHERE {
+				wd:${subject} p:${verb} ?stmt.
+				?stmt ps:${verb} "${object}".
+			}
+		`
+	}
+
+	let answer = await sparqlQuery(query);
 	if (answer[0]) {
 		let output = answer[0].stmt.value.replace("http://www.wikidata.org/entity/statement/", '').replace(/\-/, '$');
 		return output;
