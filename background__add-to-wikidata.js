@@ -197,6 +197,9 @@ async function getExistingStatement(object, verb, subject) {
 				?stmt ps:${verb} "${object}".
 			}
 		`
+	} else {
+		// existence check not yet supported for other types
+		return false;
 	}
 
 	let answer = await sparqlQuery(query);
