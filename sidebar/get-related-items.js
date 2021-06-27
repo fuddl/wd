@@ -1,3 +1,5 @@
+import { sparqlQuery } from '../sqarql-query.js';
+
 async function getRelatedItems(item) {
 	let query = `
 		SELECT ?prop ?item

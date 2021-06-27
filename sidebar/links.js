@@ -1,3 +1,7 @@
+import { getRelatedItems } from './get-related-items.js';
+import { templates } from './components/templates.tpl.js';
+import { resolvePlaceholders } from './resolve-placeholders.js';
+
 if (window.location.search) {
 	let currentEntity = window.location.search.match(/^\?(\w\d+)/, '')[1];
 	if (currentEntity.match(/[QMPL]\d+/)) {
