@@ -66,15 +66,12 @@ function getPropertyScope(property) {
 	propform.appendChild(preview);
 
 	if (proposals.ld) {
-		await ldToStatements(proposals.ld, propform, proposals.source.url);
+		await ldToStatements(proposals.ld, propform, proposals.source);
 	}
 
 	if(!isMultiple && property[proposals.ids[0][0].prop]?.claims?.P2302) {
 		constraintsToStatements(proposals.ids[0][0].prop, property[proposals.ids[0][0].prop].claims.P2302, propform)
 	}
-
-
-	resolvePlaceholders();
 
 	let labelField = templates.join({
 		human: proposals.titles[0],

@@ -1,6 +1,13 @@
 import { templates } from './components/templates.tpl.js';
 import { findMatchingClass, findConnections, makeReferences } from './ld-map-wd.js';
 
+function uuidv4() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
+
 async function ldToStatements(ld, propform, source) {
 
 	let comment = templates.smallBlock(
@@ -16,9 +23,8 @@ async function ldToStatements(ld, propform, source) {
 		if (d.hasOwnProperty('isNeedle') && d.isNeedle) {
 			let matchingClass = await findMatchingClass(d);
 			if (matchingClass) {
-				counter++;
 				let check = document.createElement('input');
-				check.setAttribute('name', counter);
+				check.setAttribute('name', uuidv4());
 				let job = {
 					type: 'set_claim',
 					verb: 'P31',
@@ -51,7 +57,6 @@ async function ldToStatements(ld, propform, source) {
 			let connections = await findConnections(d, source);
 			for (let connection of connections) {
 				if (connection.jobs) {
-					counter++;
 					let check, label, select;
 
 					if (connection.jobs.length === 1) {
@@ -60,21 +65,22 @@ async function ldToStatements(ld, propform, source) {
 							entity: connection.jobs[0].label,
 						});
 						check.setAttribute('type', 'checkbox');
-						check.setAttribute('name', counter);
+						check.setAttribute('name', uuidv4());
 						check.setAttribute('value', JSON.stringify(connection.jobs[0].instructions));
 						check.checked = true;
 					} else {
 						select = document.createElement('select');
-						select.setAttribute('name', counter);
+						select.setAttribute('name', uuidv4());
 						let emptyOption = document.createElement('option');
 						select.appendChild(emptyOption);
 						for (let job of connection.jobs) {
-							let option = document.createElement('option');
-							option.innerText = job.label;
-							option.classList.add('placeholder');
-							option.setAttribute('data-entity', job.label);
-							option.setAttribute('data-type', 'option');
-							option.setAttribute('value', JSON.stringify(job.instructions))
+							let option = templates.placeholder({
+								tag: 'option',
+								entity: job.label,
+								type: 'option',
+							});
+							option.setAttribute('value', JSON.stringify(job.instructions));
+
 							select.appendChild(option);
 						}
 					}

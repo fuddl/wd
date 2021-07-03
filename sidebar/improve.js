@@ -10,6 +10,8 @@ content.appendChild(propform);
 
 const parser = new DOMParser();
 
+let visitedUrls = [];
+
 if (window.location.search) {
 	let currentEntity = window.location.search.match(/^\?(\w\d+)/, '')[1];
 	if (currentEntity.match(/[QMPL]\d+/)) {
@@ -18,22 +20,34 @@ if (window.location.search) {
 			for (let id of Object.keys(entities)) {
 				let entity = entities[id];
 				for(let claim in entity.claims) {
-					if (entity.claims[claim][0].mainsnak?.datatype === 'external-id') {
+					if (entity.claims[claim][0].mainsnak?.datatype === 'external-id' && entity?.claims[claim][0].mainsnak?.datavalue?.value) {
 						let urls = await getFormatterUrls(claim, entity.claims[claim][0].mainsnak.datavalue.value);
 						for (let url of urls) {
-							let result = await fetch(url);
-							let text = await result.text();
-							if (text) {
-								const doc = parser.parseFromString(text, "text/html");
-								const ld = findLinkedData(doc);
-								if (ld) {
-									let enriched = await enrichLinkedData(ld, claim, doc);
-									await ldToStatements(enriched, propform, {
-										url: url,
-										title: 'foo',
-										lang: 'en',
-									});
+							try {
+								let result = await fetch(url);
+								let sourceUrl = result.url;
+								let text = await result.text();
+								if (text) {
+									const doc = parser.parseFromString(text, "text/html");
+									let canonical = doc.querySelector('link[rel="canonical"][href]');
+									if (canonical) {
+										sourceUrl = canonical.getAttribute('href');
+									}
+									if (!visitedUrls.includes(sourceUrl)) {
+										visitedUrls.push(sourceUrl);
+										const ld = findLinkedData(doc);
+										if (ld) {
+											let enriched = await enrichLinkedData(ld, claim, doc);
+											await ldToStatements(enriched, propform, {
+												url: sourceUrl,
+												title: 'foo',
+												lang: 'en',
+											});
+										}
+									}
 								}
+							} catch (error) {
+							  console.error(`Something went wrong fetching ${url}`);
 							}
 						}
 					}
@@ -45,4 +59,36 @@ if (window.location.search) {
 			}
 		})()
 	}
+
+	let form = document.createElement('div');
+	form.classList.add('submit-actions');
+	content.appendChild(form);
+
+	let saveButton = document.createElement('button');
+	form.appendChild(saveButton);
+	saveButton.innerText = 'Send to Wikidata';
+	
+	saveButton.addEventListener('click', async function() {
+		let jobs = [];
+		const formData = new FormData(propform)
+		for (let pair of formData.entries()) {
+			console.debug(pair)
+			if (pair[1] != '') {
+			 	let job = JSON.parse(pair[1]);
+			 	if (!job.subject) {
+			 		job.subject = currentEntity;
+			 	}
+			 	jobs.push(job);
+			}
+		}
+
+		browser.runtime.sendMessage({
+			type: 'send_to_wikidata',
+			data: jobs,
+		});
+
+		browser.runtime.sendMessage({
+			type: 'wait',
+		});
+	});
 }

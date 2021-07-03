@@ -64,21 +64,22 @@ function durationToQuantity(data) {
 function makeTypeAbsolute(data) {
 	if (data.hasOwnProperty('@type')) {
 		let type = data['@type'];
-		console.debug(data['@type'])
-		if (data['@type'].match(/^https?:\/\/./)) {
-			// seems to be a full url so its fine
-			return data;
-		} else {
-			// data seems to be mission context
-			if (data.hasOwnProperty('@context')) {
-				// so lets apply context
-				data['@type'] = `${data['@context']}/${data['@type']}`;
+		if (typeof data['@type'] === 'string' ) {
+			if (data['@type'].match(/^https?:\/\/./)) {
+				// seems to be a full url so its fine
+				return data;
 			} else {
-				// there is no context and the type has a relative url.
-				// lets assume schema.org is used.
-				data['@type'] = `https://schema.org/${data['@type']}`;
+				// data seems to be mission context
+				if (data.hasOwnProperty('@context')) {
+					// so lets apply context
+					data['@type'] = `${data['@context']}/${data['@type']}`;
+				} else {
+					// there is no context and the type has a relative url.
+					// lets assume schema.org is used.
+					data['@type'] = `https://schema.org/${data['@type']}`;
+				}
+				return data;
 			}
-			return data;
 		}
 	}
 }
@@ -216,6 +217,9 @@ async function findMatchingClass(data) {
 		return false;
 	} else {
 		data = makeTypeAbsolute(data);
+		if (!data) {
+			return false;
+		}
 		let query = `
 			SELECT ?item WHERE {
 				{
