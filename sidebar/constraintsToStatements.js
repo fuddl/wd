@@ -50,7 +50,7 @@ function constraintsToStatements(prop, contraints, propform, classes) {
 					}
 
 					if(contraint?.qualifiers?.P2308.length > 1) {
-						
+
 						value = document.createElement('select');
 						value.setAttribute('name', prop + 'Q21503250');
 						let emptyOption = document.createElement('option');
@@ -91,6 +91,7 @@ function constraintsToStatements(prop, contraints, propform, classes) {
 						})
 					}
 					let instanceOfPreview = templates.remark({
+						sortKey: 'P31',
 						check: check ? check : null,
 						prop: templates.placeholder({
 							entity: 'P31',
@@ -107,10 +108,11 @@ function constraintsToStatements(prop, contraints, propform, classes) {
 					check.setAttribute('type', 'checkbox');
 					check.setAttribute('name', prop + 'Q21503247');
 					check.checked = true;
+					const verb = contraint?.qualifiers?.P2306[0]?.datavalue?.value?.id;
 
 					let job = {
 						type: 'set_claim',
-						verb: contraint?.qualifiers?.P2306[0]?.datavalue?.value?.id,
+						verb: verb,
 						object: {
 							'entity-type': "item",
 							'numeric-id': contraint?.qualifiers?.P2305[0]?.datavalue?.value['numeric-id'],
@@ -124,6 +126,7 @@ function constraintsToStatements(prop, contraints, propform, classes) {
 					});
 
 					let requiredStatementPreview = templates.remark({
+						sortKey: verb,
 						check: check,
 						prop: templates.placeholder({
 							entity: contraint?.qualifiers?.P2306[0]?.datavalue?.value?.id,

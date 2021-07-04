@@ -39,6 +39,7 @@ async function ldToStatements(ld, propform, source) {
 				check.checked = true;
 
 				let instanceOfPreview = templates.remark({
+					sortKey: 'P31',
 					check: check,
 					prop: templates.placeholder({
 						entity: 'P31',
@@ -107,7 +108,9 @@ async function ldToStatements(ld, propform, source) {
 							});
 							break;
 					}
+
 					let preview = templates.remark({
+						sortKey: connection.prop.join(),
 						check: check ? check : document.createTextNode(''),
 						prop: label ? label : select,
 						vals: [

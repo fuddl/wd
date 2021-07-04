@@ -10,12 +10,22 @@ import { sparqlQuery } from "../sqarql-query.js"
 
 let content = document.getElementById('content');
 let propform = document.createElement('form');
+
 content.appendChild(propform);
+let numberOfProposals = 0;
+const observer = new MutationObserver((change) => {
+	if (numberOfProposals < propform.children.length) {
+		[...propform.children]
+		  .sort((a,b) => a.getAttribute('data-sortkey') > b.getAttribute('data-sortkey') ? 1 : -1)
+		  .forEach(node => propform.appendChild(node));
+		 numberOfProposals = propform.children.length;
+	}
+});
+observer.observe(propform, {childList: true});
 
 const parser = new DOMParser();
 
 let visitedUrls = [];
-
 
 async function getAllClasses(instance) {
 	const query = `

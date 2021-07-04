@@ -9,6 +9,9 @@ const remark = (vars) => {
 	if (vars.id) {
 		dl.setAttribute('id', vars.id);
 	}
+	if (vars.sortKey) {
+		dl.setAttribute('data-sortkey', vars.sortKey);
+	}
 
 	let dt = document.createElement('dt');
 	dt.classList.add('remark__verb');
