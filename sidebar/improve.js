@@ -6,6 +6,7 @@ import { findLinkedData, enrichLinkedData } from '../content/content__collect-ld
 import { ldToStatements } from './ldToStatements.js';
 import { getElementLanguage } from '../content/content__collect-strings.js';
 import { makeLanguageValid } from '../get-valid-string-languages.js';
+import { sparqlQuery } from "../sqarql-query.js"
 
 let content = document.getElementById('content');
 let propform = document.createElement('form');
@@ -15,6 +16,27 @@ const parser = new DOMParser();
 
 let visitedUrls = [];
 
+
+async function getAllClasses(instance) {
+	const query = `
+	SELECT ?c WHERE {
+	  { wd:${instance} wdt:P31 ?class. }
+	  UNION
+	  { 
+	    wd:${instance} wdt:P31 ?childClass.
+	    ?childClass wdt:P279* ?class.
+	  }
+		BIND (replace(str(?class), 'http://www.wikidata.org/entity/', '') AS ?c)
+	}
+	`
+	let classes = await sparqlQuery(query);
+	let output = [];
+	for(let cl of classes) {
+		output.push(cl.c.value);
+	}
+	return output;
+}
+
 if (window.location.search) {
 	let currentEntity = window.location.search.match(/^\?(\w\d+)/, '')[1];
 	if (currentEntity.match(/[QMPL]\d+/)) {
@@ -23,6 +45,7 @@ if (window.location.search) {
 			const entities = await wikidataGetEntity(currentEntity, false);
 			for (let id of Object.keys(entities)) {
 				let entity = entities[id];
+				let classes = await getAllClasses(id);
 				for(let claim in entity.claims) {
 					if (entity.claims[claim][0].mainsnak?.datatype === 'external-id' && entity?.claims[claim][0].mainsnak?.datavalue?.value) {
 						let urls = await getFormatterUrls(claim, entity.claims[claim][0].mainsnak.datavalue.value);
@@ -60,7 +83,7 @@ if (window.location.search) {
 					}
 					const property = await wikidataGetEntity(claim, false);
 					if (property[claim].claims?.P2302) {
-						constraintsToStatements(claim, property[claim].claims.P2302, propform)
+						constraintsToStatements(claim, property[claim].claims.P2302, propform, classes);
 					}
 				}
 			}
