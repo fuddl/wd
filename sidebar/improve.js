@@ -1,8 +1,11 @@
 import { wikidataGetEntity } from '../wd-get-entity.js';
 import { constraintsToStatements } from './constraintsToStatements.js';
 import { getFormatterUrls } from './get-formatter-urls.js';
+import { getCurrentTab } from '../get-current-tab.js';
 import { findLinkedData, enrichLinkedData } from '../content/content__collect-ld.js';
 import { ldToStatements } from './ldToStatements.js';
+import { getElementLanguage } from '../content/content__collect-strings.js';
+import { makeLanguageValid } from '../get-valid-string-languages.js';
 
 let content = document.getElementById('content');
 let propform = document.createElement('form');
@@ -16,6 +19,7 @@ if (window.location.search) {
 	let currentEntity = window.location.search.match(/^\?(\w\d+)/, '')[1];
 	if (currentEntity.match(/[QMPL]\d+/)) {
 		( async()=> {
+
 			const entities = await wikidataGetEntity(currentEntity, false);
 			for (let id of Object.keys(entities)) {
 				let entity = entities[id];
@@ -38,10 +42,13 @@ if (window.location.search) {
 										const ld = findLinkedData(doc);
 										if (ld) {
 											let enriched = await enrichLinkedData(ld, claim, doc);
+											let title = doc.querySelector('title');
+											let root = doc.querySelector('html');
+											let rootLang = root.hasAttribute('lang') ? root.getAttribute('lang') : '';
 											await ldToStatements(enriched, propform, {
 												url: sourceUrl,
-												title: 'foo',
-												lang: 'en',
+												title: title ? title.innerText.trim() : null,
+												lang: await makeLanguageValid(rootLang),
 											});
 										}
 									}
@@ -69,10 +76,10 @@ if (window.location.search) {
 	saveButton.innerText = 'Send to Wikidata';
 	
 	saveButton.addEventListener('click', async function() {
+		let currentTab = await getCurrentTab();
 		let jobs = [];
 		const formData = new FormData(propform)
 		for (let pair of formData.entries()) {
-			console.debug(pair)
 			if (pair[1] != '') {
 			 	let job = JSON.parse(pair[1]);
 			 	if (!job.subject) {
@@ -89,6 +96,7 @@ if (window.location.search) {
 
 		browser.runtime.sendMessage({
 			type: 'wait',
+			tid: currentTab,
 		});
 	});
 }

@@ -243,14 +243,15 @@ async function findMatchingProp(prop, type, namespace) {
 	let query = `
 		SELECT DISTINCT ?prop WHERE {
 			{
-				?item wdt:P1628 <${ namespace }/${ prop }>.
+				?item p:P1628/ps:P1628 <${ namespace.replace(/^https\:/, 'http:') }/${ prop }>.
 			} UNION {
-				?item wdt:P1628 <${ namespace.replace(/^http\:/, 'https:') }/${ prop }>.
+				?item p:P1628/ps:P1628 <${ namespace.replace(/^http\:/, 'https:') }/${ prop }>.
 			}
 			?item wikibase:propertyType wikibase:${type}.
-
+		  ?item p:P1628 [ wikibase:rank ?rank ]. 
 			BIND (replace(str(?item), 'http://www.wikidata.org/entity/', '') AS ?prop)
-		}
+		  BIND (IF(?rank = wikibase:PreferredRank, 1, IF(?rank = wikibase:NormalRank, 2, 3)) as ?order) 
+		} ORDER BY ?order
 	`;
 	let result = await sparqlQuery(query);
 	if (result.length > 0) {

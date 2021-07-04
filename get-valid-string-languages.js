@@ -6,6 +6,7 @@ async function getValidStringLanguages() {
 }
 
 async function makeLanguageValid(invalidLang) {
+
 	// all valid languages seem to be lowercased
 	invalidLang = invalidLang.toLowerCase();
 	let validLangs = await getValidStringLanguages();

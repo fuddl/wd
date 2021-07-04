@@ -32,7 +32,7 @@ function getPropertyScope(property) {
 	let propform = document.createElement('form');
 	content.appendChild(propform);
 
-	let currentTab = await getCurrentTab()
+	let currentTab = await getCurrentTab();
 	let propPreview;
 
 	if (!isMultiple) {
