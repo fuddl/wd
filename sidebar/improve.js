@@ -8,6 +8,7 @@ import { getElementLanguage } from '../content/content__collect-strings.js';
 import { makeLanguageValid } from '../get-valid-string-languages.js';
 import { sparqlQuery } from "../sqarql-query.js"
 
+
 let content = document.getElementById('content');
 let propform = document.createElement('form');
 

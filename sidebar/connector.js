@@ -42,12 +42,13 @@ function getPropertyScope(property) {
 	} else {
 		propPreview = document.createElement('select');
 		for (let prop of proposals.ids[0][0].prop) {
-			let option = document.createElement('option');
-			option.innerText = prop;
-			option.classList.add('placeholder');
-			option.setAttribute('data-entity', prop);
+			let option = templates.placeholder({
+				tag: 'option',
+				entity: prop,
+				type: 'option',
+			});
 			option.setAttribute('value', prop);
-			option.setAttribute('data-type', 'option');
+
 			propPreview.appendChild(option);
 		}
 		propPreview.addEventListener('change', function(event) {

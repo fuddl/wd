@@ -35,10 +35,10 @@ function durationToQuantity(data) {
 	}
 	if (s) {
 		if (m) {
-			s =+ m * 60;
+			s = s + m * 60;
 		}
 		if (h) {
-			s =+ h * 3600;
+			s = s + h * 3600;
 		}
 		return {
 			amount: `+${s}`,
@@ -46,7 +46,7 @@ function durationToQuantity(data) {
 		};
 	} else if (m) {
 		if (h) {
-			m =+ h * 60;
+			m = m + h * 60;
 		}
 		return {
 			amount: `+${m}`,
