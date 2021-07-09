@@ -10,7 +10,6 @@ import { wikidataGetEditToken, getTokens } from './wd-get-token.js';
 import { wikidataGetEntity } from '../wd-get-entity.js';
 import { ApplyFormatters } from './formatters.js';
 
-
 const lang = navigator.language.substr(0,2);
 const footnoteStorage = {};
 let refCounter = {};
@@ -454,7 +453,7 @@ function updateView(id, useCache = true) {
 				},
 				{
 					link: 'improve.html?' + id,
-					moji: './icons/u270Eu002B-addStatement.svg',
+					moji: './icons/u2728-specialPages.svg',
 					title: 'Improve',
 					desc: 'Automatic suggestions on how to imrove this item',
 				},

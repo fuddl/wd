@@ -3,6 +3,7 @@ import { getCurrentTab } from '../get-current-tab.js';
 import { getValueByLang, getAliasesByLang } from './get-value-by-lang.js';
 import { templates } from './components/templates.tpl.js';
 import { sparqlQuery } from '../sqarql-query.js';
+import { updateStatusInternal } from "../update-status.js"
 
 const itemTypes = [
 	"wikibase-item",
@@ -31,6 +32,17 @@ async function askIfStatementExists(subject, verb, object) {
 	}
 }
 
+let bouncer = templates.bouncer();
+let bouncerCleared = false;
+document.body.appendChild(bouncer);
+
+function clearBouncer() {
+	if (!bouncerCleared) {
+		bouncerCleared = true;
+		document.body.removeChild(bouncer);
+	}
+}
+
 let currentEntity = window.location.search.match(/^\?(\w\d+)/, '')[1];
 
 browser.runtime.sendMessage({
@@ -40,6 +52,11 @@ browser.runtime.sendMessage({
 let content = document.getElementById('content');
 content.innerHTML = '';
 (async () => {
+
+
+	updateStatusInternal([
+		'Searching this website for links that can be correlated to wikidata…',
+	]);
 	let entities = await wikidataGetEntity(currentEntity);
 	let e = entities[currentEntity];
 	let currentTab = await getCurrentTab();
@@ -91,6 +108,7 @@ content.innerHTML = '';
 
 	browser.runtime.onMessage.addListener(async (data, sender) => {
 		if (data.type === 'entity_add') {
+			clearBouncer();
 			if (!receivedEntities.includes(data.id)) {
 				receivedEntities.push(data.id);
 				
@@ -107,6 +125,7 @@ content.innerHTML = '';
 		}
 
 		if (data.type === 'use_in_statement') {
+			clearBouncer();
 			let target = {};
 			if (data.dataype === 'wikibase-item') {
 				target = propPicker.element.querySelector(`[data-entity="${ data.wdEntityId }"]`);

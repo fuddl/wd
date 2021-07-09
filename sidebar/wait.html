@@ -5,55 +5,10 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<link rel="stylesheet" href="base.css"/>
 		<link rel="icon" type="image/svg+xml" href="../icons/wd.svg">
-		<style type="text/css">
-
-			.bouncer {
-				position: absolute;
-				left: 50%;
-				top:	50%;
-				white-space: nowrap;
-				transform: translate(-50%,-50%);
-			}
-			.bouncer > .bouncer-bounce,
-			.bouncer:before,
-			.bouncer:after {
-				content: '';
-				background-color: #72777d;
-				display: block;
-				display:	inline-block;
-				width: 12px;
-				height: 12px;
-				border-radius: 100%;
-				animation: bounce 1600ms ease-in-out -160ms infinite both
-			}
-			.bouncer:before {
-				margin-right: 4px;
-				animation-delay: -330ms
-			}
-			.bouncer:after {
-				margin-left: 4px;
-				animation-delay: 0s
-			}
-
-			@keyframes bounce {
-				0%,
-				50%,
-				100% {
-					transform: scale(.625)
-				}
-				20% {
-					opacity: .87;
-					transform: scale(1)
-				}
-			}
-
-		</style>
 		<title>Please wait…</title>
 		<link rel="license" href="https: //www.wikidata.org/wiki/Wikidata: Copyright"/>
 	</head>
 <body>
-	<div class="bouncer"><div class="bouncer-bounce"></div></div>
+	<script src="wait.js" type="module"></script>
 </body>
 </html>
-
-

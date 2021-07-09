@@ -1,4 +1,5 @@
 import { templates } from './components/templates.tpl.js';
+import { updateStatusInternal } from "../update-status.js"
 
 function addConstraintComment(value, constraintId, propId) {
 	let comment = templates.smallBlock(

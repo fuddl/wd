@@ -3,8 +3,31 @@ import { getTokens } from './sidebar/wd-get-token.js';
 import { wikidataGetEntity } from './wd-get-entity.js';
 import { resolvers } from './content/resolver.js';
 import { pushEnitiyToSidebar } from "./push-enitiy-to-sidebar.js"
+import { updateStatus } from "./update-status.js"
 
-async function processJobs(jobs) {
+function groupJobs(jobs) {
+	let groupedJobs = {};
+	for (let job of jobs) {
+		let jobWithoutReferences = { ...job, references: null };
+		job.serialised = JSON.stringify(jobWithoutReferences);
+	}
+	for (let job of jobs) {
+		if (groupedJobs.hasOwnProperty(job.serialised)) {
+			groupedJobs[job.serialised].references.push(job.references);
+		} else {
+			groupedJobs[job.serialised] = job;
+		}
+	}
+	for (let key in groupedJobs) {
+		delete groupedJobs[key].serialised;
+	}
+
+	return Object.values(groupedJobs);
+}
+
+async function processJobs(jobsUngrouped) {
+	let jobs = groupJobs(jobsUngrouped);
+
 	let lastCreated = null;
 	let lastEdit = null;
 	let answer = null;
@@ -26,6 +49,10 @@ async function processJobs(jobs) {
 			let subject = job.subject !== 'LAST' ? job.subject : lastCreated.id;
 
 			if (!extistingStatement) {
+				updateStatus([
+					'Setting statement ', {placeholder:{entity:job.verb}},' of ', {placeholder:{entity:subject}},
+				]);
+
 				answer = await setClaim(subject, job.verb, job.object);
 			} else {
 				answer = {
@@ -37,11 +64,17 @@ async function processJobs(jobs) {
 			}
 			
 			if (job?.references && answer.success && answer.success == 1) {
+				updateStatus([
+					'Adding references to statement ', {placeholder:{entity:job.verb}},' of ', {placeholder:{entity:subject}},
+				]);
 				for (let reference of job.references) {
 					refAnswer = await addReference(answer.claim.id, reference);
 				}
 			}
 			if (job?.qualifiers && answer.success && answer.success == 1) {
+				updateStatus([
+					'Adding qualifiers to statement ', {placeholder:{entity:job.verb}},' of ', {placeholder:{entity:subject}},
+				]);
 				for (let qualifier of job.qualifiers) {
 					qualAnswer = await addQualifier(answer.claim.id, qualifier);
 				}
@@ -57,6 +90,7 @@ async function processJobs(jobs) {
 		lastEdit = lastCreated;
 	}
 
+	console.debug(JSON.stringify(lastEdit));
 	if (lastEdit) {
 		if (lastEdit.job.fromTab) {
 			pushEnitiyToSidebar(lastEdit.id, lastEdit.job.fromTab, true, true);
@@ -91,6 +125,7 @@ async function createEntity(label, lang) {
 	data.append('token', token);
 	data.append('bot', '1');
 	data.append('format', "json");
+
 
 	let response = await fetch('https://www.wikidata.org/w/api.php', {
 		method: 'post',

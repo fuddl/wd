@@ -7,7 +7,8 @@ import { ldToStatements } from './ldToStatements.js';
 import { getElementLanguage } from '../content/content__collect-strings.js';
 import { makeLanguageValid } from '../get-valid-string-languages.js';
 import { sparqlQuery } from "../sqarql-query.js"
-
+import { templates } from "./components/templates.tpl.js"
+import { updateStatusInternal } from "../update-status.js"
 
 let content = document.getElementById('content');
 let propform = document.createElement('form');
@@ -48,10 +49,14 @@ async function getAllClasses(instance) {
 	return output;
 }
 
+let bouncer = templates.bouncer();
+
 if (window.location.search) {
 	let currentEntity = window.location.search.match(/^\?(\w\d+)/, '')[1];
 	if (currentEntity.match(/[QMPL]\d+/)) {
 		( async()=> {
+
+			document.body.appendChild(bouncer)
 
 			const entities = await wikidataGetEntity(currentEntity, false);
 			for (let id of Object.keys(entities)) {
@@ -61,6 +66,11 @@ if (window.location.search) {
 					if (entity.claims[claim][0].mainsnak?.datatype === 'external-id' && entity?.claims[claim][0].mainsnak?.datavalue?.value) {
 						let urls = await getFormatterUrls(claim, entity.claims[claim][0].mainsnak.datavalue.value);
 						for (let url of urls) {
+							updateStatusInternal([
+								'Searching ',
+								{urlLink: url},
+								' for useful Metadata…',
+							]);
 							try {
 								let result = await fetch(url);
 								let sourceUrl = result.url;
@@ -71,10 +81,16 @@ if (window.location.search) {
 									if (canonical) {
 										sourceUrl = canonical.getAttribute('href');
 									}
+
 									if (!visitedUrls.includes(sourceUrl)) {
 										visitedUrls.push(sourceUrl);
 										const ld = findLinkedData(doc);
 										if (ld) {
+											updateStatusInternal([
+												'Found metadata in ',
+													{urlLink: url},
+												'!',
+											]);
 											let enriched = await enrichLinkedData(ld, claim, doc);
 											let title = doc.querySelector('title');
 											let root = doc.querySelector('html');
@@ -94,9 +110,14 @@ if (window.location.search) {
 					}
 					const property = await wikidataGetEntity(claim, false);
 					if (property[claim].claims?.P2302) {
+						updateStatusInternal([
+							'Checking constraints for ',
+							{placeholder: {entity: claim}},
+						]);
 						constraintsToStatements(claim, property[claim].claims.P2302, propform, classes);
 					}
 				}
+				document.body.removeChild(bouncer);
 			}
 		})()
 	}
@@ -118,6 +139,7 @@ if (window.location.search) {
 			 	let job = JSON.parse(pair[1]);
 			 	if (!job.subject) {
 			 		job.subject = currentEntity;
+			 		job.fromTab = currentTab;
 			 	}
 			 	jobs.push(job);
 			}

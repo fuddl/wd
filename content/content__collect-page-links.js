@@ -1,5 +1,6 @@
 import { displayMetadata } from './content__display-metadata.js';
 import { resolvers } from './resolver.js';
+import { updateStatus } from "../update-status.js"
 
 function getClosestID(element) {
 	let subject = element;
@@ -84,6 +85,11 @@ function toggleSelectedEntities(id) {
 }
 
 async function collectPageLinks(subject) {
+	updateStatus([
+		'Searching ',
+		{urlLink: window.location.href},
+		' for links…',
+	]);
 	displayMetadata();
 	let foundEntities = [];
 
@@ -130,6 +136,11 @@ async function collectPageLinks(subject) {
 		}
 	 	return 0;
 	});
+
+	updateStatus([
+		`Checking ${uniqueLinks.length} unique links in `,
+		{urlLink: window.location.href},
+	]);
 
 	// mark	links that are not applicable to wikidata as not-applicable
 	for (let key in uniqueLinks) {
@@ -235,11 +246,21 @@ async function collectPageLinks(subject) {
 	}
 
 	(async () => {
+
+		let linkNumber = 0;
 		for (let key in uniqueLinks) {
+			linkNumber++;
 			if (uniqueLinks[key].applicable) {
 				await uniqueLinks[key].setup();
 			}
 		}
+
+		updateStatus([
+			`There are ${linkNumber} links in `,
+			{urlLink: window.location.href},
+			' which could be associated to wikidata items. Checking now.'
+		]);
+
 		for (let key in uniqueLinks) {
 			if (uniqueLinks[key].applicable) {
 				await uniqueLinks[key].init();

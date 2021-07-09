@@ -13,6 +13,7 @@ import { flex } from './flex/flex.tpl.js';
 import { actions } from './actions/actions.tpl.js';
 import { title } from './title/title.tpl.js';
 import { join } from './join/join.tpl.js';
+import { bouncer } from './bouncer/bouncer.tpl.js';
 
 const templates = {
 	actions: actions,
@@ -30,6 +31,7 @@ const templates = {
 	direction: direction,
 	title: title,
 	join: join,
+	bouncer: bouncer,
 	br: () => { return document.createElement('br') },
 	code: (text) => {
 		let tag = document.createElement('code');
