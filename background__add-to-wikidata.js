@@ -13,6 +13,9 @@ function groupJobs(jobs) {
 	}
 	for (let job of jobs) {
 		if (groupedJobs.hasOwnProperty(job.serialised)) {
+			if (!groupedJobs[job.serialised].hasOwnProperty('references')) {
+				groupedJobs[job.serialised].references = [];
+			}
 			groupedJobs[job.serialised].references.push(job.references);
 		} else {
 			groupedJobs[job.serialised] = job;
@@ -90,7 +93,6 @@ async function processJobs(jobsUngrouped) {
 		lastEdit = lastCreated;
 	}
 
-	console.debug(JSON.stringify(lastEdit));
 	if (lastEdit) {
 		if (lastEdit.job.fromTab) {
 			pushEnitiyToSidebar(lastEdit.id, lastEdit.job.fromTab, true, true);

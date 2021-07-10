@@ -46,7 +46,7 @@ function constraintsToStatements(prop, contraints, propform, classes) {
 					});
 					// if one of the proposed classes is already there, we don't need
 					// to go any further.
-					if (classes.filter(value => proposedClasses.includes(value))) {
+					if (classes.filter(value => proposedClasses.includes(value)).length > 0) {
 						continue;
 					}
 

@@ -56,7 +56,7 @@ if (window.location.search) {
 	if (currentEntity.match(/[QMPL]\d+/)) {
 		( async()=> {
 
-			document.body.appendChild(bouncer)
+			document.body.appendChild(bouncer);
 
 			const entities = await wikidataGetEntity(currentEntity, false);
 			for (let id of Object.keys(entities)) {
@@ -145,14 +145,19 @@ if (window.location.search) {
 			}
 		}
 
-		browser.runtime.sendMessage({
-			type: 'send_to_wikidata',
-			data: jobs,
-		});
+		console.debug(jobs)
 
-		browser.runtime.sendMessage({
-			type: 'wait',
-			tid: currentTab,
-		});
+
+			Promise.all([
+				browser.runtime.sendMessage({
+					type: 'send_to_wikidata',
+					data: jobs,
+				}), 
+			]).then((values) => {
+				browser.runtime.sendMessage({
+					type: 'wait',
+					tid: currentTab,
+				});
+			});
 	});
 }
