@@ -38,7 +38,7 @@ async function findApplicables(location, openInSidebar = true) {
 				ids: applicables,
 				titles: findTitles(),
 				desc: findDescriptions(),
-				ld: await enrichLinkedData(linkedData, applicables[0]),
+				ld: await enrichLinkedData(linkedData, applicables[0], window.location.href),
 				source: {
 					url: url,
 					title: document.querySelector('title').innerText,

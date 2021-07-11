@@ -16,6 +16,9 @@ async function getFormatterUrls(prop, id) {
 			OPTIONAL { 
 				?s pq:P8460 ?exp.
 			}
+			FILTER(!STRSTARTS(?form, 'https://wikidata-externalid-url.toolforge.org/'))
+			FILTER(!STRSTARTS(?form, 'https://web.archive.org/web/'))
+			FILTER(!STRSTARTS(?form, 'https://resolve.eidr.org/'))
 		}
 	`;
 	const patterns = await sparqlQuery(query);

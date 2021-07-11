@@ -1,6 +1,6 @@
 import { resolvers } from './resolver.js';
 
-async function parse(thing, ids) {
+async function parse(thing, ids, url) {
 
 	if (thing.hasOwnProperty('@type') && ['BreadcrumbList'].includes(thing['@type'])) {
 		return null;
@@ -8,7 +8,14 @@ async function parse(thing, ids) {
 
 	if (thing.hasOwnProperty('url')) {
 		let link = document.createElement('a');
-		link.setAttribute('href', thing['url']);
+
+		if (thing['url'].startsWith('/') || thing['url'].startsWith('.')) {
+			link.setAttribute('href', url);
+			link.pathname = thing['url'];
+		} else {
+			link.setAttribute('href', thing['url']);
+		}
+
 		for (let id of Object.keys(resolvers)) {
 			let isApplicable = await resolvers[id].applicable(link);
 			if (isApplicable) {
@@ -32,11 +39,11 @@ async function parse(thing, ids) {
 		if (Array.isArray(thing[prop])) {
 			for (let i in thing[prop]) {
 				if (typeof thing[prop][i] === 'object' && thing[prop][i].hasOwnProperty('@type')) {
-					thing[prop][i] = await parse(thing[prop][i], ids)
+					thing[prop][i] = await parse(thing[prop][i], ids, url)
 				}
 			}
 		} else if (typeof thing[prop] === 'object' && thing[prop].hasOwnProperty('@type')) {
-			thing[prop] = await parse(thing[prop], ids)
+			thing[prop] = await parse(thing[prop], ids, url)
 		}
 	}
 	return thing;
@@ -46,11 +53,11 @@ function jsonParse(i) {
 	return JSON.parse(i.replace(/\/\*[\s\S]*?\*\//g, ''));
 }
 
-async function enrichLinkedData(snippeds, ids) {
+async function enrichLinkedData(snippeds, ids, url) {
 	let parsed = []
 
 	for (let snipped of snippeds) {
-		parsed.push(await parse(jsonParse(snipped.innerHTML), ids));
+		parsed.push(await parse(jsonParse(snipped.innerHTML), ids, url));
 	}
 
 	parsed = parsed.filter((v) => {

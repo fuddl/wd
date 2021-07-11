@@ -65,6 +65,10 @@ if (window.location.search) {
 
 			document.body.appendChild(bouncer);
 
+			browser.runtime.sendMessage({
+				type: 'lock_sidebar',
+			});
+
 			const entities = await wikidataGetEntity(currentEntity, false);
 			for (let id of Object.keys(entities)) {
 				let entity = entities[id];
@@ -98,7 +102,7 @@ if (window.location.search) {
 													{urlLink: url},
 												'!',
 											]);
-											let enriched = await enrichLinkedData(ld, claim, doc);
+											let enriched = await enrichLinkedData(ld, claim, url);
 											let title = doc.querySelector('title');
 											let root = doc.querySelector('html');
 											let rootLang = root.hasAttribute('lang') ? root.getAttribute('lang') : '';
@@ -128,6 +132,9 @@ if (window.location.search) {
 				if (propform.children.length < 1) {
 					document.body.innerText = '';
 					document.body.appendChild(message);
+					browser.runtime.sendMessage({
+						type: 'unlock_sidebar',
+					});
 				}
 			}
 		})()
@@ -161,6 +168,9 @@ if (window.location.search) {
 				type: 'send_to_wikidata',
 				data: jobs,
 			}), 
+			browser.runtime.sendMessage({
+				type: 'unlock_sidebar',
+			}),
 		]).then((values) => {
 			browser.runtime.sendMessage({
 				type: 'wait',
