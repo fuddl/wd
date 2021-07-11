@@ -1,0 +1,24 @@
+.intertitle {
+	background: white;
+	bottom: 0;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	left: 0;
+	overflow: auto;
+	padding: 1rem;
+	position: fixed;
+	right: 0;
+	text-align: center;
+	top: 0;
+}
+
+.intertitle__icon {
+	max-width: 50vw;
+	font-size: 50vw;
+	margin: 0 auto;
+}
+
+.intertitle__text {
+	text-align: center;
+}

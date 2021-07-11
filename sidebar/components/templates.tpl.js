@@ -14,6 +14,7 @@ import { actions } from './actions/actions.tpl.js';
 import { title } from './title/title.tpl.js';
 import { join } from './join/join.tpl.js';
 import { bouncer } from './bouncer/bouncer.tpl.js';
+import { intertitle } from './intertitle/intertitle.tpl.js';
 
 const templates = {
 	actions: actions,
@@ -32,6 +33,7 @@ const templates = {
 	title: title,
 	join: join,
 	bouncer: bouncer,
+	intertitle: intertitle,
 	br: () => { return document.createElement('br') },
 	code: (text) => {
 		let tag = document.createElement('code');

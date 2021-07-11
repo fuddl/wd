@@ -13,11 +13,12 @@ import { googleMaps } from './resolver__google-maps.js';
 
 const resolvers = {
 	wikidata: {
+		regex: /^https:\/\/[\w]+.wikidata.org\/w(?:iki\/|\/index\.php\?title=)(?:Special:WhatLinksHere\/|Talk\:)?(?:\w+\:)?([QMPL]\d+)/,
 		applicable: function(location) {
-			return location.href.match(/https:\/\/[\w]+.wikidata.org\/wiki\/(?:\w+\:)?[QMPL]\d+/) !== null;
+			return location.href.match(this.regex) !== null;
 		},
 		getEntityId: function(location) {
-			return location.href.match(/https:\/\/[\w]+.wikidata.org\/wiki\/(?:\w+\:)?([QMPL]\d+)/)[1];
+			return location.href.match(this.regex)[1];
 		}
 	},
 	hash: hash,

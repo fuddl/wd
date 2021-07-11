@@ -50,6 +50,13 @@ async function getAllClasses(instance) {
 }
 
 let bouncer = templates.bouncer();
+let message = templates.intertitle({
+	icon: {
+		src: 'https://upload.wikimedia.org/wikipedia/commons/a/a5/OpenMoji-color_1F44C.svg',
+		alt: '👌',
+	},
+	text: 'Could not find possible improvements. Add external identifers and try again.',
+});
 
 if (window.location.search) {
 	let currentEntity = window.location.search.match(/^\?(\w\d+)/, '')[1];
@@ -118,6 +125,10 @@ if (window.location.search) {
 					}
 				}
 				document.body.removeChild(bouncer);
+				if (propform.children.length < 1) {
+					document.body.innerText = '';
+					document.body.appendChild(message);
+				}
 			}
 		})()
 	}
@@ -145,19 +156,16 @@ if (window.location.search) {
 			}
 		}
 
-		console.debug(jobs)
-
-
-			Promise.all([
-				browser.runtime.sendMessage({
-					type: 'send_to_wikidata',
-					data: jobs,
-				}), 
-			]).then((values) => {
-				browser.runtime.sendMessage({
-					type: 'wait',
-					tid: currentTab,
-				});
+		Promise.all([
+			browser.runtime.sendMessage({
+				type: 'send_to_wikidata',
+				data: jobs,
+			}), 
+		]).then((values) => {
+			browser.runtime.sendMessage({
+				type: 'wait',
+				tid: currentTab,
 			});
+		});
 	});
 }
