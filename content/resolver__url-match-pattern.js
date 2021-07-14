@@ -33,7 +33,9 @@ const URL_match_pattern = {
 		return output;
 	},
 	applicable: async function(location) {
-		this.patterns = await this.aquireRegexes();
+		if (!this.patterns) {
+			this.patterns = await this.aquireRegexes();
+		}
 		let href = decodeURIComponent(location.href);
 		for (let prop of this.patterns) {
 			let match = href.match(prop.s);

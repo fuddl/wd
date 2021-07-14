@@ -9,6 +9,7 @@ import { makeLanguageValid } from '../get-valid-string-languages.js';
 import { sparqlQuery } from "../sqarql-query.js"
 import { templates } from "./components/templates.tpl.js"
 import { updateStatusInternal } from "../update-status.js"
+import { findMediaWikiData } from "./mw-data.js"
 
 let content = document.getElementById('content');
 let propform = document.createElement('form');
@@ -80,7 +81,7 @@ if (window.location.search) {
 							updateStatusInternal([
 								'Searching ',
 								{urlLink: url},
-								' for useful Metadata…',
+								' for metadata…',
 							]);
 							try {
 								let result = await fetch(url);
@@ -91,6 +92,11 @@ if (window.location.search) {
 									let canonical = doc.querySelector('link[rel="canonical"][href]');
 									if (canonical) {
 										sourceUrl = canonical.getAttribute('href');
+										updateStatusInternal([
+											'Searching ',
+											{urlLink: sourceUrl},
+											' for metadata…',
+										]);
 									}
 
 									if (!visitedUrls.includes(sourceUrl)) {
@@ -112,6 +118,8 @@ if (window.location.search) {
 												lang: await makeLanguageValid(rootLang),
 											});
 										}
+										const mwData = await findMediaWikiData(doc, propform, sourceUrl ?? url);
+
 									}
 								}
 							} catch (error) {

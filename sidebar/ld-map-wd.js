@@ -246,6 +246,10 @@ async function findMatchingProp(prop, type, namespace) {
 				?item p:P1628/ps:P1628 <${ namespace.replace(/^https\:/, 'http:') }/${ prop }>.
 			} UNION {
 				?item p:P1628/ps:P1628 <${ namespace.replace(/^http\:/, 'https:') }/${ prop }>.
+			}	UNION {
+				?item p:P2235/ps:P2235 <${ namespace.replace(/^https\:/, 'http:') }/${ prop }>.
+			} UNION {
+				?item p:P2235/ps:P2235 <${ namespace.replace(/^http\:/, 'https:') }/${ prop }>.
 			}
 			?item wikibase:propertyType wikibase:${type}.
 		  ?item p:P1628 [ wikibase:rank ?rank ]. 
