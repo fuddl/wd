@@ -18,7 +18,7 @@ const usefullMetatags = [
 			'music.radio_station': 14350,
 			'music.song': 2188189,
 			'video.episode': 21191270,
-			'video.movie': 11424610,
+			'video.movie': 11424,
 			'video.tv_show': 5398426,
 			'wdff.edition': 3331189,
 		}
