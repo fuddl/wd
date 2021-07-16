@@ -10,6 +10,8 @@ import { sparqlQuery } from "../sqarql-query.js"
 import { templates } from "./components/templates.tpl.js"
 import { updateStatusInternal } from "../update-status.js"
 import { findMediaWikiData } from "./mw-data.js"
+import { findMetaData, enrichMetaData } from '../content/content__collect-meta.js';
+import { metaToStatements } from './metaToStatements.js';
 
 let content = document.getElementById('content');
 let propform = document.createElement('form');
@@ -101,17 +103,35 @@ if (window.location.search) {
 
 									if (!visitedUrls.includes(sourceUrl)) {
 										visitedUrls.push(sourceUrl);
-										const ld = findLinkedData(doc);
-										if (ld) {
+
+										let title = doc.querySelector('title');
+										let root = doc.querySelector('html');
+										let rootLang = root.hasAttribute('lang') ? root.getAttribute('lang') : '';
+										
+										const meta = findMetaData(doc);
+										if (meta) {
 											updateStatusInternal([
 												'Found metadata in ',
 													{urlLink: url},
 												'!',
 											]);
+											let enrichedMeta = await enrichMetaData(meta, claim, url);
+											await metaToStatements(enrichedMeta, propform, {
+												url: sourceUrl,
+												title: title ? title.innerText.trim() : null,
+												lang: await makeLanguageValid(rootLang),
+											});
+										}
+
+
+										const ld = findLinkedData(doc);
+										if (ld) {
+											updateStatusInternal([
+												'Found structured data in ',
+													{urlLink: url},
+												'!',
+											]);
 											let enriched = await enrichLinkedData(ld, claim, url);
-											let title = doc.querySelector('title');
-											let root = doc.querySelector('html');
-											let rootLang = root.hasAttribute('lang') ? root.getAttribute('lang') : '';
 											await ldToStatements(enriched, propform, {
 												url: sourceUrl,
 												title: title ? title.innerText.trim() : null,

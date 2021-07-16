@@ -5,10 +5,12 @@ import { makeLanguageValid } from '../get-valid-string-languages.js';
 import { findTitles } from './pagedata__title.js';
 import { findDescriptions } from './pagedata__description.js';
 import { findLinkedData, enrichLinkedData } from './content__collect-ld.js';
+import { findMetaData, enrichMetaData } from './content__collect-meta.js';
 
 async function findApplicables(location, openInSidebar = true) {
 	let applicables = [];
 	let linkedData = findLinkedData(document)
+	let metaData = findMetaData(document)
 
 	let foundMatch = false;
 	for (let id of Object.keys(resolvers)) {
@@ -39,6 +41,7 @@ async function findApplicables(location, openInSidebar = true) {
 				titles: findTitles(),
 				desc: findDescriptions(),
 				ld: await enrichLinkedData(linkedData, applicables[0], window.location.href),
+				meta: await enrichMetaData(metaData, applicables[0], window.location.href),
 				source: {
 					url: url,
 					title: document.querySelector('title').innerText,

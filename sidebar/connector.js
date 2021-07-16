@@ -6,6 +6,7 @@ import { getTokens } from './wd-get-token.js';
 import { templates } from './components/templates.tpl.js';
 import { constraintsToStatements } from './constraintsToStatements.js';
 import { ldToStatements } from './ldToStatements.js';
+import { metaToStatements } from './metaToStatements.js';
 
 function getPropertyScope(property) {
 	let scopes = {
@@ -68,6 +69,10 @@ function getPropertyScope(property) {
 
 	if (proposals.ld) {
 		await ldToStatements(proposals.ld, propform, proposals.source);
+	}
+	
+	if (proposals.meta) {
+		await metaToStatements(proposals.meta, propform, proposals.source);
 	}
 
 	if(!isMultiple && property[proposals.ids[0][0].prop]?.claims?.P2302) {
