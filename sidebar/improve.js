@@ -77,8 +77,24 @@ if (window.location.search) {
 				let entity = entities[id];
 				let classes = await getAllClasses(id);
 				for(let claim in entity.claims) {
-					if (entity.claims[claim][0].mainsnak?.datatype === 'external-id' && entity?.claims[claim][0].mainsnak?.datavalue?.value) {
-						let urls = await getFormatterUrls(claim, entity.claims[claim][0].mainsnak.datavalue.value);
+					if (['url', 'external-id'].includes(entity.claims[claim][0].mainsnak?.datatype) && entity?.claims[claim][0].mainsnak?.datavalue?.value) {
+						let urls = []; 
+						switch (entity.claims[claim][0].mainsnak.datatype) {
+							case 'external-id':
+							  for (let key in entity.claims[claim]) {
+							  	let moreUrls = await getFormatterUrls(claim, entity.claims[claim][key].mainsnak.datavalue.value);
+									urls = [...urls, ...moreUrls];
+							  }
+							  break;
+							case 'url':
+								for (let key in entity.claims[claim]) {
+									if(entity.claims[claim][key].mainsnak?.datavalue?.value) {
+										urls.push(entity.claims[claim][key].mainsnak.datavalue.value);	
+									}
+								}
+								break;
+						}
+
 						for (let url of urls) {
 							updateStatusInternal([
 								'Searching ',

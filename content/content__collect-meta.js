@@ -5,6 +5,7 @@ const usefullMetatags = [
 		name: 'og:title',
 		prop: 'P1476',
 		type: 'Monolingualtext',
+		suggested: false,
 	},
 	{
 		name: 'og:type',
@@ -21,33 +22,39 @@ const usefullMetatags = [
 			'video.movie': 11424,
 			'video.tv_show': 5398426,
 			'wdff.edition': 3331189,
-		}
+		},
+		suggested: false,
 	},
 	{
 		name: 'video:duration',
 		type: 'Quantity',
 		prop: 'P2047',
 		unit: 'http://www.wikidata.org/entity/Q11574',
+		suggested: true,
 	},
 	{
 		name: 'video:series',
 		type: 'WikibaseItem',
 		prop: 'P179',
+		suggested: true,
 	},
 	{
 		name: 'books:author',
 		type: 'WikibaseItem',
 		prop: 'P50',
+		suggested: true,
 	},
 	{
 		name: 'books:isbn',
 		prop: 'P212',
 		type: 'ExternalId',
+		suggested: true,
 	},
 	{
 		name: 'books:page_count',
 		prop: 'P1104',
 		type: 'Quantity',
+		suggested: true,
 	}
 ];
 

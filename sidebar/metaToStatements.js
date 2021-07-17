@@ -25,7 +25,7 @@ async function metaToStatements(meta, propform, source) {
 		console.debug(job);
 		check.setAttribute('type', 'checkbox')
 		check.setAttribute('value', JSON.stringify(job))
-		check.checked = true;
+		check.checked = type?.suggested;
 		let preview = document.createDocumentFragment();
 		switch (type.type) {
 			case 'WikibaseItem':
