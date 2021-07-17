@@ -42,6 +42,8 @@ function getPropertyScope(property) {
 		})
 	} else {
 		propPreview = document.createElement('select');
+		let emptyOption = document.createElement('option');
+		propPreview.appendChild(emptyOption);
 		for (let prop of proposals.ids[0][0].prop) {
 			let option = templates.placeholder({
 				tag: 'option',
@@ -54,6 +56,7 @@ function getPropertyScope(property) {
 		}
 		propPreview.addEventListener('change', function(event) {
 			connectorProp = event.target.value;
+			propPreview.removeChild(emptyOption);
 		});
 	}
 
