@@ -34,6 +34,7 @@ async function findApplicables(location, openInSidebar = true) {
 	}
 	if (applicables.length > 0 && !foundMatch && openInSidebar) {
 		const url = location.toString();
+		const documentLang =  await makeLanguageValid(document.querySelector('html').lang);
 		browser.runtime.sendMessage({
 			type: 'match_proposal',
 			proposals: {
@@ -41,11 +42,11 @@ async function findApplicables(location, openInSidebar = true) {
 				titles: findTitles(),
 				desc: findDescriptions(),
 				ld: await enrichLinkedData(linkedData, applicables[0], window.location.href),
-				meta: await enrichMetaData(metaData, applicables[0], window.location.href),
+				meta: await enrichMetaData(metaData, documentLang, window.location.href),
 				source: {
 					url: url,
 					title: document.querySelector('title').innerText,
-					lang: await makeLanguageValid(document.querySelector('html').lang),
+					lang: documentLang,
 				}
 			},
 		});

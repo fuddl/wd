@@ -123,7 +123,8 @@ if (window.location.search) {
 										let title = doc.querySelector('title');
 										let root = doc.querySelector('html');
 										let rootLang = root.hasAttribute('lang') ? root.getAttribute('lang') : '';
-										
+										let validRootLang = await makeLanguageValid(rootLang);
+
 										const meta = findMetaData(doc);
 										if (meta) {
 											updateStatusInternal([
@@ -131,11 +132,11 @@ if (window.location.search) {
 													{urlLink: url},
 												'!',
 											]);
-											let enrichedMeta = await enrichMetaData(meta, claim, url);
+											let enrichedMeta = await enrichMetaData(meta, rootLang, url);
 											await metaToStatements(enrichedMeta, propform, {
 												url: sourceUrl,
 												title: title ? title.innerText.trim() : null,
-												lang: await makeLanguageValid(rootLang),
+												lang: validRootLang,
 											});
 										}
 
@@ -151,7 +152,7 @@ if (window.location.search) {
 											await ldToStatements(enriched, propform, {
 												url: sourceUrl,
 												title: title ? title.innerText.trim() : null,
-												lang: await makeLanguageValid(rootLang),
+												lang: validRootLang,
 											});
 										}
 										const mwData = await findMediaWikiData(doc, propform, sourceUrl ?? url);

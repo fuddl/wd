@@ -1,4 +1,5 @@
 import { resolvers } from './resolver.js';
+import { makeLanguageValid } from '../get-valid-string-languages.js';
 
 const usefullMetatags = [
 	{
@@ -58,51 +59,65 @@ const usefullMetatags = [
 	}
 ];
 
-async function enrichMetaData(tags, ids, url) {
+async function enrichMetaData(tags, lang, url) {
 	let enriched = {};
 	for (let key in tags) {
 		let type = usefullMetatags.find(v => v.name === key);
-		if (type.type === 'WikibaseItem') {
-			if (type.hasOwnProperty('options')) {
-				if (type.options.hasOwnProperty(tags[key])) {
-					enriched[key] = {
-						verb: type.prop,
-						object: {
-							'numeric-id': type.options[tags[key]],
-						}
-					};
-				}
-			} else {
-				for (let id of Object.keys(resolvers)) {
-					let link = document.createElement('a');
-					link.href = tags[key];
-					let isApplicable = await resolvers[id].applicable(link);
-					if (isApplicable) {
-						let entityId = await resolvers[id].getEntityId(link);
-						if (entityId) {
-							enriched[key] = {
-								verb: type.prop,
-								object: {
-									'numeric-id': entityId.replace(/^Q/, ''),
-								}
-							};
+		for (let delta in tags[key]) {
+			const newKey = `${key}|${delta}`;
+			if (type.type === 'WikibaseItem') {
+				if (type.hasOwnProperty('options')) {
+					if (type.options.hasOwnProperty(tags[key])) {
+						enriched[newKey] = {
+							verb: type.prop,
+							object: {
+								'numeric-id': type.options[tags[key][delta]],
+							}
+						};
+					}
+				} else {
+					for (let id of Object.keys(resolvers)) {
+						let link = document.createElement('a');
+						link.href = tags[key][delta];
+						let isApplicable = await resolvers[id].applicable(link);
+						if (isApplicable) {
+							let entityId = await resolvers[id].getEntityId(link);
+							if (entityId) {
+								enriched[newKey] = {
+									verb: type.prop,
+									object: {
+										'numeric-id': entityId.replace(/^Q/, ''),
+									}
+								};
+							}
 						}
 					}
 				}
-			}
-		} else if (type.type === 'String' || type.type === 'ExternalId') {
-			enriched[key] = {
-				verb: type.prop,
-				object: tags[key],
-			};
-		} else if (type.type === 'Quantity') {
-			enriched[key] = {
-				verb: type.prop,
-				object: {
-					amount: tags[key],
-					unit: type?.unit ?? '1',
+			} else if (type.type === 'String' || type.type === 'ExternalId') {
+				enriched[newKey] = {
+					verb: type.prop,
+					object: tags[key][delta],
+				};
+			} else if (type.type === 'Quantity') {
+				enriched[newKey] = {
+					verb: type.prop,
+					object: {
+						amount: tags[key][delta],
+						unit: type?.unit ?? '1',
+					}
+				};
+			} else if (type.type === 'Monolingualtext') {
+				if (lang) {
+					console.debug(lang);
+					enriched[newKey] = {
+						verb: type.prop,
+						object: {
+							text: tags[key][delta],
+							language: lang,
+						}
+					};
 				}
-			};
+			}
 		}
 	}
 	return enriched;
@@ -121,15 +136,17 @@ function findMetaData(document) {
 		if (property && usefullMetatags.find(v => v.name === property)) {
 			let content = tag.getAttribute('content');
 			if (content != 'null') {
-				meta[property] = content;
+				if (!meta.hasOwnProperty(property)) {
+					meta[property] = [];
+				}
+				meta[property].push(content);
 			}
 		}
 	}
 	if (meta.hasOwnProperty('books:isbn') && meta.hasOwnProperty('og:type')) {
 		// it it has an isbn number it is an edition, not a book
-		meta['og:type'] = 'wdff.edition';
+		meta['og:type'] = ['wdff.edition'];
 	}
-
 	return meta;
 }
 

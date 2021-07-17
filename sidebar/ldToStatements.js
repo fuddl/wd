@@ -36,7 +36,9 @@ async function ldToStatements(ld, propform, source) {
 				}
 				check.setAttribute('type', 'checkbox')
 				check.setAttribute('value', JSON.stringify(job))
-				check.checked = true;
+				
+				// since these tend to be wrong or unprecise
+				check.checked = false;
 
 				let instanceOfPreview = templates.remark({
 					sortKey: 'P31',

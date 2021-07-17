@@ -3,7 +3,6 @@ import { makeReferences } from './ld-map-wd.js';
 import { usefullMetatags } from '../content/content__collect-meta.js';
 
 async function metaToStatements(meta, propform, source) {
-
 	let comment = templates.smallBlock(
 		templates.text(
 			[
@@ -14,7 +13,7 @@ async function metaToStatements(meta, propform, source) {
 	);
 
 	for (let k in meta) {
-		let type = usefullMetatags.find(v => v.name === k);
+		let type = usefullMetatags.find(v => v.name === k.split('|')[0]);
 		let check = document.createElement('input');
 		check.setAttribute('name', `meta-${k}`);
 		let job = {
@@ -22,8 +21,7 @@ async function metaToStatements(meta, propform, source) {
 			...meta[k],
 			references: makeReferences(source),
 		}
-		console.debug(job);
-		check.setAttribute('type', 'checkbox')
+		check.setAttribute('type', 'checkbox');
 		check.setAttribute('value', JSON.stringify(job))
 		check.checked = type?.suggested;
 		let preview = document.createDocumentFragment();
@@ -43,8 +41,14 @@ async function metaToStatements(meta, propform, source) {
 					unit: meta[k].object?.unit,
 				});
 				break;
+			case 'Monolingualtext':
+				preview = templates.title({
+					text: meta[k].object?.text,
+					lang: meta[k].object?.lang,
+				});
+				break;
 			default:
-				console.debug(type.type)
+				console.debug(type.type);
 			continue;
 		}
 
