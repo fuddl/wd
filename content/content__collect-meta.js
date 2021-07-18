@@ -108,7 +108,6 @@ async function enrichMetaData(tags, lang, url) {
 				};
 			} else if (type.type === 'Monolingualtext') {
 				if (lang) {
-					console.debug(lang);
 					enriched[newKey] = {
 						verb: type.prop,
 						object: {

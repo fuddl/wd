@@ -12,6 +12,60 @@ import { updateStatusInternal } from "../update-status.js"
 import { findMediaWikiData } from "./mw-data.js"
 import { findMetaData, enrichMetaData } from '../content/content__collect-meta.js';
 import { metaToStatements } from './metaToStatements.js';
+import { URL_match_pattern } from "../content/resolver__url-match-pattern.js";
+
+async function checkRedirectForIds(url, propform, originalUrl, claims) {
+	let comment = templates.smallBlock(
+		templates.text(
+			[
+				document.createTextNode('Found behind redirect of '),
+				templates.urlLink(originalUrl),
+				document.createTextNode(' to '),
+				templates.urlLink(url),
+			]
+		)
+	);
+	const location = {
+		href: url
+	};
+	let isApplicable = await URL_match_pattern.applicable(location);
+	if (isApplicable) {
+		let entityId = await URL_match_pattern.getEntityId(location);
+		if (!entityId) {
+			let label = templates.placeholder({
+				entity: isApplicable[0].prop,
+			});
+
+			if (claims.hasOwnProperty(isApplicable[0].prop)) {
+				return false;
+			}
+
+			let check = document.createElement('input');
+			check.setAttribute('type', 'checkbox');
+			check.setAttribute('name', isApplicable[0].value);
+			check.setAttribute('value', JSON.stringify({
+				type: 'set_claim',
+				verb: isApplicable[0].prop,
+				object: isApplicable[0].value,
+			}));
+
+			// these need to be checked
+			check.checked = false;
+			let preview = templates.remark({
+				sortKey: isApplicable[0].prop,
+				check: check,
+				prop: label,
+				vals: [
+					templates.text([
+						templates.code(isApplicable[0].value),
+						comment,
+					]),
+				],
+			});
+			propform.appendChild(preview);		
+		}
+	}
+}
 
 let content = document.getElementById('content');
 let propform = document.createElement('form');
@@ -105,6 +159,11 @@ if (window.location.search) {
 								let result = await fetch(url);
 								let sourceUrl = result.url;
 								let text = await result.text();
+
+								if (result.redirected) {
+									await checkRedirectForIds(result.url, propform, url, entity.claims);
+								}
+
 								if (text) {
 									const doc = parser.parseFromString(text, "text/html");
 									let canonical = doc.querySelector('link[rel="canonical"][href]');
@@ -160,7 +219,7 @@ if (window.location.search) {
 									}
 								}
 							} catch (error) {
-							  console.error(`Something went wrong fetching ${url}`);
+								console.error(`Something went wrong fetching ${url}`);
 							}
 						}
 					}
