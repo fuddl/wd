@@ -46,6 +46,8 @@ async function processJobs(jobsUngrouped) {
 				}
 			}
 
+		} else if (job.type === 'set_sitelink') {
+			setSiteLink(job.subject, job.verb, job.object);
 		} else if (job.type === 'set_claim') {
 			
 			let extistingStatement = await getExistingStatement(job.object, job.verb, job.subject);
@@ -135,6 +137,16 @@ async function createEntity(label, lang) {
 	});
 
 	return JSON.parse(await response.text());
+}
+
+async function setSiteLink(subjectId, property, value) {
+	let data = new FormData();
+	data.append('token', await getTokens());
+	const action = `action=wbsetsitelink&id=${subjectId}&linksite=${property}&linktitle=${value}&format=json`;
+	let response = await fetch(`https://www.wikidata.org/w/api.php?${action}`, {
+		method: 'post',
+		body: new URLSearchParams(data),
+	});
 }
 
 async function setClaim(subjectId, property, value) {

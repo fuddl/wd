@@ -26,65 +26,78 @@ function getPropertyScope(property) {
 
 (async () => {
 	let proposals = JSON.parse(decodeURIComponent(window.location.search.replace(/^\?/, '')));
-	const isMultiple = typeof proposals.ids[0][0].prop !== 'string'
-	let connectorProp = !isMultiple ? proposals.ids[0][0].prop : proposals.ids[0][0].prop[0];
-	let property = !isMultiple ? await wikidataGetEntity(proposals.ids[0][0].prop) : null;
+	
 	let content = document.getElementById('content');
-	let propform = document.createElement('form');
-	content.appendChild(propform);
-
-	let currentTab = await getCurrentTab();
 	let propPreview;
+	let connectorProp;
+	let propform = document.createElement('form');
+	let preview = document.createDocumentFragment();
+	let isMultiple = false;
+	content.appendChild(propform);
+	let scope = 'item';
+	let currentTab = await getCurrentTab();
 
-	if (!isMultiple) {
-		propPreview = templates.placeholder({
-			entity: proposals.ids[0][0].prop,
-		})
-	} else {
-		propPreview = document.createElement('select');
-		let emptyOption = document.createElement('option');
-		propPreview.appendChild(emptyOption);
-		for (let prop of proposals.ids[0][0].prop) {
-			let option = templates.placeholder({
-				tag: 'option',
-				entity: prop,
-				type: 'option',
+	const isProp = proposals.ids[0][0].hasOwnProperty('prop');
+	const isSitelink = proposals.ids[0][0].hasOwnProperty('sitelink');
+	
+	if (isProp) {
+		isMultiple = typeof proposals.ids[0][0].prop !== 'string'
+		connectorProp = !isMultiple ? proposals.ids[0][0].prop : proposals.ids[0][0].prop[0];
+		let property = !isMultiple ? await wikidataGetEntity(proposals.ids[0][0].prop) : null;
+
+		scope = !isMultiple ? getPropertyScope(property[proposals.ids[0][0].prop]) : 'item';
+
+		if (!isMultiple) {
+			propPreview = templates.placeholder({
+				entity: proposals.ids[0][0].prop,
+			})
+		} else {
+			propPreview = document.createElement('select');
+			let emptyOption = document.createElement('option');
+			propPreview.appendChild(emptyOption);
+			for (let prop of proposals.ids[0][0].prop) {
+				let option = templates.placeholder({
+					tag: 'option',
+					entity: prop,
+					type: 'option',
+				});
+				option.setAttribute('value', prop);
+
+				propPreview.appendChild(option);
+			}
+			propPreview.addEventListener('change', function(event) {
+				connectorProp = event.target.value;
+				propPreview.removeChild(emptyOption);
 			});
-			option.setAttribute('value', prop);
-
-			propPreview.appendChild(option);
 		}
-		propPreview.addEventListener('change', function(event) {
-			connectorProp = event.target.value;
-			propPreview.removeChild(emptyOption);
+		preview = templates.remark({
+			prop: propPreview,
+			vals: [templates.code(proposals.ids[0][0].value)],
+		});
+		if (proposals.ld) {
+			await ldToStatements(proposals.ld, propform, proposals.source);
+		}
+		
+		if (proposals.meta) {
+			await metaToStatements(proposals.meta, propform, proposals.source);
+		}
+
+		if(!isMultiple && property[proposals.ids[0][0].prop]?.claims?.P2302) {
+			constraintsToStatements(proposals.ids[0][0].prop, property[proposals.ids[0][0].prop].claims.P2302, propform)
+		}
+	} else if (isSitelink) {
+		preview = templates.remark({
+			prop: document.createTextNode(`Add sitelink ${proposals.ids[0][0].sitelink}`),
+			vals: [templates.code(proposals.ids[0][0].value)],
 		});
 	}
 
-	let preview = templates.remark({
-		prop: propPreview,
-		vals: [templates.code(proposals.ids[0][0].value)],
-	});
-
-
-	let counter = 0;
-
 	propform.appendChild(preview);
 
-	if (proposals.ld) {
-		await ldToStatements(proposals.ld, propform, proposals.source);
-	}
-	
-	if (proposals.meta) {
-		await metaToStatements(proposals.meta, propform, proposals.source);
-	}
-
-	if(!isMultiple && property[proposals.ids[0][0].prop]?.claims?.P2302) {
-		constraintsToStatements(proposals.ids[0][0].prop, property[proposals.ids[0][0].prop].claims.P2302, propform)
-	}
 
 	let labelField = templates.join({
 		human: proposals.titles[0],
-		scope: !isMultiple ? getPropertyScope(property[proposals.ids[0][0].prop]) : 'item',
+		scope: scope,
 		id: 'joiner',
 	});
 	let direction = templates.direction();
@@ -138,54 +151,66 @@ function getPropertyScope(property) {
 				selectedEntity = 'LAST'; 
 			}
 
-			let now = new Date();
+			if (isProp) {
 
-			jobs.push({
-				type: 'set_claim',
-				subject: selectedEntity,
-				verb: connectorProp,
-				object: proposals.ids[0][0].value,
-				fromTab: currentTab,
-				references: [{
-					"P854": [{
-						"snaktype": "value",
-						"property": "P854",
-						"datavalue": {
-							"value": proposals.source.url,
-							"type": "string"
-						},
-						"datatype": "url"
-					}],
-					"P1476": [{
-						"snaktype": "value",
-						"property": "P1476",
-						"datavalue": {
-							"value": {
-								"text": proposals.source.title.trim(),
-								"language": proposals.source.lang ? proposals.source.lang : 'zxx',
+				let now = new Date();
+
+				jobs.push({
+					type: 'set_claim',
+					subject: selectedEntity,
+					verb: connectorProp,
+					object: proposals.ids[0][0].value,
+					fromTab: currentTab,
+					references: [{
+						"P854": [{
+							"snaktype": "value",
+							"property": "P854",
+							"datavalue": {
+								"value": proposals.source.url,
+								"type": "string"
 							},
-							"type": "monolingualtext"
-						},
-						"datatype": "string"
-					}],
-					"P813": [{
-						"snaktype": "value",
-						"property": "P813",
-						"datavalue": {
-							"type": "time",
-							"value": {
-								"after": 0,
-								"before": 0,
-								"calendarmodel": "http://www.wikidata.org/entity/Q1985727",
-								"precision": 11,
-								"time": `+${ now.toISOString().substr(0,10) }T00:00:00Z`,
-								"timezone": 0
+							"datatype": "url"
+						}],
+						"P1476": [{
+							"snaktype": "value",
+							"property": "P1476",
+							"datavalue": {
+								"value": {
+									"text": proposals.source.title.trim(),
+									"language": proposals.source.lang ? proposals.source.lang : 'zxx',
+								},
+								"type": "monolingualtext"
+							},
+							"datatype": "string"
+						}],
+						"P813": [{
+							"snaktype": "value",
+							"property": "P813",
+							"datavalue": {
+								"type": "time",
+								"value": {
+									"after": 0,
+									"before": 0,
+									"calendarmodel": "http://www.wikidata.org/entity/Q1985727",
+									"precision": 11,
+									"time": `+${ now.toISOString().substr(0,10) }T00:00:00Z`,
+									"timezone": 0
+								}
 							}
-						}
-					}]
-				}],
-			});
+						}]
+					}],
+				});
+			}
 
+			if (isSitelink) {
+				jobs.push({
+					type: 'set_sitelink',
+					subject: selectedEntity,
+					verb: proposals.ids[0][0].sitelink,
+					object: proposals.ids[0][0].value,
+					fromTab: currentTab,
+				});
+			}
 
 			const formData = new FormData(propform)
 			for (let pair of formData.entries()) {
