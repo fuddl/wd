@@ -24,7 +24,6 @@ async function findMediaWikiData(doc, propform, url) {
 		if (script?.innerText.match(/"wgArticleInterlangList":\s*\[[^\]]+\]/)) {
 			const wgTitle = script?.innerText.match(/"wgTitle":\s*\"([^"]+)"/)[1];
 			const wgPageContentLanguage = script?.innerText.match(/"wgPageContentLanguage":"([^"]+)"/)[1];
-			const wgArticleId = script?.innerText.match(/"wgArticleId":(\d+)/)[1];
 			// this page seems to be a mediawiki article with interwiki links
 			let editUri = doc.querySelector('link[rel="EditURI"]');
 			let apiUrl = editUri?.href.replace(/\?.*/, '');
@@ -49,6 +48,9 @@ async function findMediaWikiData(doc, propform, url) {
 							]
 						)
 					);
+
+					
+					
 
 					const langlinks = jsonResponse.query.pages[pageID].langlinks;
 					for (let langlink of langlinks) {
@@ -84,6 +86,19 @@ async function findMediaWikiData(doc, propform, url) {
 									"datatype": "string"
 								}];
 								
+								let result = await fetch(location.href);
+								let text = await result.text();
+								let wgArticleId;
+								let wgArticleIDQuaifier = [];
+								if (text) {
+									wgArticleId = text.match(/"wgArticleId":(\d+)/)[1];
+									if (wgArticleId) {
+										wgArticleIDQuaifier = [{
+											property: 'P9675',
+											value: wgArticleId,
+										}];
+									}
+								}
 
 								let check = document.createElement('input');
 								check.setAttribute('type', 'checkbox');
@@ -103,10 +118,8 @@ async function findMediaWikiData(doc, propform, url) {
 											'numeric-id': await getLangQid(langlink.lang),
 										}
 									},
-									{
-										property: 'P9675',
-										value: wgArticleId,
-									}],
+										...wgArticleIDQuaifier,
+									],
 									references: references,
 								}));
 								check.checked = true;

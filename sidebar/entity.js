@@ -576,8 +576,10 @@ async function enrichStatements(statements) {
 	for (let prop in statements) {
 		for (let value of statements[prop]) {
 			if (breadcrumbProperties.includes(prop)) {
-				let vid = value.mainsnak.datavalue.value.id;
-				value.mainsnak.datavalue.parents = vid;
+			  if (value?.mainsnak?.datavalue?.value?.id) {
+					let vid = value.mainsnak.datavalue.value.id;
+					value.mainsnak.datavalue.parents = vid;
+			  }
 			}
 		}
 	}
