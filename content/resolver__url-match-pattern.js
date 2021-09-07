@@ -4,11 +4,15 @@ const URL_match_pattern = {
 	aquireRegexes: async function() {
 		
 		let query = `
-			SELECT ?p ?s ?r WHERE {
+			SELECT ?p ?s ?r ?ci WHERE {
 				?stat ps:P8966 ?s.
 				OPTIONAL { ?stat pq:P8967 ?r. }
 				?prop	p:P8966 ?stat.
 				BIND(REPLACE(STR(?prop), 'http://www.wikidata.org/entity/', '')	AS ?p ).
+				OPTIONAL {
+					?prop p:P1552 ?ci.
+					?ci ps:P1552 wd:Q55121297.
+				}
 			} ORDER BY STRLEN(str(?s))
 		`;
 		let patterns = await sparqlQuery(query);
@@ -22,11 +26,13 @@ const URL_match_pattern = {
 					isValid = false;
 					console.warn('This regex is not valid', JSON.stringify(prop, null, 2));
 			}
+			console.debug(JSON.stringify(prop))
 			if (isValid) {
 				output.push({
 					p: prop.p.value,
 					s: regexp,
 					r: 'r' in prop ? prop.r.value.replace(/\\(\d+)/g, "$$$1") : "$1",
+					ci: 'ci' in prop ? typeof prop.ci.value === 'string' : false,
 				});
 			}
 		}
@@ -43,6 +49,7 @@ const URL_match_pattern = {
 				return [{
 					prop: prop.p,
 					value: href.replace(prop.s, prop.r),
+					valueIsCaseInsensitive: prop?.ci,
 					recommended: true,
 				}];
 			}
@@ -54,9 +61,11 @@ const URL_match_pattern = {
 
 		let prop = applicable[0].prop;
 		let id = applicable[0].value;
-		return await this.getEntityByRegexedId(prop, id);
+		let ci = applicable[0].valueIsCaseInsensitive;
+
+		return await this.getEntityByRegexedId(prop, id, ci);
 	},
-	getEntityByRegexedId: async function(prop, id) {
+	getEntityByRegexedId: async function(prop, id, ci = false) {
 		let cached = await this.checkIfCached(prop, id);
 		if (cached) {
 			return cached;
@@ -64,7 +73,8 @@ const URL_match_pattern = {
 		let query = `
 			SELECT ?item
 			WHERE {
-				?item wdt:${ prop } "${ id }".
+				?item wdt:${ prop } ${ ci ? '?id' : `"${id}"`}.
+				${ ci ? `filter(lcase(?id) = "${ id.toLowerCase() }")` : ''}
 			}
 		`;
 		let result = await sparqlQuery(query);
