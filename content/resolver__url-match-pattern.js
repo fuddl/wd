@@ -26,7 +26,6 @@ const URL_match_pattern = {
 					isValid = false;
 					console.warn('This regex is not valid', JSON.stringify(prop, null, 2));
 			}
-			console.debug(JSON.stringify(prop))
 			if (isValid) {
 				output.push({
 					p: prop.p.value,
