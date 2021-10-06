@@ -92,7 +92,7 @@ const URL_match_pattern = {
 		let cache = await browser.storage.local.get('externalIDCache');
 		let cacheKey = this.formCacheKey(prop, id);
 		if ('externalIDCache' in cache && cacheKey in cache.externalIDCache) {
-			console.debug(`Found ${cacheKey} in externalIDCache`);
+			//console.debug(`Found ${cacheKey} in externalIDCache`);
 			return cache.externalIDCache[cacheKey];
 		} else {
 			return false;

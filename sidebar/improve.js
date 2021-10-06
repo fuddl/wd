@@ -12,6 +12,7 @@ import { updateStatusInternal } from "../update-status.js"
 import { findMediaWikiData } from "./mw-data.js"
 import { findMetaData, enrichMetaData } from '../content/content__collect-meta.js';
 import { metaToStatements } from './metaToStatements.js';
+import { wdGetOSMElements, OSMToSatements } from './osm.js';
 import { URL_match_pattern } from "../content/resolver__url-match-pattern.js";
 
 async function checkRedirectForIds(url, propform, originalUrl, claims) {
@@ -127,6 +128,21 @@ if (window.location.search) {
 			});
 
 			const entities = await wikidataGetEntity(currentEntity, false);
+			
+			updateStatusInternal([
+				'Searching OpenStreetMap for relevant data…',
+			]);
+			let osmElements = await wdGetOSMElements(currentEntity);
+			
+			if (osmElements.length > 0) {
+				for (let element of osmElements) {
+					OSMToSatements(element, propform, {
+						url: element.sourceUrl,
+						title: element.title,
+					});
+				}
+			}
+
 			for (let id of Object.keys(entities)) {
 				let entity = entities[id];
 				let classes = await getAllClasses(id);
@@ -236,9 +252,6 @@ if (window.location.search) {
 				if (propform.children.length < 1) {
 					document.body.innerText = '';
 					document.body.appendChild(message);
-					browser.runtime.sendMessage({
-						type: 'unlock_sidebar',
-					});
 				}
 			}
 		})()
