@@ -390,12 +390,11 @@ function updateView(id, useCache = true) {
 				let description = getValueByLang(e, 'descriptions', false);
 
 				let hasDescription = description != false;
+				let titleFragment = document.createElement('div');
+				wrapper.appendChild(titleFragment);
+
 				if (!description) {
-					if ('claims' in e && 'P31' in e.claims) {
-						description = await getAutodesc(id);
-					} else {
-						description = '???';
-					}
+					description = '???';
 				} else {
 					let metaDesc = document.createElement('meta');
 					metaDesc.setAttribute('name', 'description');
@@ -403,15 +402,29 @@ function updateView(id, useCache = true) {
 					document.head.appendChild(metaDesc);
 				}
 
-				wrapper.appendChild(templates.ensign({
-					revid: e.lastrevid,
-					id: id,
-					label: getValueByLang(e, 'labels', e.title),
-					description: {
-						text: description,
-						provisional: !hasDescription
-					},
-				}));
+				const setTitle = (description) => {
+					if (titleFragment.firstChild) {
+						titleFragment.removeChild(titleFragment.firstChild);
+					}
+					titleFragment.appendChild(templates.ensign({
+						revid: e.lastrevid,
+						id: id,
+						label: getValueByLang(e, 'labels', e.title),
+						description: {
+							text: description,
+							provisional: !hasDescription
+						},
+					}));
+				}
+
+				setTitle(description);
+
+				if (!hasDescription && 'claims' in e && 'P31' in e.claims) {
+					(async () => {
+						description = await getAutodesc(id);
+						setTitle(description);
+					})()
+				}
 			}
 
 			let aliases = getAliasesByLang(e);
