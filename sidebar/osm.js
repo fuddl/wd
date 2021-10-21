@@ -71,7 +71,17 @@ const tagsAndKeys = [
 				return value;
 			},
 		}
-	}
+	},
+	{
+		tag: 'contact:email=*',
+		statement: {
+			prop: 'P968',
+			type: 'String',
+			value: (value) => {
+				return `mailto:${value}`;
+			},
+		}
+	},
 ];
 
 async function wdGetOSMElements(qid) {
@@ -156,6 +166,15 @@ function OSMToSatements(data, propform, source) {
 											"type": "monolingualtext"
 										},
 										"datatype": "string"
+									},
+									{
+										"snaktype": "value",
+										"property": "P1282",
+										"datavalue": {
+											"type":"string",
+											"value":`Tag:${keyValue[0]}=${data.element.tags[keyValue[0]]}`,
+										},
+										"datatype": "string"
 									}
 								]
 							]
@@ -165,7 +184,7 @@ function OSMToSatements(data, propform, source) {
 						} else {
 							job.object = {
 								'entity-type': "item",
-								'numeric-id': value,
+								'numeric-id': value.replace(/^Q/, ''),
 							};
 						}
 						check.setAttribute('value', JSON.stringify(job))
