@@ -67,9 +67,13 @@ const tagsAndKeys = [
 		statement: {
 			prop: 'P1329',
 			type: 'String',
-			value: (value) => {
-				return value;
-			},
+		}
+	},
+	{
+		tag: 'website=*',
+		statement: {
+			prop: 'P856',
+			type: 'String',
 		}
 	},
 	{
@@ -132,7 +136,12 @@ function OSMToSatements(data, propform, source) {
 					if (data.element.tags[keyValue[0]] === keyValue[1] || keyValue[1] === '*') {
 
 						const type = item?.statement?.type ?? 'Item';
-						const value = typeof item.statement.value === 'function' ? item.statement.value(data.element.tags[keyValue[0]]) : item.statement.value;
+						let value;
+						if (item.statement.value) {
+							value = typeof item.statement.value === 'function' ? item.statement.value(data.element.tags[keyValue[0]]) : item.statement.value;
+						} else {
+							value = data.element.tags[keyValue[0]];
+						}
 
 						if (!value) {
 							continue;
