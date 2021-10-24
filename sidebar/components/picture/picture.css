@@ -1,0 +1,21 @@
+.picture {
+	position: relative;
+}
+
+.picture > img {
+	vertical-align: bottom;
+}
+
+.picture__tag {
+	position: absolute;
+	top: 1em;
+	left: 1em;
+	background: white;
+	padding: .5em;
+}
+
+@media (prefers-color-scheme: dark) {
+	.picture__tag {
+		background: #2E3136;
+	}
+}

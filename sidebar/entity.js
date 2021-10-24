@@ -369,15 +369,6 @@ function updateView(id, useCache = true) {
 				}));
 			}
 
-			if (e.forms) {
-				wrapper.appendChild(templates.flex({
-					forms: e.forms,
-					category: e.lexicalCategory,
-					lang: e.language,
-					gender: typeof e.claims?.P5185 === 'object' ? e.claims?.P5185[0]?.mainsnak?.datavalue?.value?.id : null,
-					auxVerb: typeof e.claims?.P5401 === 'object' ? e.claims?.P5401[0]?.mainsnak?.datavalue?.value?.id : null,
-				}));
-			}
 
 			let metaCanon = document.createElement('meta');
 			metaCanon.setAttribute('name', 'canonical');
@@ -474,10 +465,22 @@ function updateView(id, useCache = true) {
 
 			let identifiers = document.createElement('div');
 			let items = document.createElement('div');
+			let glosses = document.createElement('div');
 
+			wrapper.appendChild(glosses);
 			wrapper.appendChild(items);
 			wrapper.appendChild(identifiers);
 			content.appendChild(wrapper);
+
+			if (e.forms) {
+				wrapper.appendChild(templates.flex({
+					forms: e.forms,
+					category: e.lexicalCategory,
+					lang: e.language,
+					gender: typeof e.claims?.P5185 === 'object' ? e.claims?.P5185[0]?.mainsnak?.datavalue?.value?.id : null,
+					auxVerb: typeof e.claims?.P5401 === 'object' ? e.claims?.P5401[0]?.mainsnak?.datavalue?.value?.id : null,
+				}));
+			}
 
 			if (e.claims || e.statements) {
 				let statements = await enrichStatements(e.claims ? e.claims : e.statements);
@@ -492,56 +495,116 @@ function updateView(id, useCache = true) {
 					}
 				}
 			}
-			for (let set of ['senses', 'forms']) {
-				if (e[set]) {
+			if (e['senses']) {
+				let senseTree = {};
+				let senseProps = {};
+				for (let sense of e['senses']) {
+					let id = sense.id;
+					senseTree[id] = {
+						sense: sense,
+						children: {},
+						symbol: '',
+						gloss: getValueByLang(sense, 'glosses', false),
+					}
+					if (!senseTree[id].gloss && senseTree[id].sense?.claims?.P5137?.[0].mainsnak?.datavalue?.value?.id) {
+						senseTree[id].gloss = templates.placeholder({
+							type: 'span',
+							entity: senseTree[id].sense.claims.P5137[0].mainsnak.datavalue.value.id,
+							desiredInner: 'descriptions',
+						});
+					}
+					if (sense?.claims) {
+						for (let cid in sense.claims) {
+							if (!senseProps.hasOwnProperty(cid)) {
+								senseProps[cid] = {
+									datatype: sense.claims[cid][0].mainsnak.datatype,
+									claims: {},
+								};
+							}
+							senseProps[cid].claims[id] = {
+								claim: sense.claims[cid],
+								sense: senseTree[id],
+							}
+						}
+					}
+				}
+				for (let id in senseTree) {
+					if (senseTree[id].sense?.claims?.P6593?.[0].mainsnak?.datavalue?.value?.id) {
+						let parentSense = senseTree[id].sense.claims.P6593[0].mainsnak.datavalue.value.id;
+						if (senseTree.hasOwnProperty(parentSense) && parentSense !== id) {
+							senseTree[parentSense].children[id] = { ...senseTree[id] };
+							delete senseTree[id];
+						}
+					}
+				}
 
-					for (let thisSet of e[set]) {
-						let setWrapper = document.createElement('div');
-						setWrapper.setAttribute('id', thisSet.id);
-						content.appendChild(setWrapper);
-						
-						let isPlaceholder = false;
-						for (let titleType of ['glosses', 'representations']) {
-							let title = false;
-							if (titleType === 'representations' && thisSet.representations) {
-								let titleParts = [];
-								for (let lang in thisSet.representations) {
-									titleParts.push(thisSet.representations[lang].value);
-									title = titleParts.join('/');
-								}
-							} else {
-								title = getValueByLang(thisSet, titleType, false);
-								if (!title && titleType === 'glosses' && thisSet.claims.P5137) {
-									let descriptions = [];
-									for (let item of thisSet.claims.P5137) {
-										if (checkNested(item, 'mainsnak', 'datavalue', 'value', 'id')) {
-											let itemId = item.mainsnak.datavalue.value.id;
-											let itemEntity = await wikidataGetEntity(itemId);
-											let description = getValueByLang(itemEntity[itemId], 'descriptions', false);
-											if (description) {
-												descriptions.push(description)
-											}
-										}
-										title = descriptions.join(', ');
-										isPlaceholder = true;
+				const number2Letter = (i) => {
+					const previousLetters = (i-1 >= 26 ? getColumnName(Math.floor(i-1 / 26) -1 ) : '');
+					const lastLetter = 'abcdefghijklmnopqrstuvwxyz'[(i-1) % 26]; 
+					return previousLetters + lastLetter;
+				}
+
+				let assignSymbols = (tree, parent = []) => {
+					let counter = 0;
+					for (let id in tree) {
+						counter++;
+						let symbol = counter.toString();
+						if (parent.length > 0) {
+							symbol = number2Letter(counter);
+						}
+						tree[id].symbol = [ ...parent, symbol ];
+						if (tree[id].children) {
+							tree[id].children = assignSymbols(tree[id].children, tree[id].symbol);
+						}
+					}
+					return tree;
+				}
+
+				senseTree = assignSymbols(senseTree);
+
+				let root = templates.glossary(senseTree);
+				glosses.appendChild(root);
+				for (let pid in senseProps) {
+					if (senseProps[pid].datatype === 'commonsMedia') {
+
+						let section = document.createElement('section');
+						let heading = document.createElement('h2');
+						let headingText = templates.placeholder({
+							entity: pid,
+							type: 'span',
+						});
+						heading.appendChild(headingText);
+						section.appendChild(heading);
+
+						for (let sid in senseProps[pid].claims) {
+							for (let stid in senseProps[pid].claims[sid].claim) {
+								let claim = senseProps[pid].claims[sid].claim[stid];
+								if (claim?.mainsnak?.datavalue?.value) {
+									let fileName = encodeURIComponent(claim?.mainsnak?.datavalue?.value);
+									let senseSymbol = document.createElement('span');
+									if (senseProps[pid].claims[sid].sense?.symbol) {
+										senseSymbol.innerText = `[${senseProps[pid].claims[sid].sense.symbol.join('')}]`;
+									} else {
+										senseSymbol = false;
 									}
+									if (fileName.match(/\.(jpe?g|png|gif|tiff?|stl)$/i)) {
+										section.appendChild(templates.picture({
+											srcSet: {
+												250: `http://commons.wikimedia.org/wiki/Special:FilePath/${ fileName }?width=250px`,
+												501: `http://commons.wikimedia.org/wiki/Special:FilePath/${ fileName }?width=501px`,
+												801: `http://commons.wikimedia.org/wiki/Special:FilePath/${ fileName }?width=801px`,
+												1068: `http://commons.wikimedia.org/wiki/Special:FilePath/${ fileName }?width=1068px`,
+											},
+											tag: senseSymbol,
+										}));
+									}
+
 								}
-							}
-							if (title) {
-								let headline = document.createElement('h2');
-								headline.innerText = title;
-								setWrapper.appendChild(headline);
-								if (isPlaceholder) {
-									headline.style.opacity = .75;
-								}
+
 							}
 						}
 
-						for (let prop of groupClaims(thisSet.claims)) {
-							let statement = renderStatement(thisSet.claims[prop]);
-							setWrapper.appendChild(statement.rendered);
-							
-						}
+						glosses.appendChild(section);
 					}
 				}
 			}

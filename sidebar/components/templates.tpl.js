@@ -1,20 +1,22 @@
 import { sparqlQuery } from '../../sqarql-query.js';
 
-import { placeholder } from './placeholder/placeholder.tpl.js';
+import { actions } from './actions/actions.tpl.js';
 import { annote } from './annote/annote.tpl.js';
+import { bouncer } from './bouncer/bouncer.tpl.js';
+import { breadcrumbs, breadcrumbsPlaceholder } from './breadcrumbs/breadcrumbs.tpl.js';
 import { direction } from './direction/direction.tpl.js';
 import { ensign } from './ensign/ensign.tpl.js';
 import { express, express__tag } from './express/express.tpl.js';
-import { breadcrumbs, breadcrumbsPlaceholder } from './breadcrumbs/breadcrumbs.tpl.js';
-import { mercator } from './mercator/mercator.tpl.js';
-import { remark } from './remark/remark.tpl.js';
-import { proof } from './proof/proof.tpl.js';
 import { flex } from './flex/flex.tpl.js';
-import { actions } from './actions/actions.tpl.js';
-import { title } from './title/title.tpl.js';
-import { join } from './join/join.tpl.js';
-import { bouncer } from './bouncer/bouncer.tpl.js';
+import { glossary } from './glossary/glossary.tpl.js';
 import { intertitle } from './intertitle/intertitle.tpl.js';
+import { join } from './join/join.tpl.js';
+import { mercator } from './mercator/mercator.tpl.js';
+import { picture } from './picture/picture.tpl.js';
+import { placeholder } from './placeholder/placeholder.tpl.js';
+import { proof } from './proof/proof.tpl.js';
+import { remark } from './remark/remark.tpl.js';
+import { title } from './title/title.tpl.js';
 
 const templates = {
 	actions: actions,
@@ -25,7 +27,9 @@ const templates = {
 	express: express, 
 	express__tag: express__tag,
 	flex: flex,
+	glossary: glossary,
 	mercator: mercator,
+	picture: picture,
 	placeholder: placeholder,
 	proof: proof,
 	remark: remark,
@@ -126,19 +130,6 @@ const templates = {
 			small.appendChild(text);
 		}
 		tag.appendChild(small);
-		return tag;
-	},
-	picture: (vars) => {
-		let tag = document.createElement('img');
-		let srcset = [];
-		for (let key in vars.srcSet) {
-			srcset.push(`${ vars.srcSet[key] } ${ key }w`);
-		}
-		tag.setAttribute('srcset', srcset.join(','));
-		tag.setAttribute('loading', 'lazy');
-
-		tag.setAttribute('src', vars.srcSet[0]);
-
 		return tag;
 	},
 	image: (vars) => {

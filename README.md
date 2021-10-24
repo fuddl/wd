@@ -13,7 +13,7 @@
 ## Development-Setup
 
 ```
-[sudo] npm install
+[sudo] npm install web-ext -g
 
 git clone git@github.com:fuddl/wd.git
 

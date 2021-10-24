@@ -53,8 +53,10 @@ const placeholder = (vars, cache) => {
 			let entity = await wikidataGetEntity(id);
 			link.setAttribute('href', getLink(id));
 			if (entity[id].labels || entity[id].descriptions) {
-				link.setAttribute('title', getValueByLang(entity[id], 'descriptions'));
-				link.innerText = getValueByLang(entity[id], 'labels', id);
+				if (vars.desiredInner != 'descriptions') {
+					link.setAttribute('title', getValueByLang(entity[id], 'descriptions'));
+				}
+				link.innerText = getValueByLang(entity[id], vars.desiredInner ?? 'labels', id);
 			} else if (entity[id].lemmas) {
 				let labels = [];
 				for (let lang in entity[id].lemmas) {
