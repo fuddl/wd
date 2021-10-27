@@ -16,7 +16,11 @@ const ensign = (vars) => {
 	header.classList.add('ensign');
 
 	title.classList.add('ensign__title');
-	title.innerText = vars.label;
+	if (typeof vars.label === 'string') {
+		title.innerText = vars.label;
+	} else if (vars.label instanceof Node) {
+		title.appendChild(vars.label);
+	}
 
 	id.classList.add('ensign__id');
 	let link = document.createElement('a');

@@ -12,6 +12,10 @@
 	margin-bottom: 0;
 }
 
+.ensign__title small {
+	font-size: .725em;
+}
+
 .ensign__description {
 	margin-top: 0;
 }

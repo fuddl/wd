@@ -1,3 +1,5 @@
+import { placeholder } from '../placeholder/placeholder.tpl.js';
+
 const glossary = (senses) => { 
 	let list = document.createElement('dl');
 
@@ -21,6 +23,17 @@ const glossary = (senses) => {
 		glossItem.classList.add('glossary__gloss');
 		list.appendChild(symbolItem);
 		list.appendChild(glossItem);
+
+		if (senses[id].item) {
+			let b = document.createElement('br');
+			let arrow = document.createTextNode('→' + String.fromCharCode(160));
+			let link = placeholder({
+				entity: senses[id].item,
+			});
+			glossItem.appendChild(b);
+			glossItem.appendChild(arrow);
+			glossItem.appendChild(link);
+		}
 		if (senses[id].children) {
 			glossItem.appendChild(glossary(senses[id].children));
 		}

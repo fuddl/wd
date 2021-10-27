@@ -9,6 +9,7 @@ import { templates } from './components/templates.tpl.js';
 import { wikidataGetEditToken, getTokens } from './wd-get-token.js';
 import { wikidataGetEntity } from '../wd-get-entity.js';
 import { ApplyFormatters } from './formatters.js';
+import { AddLemmaAffix } from './lemma-afixes.js';
 
 const lang = navigator.language.substr(0,2);
 const footnoteStorage = {};
@@ -344,9 +345,18 @@ function updateView(id, useCache = true) {
 			let wrapper = document.createElement('div');
 			
 			if (e.lemmas) {
-				let labels = [];
+				let labels = document.createDocumentFragment();
 				for (let lang in e.lemmas) {
-					labels.push(e.lemmas[lang].value)
+					let lemma = AddLemmaAffix(e.lemmas[lang].value, {
+						category: e.lexicalCategory,
+						lang: e.language,
+						gender: typeof e.claims?.P5185 === 'object' ? e.claims?.P5185[0]?.mainsnak?.datavalue?.value?.id : null,
+					});
+
+					if (labels.childNodes.length !== 0) {
+						labels.appendChild(document.createTextNode(' ‧ '));
+					}
+					labels.appendChild(lemma);
 				}
 
 				let lexemeDescription = document.createDocumentFragment();
@@ -364,7 +374,7 @@ function updateView(id, useCache = true) {
 				wrapper.appendChild(templates.ensign({
 					revid: e.lastrevid,
 					id: id,
-					label: labels.join(' ‧ '),
+					label: labels,
 					description: { text: lexemeDescription },
 				}));
 			}
@@ -472,16 +482,6 @@ function updateView(id, useCache = true) {
 			wrapper.appendChild(identifiers);
 			content.appendChild(wrapper);
 
-			if (e.forms) {
-				wrapper.appendChild(templates.flex({
-					forms: e.forms,
-					category: e.lexicalCategory,
-					lang: e.language,
-					gender: typeof e.claims?.P5185 === 'object' ? e.claims?.P5185[0]?.mainsnak?.datavalue?.value?.id : null,
-					auxVerb: typeof e.claims?.P5401 === 'object' ? e.claims?.P5401[0]?.mainsnak?.datavalue?.value?.id : null,
-				}));
-			}
-
 			if (e.claims || e.statements) {
 				let statements = await enrichStatements(e.claims ? e.claims : e.statements);
 				for (let prop of groupClaims(statements)) {
@@ -513,6 +513,13 @@ function updateView(id, useCache = true) {
 							desiredInner: 'descriptions',
 						});
 					}
+
+					if (senseTree[id].sense?.claims?.P5137?.[0].mainsnak?.datavalue?.value?.id) {
+						senseTree[id].item = senseTree[id].sense.claims.P5137[0].mainsnak.datavalue.value.id;
+					} else if (senseTree[id].sense?.claims?.P9970?.[0].mainsnak?.datavalue?.value?.id) {
+						senseTree[id].item = senseTree[id].sense.claims.P9970[0].mainsnak.datavalue.value.id;
+					}
+					
 					if (sense?.claims) {
 						for (let cid in sense.claims) {
 							if (!senseProps.hasOwnProperty(cid)) {
@@ -532,7 +539,7 @@ function updateView(id, useCache = true) {
 					if (senseTree[id].sense?.claims?.P6593?.[0].mainsnak?.datavalue?.value?.id) {
 						let parentSense = senseTree[id].sense.claims.P6593[0].mainsnak.datavalue.value.id;
 						if (senseTree.hasOwnProperty(parentSense) && parentSense !== id) {
-							senseTree[parentSense].children[id] = { ...senseTree[id] };
+							senseTree[parentSense].children[id] = senseTree[id];
 							delete senseTree[id];
 						}
 					}
@@ -607,6 +614,16 @@ function updateView(id, useCache = true) {
 						glosses.appendChild(section);
 					}
 				}
+			}
+
+			if (e.forms) {
+				glosses.appendChild(templates.flex({
+					forms: e.forms,
+					category: e.lexicalCategory,
+					lang: e.language,
+					gender: typeof e.claims?.P5185 === 'object' ? e.claims?.P5185[0]?.mainsnak?.datavalue?.value?.id : null,
+					auxVerb: typeof e.claims?.P5401 === 'object' ? e.claims?.P5401[0]?.mainsnak?.datavalue?.value?.id : null,
+				}));
 			}
 		}
 

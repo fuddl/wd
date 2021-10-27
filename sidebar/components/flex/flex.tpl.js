@@ -107,12 +107,49 @@ const flex = (vars) => {
 				},
 			};
 
-			if (vars.gender === 'Q499327') {
-				// male
+			if (vars.gender === 'Q1775415') {
+				// female
 				affixes = [
 					{
 						features: ['Q131105', 'Q110786'],
+						prefix: tn(`die `),
+					},
+					{
+						features: ['Q131105', 'Q146786'],
+						prefix: tn(`die `),
+					},
+					{
+						features: ['Q146233', 'Q110786'],
 						prefix: tn(`der `),
+					},
+					{
+						features: ['Q146233', 'Q146786'],
+						prefix: tn(`der `),
+					},
+					{
+						features: ['Q145599', 'Q110786'],
+						prefix: tn(`der `),
+					},
+					{
+						features: ['Q145599', 'Q146786'],
+						prefix: tn(`den `),
+					},
+					{
+						features: ['Q146078', 'Q110786'],
+						prefix: tn(`die `),
+					},
+					{
+						features: ['Q146078', 'Q146786'],
+						prefix: tn(`die `),
+					},
+				];
+			}
+			if (vars.gender === 'Q1775461') {
+				// neuter
+				affixes = [
+					{
+						features: ['Q131105', 'Q110786'],
+						prefix: tn(`das `),
 					},
 					{
 						features: ['Q131105', 'Q146786'],
@@ -136,7 +173,7 @@ const flex = (vars) => {
 					},
 					{
 						features: ['Q146078', 'Q110786'],
-						prefix: tn(`den `),
+						prefix: tn(`das `),
 					},
 					{
 						features: ['Q146078', 'Q146786'],
@@ -276,19 +313,19 @@ const flex = (vars) => {
 		if (vars.category === 'Q34698') {
 			yAxis = {
 				positive: {
-					features: ['Q3482678', 'Q1931259'],
+					features: ['Q3482678'],
 					hidden: ['Q1931259'],
 				},
 				comperative: {
-					features: ['Q14169499'],
+					features: ['Q577714'],
 				},
 				superlative: {
-					features: ['Q1817208'],
+					features: ['Q5483481'],
 				},
 			};
 			affixes = [
 				{
-					features: ['Q1817208'],
+					features: ['Q5483481'],
 					prefix: tn(`am `),
 				},
 			]
