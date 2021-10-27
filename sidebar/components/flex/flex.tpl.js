@@ -144,12 +144,12 @@ const flex = (vars) => {
 					},
 				];
 			}
-			if (vars.gender === 'Q1775461') {
-				// neuter
+			if (vars.gender === 'Q499327') {
+				// male
 				affixes = [
 					{
 						features: ['Q131105', 'Q110786'],
-						prefix: tn(`das `),
+						prefix: tn(`der `),
 					},
 					{
 						features: ['Q131105', 'Q146786'],
@@ -173,7 +173,7 @@ const flex = (vars) => {
 					},
 					{
 						features: ['Q146078', 'Q110786'],
-						prefix: tn(`das `),
+						prefix: tn(`den `),
 					},
 					{
 						features: ['Q146078', 'Q146786'],
