@@ -504,6 +504,7 @@ function updateView(id, useCache = true) {
 						sense: sense,
 						children: {},
 						symbol: '',
+						field: null,
 						gloss: getValueByLang(sense, 'glosses', false),
 					}
 					if (!senseTree[id].gloss && senseTree[id].sense?.claims?.P5137?.[0].mainsnak?.datavalue?.value?.id) {
@@ -520,6 +521,10 @@ function updateView(id, useCache = true) {
 						senseTree[id].item = senseTree[id].sense.claims.P9970[0].mainsnak.datavalue.value.id;
 					}
 					
+					if (senseTree[id].sense?.claims?.P9488?.[0].mainsnak?.datavalue?.value?.id) {
+						senseTree[id].field = senseTree[id].sense.claims.P9488[0].mainsnak.datavalue.value.id;
+					}
+
 					if (sense?.claims) {
 						for (let cid in sense.claims) {
 							if (!senseProps.hasOwnProperty(cid)) {
@@ -535,6 +540,7 @@ function updateView(id, useCache = true) {
 						}
 					}
 				}
+
 				for (let id in senseTree) {
 					if (senseTree[id].sense?.claims?.P6593?.[0].mainsnak?.datavalue?.value?.id) {
 						let parentSense = senseTree[id].sense.claims.P6593[0].mainsnak.datavalue.value.id;
@@ -594,7 +600,7 @@ function updateView(id, useCache = true) {
 									} else {
 										senseSymbol = false;
 									}
-									if (fileName.match(/\.(jpe?g|png|gif|tiff?|stl)$/i)) {
+									if (fileName.match(/\.(jpe?g|png|gif|tiff?)$/i)) {
 										section.appendChild(templates.picture({
 											srcSet: {
 												250: `http://commons.wikimedia.org/wiki/Special:FilePath/${ fileName }?width=250px`,

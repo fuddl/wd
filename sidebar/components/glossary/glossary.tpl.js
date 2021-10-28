@@ -15,9 +15,21 @@ const glossary = (senses) => {
 		symbolItem.classList.add('glossary__symbol');
 		let glossItem = document.createElement('dd');
 		symbolItem.innerText = `[${senses[id].symbol.join('')}]`;
+
+		if (senses[id].field) {
+			console.debug(senses[id].field);
+			let field = placeholder({
+				entity: senses[id].field,
+			});
+			let em = document.createElement('em');
+			em.appendChild(field);
+			glossItem.appendChild(em);
+			glossItem.appendChild(document.createTextNode(': '));
+		}
+
 		if (typeof senses[id].gloss === 'string') {
-			glossItem.innerText = senses[id].gloss;
-		} else if ( senses[id].gloss instanceof HTMLElement) {
+			glossItem.appendChild(document.createTextNode(senses[id].gloss));
+		} else if (senses[id].gloss instanceof HTMLElement) {
 			glossItem.appendChild(senses[id].gloss);
 		}
 		glossItem.classList.add('glossary__gloss');
