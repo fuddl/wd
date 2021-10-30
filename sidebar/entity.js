@@ -557,17 +557,18 @@ function updateView(id, useCache = true) {
 					return previousLetters + lastLetter;
 				}
 
-				let assignSymbols = (tree, parent = []) => {
+				let assignSymbols = (tree, parent = '') => {
 					let counter = 0;
 					for (let id in tree) {
 						counter++;
-						let symbol = counter.toString();
+						let child = counter.toString();
 						if (parent.length > 0) {
-							symbol = number2Letter(counter);
+							child = number2Letter(counter);
 						}
-						tree[id].symbol = [ ...parent, symbol ];
+						let thisSymbol = `${parent}${child}`;
+						tree[id].symbol = templates.symbol(thisSymbol, id);
 						if (tree[id].children) {
-							tree[id].children = assignSymbols(tree[id].children, tree[id].symbol);
+							tree[id].children = assignSymbols(tree[id].children, thisSymbol);
 						}
 					}
 					return tree;
@@ -594,11 +595,9 @@ function updateView(id, useCache = true) {
 								let claim = senseProps[pid].claims[sid].claim[stid];
 								if (claim?.mainsnak?.datavalue?.value) {
 									let fileName = encodeURIComponent(claim?.mainsnak?.datavalue?.value);
-									let senseSymbol = document.createElement('span');
+									let senseSymbol = false;
 									if (senseProps[pid].claims[sid].sense?.symbol) {
-										senseSymbol.innerText = `[${senseProps[pid].claims[sid].sense.symbol.join('')}]`;
-									} else {
-										senseSymbol = false;
+										senseSymbol = senseProps[pid].claims[sid].sense.symbol.cloneNode(true);
 									}
 									if (fileName.match(/\.(jpe?g|png|gif|tiff?)$/i)) {
 										section.appendChild(templates.picture({

@@ -1,13 +1,15 @@
 .glossary {
 	display: grid;
 	grid-template-columns: auto 1fr;
-	grid-gap: 0 .25em;
+	grid-gap: .25em;
 	font-family: 'Linux Libertine','Georgia','Times',serif;
 	font-size: 1.2rem;
 	line-height: 1.3;
 	font-weight: 400;
+	margin: .25em 0;
 }
 
 .glossary__gloss {
 	margin: 0;
+	padding-left: .25em;
 }

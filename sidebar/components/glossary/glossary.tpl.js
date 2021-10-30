@@ -14,10 +14,9 @@ const glossary = (senses) => {
 		let symbolItem = document.createElement('dt');
 		symbolItem.classList.add('glossary__symbol');
 		let glossItem = document.createElement('dd');
-		symbolItem.innerText = `[${senses[id].symbol.join('')}]`;
+		symbolItem.appendChild(senses[id].symbol.cloneNode(true));
 
 		if (senses[id].field) {
-			console.debug(senses[id].field);
 			let field = placeholder({
 				entity: senses[id].field,
 			});
@@ -46,7 +45,7 @@ const glossary = (senses) => {
 			glossItem.appendChild(arrow);
 			glossItem.appendChild(link);
 		}
-		if (senses[id].children) {
+		if (JSON.stringify(senses[id].children) != '{}') {
 			glossItem.appendChild(glossary(senses[id].children));
 		}
 	}

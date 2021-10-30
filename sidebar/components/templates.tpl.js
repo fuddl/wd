@@ -16,6 +16,7 @@ import { picture } from './picture/picture.tpl.js';
 import { placeholder } from './placeholder/placeholder.tpl.js';
 import { proof } from './proof/proof.tpl.js';
 import { remark } from './remark/remark.tpl.js';
+import { symbol } from './symbol/symbol.tpl.js';
 import { title } from './title/title.tpl.js';
 
 const templates = {
@@ -33,6 +34,7 @@ const templates = {
 	placeholder: placeholder,
 	proof: proof,
 	remark: remark,
+	symbol: symbol,
 	direction: direction,
 	title: title,
 	join: join,

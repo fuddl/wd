@@ -1,0 +1,16 @@
+.symbol {
+	background: #c8ccd1;
+	border-radius: 1em;
+	width: 2em;
+	line-height: 2em;
+	text-align: center;
+	display: inline-block;
+	font-size: .75rem;
+	font-family: "Linux Libertine", "Georgia", "Times", 'pIqaD', serif;
+}
+
+@media (prefers-color-scheme: dark) {
+	.symbol {
+		color: #27292D;
+	}
+}
