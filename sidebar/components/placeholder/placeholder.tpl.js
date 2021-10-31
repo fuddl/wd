@@ -77,11 +77,14 @@ const placeholder = (vars, cache) => {
 					labels.push(baseEntity[baseEntityId].lemmas[lang].value)
 				}
 				link.innerText = labels.join(' ‧ ');
-				let gloss = document.createElement('small');
-				gloss.innerText = getValueByLang(entity[id], 'glosses', id);
-				gloss.style.display = 'block';
-				link.style.display = 'inline-block';
-				link.appendChild(gloss);
+
+				if (vars?.displayGloss ?? true) {
+					let gloss = document.createElement('small');
+					gloss.innerText = getValueByLang(entity[id], 'glosses', id);
+					gloss.style.display = 'block';
+					link.style.display = 'inline-block';
+					link.appendChild(gloss);
+				} 
 			}
 		}
 		if (link.tagName === 'A') {

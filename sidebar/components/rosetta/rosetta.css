@@ -1,0 +1,25 @@
+.rosetta {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(10em, 1fr));
+	grid-gap: 1em;
+}
+
+.rosetta__group {
+	margin: 0;
+}
+
+.rosetta__lang {
+	font-weight: bold;
+	margin-bottom: .5em;
+}
+
+.rosetta__lang > a {
+	color: inherit;
+}
+
+.rosetta__words {
+	margin: 0 0 .5em 0;
+	display: grid;
+	grid-template-columns: auto 1fr;
+	grid-gap: .5em;
+}

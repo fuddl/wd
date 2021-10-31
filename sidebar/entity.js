@@ -617,6 +617,42 @@ function updateView(id, useCache = true) {
 						}
 
 						glosses.appendChild(section);
+					} else if (senseProps[pid].datatype === 'wikibase-sense') {
+						let section = document.createElement('section');
+						let heading = document.createElement('h2');
+						let headingText = templates.placeholder({
+							entity: pid,
+							type: 'span',
+						});
+						heading.appendChild(headingText);
+						section.appendChild(heading);
+
+						let translations = {};
+						for (let sid in senseProps[pid].claims) {
+							for (let stid in senseProps[pid].claims[sid].claim) {
+								let claim = senseProps[pid].claims[sid].claim[stid];
+								if (claim?.mainsnak?.datavalue?.value) {
+									const senseId = claim.mainsnak.datavalue.value.id;
+									const lexemeId = senseId.split('-')[0];
+									const lexeme = await wikidataGetEntity(lexemeId);
+									const lexemeLanguage = lexeme[lexemeId].language;
+									if (!translations.hasOwnProperty(lexemeLanguage)) {
+										translations[lexemeLanguage] = {};
+									}
+									if (!translations[lexemeLanguage].hasOwnProperty(sid)) { 
+										translations[lexemeLanguage][sid] = {
+											symbol: senseProps[pid].claims[sid].sense?.symbol ?  senseProps[pid].claims[sid].sense.symbol.cloneNode(true) : false,
+											senses: [],
+										};
+									}
+									translations[lexemeLanguage][sid].senses.push(senseId);
+								}
+							}
+						}
+
+						section.appendChild(templates.rosetta(translations));
+
+						glosses.appendChild(section);
 					}
 				}
 			}
