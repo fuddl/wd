@@ -33,7 +33,6 @@ const url = {
 			  }
 			}
 		`;
-		console.debug(query);
 		let entity = await sparqlQuery(query);
 		if (entity[0]) {
 			let entityId = entity[0].item.value.match(/https?:\/\/www\.wikidata\.org\/entity\/(Q\d+)/)[1]

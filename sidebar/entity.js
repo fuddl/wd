@@ -495,6 +495,7 @@ function updateView(id, useCache = true) {
 					}
 				}
 			}
+			const singleSense = e['senses'].length === 1;
 			if (e['senses']) {
 				let senseTree = {};
 				let senseProps = {};
@@ -574,7 +575,9 @@ function updateView(id, useCache = true) {
 					return tree;
 				}
 
-				senseTree = assignSymbols(senseTree);
+				if (!singleSense) {
+					senseTree = assignSymbols(senseTree);
+				}
 
 				let root = templates.glossary(senseTree);
 				glosses.appendChild(root);

@@ -14,7 +14,9 @@ const glossary = (senses) => {
 		let symbolItem = document.createElement('dt');
 		symbolItem.classList.add('glossary__symbol');
 		let glossItem = document.createElement('dd');
-		symbolItem.appendChild(senses[id].symbol.cloneNode(true));
+		if (senses[id].symbol) {
+			symbolItem.appendChild(senses[id].symbol.cloneNode(true));
+		}
 
 		if (senses[id].field) {
 			let field = placeholder({
