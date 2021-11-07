@@ -431,6 +431,7 @@ const flex = (vars) => {
 			let yFeatures =  yAxis[y].features;
 			let dCell = document.createElement('td');
 			for (let form of vars.forms) {
+				let hyphenisation = form?.claims?.P5279?.[0]?.mainsnak?.datavalue?.value;
 				let variation = document.createElement('div');
 				if (oneColumn || xFeatures.every(v => form.grammaticalFeatures.includes(v))) {
 					if (yFeatures.every(v => { return form.grammaticalFeatures.includes(v) })) {
@@ -447,12 +448,16 @@ const flex = (vars) => {
 						variation.appendChild(formLink);
 						for (let rep in form.representations) {
 							let repSpan = document.createElement('span');
-							repSpan.setAttribute('lang', form.representations[rep]);
-							repSpan.innerText = form.representations[rep].value;
+							repSpan.setAttribute('lang', form.representations[rep].language);
+							let formStr = form.representations[rep].value;
+							if (hyphenisation && hyphenisation.replace(/‧/g, '') === formStr) {
+								formStr = hyphenisation.replace(/‧/g, String.fromCodePoint(173));
+							}
+							repSpan.innerText = formStr;
 							formLink.appendChild(repSpan);
 						}
 						if (affix?.suffix) {
-							variation.appendChild(affix.suffix);
+							variation.appendChild(affix.suffix.cloneNode());
 						}
 						dCell.appendChild(variation);
 					}

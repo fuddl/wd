@@ -38,7 +38,7 @@ a:hover {
 a {
 	text-decoration: none;
 	color: #3366cc;
-	hyphens: none;
+	hyphens: manual;
 }
 
 @media (prefers-color-scheme: dark) {
