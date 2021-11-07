@@ -440,7 +440,7 @@ const flex = (vars) => {
 							}
 						});
 						if (affix?.prefix) {
-							variation.appendChild(affix.prefix);
+							variation.appendChild(affix.prefix.cloneNode());
 						}
 						let formLink = document.createElement('a');
 						formLink.setAttribute('href', '#' + form.id);

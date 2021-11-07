@@ -650,7 +650,7 @@ function updateView(id, useCache = true) {
 							}
 						}
 
-						section.appendChild(templates.rosetta(translations));
+						section.appendChild(templates.rosetta(translations, e.language));
 
 						glosses.appendChild(section);
 					}

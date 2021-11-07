@@ -1,18 +1,23 @@
 import { placeholder } from '../placeholder/placeholder.tpl.js';
 
-const rosetta = (translations) => { 
+const rosetta = (translations, mainLanguage) => { 
 	let div = document.createElement('div');
 	div.classList.add('rosetta');
+
+	const mainOnly = Object.keys(translations).length === 1 && translations.hasOwnProperty(mainLanguage);
+
 	for (let language in translations) {
-		let dl = document.createElement('dl');
+		let dl = document.createElement(mainOnly ? 'div' : 'dl');
 		dl.classList.add('rosetta__group');
 		div.appendChild(dl);
-		let dt = document.createElement('dt');
-		dt.appendChild(placeholder({entity: language }));
-		dt.classList.add('rosetta__lang');
-		dl.appendChild(dt);
+		if (!mainOnly) {
+			let dt = document.createElement('dt');
+			dt.appendChild(placeholder({entity: language }));
+			dt.classList.add('rosetta__lang');
+			dl.appendChild(dt);
+		}
 		for (let sense in translations[language]) {
-			let d = document.createElement('dd');
+			let d = document.createElement(mainOnly ? 'div' : 'dd');
 			d.classList.add('rosetta__words');
 			if (translations[language][sense].symbol) {
 				let symbolWrapper = document.createElement('span');
