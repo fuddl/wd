@@ -495,8 +495,8 @@ function updateView(id, useCache = true) {
 					}
 				}
 			}
-			const singleSense = e['senses'].length === 1;
 			if (e['senses']) {
+				const singleSense = e['senses'].length === 1;
 				let senseTree = {};
 				let senseProps = {};
 				for (let sense of e['senses']) {
