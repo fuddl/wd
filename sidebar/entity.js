@@ -17,6 +17,20 @@ let refCounter = {};
 
 let cache = {}
 
+function highlightWord(el, text) {
+  let t = el.textContent;
+  el.textContent = '';
+  let idx, prev = 0;
+  while((idx = t.indexOf(text, prev)) !== -1){
+    el.append(t.slice(prev, idx));
+    const mark = document.createElement('mark');
+    mark.textContent = text;
+    el.appendChild(mark);
+    prev = idx + text.length;
+  }
+  el.append(t.slice(prev));
+}
+
 function checkNested(obj, level,	...rest) {
 	if (obj === undefined) return false
 	if (rest.length == 0 && obj.hasOwnProperty(level)) return true
@@ -655,6 +669,43 @@ function updateView(id, useCache = true) {
 
 						section.appendChild(templates.rosetta(translations, e.language));
 
+						glosses.appendChild(section);
+					}
+				}
+			}
+
+			if (e.claims) {
+				for (let cid in e.claims) {
+					if(e.claims[cid]?.[0].mainsnak?.datatype === 'monolingualtext') {
+						let section = document.createElement('section');
+						let heading = document.createElement('h2');
+						let headingText = templates.placeholder({
+							entity: cid,
+							type: 'span',
+						});
+						heading.appendChild(headingText);
+						section.appendChild(heading);
+						for (let claim of e.claims[cid]) {
+							if(claim?.mainsnak?.datavalue?.value?.text) {
+								let quote = claim.mainsnak.datavalue.value.text;
+								let lang = claim.mainsnak.datavalue.value.language;
+								let bq = templates.blockquote(quote, lang);
+								if (claim?.qualifiers?.P5830?.[0]?.datavalue?.value?.id) {
+									let subjectForm = claim.qualifiers.P5830[0].datavalue.value.id;
+									for (let fid in e.forms) {
+										if (e.forms[fid]?.id === subjectForm) {
+											for (let rep in e.forms[fid].representations) {
+												if (e.forms[fid].representations[rep]) {
+													let repString = e.forms[fid].representations[rep].value;
+													highlightWord(bq, repString);
+												}
+											}
+										}
+									}
+								}
+								section.appendChild(bq);
+							}
+						}
 						glosses.appendChild(section);
 					}
 				}

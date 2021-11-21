@@ -101,7 +101,11 @@ const templates = {
 	blockquote: (text, lang) => {
 		let tag = document.createElement('blockquote');
 		tag.setAttribute('lang', lang);
-		tag.innerText = text;
+		if (typeof text === 'string') {
+			tag.innerText = text;
+		} else {
+			
+		}
 		return tag;
 	},
 	idLinksPlaceholder: (prop, id) => {

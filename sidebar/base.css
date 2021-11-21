@@ -24,6 +24,12 @@ body {
 	margin: 0;
 }
 
+mark {
+	background: #7198F7;
+	display: inline-block;
+	padding: 0 .25em;
+}
+
 @media (prefers-color-scheme: dark) {
 	body {
 		background: #27292D;
