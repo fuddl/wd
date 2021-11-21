@@ -14,11 +14,21 @@
 	vertical-align: top;
 }
 
+.flex__variant:nth-child(n+2) {
+	border-top: 1px solid #eaecf0;
+	padding-top: .2em;
+	margin-top: .2em;
+}
+
 @media (prefers-color-scheme: dark) {
 	.flex td,
 	.flex th {
 		border-color: #44464A;
 	}
+	.flex__variant:nth-child(n+2) {
+		border-top-color: #44464A;
+	}
+
 }
 
 .flex th {
@@ -28,5 +38,11 @@
 @media (prefers-color-scheme: dark) {
 	.flex th {
 		background-color: #27292D;
+	}
+}
+
+@media (max-width: 300px) {
+	.flex__affix {
+		display: none;
 	}
 }

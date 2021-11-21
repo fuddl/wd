@@ -433,6 +433,7 @@ const flex = (vars) => {
 			for (let form of vars.forms) {
 				let hyphenisation = form?.claims?.P5279?.[0]?.mainsnak?.datavalue?.value;
 				let variation = document.createElement('div');
+				variation.classList.add('flex__variant');
 				if (oneColumn || xFeatures.every(v => form.grammaticalFeatures.includes(v))) {
 					if (yFeatures.every(v => { return form.grammaticalFeatures.includes(v) })) {
 						let affix = affixes.find((v) => {
@@ -441,7 +442,10 @@ const flex = (vars) => {
 							}
 						});
 						if (affix?.prefix) {
-							variation.appendChild(affix.prefix.cloneNode());
+							let affixElement = document.createElement('span');
+							affixElement.classList.add('flex__affix');
+							affixElement.appendChild(affix.prefix.cloneNode());
+							variation.appendChild(affixElement);
 						}
 						let formLink = document.createElement('a');
 						formLink.setAttribute('href', '#' + form.id);
