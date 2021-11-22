@@ -672,44 +672,44 @@ function updateView(id, useCache = true) {
 						glosses.appendChild(section);
 					}
 				}
-			}
-
-			if (e.claims) {
-				for (let cid in e.claims) {
-					if(e.claims[cid]?.[0].mainsnak?.datatype === 'monolingualtext') {
-						let section = document.createElement('section');
-						let heading = document.createElement('h2');
-						let headingText = templates.placeholder({
-							entity: cid,
-							type: 'span',
-						});
-						heading.appendChild(headingText);
-						section.appendChild(heading);
-						for (let claim of e.claims[cid]) {
-							if(claim?.mainsnak?.datavalue?.value?.text) {
-								let quote = claim.mainsnak.datavalue.value.text;
-								let lang = claim.mainsnak.datavalue.value.language;
-								let bq = templates.blockquote(quote, lang);
-								if (claim?.qualifiers?.P5830?.[0]?.datavalue?.value?.id) {
-									let subjectForm = claim.qualifiers.P5830[0].datavalue.value.id;
-									for (let fid in e.forms) {
-										if (e.forms[fid]?.id === subjectForm) {
-											for (let rep in e.forms[fid].representations) {
-												if (e.forms[fid].representations[rep]) {
-													let repString = e.forms[fid].representations[rep].value;
-													highlightWord(bq, repString);
+				if (e.claims) {
+					for (let cid in e.claims) {
+						if(e.claims[cid]?.[0].mainsnak?.datatype === 'monolingualtext') {
+							let section = document.createElement('section');
+							let heading = document.createElement('h2');
+							let headingText = templates.placeholder({
+								entity: cid,
+								type: 'span',
+							});
+							heading.appendChild(headingText);
+							section.appendChild(heading);
+							for (let claim of e.claims[cid]) {
+								if(claim?.mainsnak?.datavalue?.value?.text) {
+									let quote = claim.mainsnak.datavalue.value.text;
+									let lang = claim.mainsnak.datavalue.value.language;
+									let bq = templates.blockquote(quote, lang);
+									if (claim?.qualifiers?.P5830?.[0]?.datavalue?.value?.id) {
+										let subjectForm = claim.qualifiers.P5830[0].datavalue.value.id;
+										for (let fid in e.forms) {
+											if (e.forms[fid]?.id === subjectForm) {
+												for (let rep in e.forms[fid].representations) {
+													if (e.forms[fid].representations[rep]) {
+														let repString = e.forms[fid].representations[rep].value;
+														highlightWord(bq, repString);
+													}
 												}
 											}
 										}
 									}
+									section.appendChild(bq);
 								}
-								section.appendChild(bq);
 							}
+							glosses.appendChild(section);
 						}
-						glosses.appendChild(section);
 					}
 				}
 			}
+
 
 			if (e.forms) {
 				glosses.appendChild(templates.flex({
