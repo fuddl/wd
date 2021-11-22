@@ -512,16 +512,19 @@ function updateView(id, useCache = true) {
 			if (e['senses']) {
 				const singleSense = e['senses'].length === 1;
 				let senseTree = {};
+				let senseFlat = {};
 				let senseProps = {};
 				for (let sense of e['senses']) {
 					let id = sense.id;
-					senseTree[id] = {
+					let newSense = {
 						sense: sense,
 						children: {},
 						symbol: '',
 						field: null,
 						gloss: getValueByLang(sense, 'glosses', false),
 					}
+					senseTree[id] = newSense;
+					senseFlat[id] = newSense;
 					if (!senseTree[id].gloss && senseTree[id].sense?.claims?.P5137?.[0].mainsnak?.datavalue?.value?.id) {
 						senseTree[id].gloss = templates.placeholder({
 							type: 'span',
@@ -689,15 +692,28 @@ function updateView(id, useCache = true) {
 									let lang = claim.mainsnak.datavalue.value.language;
 									let bq = templates.blockquote(quote, lang);
 									if (claim?.qualifiers?.P5830?.[0]?.datavalue?.value?.id) {
-										let subjectForm = claim.qualifiers.P5830[0].datavalue.value.id;
-										for (let fid in e.forms) {
-											if (e.forms[fid]?.id === subjectForm) {
-												for (let rep in e.forms[fid].representations) {
-													if (e.forms[fid].representations[rep]) {
-														let repString = e.forms[fid].representations[rep].value;
-														highlightWord(bq, repString);
+										for (let form of claim.qualifiers.P5830) {
+											let subjectForm = form.datavalue.value.id;
+											for (let fid in e.forms) {
+												if (e.forms[fid]?.id === subjectForm) {
+													for (let rep in e.forms[fid].representations) {
+														if (e.forms[fid].representations[rep]) {
+															let repString = e.forms[fid].representations[rep].value;
+															highlightWord(bq, repString);
+
+														}
 													}
 												}
+											}
+										}
+									}
+									if (claim?.qualifiers?.P6072?.[0]?.datavalue?.value?.id) {
+										let subjectSense = claim.qualifiers.P6072;
+										for (let sense of claim.qualifiers.P6072) {
+											if(senseFlat.hasOwnProperty(sense.datavalue.value.id)) {
+												let symbol = senseFlat[sense.datavalue.value.id].symbol.cloneNode(true);
+												bq.insertBefore(symbol, bq.firstChild);
+												bq.insertBefore(document.createTextNode(' '), symbol.nextSibling);
 											}
 										}
 									}
