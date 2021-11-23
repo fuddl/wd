@@ -711,9 +711,11 @@ function updateView(id, useCache = true) {
 										let subjectSense = claim.qualifiers.P6072;
 										for (let sense of claim.qualifiers.P6072) {
 											if(senseFlat.hasOwnProperty(sense.datavalue.value.id)) {
-												let symbol = senseFlat[sense.datavalue.value.id].symbol.cloneNode(true);
-												bq.insertBefore(symbol, bq.firstChild);
-												bq.insertBefore(document.createTextNode(' '), symbol.nextSibling);
+												if (senseFlat[sense.datavalue.value.id].symbol) {
+													let symbol = senseFlat[sense.datavalue.value.id].symbol.cloneNode(true);
+													bq.insertBefore(symbol, bq.firstChild);
+													bq.insertBefore(document.createTextNode(' '), symbol.nextSibling);
+												}
 											}
 										}
 									}
