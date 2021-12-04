@@ -86,6 +86,20 @@ const placeholder = (vars, cache) => {
 					link.appendChild(gloss);
 				} 
 			}
+		} else if (vars.json) {
+			try {
+				const response = await fetch(vars.json);
+
+				if (response.status !== 200) {
+					throw 'Status Code: ' + response.status;
+				}
+
+				let json = await response.json();
+
+				link.innerText = vars.extractor(json);
+			} catch(error) {
+				throw ['Fetch Error :-S', error];
+			}
 		}
 		if (link.tagName === 'A') {
 			link.addEventListener('click', (e) => {

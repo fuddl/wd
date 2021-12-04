@@ -34,13 +34,9 @@ const flex = (vars) => {
 		// verb
 		if (vars.category === 'Q24905') {
 			yAxis = {
-				presentSingular: {
-					features: ['Q3910936', 'Q51929218'], 
+				simplePresent: {
+					features: ['Q3910936'], 
 					hidden: ['Q51929218'],
-				},
-				presentPlural: {
-					features: ['Q3910936','Q51929447'], 
-					hidden: ['Q51929447'],
 				},
 				simplePast: {
 					features: ['Q1392475']
@@ -49,7 +45,7 @@ const flex = (vars) => {
 					features: ['Q10345583']
 				},
 				presentParticiple: {
-					features: ['Q12717679']
+					features: ['Q1230649']
 				}
 			}
 			affixes = [

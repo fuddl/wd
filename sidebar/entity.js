@@ -483,7 +483,7 @@ function updateView(id, useCache = true) {
 					link: 'improve.html?' + id,
 					moji: './icons/u2728-specialPages.svg',
 					title: 'Improve',
-					desc: 'Automatic suggestions on how to imrove this item',
+					desc: 'Automatic suggestions on how to improve this item',
 				},
 			]));
 
@@ -730,13 +730,31 @@ function updateView(id, useCache = true) {
 
 
 			if (e.forms) {
-				glosses.appendChild(templates.flex({
+				let section = document.createElement('section');
+				let heading = document.createElement('h2');
+				let headingText = templates.placeholder({
+					json: `https://www.wikidata.org/w/api.php?action=parse&page=Translations:Help:Data_type/87/${lang}&disableeditsection=true&format=json`, 
+					type: 'span',
+					extractor: (input) => {
+						if (input?.parse?.text?.['*']) {
+							return input.parse.text['*'].replace(/<\/?[^>]+(>|$)/g, "").trim();
+						} else {
+							headingText.parentNode.removeChild(headingText);
+						}
+					}
+				});
+				heading.appendChild(headingText);
+				section.appendChild(heading);
+
+				section.appendChild(templates.flex({
 					forms: e.forms,
 					category: e.lexicalCategory,
 					lang: e.language,
 					gender: typeof e.claims?.P5185 === 'object' ? e.claims?.P5185[0]?.mainsnak?.datavalue?.value?.id : null,
 					auxVerb: typeof e.claims?.P5401 === 'object' ? e.claims?.P5401[0]?.mainsnak?.datavalue?.value?.id : null,
 				}));
+
+				glosses.appendChild(section);
 			}
 		}
 

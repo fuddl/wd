@@ -1,5 +1,6 @@
 function AddLemmaAffix(inputLemma, lexeme) {
 	let lemma = document.createTextNode(inputLemma);
+	let prefix = '';
 	let suffix = '';
 	switch (lexeme.lang) {
 		case 'Q188': // german
@@ -18,15 +19,25 @@ function AddLemmaAffix(inputLemma, lexeme) {
 				}
 			}
 			break;
+		case 'Q1860': // english
+			if (lexeme.category === 'Q24905') { // noun
+				prefix = 'to ';
+			}
+			break;
 	}
-	let ouput = document.createDocumentFragment();
-	ouput.appendChild(lemma);
+	let output = document.createDocumentFragment();
+	output.appendChild(lemma);
 	if (suffix) {
 		let suffixElement = document.createElement('small')
 		suffixElement.innerText = suffix;
-		ouput.appendChild(suffixElement);
+		output.appendChild(suffixElement);
 	}
-	return ouput;
+	if (prefix) {
+		let prefixElement = document.createElement('small')
+		prefixElement.innerText = prefix;
+		output.insertBefore(prefixElement, output.firstChild);
+	}
+	return output;
 }
 
 export { AddLemmaAffix };
