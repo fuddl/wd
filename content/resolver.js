@@ -8,7 +8,7 @@ import { inventaire } from './resolver__inventaire.js';
 import { URL_match_pattern } from './resolver__url-match-pattern.js';
 import { wikipedia } from './resolver__wikipedia.js';
 import { schemaOrg } from './resolver__schema-org.js';
-//import { url } from './resolver__url.js';
+import { url } from './resolver__url.js';
 import { googleMaps } from './resolver__google-maps.js';
 
 const resolvers = {
@@ -31,7 +31,7 @@ const resolvers = {
 	schemaOrg: schemaOrg,
 	googleMaps: googleMaps,
 	//officialWebsite: officialWebsite,
-	// url: url,
+	url: url,
 	// isbn: isbn,
 };
 

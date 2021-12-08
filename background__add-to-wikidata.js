@@ -237,16 +237,18 @@ async function getExistingStatement(object, verb, subject) {
 			SELECT ?stmt WHERE {
 				wd:${subject} p:${verb} ?stmt.
 
-				# if we'd care about the language, we would do 
-				# ?stmt ps:${verb} "${object.text}"@${object.language}.
-				# but we don't because the language currently 
-				# in wikidata is probably more accurate than 
-				# what we could extract from a website.
+				${
+				// if we'd care about the language, we would do 
+				// ?stmt ps:${verb} "${object.text}"@${object.language}.
+				// but we don't because the language currently 
+				// in wikidata is probably more accurate than 
+				// what we could extract from a website.
+				''}
 
-				# So we do
+				${ /* So we do */ ''}
 				?stmt ps:${verb} ?vl.
 				FILTER (str(?vl) = "${object.text}")
-				# instead
+				${ /* instead */ ''}
 			}
 		`
 	}	else if (typeof object === 'string') {
