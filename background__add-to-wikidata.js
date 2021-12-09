@@ -37,6 +37,10 @@ async function processJobs(jobsUngrouped) {
 	let refAnswer = null;
 	let qualAnswer = null;
 	for (let job of jobs) {
+		if (job.hasOwnProperty('object') && (job.object.hasOwnProperty('numeric-id') && !job.object.hasOwnProperty('entity-type'))) {
+			job.object['entity-type'] = "item";
+		}
+
 		if (job.type === 'create') {
 			answer = await createEntity(job.label, job.lang);
 			if (answer.success && answer.success == 1) {
@@ -48,8 +52,7 @@ async function processJobs(jobsUngrouped) {
 
 		} else if (job.type === 'set_sitelink') {
 			setSiteLink(job.subject, job.verb, job.object);
-		} else if (job.type === 'set_claim') {
-			
+		} else if (job.type === 'set_claim') {			
 			let extistingStatement = await getExistingStatement(job.object, job.verb, job.subject);
 			let subject = job.subject !== 'LAST' ? job.subject : lastCreated.id;
 
