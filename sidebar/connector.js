@@ -8,6 +8,24 @@ import { constraintsToStatements } from './constraintsToStatements.js';
 import { ldToStatements } from './ldToStatements.js';
 import { metaToStatements } from './metaToStatements.js';
 
+class jobRedundancyChecker {
+	constructor() {
+		this.list = [];
+	}
+	check(job) {
+		let hash = JSON.stringify(job);
+		if (this.list.includes(hash)) {
+			return true;
+		} else {
+			this.list.push(hash);
+			return false;
+		}
+	}
+	debug() {
+		console.debug(this.list);
+	}
+}
+
 function getPropertyScope(property) {
 	let scopes = {
 		'Q54254515': 'lexeme',
@@ -23,6 +41,9 @@ function getPropertyScope(property) {
 	}
 	return 'item';
 }
+
+
+let existing = new jobRedundancyChecker();
 
 (async () => {
 	let proposals = JSON.parse(decodeURIComponent(window.location.search.replace(/^\?/, '')));
@@ -75,11 +96,11 @@ function getPropertyScope(property) {
 			vals: [templates.code(proposals.ids[0][0].value)],
 		});
 		if (proposals.ld) {
-			await ldToStatements(proposals.ld, propform, proposals.source);
+			await ldToStatements(proposals.ld, propform, proposals.source, existing);
 		}
 		
 		if (proposals.meta) {
-			await metaToStatements(proposals.meta, propform, proposals.source);
+			await metaToStatements(proposals.meta, propform, proposals.source, existing);
 		}
 
 		if(!isMultiple && property[proposals.ids[0][0].prop]?.claims?.P2302) {

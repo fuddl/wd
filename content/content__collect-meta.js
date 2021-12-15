@@ -71,7 +71,8 @@ async function enrichMetaData(tags, lang, url) {
 						enriched[newKey] = {
 							verb: type.prop,
 							object: {
-								'numeric-id': type.options[tags[key][delta]],
+								'entity-type': "item",
+								'numeric-id': type.options[tags[key][delta]].toString(),
 							}
 						};
 					}
@@ -86,6 +87,7 @@ async function enrichMetaData(tags, lang, url) {
 								enriched[newKey] = {
 									verb: type.prop,
 									object: {
+										'entity-type': "item",
 										'numeric-id': entityId.replace(/^Q/, ''),
 									}
 								};

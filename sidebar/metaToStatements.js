@@ -2,7 +2,7 @@ import { templates } from './components/templates.tpl.js';
 import { makeReferences } from './ld-map-wd.js';
 import { usefullMetatags } from '../content/content__collect-meta.js';
 
-async function metaToStatements(meta, propform, source) {
+async function metaToStatements(meta, propform, source, existing) {
 	let comment = templates.smallBlock(
 		templates.text(
 			[
@@ -20,6 +20,9 @@ async function metaToStatements(meta, propform, source) {
 			type: 'set_claim',
 			...meta[k],
 			references: makeReferences(source),
+		}
+		if (existing.check(job)) {
+			continue;
 		}
 		check.setAttribute('type', 'checkbox');
 		check.setAttribute('value', JSON.stringify(job))

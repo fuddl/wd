@@ -42,19 +42,26 @@ async function processJobs(jobsUngrouped) {
 		}
 
 		if (job.type === 'create') {
+			updateStatus([
+				`Creating new entity labeled ${job.label}`,
+			]);
+
 			answer = await createEntity(job.label, job.lang);
 			if (answer.success && answer.success == 1) {
 				lastCreated = {
 					id: answer.entity.id,
 					job: job,
 				}
+				updateStatus([
+					`Created new entity ${answer.entity.id}`,
+				]);
 			}
 
 		} else if (job.type === 'set_sitelink') {
 			setSiteLink(job.subject, job.verb, job.object);
 		} else if (job.type === 'set_claim') {			
-			let extistingStatement = await getExistingStatement(job.object, job.verb, job.subject);
 			let subject = job.subject !== 'LAST' ? job.subject : lastCreated.id;
+			let extistingStatement = await getExistingStatement(job.object, job.verb, subject);
 
 			if (!extistingStatement) {
 				updateStatus([
@@ -227,51 +234,45 @@ async function addQualifier(claimId, qualifier) {
 }
 
 async function getExistingStatement(object, verb, subject) {
-	let query;
-	if (object.hasOwnProperty('numeric-id')) {
-		query = `
-			SELECT ?stmt WHERE {
-				wd:${subject} p:${verb} ?stmt.
-				?stmt ps:${verb} wd:Q${object['numeric-id']}.
-			}
-		`
-	} else if (object.hasOwnProperty('language') && object.hasOwnProperty('text')) {
-		query = `
-			SELECT ?stmt WHERE {
-				wd:${subject} p:${verb} ?stmt.
+	try {
+		const response = await fetch(`https://www.wikidata.org/w/api.php?action=wbgetentities&ids=${subject}&props=claims&format=json`, {
+			cache: 'reload',
+		});
 
-				${
-				// if we'd care about the language, we would do 
-				// ?stmt ps:${verb} "${object.text}"@${object.language}.
-				// but we don't because the language currently 
-				// in wikidata is probably more accurate than 
-				// what we could extract from a website.
-				''}
+		if (response.status !== 200) {
+			throw 'Status Code: ' + response.status;
+		}
 
-				${ /* So we do */ ''}
-				?stmt ps:${verb} ?vl.
-				FILTER (str(?vl) = "${object.text}")
-				${ /* instead */ ''}
-			}
-		`
-	}	else if (typeof object === 'string') {
-		query = `
-			SELECT ?stmt WHERE {
-				wd:${subject} p:${verb} ?stmt.
-				?stmt ps:${verb} "${object}".
-			}
-		`
-	} else {
-		// existence check not yet supported for other types
-		return false;
-	}
+		const json = await response.json();
+		const claims = json.entities[subject].claims;
 
-	let answer = await sparqlQuery(query);
-	if (answer[0]) {
-		let output = answer[0].stmt.value.replace("http://www.wikidata.org/entity/statement/", '').replace(/\-/, '$');
-		return output;
-	} else {
-		return false;
+		if (!claims.hasOwnProperty(verb)) {
+			return false;
+		} else {
+			for (const claim of claims[verb]) {
+				if(claim.hasOwnProperty('mainsnak')) {
+					const value = claim.mainsnak.datavalue.value;
+					if (object.hasOwnProperty('numeric-id') && value.hasOwnProperty('numeric-id') && object['numeric-id'] == value['numeric-id']) {
+						return claim.id;
+					}
+					else if (object.hasOwnProperty('language') && object.hasOwnProperty('text') && value.hasOwnProperty('text') && value.hasOwnProperty('language') ) {
+						if (value.language.startsWith(object.language)) {
+							if (object.text === value.text) {
+								return claim.id;
+							}
+						}
+					}
+					else if (typeof object === 'string') {
+						if (value === object) {
+							return claim.id;
+						}
+					}
+				}
+			}
+			return false;
+		}
+	} catch(error) {
+		throw ['Fetch Error :-S', error];
 	}
 }
 

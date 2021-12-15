@@ -8,7 +8,9 @@ function uuidv4() {
   });
 }
 
-async function ldToStatements(ld, propform, source) {
+
+
+async function ldToStatements(ld, propform, source, existing) {
 
 	let comment = templates.smallBlock(
 		templates.text(
@@ -23,8 +25,6 @@ async function ldToStatements(ld, propform, source) {
 		if (d.hasOwnProperty('isNeedle') && d.isNeedle) {
 			let matchingClass = await findMatchingClass(d);
 			if (matchingClass) {
-				let check = document.createElement('input');
-				check.setAttribute('name', uuidv4());
 				let job = {
 					type: 'set_claim',
 					verb: 'P31',
@@ -34,6 +34,12 @@ async function ldToStatements(ld, propform, source) {
 					},
 					references: makeReferences(source),
 				}
+				
+				// if the job already exists, we head straigt to the next
+				existing.check(job);
+
+				let check = document.createElement('input');
+				check.setAttribute('name', uuidv4());
 				check.setAttribute('type', 'checkbox')
 				check.setAttribute('value', JSON.stringify(job))
 				
@@ -63,6 +69,9 @@ async function ldToStatements(ld, propform, source) {
 					let check, label, select;
 
 					if (connection.jobs.length === 1) {
+						if (existing.check(connection.jobs[0].instructions)) {
+							continue;
+						}
 						check = document.createElement('input');
 						label = templates.placeholder({
 							entity: connection.jobs[0].label,
@@ -77,6 +86,9 @@ async function ldToStatements(ld, propform, source) {
 						let emptyOption = document.createElement('option');
 						select.appendChild(emptyOption);
 						for (let job of connection.jobs) {
+							if (existing.check(job.instructions)) {
+								continue;
+							}
 							let option = templates.placeholder({
 								tag: 'option',
 								entity: job.label,
@@ -127,6 +139,7 @@ async function ldToStatements(ld, propform, source) {
 			}
 		}
 	}
+	existing.debug();
 }
 
 export { ldToStatements }
