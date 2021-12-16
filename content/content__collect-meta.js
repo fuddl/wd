@@ -27,10 +27,14 @@ const usefullMetatags = [
 		suggested: false,
 	},
 	{
+		name: 'music:duration',
+		type: 'Quantity',
+		prop: 'P2047',
+		suggested: true,
+	},	{
 		name: 'video:duration',
 		type: 'Quantity',
 		prop: 'P2047',
-		unit: 'http://www.wikidata.org/entity/Q11574',
 		suggested: true,
 	},
 	{
@@ -56,6 +60,39 @@ const usefullMetatags = [
 		prop: 'P1104',
 		type: 'Quantity',
 		suggested: true,
+	}
+];
+
+const durations = [
+	{
+		name: 'year',
+		wd: 'Q577',
+		seconds: 31557600,
+	},
+	{
+		name: 'week',
+		wd: 'Q23387',
+		seconds: 604800,
+	},
+	{
+		name: 'day',
+		wd: 'Q573',
+		seconds: 86400,
+	},
+	{
+		name: 'hour',
+		wd: 'Q25235',
+		seconds: 3600,
+	},
+	{
+		name: 'minute',
+		wd: 'Q7727',
+		seconds: 60,
+	},
+	{
+		name: 'second',
+		wd: 'Q11574',
+		seconds: 1,
 	}
 ];
 
@@ -101,11 +138,22 @@ async function enrichMetaData(tags, lang, url) {
 					object: tags[key][delta],
 				};
 			} else if (type.type === 'Quantity') {
+				let amount = tags[key][delta];
+				let unit = '1';
+
+				for (const interval of durations) {
+					let divided = amount / interval.seconds;
+					if (divided > 1 && divided % 1 === 0 && amount !== divided) {
+						amount = divided;
+						unit = `http://www.wikidata.org/entity/${interval.wd}`;
+					}
+				}
+
 				enriched[newKey] = {
 					verb: type.prop,
 					object: {
-						amount: tags[key][delta],
-						unit: type?.unit ?? '1',
+						amount: amount,
+						unit: unit,
 					}
 				};
 			} else if (type.type === 'Monolingualtext') {

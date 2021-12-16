@@ -255,14 +255,18 @@ async function getExistingStatement(object, verb, subject) {
 					if (object.hasOwnProperty('numeric-id') && value.hasOwnProperty('numeric-id') && object['numeric-id'] == value['numeric-id']) {
 						return claim.id;
 					}
-					else if (object.hasOwnProperty('language') && object.hasOwnProperty('text') && value.hasOwnProperty('text') && value.hasOwnProperty('language') ) {
+					else if (object.hasOwnProperty('language') && object.hasOwnProperty('text') && value.hasOwnProperty('text') && value.hasOwnProperty('language')) {
 						if (value.language.startsWith(object.language)) {
 							if (object.text === value.text) {
 								return claim.id;
 							}
 						}
 					}
-					else if (typeof object === 'string') {
+					else if (object.hasOwnProperty('amount') && object.hasOwnProperty('unit') && value.hasOwnProperty('amount') && value.hasOwnProperty('unit')) {
+						if (object.amount == value.amount && object.unit === value.unit) {
+							return claim.id;
+						}
+					} else if (typeof object === 'string') {
 						if (value === object) {
 							return claim.id;
 						}

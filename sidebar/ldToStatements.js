@@ -139,7 +139,6 @@ async function ldToStatements(ld, propform, source, existing) {
 			}
 		}
 	}
-	existing.debug();
 }
 
 export { ldToStatements }
