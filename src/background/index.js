@@ -121,7 +121,7 @@ browser.runtime.onMessage.addListener(
 					if (await browser.sidebarAction.isOpen({})) {
 						pushProposalToSidebar(data.proposals, sender.tab.id);
 					}
-				})();	
+				})();
 			} else {
 				tabStates[sender.tab.id].mode = false;
 
@@ -136,7 +136,7 @@ browser.runtime.onMessage.addListener(
 			}
 		} else {
 			if(data.type === 'add_url_cache') {
-				addToUrlCache(data.id, data.url);	
+				addToUrlCache(data.id, data.url);
 			}
 			if(data.type === 'send_to_wikidata') {
 				processJobs(data.data);
@@ -166,7 +166,7 @@ browser.runtime.onMessage.addListener(
 				}).then((tabs) => {
 					for (let tab of tabs) {
 						browser.tabs.insertCSS({file: "content/content__collect-page-links.css"});
-						
+
 						browser.tabs.sendMessage(
 							tab.id,
 							{
