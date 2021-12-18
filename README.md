@@ -12,12 +12,25 @@
 
 ## Development-Setup
 
-```
-[sudo] npm install web-ext -g
+### Build locally
 
-git clone git@github.com:fuddl/wd.git
+1. Checkout the repository to your local machine eg. with `git clone git@github.com:fuddl/wd.git`
+1. run `yarn` to install all required dependencies
+1. run `yarn build`
 
-cd wd
+The build step will create the `distribution` folder, this folder will contain the generated extension.
 
-npm run dev && web-ext run --start-url https://www.wikidata.org/wiki/Q16276
-```
+### Run the extension
+
+Using [web-ext](https://extensionworkshop.com/documentation/develop/getting-started-with-web-ext/) is recommened for automatic reloading and running in a dedicated browser instance. Alternatively you can load the extension manually (see below).
+
+1. run `yarn watch` to watch for file changes and build continuously
+1. run `npm install --global web-ext` (only only for the first time)
+1. in another terminal, run `web-ext run --start-url https://www.wikidata.org/wiki/Q16276` for Firefox or `web-ext run -t chromium`
+
+Note: Firefox will automatically reload content scripts when the extension is updated, Chrome requires you to reload the page to reload the content scripts.
+
+#### Manually
+
+You can also [load the extension manually in Chrome](https://www.smashingmagazine.com/2017/04/browser-extension-edge-chrome-firefox-opera-brave-vivaldi/#google-chrome-opera-vivaldi) or [Firefox](https://www.smashingmagazine.com/2017/04/browser-extension-edge-chrome-firefox-opera-brave-vivaldi/#mozilla-firefox).
+
