@@ -1,3 +1,5 @@
+import browser from 'webextension-polyfill'
+
 function pushEnitiyToSidebar(id, tid, setPanel = true, nocache = false) {
 	if (!sidebarLocked && setPanel) {
 		browser.sidebarAction.setPanel({

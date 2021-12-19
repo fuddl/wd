@@ -1,3 +1,5 @@
+import browser from 'webextension-polyfill'
+
 function updateStatus(parts) {
 	browser.runtime.sendMessage({
 		type: 'status',

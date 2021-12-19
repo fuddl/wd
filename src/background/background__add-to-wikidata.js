@@ -1,9 +1,10 @@
-import { sparqlQuery } from "../sqarql-query.js"
-import { getTokens } from '../sidebar/wd-get-token.js';
-import { wikidataGetEntity } from '../wd-get-entity.js';
-import { resolvers } from '../content/resolver.js';
-import { pushEnitiyToSidebar } from "./push-enitiy-to-sidebar.js"
-import { updateStatus } from "../update-status.js"
+import {getTokens} from '../sidebar/wd-get-token.js'
+import {wikidataGetEntity} from '../wd-get-entity.js'
+import {resolvers} from '../content/resolver.js'
+import {pushEnitiyToSidebar} from "./push-enitiy-to-sidebar.js"
+import {updateStatus} from "../update-status.js"
+import browser from 'webextension-polyfill'
+
 
 function groupJobs(jobs) {
 	let groupedJobs = {};

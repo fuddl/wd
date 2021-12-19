@@ -1,4 +1,5 @@
 import { templates } from '../templates.tpl.js';
+import browser from 'webextension-polyfill'
 
 function statusMessage(parts) {
 	let output = document.createDocumentFragment();

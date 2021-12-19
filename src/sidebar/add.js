@@ -4,6 +4,7 @@ import { getValueByLang, getAliasesByLang } from './get-value-by-lang.js';
 import { templates } from './components/templates.tpl.js';
 import { sparqlQuery } from '../sqarql-query.js';
 import { updateStatusInternal } from "../update-status.js"
+import browser from 'webextension-polyfill'
 import { PrependNav } from './prepend-nav.js';
 
 PrependNav();
@@ -114,7 +115,7 @@ content.innerHTML = '';
 			clearBouncer();
 			if (!receivedEntities.includes(data.id)) {
 				receivedEntities.push(data.id);
-				
+
 				let tag = templates.express__tag({
 					id: data.id,
 					dest: propPicker.selection,
@@ -318,13 +319,13 @@ content.innerHTML = '';
 
 				}
 			}
-			
-			
+
+
 			Promise.all([
 				browser.runtime.sendMessage({
 					type: 'send_to_wikidata',
 					data: jobs,
-				}), 
+				}),
 				browser.runtime.sendMessage({
 					type: 'unlock_sidebar',
 				}),

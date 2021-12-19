@@ -14,6 +14,7 @@ import { findMetaData, enrichMetaData } from '../content/content__collect-meta.j
 import { metaToStatements } from './metaToStatements.js';
 import { wdGetOSMElements, OSMToSatements } from './osm.js';
 import { URL_match_pattern } from "../content/resolver__url-match-pattern.js";
+import browser from 'webextension-polyfill'
 import { PrependNav } from './prepend-nav.js';
 
 PrependNav();
@@ -66,7 +67,7 @@ async function checkRedirectForIds(url, propform, originalUrl, claims) {
 					]),
 				],
 			});
-			propform.appendChild(preview);		
+			propform.appendChild(preview);
 		}
 	}
 }
@@ -131,12 +132,12 @@ if (window.location.search) {
 			});
 
 			const entities = await wikidataGetEntity(currentEntity, false);
-			
+
 			updateStatusInternal([
 				'Searching OpenStreetMap for relevant data…',
 			]);
 			let osmElements = await wdGetOSMElements(currentEntity);
-			
+
 			if (osmElements.length > 0) {
 				for (let element of osmElements) {
 					OSMToSatements(element, propform, {
@@ -151,7 +152,7 @@ if (window.location.search) {
 				let classes = await getAllClasses(id);
 				for(let claim in entity.claims) {
 					if (['url', 'external-id'].includes(entity.claims[claim][0].mainsnak?.datatype) && entity?.claims[claim][0].mainsnak?.datavalue?.value) {
-						let urls = []; 
+						let urls = [];
 						switch (entity.claims[claim][0].mainsnak.datatype) {
 							case 'external-id':
 							  for (let key in entity.claims[claim]) {
@@ -162,7 +163,7 @@ if (window.location.search) {
 							case 'url':
 								for (let key in entity.claims[claim]) {
 									if(entity.claims[claim][key].mainsnak?.datavalue?.value) {
-										urls.push(entity.claims[claim][key].mainsnak.datavalue.value);	
+										urls.push(entity.claims[claim][key].mainsnak.datavalue.value);
 									}
 								}
 								break;
@@ -266,7 +267,7 @@ if (window.location.search) {
 	let saveButton = document.createElement('button');
 	form.appendChild(saveButton);
 	saveButton.innerText = 'Send to Wikidata';
-	
+
 	saveButton.addEventListener('click', async function() {
 		let currentTab = await getCurrentTab();
 		let jobs = [];
@@ -286,7 +287,7 @@ if (window.location.search) {
 			browser.runtime.sendMessage({
 				type: 'send_to_wikidata',
 				data: jobs,
-			}), 
+			}),
 			browser.runtime.sendMessage({
 				type: 'unlock_sidebar',
 			}),

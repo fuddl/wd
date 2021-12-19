@@ -6,6 +6,8 @@ import { findTitles } from './pagedata__title.js';
 import { findDescriptions } from './pagedata__description.js';
 import { findLinkedData, enrichLinkedData } from './content__collect-ld.js';
 import { findMetaData, enrichMetaData } from './content__collect-meta.js';
+import {setupSidebar} from "./sidebar"
+import browser from 'webextension-polyfill'
 
 async function findApplicables(location, openInSidebar = true) {
     let applicables = [];
@@ -55,6 +57,8 @@ async function findApplicables(location, openInSidebar = true) {
 };
 
 function main() {
+	setupSidebar()
+
 	findApplicables(location);
 
 	browser.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {

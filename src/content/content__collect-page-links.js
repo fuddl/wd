@@ -1,6 +1,7 @@
-import { displayMetadata } from './content__display-metadata.js';
-import { resolvers } from './resolver.js';
-import { updateStatus } from "../update-status.js"
+import {displayMetadata} from './content__display-metadata.js'
+import {resolvers} from './resolver.js'
+import {updateStatus} from "../update-status.js"
+import browser from 'webextension-polyfill'
 
 function getClosestID(element) {
 	let subject = element;
@@ -29,7 +30,7 @@ function getClosestID(element) {
 		return {
 			section: element.innerText,
 			hash: thisId,
-		};			
+		};
 	}
 
 	if (subject.closest) {
@@ -38,7 +39,7 @@ function getClosestID(element) {
 					return {
 						section: null,
 						hash: IDwrapper.getAttribute('id'),
-					}; 	
+					};
 			}
 	}
 
@@ -69,7 +70,7 @@ function highlightSelected(id, add = true) {
 				} else {
 					selector.classList.remove('entity-selector--selected');
 				}
-			}	
+			}
 		}
 	}
 }
@@ -154,7 +155,7 @@ async function collectPageLinks(subject) {
 			}
 		}
 		uniqueLinks[key].applicable = applicableTo;
-		uniqueLinks[key].setup = async function() {
+		uniqueLinks[key].setupSidebar = async function() {
 			this.selectors = [];
 			for (let link of this.links) {
 				let selector = document.createElement('a');
@@ -210,7 +211,7 @@ async function collectPageLinks(subject) {
 
 						let sectionData = getClosestID(e.target);
 
-						let hash = sectionData.hash ? '#' + sectionData.hash : ''; 
+						let hash = sectionData.hash ? '#' + sectionData.hash : '';
 
 						let oldId = getOldid();
 
@@ -242,7 +243,7 @@ async function collectPageLinks(subject) {
 	 			}
 	 		}
 		}
-		
+
 	}
 
 	(async () => {

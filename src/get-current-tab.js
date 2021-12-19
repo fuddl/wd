@@ -1,3 +1,5 @@
+import browser from 'webextension-polyfill'
+
 async function getCurrentTab() {
 	let result = await browser.tabs.query({
 		currentWindow: true,

@@ -1,5 +1,6 @@
 import { processJobs } from "./background__add-to-wikidata.js"
 import { pushEnitiyToSidebar } from "./push-enitiy-to-sidebar.js"
+import browser from 'webextension-polyfill'
 import activeIcon from 'url:../icons/wd.svg'
 
 let tabStates = {};
