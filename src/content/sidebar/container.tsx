@@ -1,11 +1,30 @@
-import browser from 'webextension-polyfill'
+import * as browser from "webextension-polyfill"
 
 import {css} from "@emotion/react"
 import {slide as Slider} from 'react-burger-menu'
-import {useState} from "react"
+import {useEffect, useState} from "react"
+import {getInternalUrlForEntity} from "../../core/navigation"
 
 export const Container = (props) => {
     const [isOpen, setOpen] = useState(true)
+    const [url, setUrl] = useState(getInternalUrlForEntity("Q99894727"))
+
+    /**
+     * one option would be to update the current logic in bg to send message to a tab
+     * another one is to short-circuit things and just send a js event,
+     * but not entirely sure if that works across iframe
+     *
+     * went with option 1 for now, though the whole round-trip thing is kind-of awkward
+     */
+
+    useEffect(() => {
+        browser.runtime.onMessage.addListener((data, sender) => {
+            if (data.type === 'match_event') {
+                setUrl(getInternalUrlForEntity(data.wdEntityId))
+            }
+        })
+
+    }, []);
 
     // todo PoC
     return <Slider
@@ -25,6 +44,6 @@ export const Container = (props) => {
               width: 100%;
               height: 100%;
             `}
-            src={browser.runtime.getURL('sidebar/entity.html') + '?' + "Q1163227"}/>
+            src={url}/>
     </Slider>
 }

@@ -101,6 +101,7 @@ browser.runtime.onMessage.addListener(
 				}
 				(async () => {
 					let tabDest = sender.tab.id ? sender.tab.id : await browser.tabs.getCurrent();
+					await browser.tabs.sendMessage(tabDest, data)
 					openInSidebarIfSidebarIsOpen(data.wdEntityId, tabDest, data.openInSidebar);
 				})();
 
