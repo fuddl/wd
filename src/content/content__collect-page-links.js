@@ -155,7 +155,7 @@ async function collectPageLinks(subject) {
 			}
 		}
 		uniqueLinks[key].applicable = applicableTo;
-		uniqueLinks[key].setupSidebar = async function() {
+		uniqueLinks[key].setup = async function() {
 			this.selectors = [];
 			for (let link of this.links) {
 				let selector = document.createElement('a');
