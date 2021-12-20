@@ -1,5 +1,6 @@
 import { processJobs } from "./background__add-to-wikidata.js"
 import { pushEnitiyToSidebar } from "./push-enitiy-to-sidebar.js"
+import activeIcon from 'url:../icons/wd.svg'
 
 let tabStates = {};
 window.sidebarLocked = false;
@@ -89,7 +90,7 @@ browser.runtime.onMessage.addListener(
 					tabStates[sender.tab.id].mode = 'show_entity';
 					tabStates[sender.tab.id].entity = data.wdEntityId;
 					browser.browserAction.setIcon({
-						path: "icons/wd.svg",
+						path: activeIcon,
 						tabId: sender.tab.id,
 					});
 					browser.browserAction.setTitle({
