@@ -18,9 +18,10 @@ export const Container = (props) => {
      */
 
     useEffect(() => {
-        browser.runtime.onMessage.addListener((data, sender) => {
-            if (data.type === 'match_event') {
-                setUrl(getInternalUrlForEntity(data.wdEntityId))
+        browser.runtime.onMessage.addListener((event, sender) => {
+            console.log('eep', event)
+            if (event.type === 'update-panel-url') {
+                setUrl(event.url)
             }
         })
 

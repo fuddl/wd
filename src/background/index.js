@@ -1,6 +1,7 @@
-import { processJobs } from "./background__add-to-wikidata.js"
-import { pushEnitiyToSidebar } from "./push-enitiy-to-sidebar.js"
+import {processJobs} from "./background__add-to-wikidata.js"
+import {pushEnitiyToSidebar} from "./push-enitiy-to-sidebar.js"
 import browser from 'webextension-polyfill'
+import {setSidebarUrl} from "./navigation"
 import activeIcon from 'url:../icons/wd.svg'
 
 let tabStates = {};
@@ -15,10 +16,7 @@ async function openEnitiyInNewTab(id) {
 function pushProposalToSidebar(proposals, tid) {
 	proposals.fromTab = tid;
 	if (!sidebarLocked) {
-		browser.sidebarAction.setPanel({
-			tabId: tid,
-			panel: browser.runtime.getURL('sidebar/connector.html') + '?' + encodeURIComponent(JSON.stringify(proposals)),
-		});
+		return setSidebarUrl(tid, browser.runtime.getURL('sidebar/connector.html') + '?' + encodeURIComponent(JSON.stringify(proposals)))
 	}
 }
 
@@ -59,9 +57,10 @@ async function addToUrlCache(id, url) {
 }
 
 async function openInSidebarIfSidebarIsOpen(entityId, tab, setPanel) {
-	if (await browser.sidebarAction.isOpen({})) {
+	// todo may always be false in chrome?
+	// if (await browser.sidebarAction.isOpen({})) {
 		pushEnitiyToSidebar(entityId, tab, setPanel);
-	}
+	// }
 };
 
 browser.runtime.onMessage.addListener(
@@ -75,13 +74,11 @@ browser.runtime.onMessage.addListener(
 
 		if(data.type === 'wait') {
 			(async () => {
-				browser.sidebarAction.setPanel({
-					tabId: data.tid,
-					panel: browser.runtime.getURL('sidebar/wait.html'),
-				});
+				setSidebarUrl(data.tid, browser.runtime.getURL('sidebar/wait.html'))
 			})()
 		}
 
+		// todo is this different in the inline-sidebar world?
 		if (sender.tab) {
 			if (!tabStates[sender.tab.id]) {
 				tabStates[sender.tab.id] = {};
@@ -101,7 +98,6 @@ browser.runtime.onMessage.addListener(
 				}
 				(async () => {
 					let tabDest = sender.tab.id ? sender.tab.id : await browser.tabs.getCurrent();
-					await browser.tabs.sendMessage(tabDest, data)
 					openInSidebarIfSidebarIsOpen(data.wdEntityId, tabDest, data.openInSidebar);
 				})();
 
@@ -121,9 +117,10 @@ browser.runtime.onMessage.addListener(
 				});
 
 				(async () => {
-					if (await browser.sidebarAction.isOpen({})) {
+					// todo
+					// if (await browser.sidebarAction.isOpen({})) {
 						pushProposalToSidebar(data.proposals, sender.tab.id);
-					}
+					// }
 				})();
 			} else {
 				tabStates[sender.tab.id].mode = false;
@@ -145,10 +142,12 @@ browser.runtime.onMessage.addListener(
 				processJobs(data.data);
 			}
 			if (data.type === 'open_adder') {
-					sidebarLocked = true;
-						browser.sidebarAction.setPanel({
-					panel: browser.runtime.getURL('sidebar/add.html') + '?' + data.entity,
-				});
+				sidebarLocked = true;
+				(async () => {
+					setSidebarUrl(
+						await browser.tabs.getCurrent(),
+						browser.runtime.getURL('sidebar/add.html') + '?' + data.entity)
+				})()
 			}
 			if (data.type === 'unlock_sidebar') {
 				sidebarLocked = false;
