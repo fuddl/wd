@@ -7,6 +7,7 @@ import {getInternalUrlForEntity} from "../../core/navigation"
 
 export const Container = (props) => {
     const [isOpen, setOpen] = useState(true)
+    // todo show a special empty panel instead
     const [url, setUrl] = useState(getInternalUrlForEntity("Q99894727"))
 
     /**
@@ -25,14 +26,15 @@ export const Container = (props) => {
             }
         })
 
-    }, []);
+    }, [])
 
-    // todo PoC
     return <Slider
         isOpen={isOpen}
         width={450}
         right
         noOverlay
+        customBurgerIcon={false}
+        styles={styles}
         customOnKeyDown={(e) => {
             if (e.key === 'Escape') {
                 setOpen(false)
@@ -47,4 +49,13 @@ export const Container = (props) => {
             `}
             src={url}/>
     </Slider>
+}
+
+const styles = {
+    bmMenu : {
+        overflow: "hidden"
+    },
+    bmCross: {
+        background: '#bdc3c7'
+    }
 }
