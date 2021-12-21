@@ -1,4 +1,6 @@
-const remark = (vars) => { 
+import "./remark.css"
+
+const remark = (vars) => {
 	let dl = document.createElement('dl');
 	dl.classList.add('remark');
 	if (vars.block) {
@@ -17,7 +19,7 @@ const remark = (vars) => {
 	dt.classList.add('remark__verb');
 	dt.appendChild(vars.prop);
 	dl.appendChild(dt);
-	
+
 	for (let item of vars.vals) {
 		let dd = document.createElement('dd');
 		dd.classList.add('remark__object');
@@ -32,11 +34,6 @@ const remark = (vars) => {
 		dl.appendChild(check);
 	}
 
-	let style = document.createElement('link');
-	style.setAttribute('rel',	"stylesheet");
-	style.setAttribute('href', "components/remark/remark.css");
-
-	dl.appendChild(style);
 	return dl;
 }
 
