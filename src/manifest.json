@@ -37,6 +37,7 @@
 	],
 	"browser_specific_settings": {
 		"gecko": {
+			"id": "ff@wikidata",
 			"strict_min_version": "89.0"
 		}
 	},
