@@ -3,6 +3,7 @@ import {pushEnitiyToSidebar} from "./push-enitiy-to-sidebar.js"
 import browser from 'webextension-polyfill'
 import {setSidebarUrl} from "./navigation"
 import activeIcon from 'url:../icons/wd.svg'
+import {setupCommandListener} from "./command-listener"
 
 let tabStates = {};
 window.sidebarLocked = false;
@@ -19,6 +20,8 @@ function pushProposalToSidebar(proposals, tid) {
 		return setSidebarUrl(tid, browser.runtime.getURL('sidebar/connector.html') + '?' + encodeURIComponent(JSON.stringify(proposals)))
 	}
 }
+
+setupCommandListener()
 
 browser.browserAction.onClicked.addListener((tab) => {
 	let tid = tab.id;
