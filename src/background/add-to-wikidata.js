@@ -29,7 +29,7 @@ function groupJobs(jobs) {
 	return Object.values(groupedJobs);
 }
 
-async function processJobs(jobsUngrouped) {
+async function processJobs(jobsUngrouped, fromTab = null) {
 	let jobs = groupJobs(jobsUngrouped);
 
 	let lastCreated = null;
@@ -107,8 +107,9 @@ async function processJobs(jobsUngrouped) {
 	}
 
 	if (lastEdit) {
-		if (lastEdit.job.fromTab) {
-			pushEnitiyToSidebar(lastEdit.id, lastEdit.job.fromTab, true, true);
+        const tabId = lastEdit.job.fromTab || fromTab
+        if (tabId) {
+			pushEnitiyToSidebar(lastEdit.id, tabId, true, true);
 		}
 
 		if (lastEdit.job.fromUrl) {

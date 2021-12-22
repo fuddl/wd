@@ -55,7 +55,9 @@ let existing = new jobRedundancyChecker();
 	let isMultiple = false;
 	content.appendChild(propform);
 	let scope = 'item';
-	let currentTab = await getCurrentTab();
+    // todo can't do that in content script context
+	// let currentTab = await getCurrentTab();
+    let currentTab = null;
 
 	const isProp = proposals.ids[0][0].hasOwnProperty('prop');
 	const isSitelink = proposals.ids[0][0].hasOwnProperty('sitelink');
@@ -264,8 +266,8 @@ let existing = new jobRedundancyChecker();
 		warning.style['padding'] = '1em';
 
 		let text1 = document.createTextNode(`
-			It appears that you are not logged into a wikidata account. Please note 
-			that some of your edits might fail, because of wikidata's spam protection. 
+			It appears that you are not logged into a wikidata account. Please note
+			that some of your edits might fail, because of wikidata's spam protection.
 			Also note that your public IP address will be publicly visible in the edit
 			history. It is strongly advised that you `);
 		warning.appendChild(text1);

@@ -6,6 +6,7 @@ import {useEffect, useState} from "react"
 import {getInternalUrlForEntity} from "../../core/navigation"
 
 export const Container = () => {
+    // todo persist this across navigations between links
     const [isOpen, setOpen] = useState(false)
 
     // todo show a special empty panel instead

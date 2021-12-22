@@ -1,4 +1,4 @@
-import {processJobs} from "./background__add-to-wikidata.js"
+import {processJobs} from "./add-to-wikidata.js"
 import {pushEnitiyToSidebar} from "./push-enitiy-to-sidebar.js"
 import browser from 'webextension-polyfill'
 import {setSidebarUrl} from "./navigation"
@@ -66,8 +66,27 @@ async function openInSidebarIfSidebarIsOpen(entityId, tab, setPanel) {
 	// }
 };
 
-browser.runtime.onMessage.addListener(
-	(data, sender) => {
+async function handleMatchEvent(event, sender) {
+    if (!sidebarLocked) {
+        tabStates[sender.tab.id].mode = 'show_entity'
+        tabStates[sender.tab.id].entity = event.wdEntityId
+        await browser.browserAction.setIcon({
+            path: activeIcon,
+            tabId: sender.tab.id,
+        })
+        await browser.browserAction.setTitle({
+            title: event.wdEntityId,
+            tabId: sender.tab.id,
+        })
+    }
+
+    let tabDest = sender.tab.id ? sender.tab.id : await browser.tabs.getCurrent()
+    await openInSidebarIfSidebarIsOpen(event.wdEntityId, tabDest, event.openInSidebar)
+
+    return addToUrlCache(event.wdEntityId, event.url)
+}
+
+browser.runtime.onMessage.addListener(async (data, sender) => {
 
 		if(data.type === 'open_in_sidebar') {
 			(async () => {
@@ -77,7 +96,7 @@ browser.runtime.onMessage.addListener(
 
 		if(data.type === 'wait') {
 			(async () => {
-				setSidebarUrl(data.tid, browser.runtime.getURL('sidebar/wait.html'))
+				setSidebarUrl(data.tid || sender?.tab?.id, browser.runtime.getURL('sidebar/wait.html'))
 			})()
 		}
 
@@ -87,25 +106,8 @@ browser.runtime.onMessage.addListener(
 				tabStates[sender.tab.id] = {};
 			}
 			if (data.type === 'match_event') {
-				if (!sidebarLocked) {
-					tabStates[sender.tab.id].mode = 'show_entity';
-					tabStates[sender.tab.id].entity = data.wdEntityId;
-					browser.browserAction.setIcon({
-						path: activeIcon,
-						tabId: sender.tab.id,
-					});
-					browser.browserAction.setTitle({
-						title: data.wdEntityId,
-						tabId: sender.tab.id,
-					});
-				}
-				(async () => {
-					let tabDest = sender.tab.id ? sender.tab.id : await browser.tabs.getCurrent();
-					openInSidebarIfSidebarIsOpen(data.wdEntityId, tabDest, data.openInSidebar);
-				})();
-
-				addToUrlCache(data.wdEntityId, data.url);
-			} else if(data.type === 'match_proposal') {
+                await handleMatchEvent(data, sender)
+            } else if(data.type === 'match_proposal') {
 				tabStates[sender.tab.id].mode = 'propose_match';
 				tabStates[sender.tab.id].proposals = data.proposals;
 
@@ -125,7 +127,10 @@ browser.runtime.onMessage.addListener(
 						pushProposalToSidebar(data.proposals, sender.tab.id);
 					// }
 				})();
-			} else {
+			} else if(data.type === 'send_to_wikidata') {
+                //todo duplication with no-sender branch
+                await processJobs(data.data, sender.tab.id);
+            } else {
 				tabStates[sender.tab.id].mode = false;
 
 				browser.browserAction.setIcon({
