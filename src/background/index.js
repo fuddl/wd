@@ -1,5 +1,6 @@
 import { processJobs } from "./background__add-to-wikidata.js"
 import { pushEnitiyToSidebar } from "./push-enitiy-to-sidebar.js"
+import activeIcon from 'url:../icons/wd.svg'
 
 let tabStates = {};
 window.sidebarLocked = false;
@@ -89,7 +90,7 @@ browser.runtime.onMessage.addListener(
 					tabStates[sender.tab.id].mode = 'show_entity';
 					tabStates[sender.tab.id].entity = data.wdEntityId;
 					browser.browserAction.setIcon({
-						path: "icons/wd.svg",
+						path: activeIcon,
 						tabId: sender.tab.id,
 					});
 					browser.browserAction.setTitle({
@@ -121,7 +122,7 @@ browser.runtime.onMessage.addListener(
 					if (await browser.sidebarAction.isOpen({})) {
 						pushProposalToSidebar(data.proposals, sender.tab.id);
 					}
-				})();	
+				})();
 			} else {
 				tabStates[sender.tab.id].mode = false;
 
@@ -136,7 +137,7 @@ browser.runtime.onMessage.addListener(
 			}
 		} else {
 			if(data.type === 'add_url_cache') {
-				addToUrlCache(data.id, data.url);	
+				addToUrlCache(data.id, data.url);
 			}
 			if(data.type === 'send_to_wikidata') {
 				processJobs(data.data);
@@ -166,7 +167,7 @@ browser.runtime.onMessage.addListener(
 				}).then((tabs) => {
 					for (let tab of tabs) {
 						browser.tabs.insertCSS({file: "content/content__collect-page-links.css"});
-						
+
 						browser.tabs.sendMessage(
 							tab.id,
 							{

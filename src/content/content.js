@@ -8,7 +8,7 @@ import { findLinkedData, enrichLinkedData } from './content__collect-ld.js';
 import { findMetaData, enrichMetaData } from './content__collect-meta.js';
 
 async function findApplicables(location, openInSidebar = true) {
-	let applicables = [];
+    let applicables = [];
 	let linkedData = findLinkedData(document)
 	let metaData = findMetaData(document)
 
@@ -99,7 +99,7 @@ function main() {
 
 				let sectionData = getClosestID(document.getSelection().focusNode);
 
-				let hash = sectionData.hash ? '#' + sectionData.hash : ''; 
+				let hash = sectionData.hash ? '#' + sectionData.hash : '';
 
 				let oldId = getOldid();
 

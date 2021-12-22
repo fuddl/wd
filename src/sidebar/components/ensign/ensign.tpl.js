@@ -1,18 +1,15 @@
 import { getTokens } from "../../wd-get-token.js";
+import "./ensign.css"
 
 const lang = navigator.language.substr(0,2);
 
-const ensign = (vars) => { 
+const ensign = (vars) => {
 	let header = document.createElement('header');
 	let title = document.createElement('h1');
 	let id = document.createElement('small');
 	let space = document.createTextNode(' ');
 	let description = document.createElement('p');
-	
-	let style = document.createElement('link');
-	style.setAttribute('rel',	"stylesheet");
-	style.setAttribute('href', "components/ensign/ensign.css");
-	
+
 	header.classList.add('ensign');
 
 	title.classList.add('ensign__title');
@@ -72,7 +69,6 @@ const ensign = (vars) => {
 	header.appendChild(space);
 	header.appendChild(id);
 	header.appendChild(description);
-	header.appendChild(style);
 
 	return header;
 }
@@ -168,7 +164,7 @@ async function ensignEditDescription(vars, description) {
 			descriptionEditForm.setAttribute('hidden', true);
 		}
 	});
-	
+
 	return descriptionEditForm;
 }
 

@@ -1,9 +1,9 @@
-import { sparqlQuery } from "./sqarql-query.js"
-import { getTokens } from './sidebar/wd-get-token.js';
-import { wikidataGetEntity } from './wd-get-entity.js';
-import { resolvers } from './content/resolver.js';
+import { sparqlQuery } from "../sqarql-query.js"
+import { getTokens } from '../sidebar/wd-get-token.js';
+import { wikidataGetEntity } from '../wd-get-entity.js';
+import { resolvers } from '../content/resolver.js';
 import { pushEnitiyToSidebar } from "./push-enitiy-to-sidebar.js"
-import { updateStatus } from "./update-status.js"
+import { updateStatus } from "../update-status.js"
 
 function groupJobs(jobs) {
 	let groupedJobs = {};
@@ -59,7 +59,7 @@ async function processJobs(jobsUngrouped) {
 
 		} else if (job.type === 'set_sitelink') {
 			setSiteLink(job.subject, job.verb, job.object);
-		} else if (job.type === 'set_claim') {			
+		} else if (job.type === 'set_claim') {
 			let subject = job.subject !== 'LAST' ? job.subject : lastCreated.id;
 			let extistingStatement = await getExistingStatement(job.object, job.verb, subject);
 
@@ -77,7 +77,7 @@ async function processJobs(jobsUngrouped) {
 					}
 				}
 			}
-			
+
 			if (job?.references && answer.success && answer.success == 1) {
 				updateStatus([
 					'Adding references to statement ', {placeholder:{entity:job.verb}},' of ', {placeholder:{entity:subject}},

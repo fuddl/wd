@@ -6,7 +6,7 @@
 	"icons": {
 		"48": "icons/wd.svg",
 		"96": "icons/wd.svg"
-	},	
+	},
 	"browser_action": {
 		"default_icon": "icons/inactive.svg",
 		"default_title": "Wikidata"
@@ -15,7 +15,7 @@
 		"default_icon": "icons/wd.svg",
 		"default_title": "Wikidata",
 		"default_panel": "sidebar/entity.html",
-		"open_at_install": false
+		"open_at_install": true
 	},
 	"permissions": [
 		"activeTab",
@@ -24,20 +24,26 @@
 		"<all_urls>"
 	],
 	"background": {
-		"page": "background.html"
+        "scripts": [
+            "background/index.js"
+        ]
 	},
 	"content_scripts": [
 		{
 			"matches": ["<all_urls>"],
-			"run_at": "document_start",
+			"run_at": "document_end",
 			"js": [
 				"content/index.js"
 			]
 		}
 	],
-	"web_accessible_resources": [
-		"sqarql-query.js"
-	],
+    "web_accessible_resources": [
+		"sqarql-query.js",
+        "sidebar/*.html",
+        "sidebar/res/*",
+		"**/*.svg",
+		"**/*.css"
+    ],
 	"browser_specific_settings": {
 		"gecko": {
 			"strict_min_version": "89.0"

@@ -79,8 +79,8 @@ function dateToString(value) {
 					?century wdt:P31 wd:Q578.
 					?century wdt:P585 "${ iso }Z"^^xsd:dateTime.
 					SERVICE wikibase:label
-					{ 
-						bd:serviceParam wikibase:language "[AUTO_LANGUAGE],${ lang }". 
+					{
+						bd:serviceParam wikibase:language "[AUTO_LANGUAGE],${ lang }".
 						?century rdfs:label ?innerText.
 					}
 				}
@@ -95,15 +95,15 @@ function dateToString(value) {
 					?decade wdt:P31 wd:Q39911.
 					?decade wdt:P585 "${ iso }Z"^^xsd:dateTime.
 					SERVICE wikibase:label
-					{ 
-						bd:serviceParam wikibase:language "[AUTO_LANGUAGE],${ lang }". 
+					{
+						bd:serviceParam wikibase:language "[AUTO_LANGUAGE],${ lang }".
 						?decade rdfs:label ?innerText.
 					}
 				}
 				LIMIT 1`,
 			text: text,
 		});
-	} else {		
+	} else {
 		if (prec > 8) {
 			output.push(date.getUTCFullYear());
 		}
@@ -128,9 +128,9 @@ function renderStatements(snak, references, type, target, scope, delta) {
 		target.appendChild(snak.datavalue.value);
 	}
 	if (type === 'value' || scope === 'reference') {
-		if (valueType === "time") {	
+		if (valueType === "time") {
 			let date = dateToString(snak.datavalue.value);
-			if (date) {		
+			if (date) {
 				target.appendChild(templates.time({
 					text: date,
 				}));
@@ -279,8 +279,8 @@ function renderStatement(value) {
 							}
 
 							let formatted = ApplyFormatters(ref.snaks, 'reference')
-							
-							
+
+
 							for (let key in formatted) {
 								for (let refthing of formatted[key]) {
 									if (refthing.datavalue) {
@@ -320,9 +320,9 @@ function renderStatement(value) {
 				}
 
 				renderStatements(delta.mainsnak, refs, type, thisvalue, 'statement', delta);
-				
+
 				values.push(thisvalue);
-				
+
 			}
 		}
 
@@ -335,7 +335,7 @@ function renderStatement(value) {
 		});
 
 		let firstValue = value.find(x=>x!==undefined);
-		
+
 		if (firstValue) {
 			return {
 				rendered: statement,
@@ -357,7 +357,7 @@ function updateView(id, useCache = true) {
 			let e = entities[id];
 
 			let wrapper = document.createElement('div');
-			
+
 			if (e.lemmas) {
 				let labels = document.createDocumentFragment();
 				for (let lang in e.lemmas) {
@@ -400,7 +400,7 @@ function updateView(id, useCache = true) {
 			document.head.appendChild(metaCanon);
 
 			if (e.labels || e.descriptions) {
-				
+
 				document.title = getValueByLang(e, 'labels', e.title);
 				let description = getValueByLang(e, 'descriptions', false);
 
@@ -538,7 +538,7 @@ function updateView(id, useCache = true) {
 					} else if (senseTree[id].sense?.claims?.P9970?.[0].mainsnak?.datavalue?.value?.id) {
 						senseTree[id].item = senseTree[id].sense.claims.P9970[0].mainsnak.datavalue.value.id;
 					}
-					
+
 					if (senseTree[id].sense?.claims?.P9488?.[0].mainsnak?.datavalue?.value?.id) {
 						senseTree[id].field = senseTree[id].sense.claims.P9488[0].mainsnak.datavalue.value.id;
 					}
@@ -571,7 +571,7 @@ function updateView(id, useCache = true) {
 
 				const number2Letter = (i) => {
 					const previousLetters = (i-1 >= 26 ? getColumnName(Math.floor(i-1 / 26) -1 ) : '');
-					const lastLetter = 'abcdefghijklmnopqrstuvwxyz'[(i-1) % 26]; 
+					const lastLetter = 'abcdefghijklmnopqrstuvwxyz'[(i-1) % 26];
 					return previousLetters + lastLetter;
 				}
 
@@ -659,7 +659,7 @@ function updateView(id, useCache = true) {
 									if (!translations.hasOwnProperty(lexemeLanguage)) {
 										translations[lexemeLanguage] = {};
 									}
-									if (!translations[lexemeLanguage].hasOwnProperty(sid)) { 
+									if (!translations[lexemeLanguage].hasOwnProperty(sid)) {
 										translations[lexemeLanguage][sid] = {
 											symbol: senseProps[pid].claims[sid].sense?.symbol ?  senseProps[pid].claims[sid].sense.symbol.cloneNode(true) : false,
 											senses: [],
@@ -733,7 +733,7 @@ function updateView(id, useCache = true) {
 				let section = document.createElement('section');
 				let heading = document.createElement('h2');
 				let headingText = templates.placeholder({
-					json: `https://www.wikidata.org/w/api.php?action=parse&page=Translations:Help:Data_type/87/${lang}&disableeditsection=true&format=json`, 
+					json: `https://www.wikidata.org/w/api.php?action=parse&page=Translations:Help:Data_type/87/${lang}&disableeditsection=true&format=json`,
 					type: 'span',
 					extractor: (input) => {
 						if (input?.parse?.text?.['*']) {
@@ -778,7 +778,7 @@ function updateView(id, useCache = true) {
 				footnote.setAttribute('title', referenceItem.innerText);
 			});
 		}, 0);
-		
+
 		resolvePlaceholders();
 		resolveBreadcrumbs(cache);
 
