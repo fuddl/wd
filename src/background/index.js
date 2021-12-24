@@ -4,6 +4,7 @@ import browser from 'webextension-polyfill'
 import {setSidebarUrl} from "./navigation"
 import activeIcon from 'url:../icons/wd.svg'
 import {setupCommandListener} from "./command-listener"
+import {Browser} from "../core/browser"
 
 let tabStates = {};
 window.sidebarLocked = false;
@@ -23,7 +24,10 @@ function pushProposalToSidebar(proposals, tid) {
 
 setupCommandListener()
 
-browser.browserAction.onClicked.addListener((tab) => {
+const toggleInlineSidebar = async () =>
+    Browser.sendMessageToActiveTab({type: "toggle-sidebar"})
+
+browser.browserAction.onClicked.addListener(async (tab) => {
 	let tid = tab.id;
 	if (!tabStates[tid]) {
 		tabStates[tid] = {};
@@ -31,22 +35,20 @@ browser.browserAction.onClicked.addListener((tab) => {
 	if (browser.sidebarAction) {
 		if (!tabStates[tid].sidebarOpen) {
 			if (tabStates[tid].mode === 'show_entity') {
-				(async () => {
-					pushEnitiyToSidebar(tabStates[tid].entity, tid);
-				})();
+				await pushEnitiyToSidebar(tabStates[tid].entity, tid);
 			} else if(tabStates[tid].mode === 'propose_match') {
-				(async () => {
-					pushProposalToSidebar(tabStates[tid].proposals, tid);
-				})();
+                await pushProposalToSidebar(tabStates[tid].proposals, tid)
 			}
-			browser.sidebarAction.open();
+			await browser.sidebarAction.open();
 			tabStates[tid].sidebarOpen = true;
 		} else {
-			browser.sidebarAction.close();
+			await browser.sidebarAction.close();
 			tabStates[tid].sidebarOpen = false;
 		}
 	} else {
-		openEnitiyInNewTab(tabStates[tid].entity);
+        //todo need better handling here if we actually want "open in new tab" behavior in some cases
+        await toggleInlineSidebar()
+		// openEnitiyInNewTab(tabStates[tid].entity);
 	}
 });
 
