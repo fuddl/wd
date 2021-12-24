@@ -8,7 +8,6 @@ import {getInternalUrlForEntity} from "../../core/navigation"
 export const Container = () => {
     // todo persist this across navigations between links
     const [isOpen, setOpen] = useState(false)
-
     // todo show a special empty panel instead
     const [url, setUrl] = useState(getInternalUrlForEntity("Q99894727"))
 
@@ -27,12 +26,6 @@ export const Container = () => {
         return () => browser.runtime.onMessage.removeListener(messageCallback)
     }, [isOpen])
 
-    const keyHandler = (e) => {
-        if (e.key === 'Escape') {
-            setOpen(false)
-        }
-    }
-
     return <Slider
         isOpen={isOpen}
         width={450}
@@ -40,7 +33,9 @@ export const Container = () => {
         noOverlay
         customBurgerIcon={false}
         styles={styles}
-        customOnKeyDown={keyHandler}
+        // This is mainly here to ensure that when menu is closed
+        // by internal element logic we're aware and maintain proper state
+        onClose={() => setOpen(false)}
     >
         {/*{props.children}*/}
         <iframe
