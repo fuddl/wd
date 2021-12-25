@@ -170,6 +170,10 @@ function initTabState(sender) {
     }
 }
 
+const getTabId =
+    async sender => sender?.tab?.id
+        || (await Browser.getActiveTab()).id
+
 browser.runtime.onMessage.addListener(async (data, sender) => {
     console.log("background message", data, sender)
 
@@ -211,13 +215,15 @@ browser.runtime.onMessage.addListener(async (data, sender) => {
     }
 
     if (data.type === 'use_in_statement') {
-        await browser.runtime.sendMessage({
+        const message = {
             type: 'use_in_statement',
             dataype: data.dataype,
             value: data.value ? data.value : null,
             wdEntityId: data.entityId ? data.entityId : null,
             reference: data.reference ? data.reference : null,
-        })
+        }
+        await browser.runtime.sendMessage(message)
+        await browser.tabs.sendMessage(await getTabId(sender), message)
     }
 
 

@@ -1,10 +1,13 @@
 import browser from 'webextension-polyfill'
+import {Browser} from "./core/browser"
 
-function updateStatus(parts) {
-	browser.runtime.sendMessage({
-		type: 'status',
-		message: parts,
-	});
+async function updateStatus(parts) {
+    const message = {
+        type: 'status',
+        message: parts,
+    }
+    await browser.runtime.sendMessage(message)
+    await Browser.sendMessageToActiveTab(message)
 }
 
 function updateStatusInternal(parts) {

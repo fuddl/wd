@@ -63,7 +63,9 @@ content.innerHTML = '';
 	]);
 	let entities = await wikidataGetEntity(currentEntity);
 	let e = entities[currentEntity];
-	let currentTab = await getCurrentTab();
+    // todo run-context incompatibility
+	// let currentTab = await getCurrentTab();
+    let currentTab = null
 
 	let description = getValueByLang(e, 'descriptions', false);
 	let hasDescription = description != false;
@@ -111,6 +113,7 @@ content.innerHTML = '';
 	};
 
 	browser.runtime.onMessage.addListener(async (data, sender) => {
+        console.log("add-content event", data)
 		if (data.type === 'entity_add') {
 			clearBouncer();
 			if (!receivedEntities.includes(data.id)) {
