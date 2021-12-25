@@ -6,7 +6,7 @@ function pushEnitiyToSidebar(id, tid, setPanel = true, nocache = false) {
 	if (!sidebarLocked && setPanel) {
 		return setSidebarUrl(tid, getInternalUrlForEntity(id, nocache))
 	} else {
-		browser.runtime.sendMessage({
+		return browser.runtime.sendMessage({
 			type: 'entity_add',
 			id: id,
 		});
