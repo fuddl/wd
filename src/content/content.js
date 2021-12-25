@@ -57,6 +57,8 @@ async function findApplicables(location, openInSidebar = true) {
 };
 
 function main() {
+    // todo many listeners are superfluous for the iframe case,
+    //  need to account for that and disable them
 	setupSidebar()
 
 	findApplicables(location);

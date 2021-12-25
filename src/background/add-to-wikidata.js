@@ -109,7 +109,7 @@ async function processJobs(jobsUngrouped, fromTab = null) {
 	if (lastEdit) {
         const tabId = lastEdit.job.fromTab || fromTab
         if (tabId) {
-			pushEnitiyToSidebar(lastEdit.id, tabId, true, true);
+			await pushEnitiyToSidebar(lastEdit.id, tabId, true, true);
 		}
 
 		if (lastEdit.job.fromUrl) {

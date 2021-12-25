@@ -181,19 +181,19 @@ async function collectPageLinks(subject) {
 
 					Object.assign(uniqueLinks[existing], uniqueLinks[key])
 				} else {
-					browser.runtime.sendMessage({
-						type: 'match_event',
-						wdEntityId: this.entityId,
-						openInSidebar: false,
-						url: this.links[0].href,
-						cache: !this.resolver.noCache,
-					});
+					await browser.runtime.sendMessage({
+                        type: 'match_event',
+                        wdEntityId: this.entityId,
+                        openInSidebar: false,
+                        url: this.links[0].href,
+                        cache: !this.resolver.noCache,
+                    });
 
-					browser.runtime.sendMessage({
-						type: 'add_url_cache',
-						url: this.links[0].href,
-						id: this.entityId,
-					});
+					await browser.runtime.sendMessage({
+                        type: 'add_url_cache',
+                        url: this.links[0].href,
+                        id: this.entityId,
+                    });
 				}
 
 				for (let selector of this.selectors) {
@@ -246,28 +246,26 @@ async function collectPageLinks(subject) {
 
 	}
 
-	(async () => {
 
-		let linkNumber = 0;
-		for (let key in uniqueLinks) {
-			linkNumber++;
-			if (uniqueLinks[key].applicable) {
-				await uniqueLinks[key].setup();
-			}
-		}
+    let linkNumber = 0
+    for (let key in uniqueLinks) {
+        linkNumber++
+        if (uniqueLinks[key].applicable) {
+            await uniqueLinks[key].setup()
+        }
+    }
 
-		updateStatus([
-			`There are ${linkNumber} links in `,
-			{urlLink: window.location.href},
-			' which could be associated to wikidata items. Checking now.'
-		]);
+    updateStatus([
+        `There are ${linkNumber} links in `,
+        {urlLink: window.location.href},
+        ' which could be associated to wikidata items. Checking now.',
+    ])
 
-		for (let key in uniqueLinks) {
-			if (uniqueLinks[key].applicable) {
-				await uniqueLinks[key].init();
-			}
-		}
-	})();
+    for (let key in uniqueLinks) {
+        if (uniqueLinks[key].applicable) {
+            await uniqueLinks[key].init()
+        }
+    }
 }
 
 

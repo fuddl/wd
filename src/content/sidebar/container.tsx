@@ -13,7 +13,7 @@ export const Container = () => {
 
     useEffect(() => {
         const messageCallback = (event) => {
-            console.log('runtime event', event)
+            console.log('content-script container ev', event)
             if (event.type === 'update-panel-url') {
                 setUrl(event.url)
             } else if (event.type === "toggle-sidebar") {
