@@ -10,6 +10,12 @@ import { wikidataGetEditToken, getTokens } from './wd-get-token.js';
 import { wikidataGetEntity } from '../wd-get-entity.js';
 import { ApplyFormatters } from './formatters.js';
 import { AddLemmaAffix } from './lemma-afixes.js';
+import { PrependNav } from './prepend-nav.js';
+
+if (history.length > 1) {
+	PrependNav();
+}
+
 
 const lang = navigator.language.substr(0,2);
 const footnoteStorage = {};
@@ -347,6 +353,7 @@ function renderStatement(value) {
 
 function updateView(id, useCache = true) {
 	let content = document.getElementById('content');
+
 	let footer = document.getElementById('footer');
 	content.innerHTML = '';
 	(async () => {

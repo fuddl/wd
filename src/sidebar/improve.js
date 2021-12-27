@@ -14,6 +14,9 @@ import { findMetaData, enrichMetaData } from '../content/content__collect-meta.j
 import { metaToStatements } from './metaToStatements.js';
 import { wdGetOSMElements, OSMToSatements } from './osm.js';
 import { URL_match_pattern } from "../content/resolver__url-match-pattern.js";
+import { PrependNav } from './prepend-nav.js';
+
+PrependNav();
 
 async function checkRedirectForIds(url, propform, originalUrl, claims) {
 	let comment = templates.smallBlock(

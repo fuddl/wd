@@ -3,9 +3,9 @@ html {
 }
 
 @font-face {
-	font-family: base-icons;
-	src: url(res/icons.woff2);
-	unicode-range: U+1F504, U+2795;
+	font-family: 'base-icons';
+	src: url("res/icons.woff2");
+	unicode-range: U+2B9C,U+1F5D9;
 }
 
 @font-face {
@@ -17,7 +17,7 @@ html {
 body {
 	color: #222222;
 	font-size: 14px;
-	font-family: base-icons,-apple-system,'BlinkMacSystemFont','Segoe UI','Roboto','Lato','Helvetica','Arial', 'pIqaD',sans-serif;
+	font-family: 'base-icons',-apple-system,'BlinkMacSystemFont','Segoe UI','Roboto','Lato','Helvetica','Arial', 'pIqaD',sans-serif;
 	user-select: text;
 	line-height: 1.2;
 	background: #F8FAFB;
@@ -137,6 +137,10 @@ sup {
 
 .submit-actions {
 	margin-top: 1em;
+}
+
+button {
+	font-family: inherit;
 }
 
 form button,

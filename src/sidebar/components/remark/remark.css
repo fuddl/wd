@@ -30,7 +30,8 @@
 	grid-row: span 2;
 	font-weight: bold;
 	position: sticky;
-	top: 7px;
+	top: var(--top-offset, 7px);
+	transition: top .25s;
 }
 
 @media (max-width: 299px) {
