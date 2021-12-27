@@ -61,11 +61,21 @@ async function addToUrlCache(id, url) {
 	await browser.storage.local.set(cache);
 }
 
+/**
+ * When we don't have Sidebar api (chrome/etc), assume it's always open and let the
+ * iframe container implementation actually deal with the state
+ */
+async function isSidebarOpen() {
+    if (browser.sidebarAction) {
+        return browser.sidebarAction.isOpen({})
+    }
+    return true
+}
+
 async function openInSidebarIfSidebarIsOpen(entityId, tab, setPanel) {
-	// todo may always be false in chrome?
-	// if (await browser.sidebarAction.isOpen({})) {
+	if (await isSidebarOpen()) {
 		await pushEnitiyToSidebar(entityId, tab, setPanel);
-	// }
+	}
 }
 
 async function handleMatchEvent(event, sender) {
@@ -145,10 +155,9 @@ async function handleMatchProposal(event, sender) {
         tabId: sender.tab.id,
     })
 
-    // todo
-    // if (await browser.sidebarAction.isOpen({})) {
-    await pushProposalToSidebar(event.proposals, sender.tab.id)
-    // }
+    if (await isSidebarOpen()) {
+        await pushProposalToSidebar(event.proposals, sender.tab.id)
+    }
 }
 
 async function resetState(sender) {
