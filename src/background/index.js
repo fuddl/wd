@@ -7,13 +7,14 @@ import browser from 'webextension-polyfill'
 import {Browser} from "../core/browser"
 
 let tabStates = {};
-window.sidebarLocked = false;
 
-async function openEnitiyInNewTab(id) {
-	await browser.tabs.create({
-		url: browser.runtime.getURL('sidebar/entity.html') + '?' + id
-	});
+function initTabState(tab) {
+    if (!tabStates[tab.id]) {
+        tabStates[tab.id] = {}
+    }
 }
+
+window.sidebarLocked = false;
 
 function pushProposalToSidebar(proposals, tid) {
 	proposals.fromTab = tid;
@@ -29,9 +30,8 @@ const toggleInlineSidebar = async () =>
 
 browser.browserAction.onClicked.addListener(async (tab) => {
 	let tid = tab.id;
-	if (!tabStates[tid]) {
-		tabStates[tid] = {};
-	}
+    initTabState(tab)
+
 	if (browser.sidebarAction) {
 		if (!tabStates[tid].sidebarOpen) {
 			if (tabStates[tid].mode === 'show_entity') {
@@ -46,11 +46,9 @@ browser.browserAction.onClicked.addListener(async (tab) => {
 			tabStates[tid].sidebarOpen = false;
 		}
 	} else {
-        //todo need better handling here if we actually want "open in new tab" behavior in some cases
         await toggleInlineSidebar()
-		// openEnitiyInNewTab(tabStates[tid].entity);
 	}
-});
+})
 
 async function addToUrlCache(id, url) {
 	let cache = await browser.storage.local.get();
@@ -173,12 +171,6 @@ async function resetState(sender) {
     })
 }
 
-function initTabState(sender) {
-    if (!tabStates[sender.tab.id]) {
-        tabStates[sender.tab.id] = {}
-    }
-}
-
 const getTabId =
     async sender => sender?.tab?.id
         || (await Browser.getActiveTab()).id
@@ -196,7 +188,7 @@ browser.runtime.onMessage.addListener(async (data, sender) => {
 
     // todo is this different in the inline-sidebar world?
     if (sender.tab) {
-        initTabState(sender)
+        initTabState(sender.tab)
 
         if (data.type === 'match_event') {
             await handleMatchEvent(data, sender)
