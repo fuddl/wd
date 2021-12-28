@@ -1,0 +1,19 @@
+.navigation {
+	background: white;
+	padding: 1em;
+	box-shadow: 0 1px 0 #00000011;
+	position: sticky;
+	top: 0;
+	z-index: 1;
+	transition: transform .25s;
+}
+
+.navigation--shy {
+	transform: translateY(-100%);
+}
+
+.navigation > button {
+	background: transparent;
+	border: none;
+	cursor: pointer;
+}

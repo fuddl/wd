@@ -4,6 +4,9 @@ import { getValueByLang, getAliasesByLang } from './get-value-by-lang.js';
 import { templates } from './components/templates.tpl.js';
 import { sparqlQuery } from '../sqarql-query.js';
 import { updateStatusInternal } from "../update-status.js"
+import { PrependNav } from './prepend-nav.js';
+
+PrependNav();
 
 const itemTypes = [
 	"wikibase-item",

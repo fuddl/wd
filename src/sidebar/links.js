@@ -1,6 +1,9 @@
 import { getRelatedItems } from './get-related-items.js';
 import { templates } from './components/templates.tpl.js';
 import { resolvePlaceholders } from './resolve-placeholders.js';
+import { PrependNav } from './prepend-nav.js';
+
+PrependNav();
 
 if (window.location.search) {
 	let currentEntity = window.location.search.match(/^\?(\w\d+)/, '')[1];
@@ -68,13 +71,4 @@ async function updateView(id, useCache = true) {
 		whatLinksHere.appendChild(statement);
 		resolvePlaceholders();
 	}
-	
-	footer.appendChild(templates.actions('Actions', [
-		{
-			link: 'entity.html?' + id,
-			moji: './icons/u1F5CF-article.svg',
-			title: 'Entity’s statements',
-			desc: 'A list of statements for this item',
-		},
-	]));
 }
