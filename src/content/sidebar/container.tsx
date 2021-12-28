@@ -53,5 +53,8 @@ const styles = {
     },
     bmCross: {
         background: '#bdc3c7'
+    },
+    bmMenuWrap: {
+        zIndex: 99999
     }
 }
