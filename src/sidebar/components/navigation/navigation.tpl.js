@@ -1,9 +1,6 @@
+import "./navigation.css"
+
 const navigation = () => {
-
-	let style = document.createElement('link');
-	style.setAttribute('rel', "stylesheet");
-	style.setAttribute('href', "components/navigation/navigation.css");
-
 
 	let wrapper = document.createElement('nav');
 	wrapper.classList.add('navigation')
@@ -16,8 +13,7 @@ const navigation = () => {
 	});
 
 	wrapper.appendChild(back);
-	wrapper.appendChild(style);
-
+	
 	let lastScroll = 0;
 	window.addEventListener('scroll', function (e) {
 		let thisScroll = this.scrollY;
