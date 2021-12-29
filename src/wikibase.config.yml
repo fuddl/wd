@@ -1,0 +1,9 @@
+wikidata:
+  namespaces: ['Q','P', 'L']
+  config:
+    instance: https://www.wikidata.org
+    sparqlEndpoint: https://query.wikidata.org/sparql
+commons:
+  namespaces: ['M']
+  config:
+    instance: https://commons.wikimedia.org

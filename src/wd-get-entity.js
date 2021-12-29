@@ -1,35 +1,48 @@
+import wikiBaseConfig from './wikibase.config.yml';
 import { getValueByLang } from './sidebar/get-value-by-lang.js';
+import WBK from 'wikibase-sdk';
+
+
+function namespaceGetInstance(id) {
+	let ns = id.charAt(0);
+	for (let name in wikiBaseConfig) {
+		if (wikiBaseConfig[name].namespaces.includes(ns)) {
+			return wikiBaseConfig[name].config;
+		}
+	}
+}
+
+function userLanguagesWithFallbacks() {
+	let langs = navigator.languages;
+	let langsFallback = [];
+	for (let lang of langs) {
+		if (lang.includes('-')) {
+			let parentLanguage = lang.split("-")[0];
+			if (!langs.includes(parentLanguage)) {
+				langsFallback.push(parentLanguage);
+			}
+		}
+	}
+	return [...langs, ...langsFallback];
+}
 
 async function wikidataGetEntity(id, usecache = true) {
-	const endpoints = {
-		'Q': 'www.wikidata.org',
-		'P': 'www.wikidata.org',
-		'L': 'www.wikidata.org',
-		'M': 'commons.wikimedia.org',
-	};
+	
+	let config = namespaceGetInstance(id);
+	let wbk = WBK(config);
 
-	let suffix = '';
-	if (!usecache) {
-		suffix = '?' + Date.now();
-	}
+	let url = wbk.getEntities({
+		ids: id,
+		languages: userLanguagesWithFallbacks(),
+	});
 
-	let ns = id.charAt(0);
-
-	let url = `https://${ endpoints[ns] }/wiki/Special:EntityData/${ id }.json` + suffix;
 	try {
-		const response = await fetch(url, {
+		let response = await fetch(url, {
 			cache: usecache ? 'default' : 'reload',
 		});
-
-		if (response.status !== 200) {
-			throw 'Status Code: ' + response.status;
-		}
-
-		let json = await response.json();
-
-		let cached = await addToLabelCache(id, json.entities);
-		
-		return json.entities;
+		response = await response.json();
+		let cached = await addToLabelCache(id, response.entities);
+		return response.entities;
 	} catch(error) {
 		throw ['Fetch Error :-S', error];
 	}
