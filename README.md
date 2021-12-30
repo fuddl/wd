@@ -15,8 +15,8 @@
 ### Build locally
 
 1. Checkout the repository to your local machine eg. with `git clone git@github.com:fuddl/wd.git`
-1. run `yarn` to install all required dependencies
-1. run `yarn build`
+2. run `yarn` to install all required dependencies
+3. run `yarn build`
 
 The build step will create the `distribution` folder, this folder will contain the generated extension.
 
@@ -25,8 +25,8 @@ The build step will create the `distribution` folder, this folder will contain t
 Using [web-ext](https://extensionworkshop.com/documentation/develop/getting-started-with-web-ext/) is recommened for automatic reloading and running in a dedicated browser instance. Alternatively you can load the extension manually (see below).
 
 1. run `yarn watch` to watch for file changes and build continuously
-1. run `npm install --global web-ext` (only only for the first time)
-1. in another terminal, run `web-ext run --start-url https://www.wikidata.org/wiki/Q16276` for Firefox or `web-ext run -t chromium`
+2. run `npm install --global web-ext` (only only for the first time)
+3. in another terminal, run `web-ext run --start-url https://www.wikidata.org/wiki/Q16276` for Firefox or `web-ext run -t chromium`
 
 Note: Firefox will automatically reload content scripts when the extension is updated, Chrome requires you to reload the page to reload the content scripts.
 
