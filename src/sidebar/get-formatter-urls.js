@@ -1,32 +1,43 @@
-import { sparqlQuery } from '../sqarql-query.js';
+import { wikidataGetEntity } from '../wd-get-entity.js';
 
 async function getFormatterUrls(prop, id) {
-	const query = `
-		SELECT ?form ?exp WHERE {
-			{
-				wd:${prop} p:P1630 ?s.
-				?s ps:P1630 ?form.
-			} UNION {
-				wd:${prop} p:P3303 ?s.
-				?s ps:P3303 ?form.
-			} UNION {
-				wd:${prop} p:P7250 ?s.
-				?s ps:P7250 ?form.
+	const property = await wikidataGetEntity(prop, true, true);
+
+	const urlBlacklist = [
+		'https://wikidata-externalid-url.toolforge.org/',
+		'https://web.archive.org/web/',
+		'https://resolve.eidr.org/',
+	];
+
+	let patternList = [];
+
+	for (let prop of ['P1630', 'P3303', 'P7250']) {
+		if (property?.claims?.[prop]) {
+			for (let value of property.claims[prop]) {
+				if (value?.mainsnak?.datavalue?.value) {
+					let exp = {}
+					if (value?.qualifiers?.['P8460']?.[0]?.datavalue?.value) {
+						exp.value = value?.qualifiers?.['P8460']?.[0]?.datavalue?.value;
+					}
+
+					patternList.push({
+						form: {
+							value: value.mainsnak.datavalue.value,
+						},
+						exp: exp,
+					});
+				}
 			}
-			OPTIONAL { 
-				?s pq:P8460 ?exp.
-			}
-			FILTER(!STRSTARTS(?form, 'https://wikidata-externalid-url.toolforge.org/'))
-			FILTER(!STRSTARTS(?form, 'https://web.archive.org/web/'))
-			FILTER(!STRSTARTS(?form, 'https://resolve.eidr.org/'))
 		}
-	`;
-	const patterns = await sparqlQuery(query);
+	}
+
+	//console.debug(patternList);
+ 
 	if (!id) {
-		return patterns;
+		return patternList;
 	} else {
 		let output = [];
-		for (let template of patterns) {
+		for (let template of patternList) {
 			if (template.exp) {
 				let regex = new RegExp(template.exp.value);
 				let match = id.match(regex);

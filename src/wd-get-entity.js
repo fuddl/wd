@@ -2,7 +2,6 @@ import wikiBaseConfig from './wikibase.config.yml';
 import { getValueByLang } from './sidebar/get-value-by-lang.js';
 import WBK from 'wikibase-sdk';
 
-
 function namespaceGetInstance(id) {
 	let ns = id.charAt(0);
 	for (let name in wikiBaseConfig) {
@@ -26,7 +25,7 @@ function userLanguagesWithFallbacks() {
 	return [...langs, ...langsFallback];
 }
 
-async function wikidataGetEntity(id, usecache = true) {
+async function wikidataGetEntity(id, usecache = true, returnSingle = false) {
 	
 	let config = namespaceGetInstance(id);
 	let wbk = WBK(config);
@@ -42,7 +41,7 @@ async function wikidataGetEntity(id, usecache = true) {
 		});
 		response = await response.json();
 		let cached = await addToLabelCache(id, response.entities);
-		return response.entities;
+		return returnSingle ? response.entities[id] : response.entities;
 	} catch(error) {
 		throw ['Fetch Error :-S', error];
 	}
