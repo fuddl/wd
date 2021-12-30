@@ -16,13 +16,24 @@ async function getFormatterUrls(prop, id) {
 			for (let value of property.claims[prop]) {
 				if (value?.mainsnak?.datavalue?.value) {
 					let exp = {}
+					let url = value.mainsnak.datavalue.value;
+					let isBadUrl = false;
+					for (let badUrl of urlBlacklist) {
+						if (url.startsWith(badUrl)) {
+							isBadUrl = true;
+							continue;
+						}
+					}
+					if (isBadUrl) {
+						continue;
+					}
 					if (value?.qualifiers?.['P8460']?.[0]?.datavalue?.value) {
 						exp.value = value?.qualifiers?.['P8460']?.[0]?.datavalue?.value;
 					}
 
 					patternList.push({
 						form: {
-							value: value.mainsnak.datavalue.value,
+							value: url,
 						},
 						exp: exp,
 					});
