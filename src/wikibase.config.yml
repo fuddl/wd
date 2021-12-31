@@ -1,5 +1,5 @@
 wikidata:
-  namespaces: ['Q','P', 'L']
+  namespaces: ['Q', 'P', 'L']
   config:
     instance: https://www.wikidata.org
     sparqlEndpoint: https://query.wikidata.org/sparql
@@ -7,3 +7,7 @@ commons:
   namespaces: ['M']
   config:
     instance: https://commons.wikimedia.org
+
+    # appearantly the correct url. though currently not avalible 
+    # https://phabricator.wikimedia.org/T297454
+    sparqlEndpoint: https://wcqs-beta.wmflabs.org/

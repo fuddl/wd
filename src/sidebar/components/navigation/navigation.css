@@ -1,7 +1,7 @@
 .navigation {
-	background: white;
+	background: var(--paper);
 	padding: 1em;
-	box-shadow: 0 1px 0 #00000011;
+	box-shadow: 0 1px 0 var(--shadow);
 	position: sticky;
 	top: 0;
 	z-index: 1;
@@ -16,4 +16,5 @@
 	background: transparent;
 	border: none;
 	cursor: pointer;
+	color: inherit;
 }
