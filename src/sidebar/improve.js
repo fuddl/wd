@@ -1,36 +1,40 @@
-import { wikidataGetEntity } from '../wd-get-entity.js';
-import { constraintsToStatements } from './constraintsToStatements.js';
-import { getFormatterUrls } from './get-formatter-urls.js';
-import { getCurrentTab } from '../get-current-tab.js';
-import { findLinkedData, enrichLinkedData } from '../content/content__collect-ld.js';
-import { ldToStatements } from './ldToStatements.js';
-import { getElementLanguage } from '../content/content__collect-strings.js';
-import { makeLanguageValid } from '../get-valid-string-languages.js';
-import { sparqlQuery } from "../sqarql-query.js"
-import { templates } from "./components/templates.tpl.js"
-import { updateStatusInternal } from "../update-status.js"
-import { findMediaWikiData } from "./mw-data.js"
-import { findMetaData, enrichMetaData } from '../content/content__collect-meta.js';
-import { metaToStatements } from './metaToStatements.js';
-import { wdGetOSMElements, OSMToSatements } from './osm.js';
+import { wikidataGetEntity } from "../wd-get-entity.js";
+import { constraintsToStatements } from "./constraintsToStatements.js";
+import { getFormatterUrls } from "./get-formatter-urls.js";
+import { getCurrentTab } from "../get-current-tab.js";
+import {
+	findLinkedData,
+	enrichLinkedData,
+} from "../content/content__collect-ld.js";
+import { ldToStatements } from "./ldToStatements.js";
+import { getElementLanguage } from "../content/content__collect-strings.js";
+import { makeLanguageValid } from "../get-valid-string-languages.js";
+import { sparqlQuery } from "../sqarql-query.js";
+import { templates } from "./components/templates.tpl.js";
+import { updateStatusInternal } from "../update-status.js";
+import { findMediaWikiData } from "./mw-data.js";
+import {
+	findMetaData,
+	enrichMetaData,
+} from "../content/content__collect-meta.js";
+import { metaToStatements } from "./metaToStatements.js";
+import { wdGetOSMElements, OSMToSatements } from "./osm.js";
 import { URL_match_pattern } from "../content/resolver__url-match-pattern.js";
-import { PrependNav } from './prepend-nav.js';
+import { PrependNav } from "./prepend-nav.js";
 
 PrependNav();
 
 async function checkRedirectForIds(url, propform, originalUrl, claims) {
 	let comment = templates.smallBlock(
-		templates.text(
-			[
-				document.createTextNode('Found behind redirect of '),
-				templates.urlLink(originalUrl),
-				document.createTextNode(' to '),
-				templates.urlLink(url),
-			]
-		)
+		templates.text([
+			document.createTextNode("Found behind redirect of "),
+			templates.urlLink(originalUrl),
+			document.createTextNode(" to "),
+			templates.urlLink(url),
+		])
 	);
 	const location = {
-		href: url
+		href: url,
 	};
 	let isApplicable = await URL_match_pattern.applicable(location);
 	if (isApplicable) {
@@ -44,14 +48,17 @@ async function checkRedirectForIds(url, propform, originalUrl, claims) {
 				return false;
 			}
 
-			let check = document.createElement('input');
-			check.setAttribute('type', 'checkbox');
-			check.setAttribute('name', isApplicable[0].value);
-			check.setAttribute('value', JSON.stringify({
-				type: 'set_claim',
-				verb: isApplicable[0].prop,
-				object: isApplicable[0].value,
-			}));
+			let check = document.createElement("input");
+			check.setAttribute("type", "checkbox");
+			check.setAttribute("name", isApplicable[0].value);
+			check.setAttribute(
+				"value",
+				JSON.stringify({
+					type: "set_claim",
+					verb: isApplicable[0].prop,
+					object: isApplicable[0].value,
+				})
+			);
 
 			// these need to be checked
 			check.checked = false;
@@ -60,31 +67,35 @@ async function checkRedirectForIds(url, propform, originalUrl, claims) {
 				check: check,
 				prop: label,
 				vals: [
-					templates.text([
-						templates.code(isApplicable[0].value),
-						comment,
-					]),
+					templates.text([templates.code(isApplicable[0].value), comment]),
 				],
 			});
-			propform.appendChild(preview);		
+			propform.appendChild(preview);
 		}
 	}
 }
 
-let content = document.getElementById('content');
-let propform = document.createElement('form');
+let content = document.getElementById("content");
+let intro = document.getElementById("intro");
+let propform = document.createElement("form");
+let saveButton = document.createElement("button");
 
 content.appendChild(propform);
 let numberOfProposals = 0;
 const observer = new MutationObserver((change) => {
+	if (propform.children.length > 0) {
+		saveButton.removeAttribute("hidden");
+	}
 	if (numberOfProposals < propform.children.length) {
 		[...propform.children]
-		  .sort((a,b) => a.getAttribute('data-sortkey') > b.getAttribute('data-sortkey') ? 1 : -1)
-		  .forEach(node => propform.appendChild(node));
-		 numberOfProposals = propform.children.length;
+			.sort((a, b) =>
+				a.getAttribute("data-sortkey") > b.getAttribute("data-sortkey") ? 1 : -1
+			)
+			.forEach((node) => propform.appendChild(node));
+		numberOfProposals = propform.children.length;
 	}
 });
-observer.observe(propform, {childList: true});
+observer.observe(propform, { childList: true });
 
 const parser = new DOMParser();
 
@@ -101,10 +112,10 @@ async function getAllClasses(instance) {
 	  }
 		BIND (replace(str(?class), 'http://www.wikidata.org/entity/', '') AS ?c)
 	}
-	`
+	`;
 	let classes = await sparqlQuery(query);
 	let output = [];
-	for(let cl of classes) {
+	for (let cl of classes) {
 		output.push(cl.c.value);
 	}
 	return output;
@@ -113,30 +124,27 @@ async function getAllClasses(instance) {
 let bouncer = templates.bouncer();
 let message = templates.intertitle({
 	icon: {
-		src: 'https://upload.wikimedia.org/wikipedia/commons/a/a5/OpenMoji-color_1F44C.svg',
-		alt: '👌',
+		src: "https://upload.wikimedia.org/wikipedia/commons/a/a5/OpenMoji-color_1F44C.svg",
+		alt: "👌",
 	},
-	text: 'Could not find possible improvements. Add external identifers and try again.',
+	text: "Could not find possible improvements. Add external identifers and try again.",
 });
 
 if (window.location.search) {
-	let currentEntity = window.location.search.match(/^\?(\w\d+)/, '')[1];
+	let currentEntity = window.location.search.match(/^\?(\w\d+)/, "")[1];
 	if (currentEntity.match(/[QMPL]\d+/)) {
-		( async()=> {
-
-			document.body.appendChild(bouncer);
+		(async () => {
+			intro.appendChild(bouncer);
 
 			browser.runtime.sendMessage({
-				type: 'lock_sidebar',
+				type: "lock_sidebar",
 			});
 
 			const entities = await wikidataGetEntity(currentEntity, false);
-			
-			updateStatusInternal([
-				'Searching OpenStreetMap for relevant data…',
-			]);
+
+			updateStatusInternal(["Searching OpenStreetMap for relevant data…"]);
 			let osmElements = await wdGetOSMElements(currentEntity);
-			
+
 			if (osmElements.length > 0) {
 				for (let element of osmElements) {
 					OSMToSatements(element, propform, {
@@ -149,20 +157,30 @@ if (window.location.search) {
 			for (let id of Object.keys(entities)) {
 				let entity = entities[id];
 				let classes = await getAllClasses(id);
-				for(let claim in entity.claims) {
-					if (['url', 'external-id'].includes(entity.claims[claim][0].mainsnak?.datatype) && entity?.claims[claim][0].mainsnak?.datavalue?.value) {
-						let urls = []; 
+				for (let claim in entity.claims) {
+					if (
+						["url", "external-id"].includes(
+							entity.claims[claim][0].mainsnak?.datatype
+						) &&
+						entity?.claims[claim][0].mainsnak?.datavalue?.value
+					) {
+						let urls = [];
 						switch (entity.claims[claim][0].mainsnak.datatype) {
-							case 'external-id':
-							  for (let key in entity.claims[claim]) {
-							  	let moreUrls = await getFormatterUrls(claim, entity.claims[claim][key].mainsnak.datavalue.value);
-									urls = [...urls, ...moreUrls];
-							  }
-							  break;
-							case 'url':
+							case "external-id":
 								for (let key in entity.claims[claim]) {
-									if(entity.claims[claim][key].mainsnak?.datavalue?.value) {
-										urls.push(entity.claims[claim][key].mainsnak.datavalue.value);	
+									let moreUrls = await getFormatterUrls(
+										claim,
+										entity.claims[claim][key].mainsnak.datavalue.value
+									);
+									urls = [...urls, ...moreUrls];
+								}
+								break;
+							case "url":
+								for (let key in entity.claims[claim]) {
+									if (entity.claims[claim][key].mainsnak?.datavalue?.value) {
+										urls.push(
+											entity.claims[claim][key].mainsnak.datavalue.value
+										);
 									}
 								}
 								break;
@@ -170,9 +188,9 @@ if (window.location.search) {
 
 						for (let url of urls) {
 							updateStatusInternal([
-								'Searching ',
-								{urlLink: url},
-								' for metadata…',
+								"Searching ",
+								{ urlLink: url },
+								" for metadata…",
 							]);
 							try {
 								let result = await fetch(url);
@@ -180,37 +198,50 @@ if (window.location.search) {
 								let text = await result.text();
 
 								if (result.redirected) {
-									await checkRedirectForIds(result.url, propform, url, entity.claims);
+									await checkRedirectForIds(
+										result.url,
+										propform,
+										url,
+										entity.claims
+									);
 								}
 
 								if (text) {
 									const doc = parser.parseFromString(text, "text/html");
-									let canonical = doc.querySelector('link[rel="canonical"][href]');
+									let canonical = doc.querySelector(
+										'link[rel="canonical"][href]'
+									);
 									if (canonical) {
-										sourceUrl = canonical.getAttribute('href');
+										sourceUrl = canonical.getAttribute("href");
 										updateStatusInternal([
-											'Searching ',
-											{urlLink: sourceUrl},
-											' for metadata…',
+											"Searching ",
+											{ urlLink: sourceUrl },
+											" for metadata…",
 										]);
 									}
 
 									if (!visitedUrls.includes(sourceUrl)) {
 										visitedUrls.push(sourceUrl);
 
-										let title = doc.querySelector('title');
-										let root = doc.querySelector('html');
-										let rootLang = root.hasAttribute('lang') ? root.getAttribute('lang') : '';
+										let title = doc.querySelector("title");
+										let root = doc.querySelector("html");
+										let rootLang = root.hasAttribute("lang")
+											? root.getAttribute("lang")
+											: "";
 										let validRootLang = await makeLanguageValid(rootLang);
 
 										const meta = findMetaData(doc);
 										if (meta) {
 											updateStatusInternal([
-												'Found metadata in ',
-													{urlLink: url},
-												'!',
+												"Found metadata in ",
+												{ urlLink: url },
+												"!",
 											]);
-											let enrichedMeta = await enrichMetaData(meta, rootLang, url);
+											let enrichedMeta = await enrichMetaData(
+												meta,
+												rootLang,
+												url
+											);
 											await metaToStatements(enrichedMeta, propform, {
 												url: sourceUrl,
 												title: title ? title.innerText.trim() : null,
@@ -218,13 +249,12 @@ if (window.location.search) {
 											});
 										}
 
-
 										const ld = findLinkedData(doc);
 										if (ld) {
 											updateStatusInternal([
-												'Found structured data in ',
-													{urlLink: url},
-												'!',
+												"Found structured data in ",
+												{ urlLink: url },
+												"!",
 											]);
 											let enriched = await enrichLinkedData(ld, claim, url);
 											await ldToStatements(enriched, propform, {
@@ -233,8 +263,11 @@ if (window.location.search) {
 												lang: validRootLang,
 											});
 										}
-										const mwData = await findMediaWikiData(doc, propform, sourceUrl ?? url);
-
+										const mwData = await findMediaWikiData(
+											doc,
+											propform,
+											sourceUrl ?? url
+										);
 									}
 								}
 							} catch (error) {
@@ -245,55 +278,60 @@ if (window.location.search) {
 					const property = await wikidataGetEntity(claim, false);
 					if (property[claim].claims?.P2302) {
 						updateStatusInternal([
-							'Checking constraints for ',
-							{placeholder: {entity: claim}},
+							"Checking constraints for ",
+							{ placeholder: { entity: claim } },
 						]);
-						constraintsToStatements(claim, property[claim].claims.P2302, propform, classes);
+						constraintsToStatements(
+							claim,
+							property[claim].claims.P2302,
+							propform,
+							classes
+						);
 					}
 				}
-				document.body.removeChild(bouncer);
+				intro.removeChild(bouncer);
 				if (propform.children.length < 1) {
-					document.body.innerText = '';
+					document.body.innerText = "";
 					document.body.appendChild(message);
 				}
 			}
-		})()
+		})();
 	}
 
-	let form = document.createElement('div');
-	form.classList.add('submit-actions');
+	let form = document.createElement("div");
+	form.classList.add("submit-actions");
 	content.appendChild(form);
 
-	let saveButton = document.createElement('button');
 	form.appendChild(saveButton);
-	saveButton.innerText = 'Send to Wikidata';
-	
-	saveButton.addEventListener('click', async function() {
+	saveButton.setAttribute("hidden", true);
+	saveButton.innerText = "Send to Wikidata";
+
+	saveButton.addEventListener("click", async function () {
 		let currentTab = await getCurrentTab();
 		let jobs = [];
-		const formData = new FormData(propform)
+		const formData = new FormData(propform);
 		for (let pair of formData.entries()) {
-			if (pair[1] != '') {
-			 	let job = JSON.parse(pair[1]);
-			 	if (!job.subject) {
-			 		job.subject = currentEntity;
-			 		job.fromTab = currentTab;
-			 	}
-			 	jobs.push(job);
+			if (pair[1] != "") {
+				let job = JSON.parse(pair[1]);
+				if (!job.subject) {
+					job.subject = currentEntity;
+					job.fromTab = currentTab;
+				}
+				jobs.push(job);
 			}
 		}
 
 		Promise.all([
 			browser.runtime.sendMessage({
-				type: 'send_to_wikidata',
+				type: "send_to_wikidata",
 				data: jobs,
-			}), 
+			}),
 			browser.runtime.sendMessage({
-				type: 'unlock_sidebar',
+				type: "unlock_sidebar",
 			}),
 		]).then((values) => {
 			browser.runtime.sendMessage({
-				type: 'wait',
+				type: "wait",
 				tid: currentTab,
 			});
 		});
