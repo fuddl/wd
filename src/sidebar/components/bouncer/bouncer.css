@@ -1,66 +1,50 @@
 .bouncer {
-	position: fixed;
-	top: 0;
-	bottom: 0;
-	left: 0;
-	right: 0;
-	background: white;
+	background: var(--paper);
+	position: relative;
 }
-
-@media (prefers-color-scheme: dark) {
-	.bouncer {
-		background: #27292D;
-	}
-}
-
 
 .bouncer__mover {
-	position: fixed;
-	left: 50%;
-	top:	50%;
 	white-space: nowrap;
-	transform: translate(-50%,-50%);
-	color:  #72777d;
+	color: #72777d;
+	text-align: center;
+	padding: 2em 1em 1em;
 }
 .bouncer__mover > .bouncer__bounce,
 .bouncer__mover:before,
 .bouncer__mover:after {
-	content: '';
+	content: "";
 	background-color: currentColor;
 	display: block;
-	display:	inline-block;
+	display: inline-block;
 	width: 12px;
 	height: 12px;
 	border-radius: 100%;
-	animation: bounce 1600ms ease-in-out -160ms infinite both
+	animation: bounce 1600ms ease-in-out -160ms infinite both;
 }
 .bouncer__mover:before {
 	margin-right: 4px;
-	animation-delay: -330ms
+	animation-delay: -330ms;
 }
 .bouncer__mover:after {
 	margin-left: 4px;
-	animation-delay: 0s
+	animation-delay: 0s;
 }
 
 @keyframes bounce {
 	0%,
 	50%,
 	100% {
-		transform: scale(.625)
+		transform: scale(0.625);
 	}
 	20% {
-		opacity: .87;
-		transform: scale(1)
+		opacity: 0.87;
+		transform: scale(1);
 	}
 }
 
 .bouncer__status {
-	margin-top: 1em;
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 90vw;
-  white-space: normal;
-  text-align: center;
+	white-space: normal;
+	text-align: center;
+	min-height: 6em;
+	padding: 1em;
 }
