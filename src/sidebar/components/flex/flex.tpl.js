@@ -491,6 +491,9 @@ const flex = (vars) => {
 						formLink.setAttribute("href", "#" + form.id);
 						variation.appendChild(formLink);
 						for (let rep in form.representations) {
+							if (formLink.innerText !== "") {
+								formLink.appendChild(document.createTextNode(" / "));
+							}
 							let repSpan = document.createElement("span");
 							repSpan.setAttribute("lang", form.representations[rep].language);
 							let formStr = form.representations[rep].value;
