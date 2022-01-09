@@ -253,7 +253,6 @@ if (window.location.search) {
 				}
 				document.body.removeChild(bouncer);
 				if (propform.children.length < 1) {
-					document.body.innerText = '';
 					document.body.appendChild(message);
 				}
 			}
