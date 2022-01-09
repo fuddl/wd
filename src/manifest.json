@@ -1,7 +1,7 @@
 {
 	"manifest_version": 2,
 	"name": "Wikidata",
-	"version": "0.213",
+	"version": "0.214",
 	"description": "Display information from wikidata.",
 	"icons": {
 		"48": "icons/wd.svg",
@@ -17,33 +17,24 @@
 		"default_panel": "sidebar/entity.html",
 		"open_at_install": true
 	},
-	"permissions": [
-		"activeTab",
-		"storage",
-		"webNavigation",
-		"<all_urls>"
-	],
+	"permissions": ["activeTab", "storage", "webNavigation", "<all_urls>"],
 	"background": {
-        "scripts": [
-            "background/index.js"
-        ]
+		"scripts": ["background/index.js"]
 	},
 	"content_scripts": [
 		{
 			"matches": ["<all_urls>"],
 			"run_at": "document_end",
-			"js": [
-				"content/index.js"
-			]
+			"js": ["content/index.js"]
 		}
 	],
-    "web_accessible_resources": [
+	"web_accessible_resources": [
 		"sqarql-query.js",
-        "sidebar/*.html",
-        "sidebar/res/*",
+		"sidebar/*.html",
+		"sidebar/res/*",
 		"**/*.svg",
 		"**/*.css"
-    ],
+	],
 	"browser_specific_settings": {
 		"gecko": {
 			"strict_min_version": "89.0"
