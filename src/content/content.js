@@ -22,13 +22,13 @@ async function findApplicables(location, openInSidebar = true) {
 
 			if (entityId && !foundMatch) {
 				foundMatch = true;
-				browser.runtime.sendMessage({
-					type: 'match_event',
-					wdEntityId: entityId,
-					openInSidebar: openInSidebar,
-					url: location.href,
-					cache: !resolvers[id].noCache,
-				});
+				await browser.runtime.sendMessage({
+                    type: 'match_event',
+                    wdEntityId: entityId,
+                    openInSidebar: openInSidebar,
+                    url: location.href,
+                    cache: !resolvers[id].noCache,
+                });
 				return entityId;
 			}
 			applicables.push(isApplicable);
@@ -37,21 +37,21 @@ async function findApplicables(location, openInSidebar = true) {
 	if (applicables.length > 0 && !foundMatch && openInSidebar) {
 		const url = location.toString();
 		const documentLang =  await makeLanguageValid(document.querySelector('html').lang);
-		browser.runtime.sendMessage({
-			type: 'match_proposal',
-			proposals: {
-				ids: applicables,
-				titles: findTitles(),
-				desc: findDescriptions(),
-				ld: await enrichLinkedData(linkedData, applicables[0], window.location.href),
-				meta: await enrichMetaData(metaData, documentLang, window.location.href),
-				source: {
-					url: url,
-					title: document.querySelector('title').innerText,
-					lang: documentLang,
-				}
-			},
-		});
+		await browser.runtime.sendMessage({
+            type: 'match_proposal',
+            proposals: {
+                ids: applicables,
+                titles: findTitles(),
+                desc: findDescriptions(),
+                ld: await enrichLinkedData(linkedData, applicables[0], window.location.href),
+                meta: await enrichMetaData(metaData, documentLang, window.location.href),
+                source: {
+                    url: url,
+                    title: document.querySelector('title').innerText,
+                    lang: documentLang,
+                }
+            },
+        });
 	}
 	return false;
 };

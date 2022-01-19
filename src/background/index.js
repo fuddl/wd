@@ -28,27 +28,28 @@ setupCommandListener()
 const toggleInlineSidebar = async () =>
     Browser.sendMessageToActiveTab({type: "toggle-sidebar"})
 
-browser.browserAction.onClicked.addListener(async (tab) => {
-	let tid = tab.id;
+async function toggleSidebar(tab) {
     initTabState(tab)
 
-	if (browser.sidebarAction) {
-		if (!tabStates[tid].sidebarOpen) {
-			if (tabStates[tid].mode === 'show_entity') {
-				await pushEnitiyToSidebar(tabStates[tid].entity, tid);
-			} else if(tabStates[tid].mode === 'propose_match') {
-                await pushProposalToSidebar(tabStates[tid].proposals, tid)
-			}
-			await browser.sidebarAction.open();
-			tabStates[tid].sidebarOpen = true;
-		} else {
-			await browser.sidebarAction.close();
-			tabStates[tid].sidebarOpen = false;
-		}
-	} else {
+    if (browser.sidebarAction) {
+        // if a user input handler waits on a promise, then its status as a user input handler is lost
+        // and this call won't work
+        // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/User_actions
+        // so, we must do this before pushing the content to sidebar
+        await browser.sidebarAction.toggle()
+    } else {
+        // todo I actually want this one in FF too, need a setting
         await toggleInlineSidebar()
-	}
-})
+    }
+
+    if (tabStates[tab.id].mode === 'show_entity') {
+        await pushEnitiyToSidebar(tabStates[tab.id].entity, tab.id)
+    } else if (tabStates[tab.id].mode === 'propose_match') {
+        await pushProposalToSidebar(tabStates[tab.id].proposals, tab.id)
+    }
+}
+
+browser.browserAction.onClicked.addListener(toggleSidebar)
 
 async function addToUrlCache(id, url) {
 	let cache = await browser.storage.local.get();
@@ -57,23 +58,6 @@ async function addToUrlCache(id, url) {
 	}
 	cache.urlCache[url] = id;
 	await browser.storage.local.set(cache);
-}
-
-/**
- * When we don't have Sidebar api (chrome/etc), assume it's always open and let the
- * iframe container implementation actually deal with the state
- */
-async function isSidebarOpen() {
-    if (browser.sidebarAction) {
-        return browser.sidebarAction.isOpen({})
-    }
-    return true
-}
-
-async function openInSidebarIfSidebarIsOpen(entityId, tab, setPanel) {
-	if (await isSidebarOpen()) {
-		await pushEnitiyToSidebar(entityId, tab, setPanel);
-	}
 }
 
 async function handleMatchEvent(event, sender) {
@@ -91,7 +75,7 @@ async function handleMatchEvent(event, sender) {
     }
 
     let tabDest = sender.tab?.id ? sender.tab.id : await browser.tabs.getCurrent()
-    await openInSidebarIfSidebarIsOpen(event.wdEntityId, tabDest, event.openInSidebar)
+    await pushEnitiyToSidebar(event.wdEntityId, tabDest, event.openInSidebar)
 
     return addToUrlCache(event.wdEntityId, event.url)
 }
@@ -153,9 +137,7 @@ async function handleMatchProposal(event, sender) {
         tabId: sender.tab.id,
     })
 
-    if (await isSidebarOpen()) {
-        await pushProposalToSidebar(event.proposals, sender.tab.id)
-    }
+    await pushProposalToSidebar(event.proposals, sender.tab.id)
 }
 
 async function resetState(sender) {
