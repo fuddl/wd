@@ -6,14 +6,6 @@ import {setupCommandListener} from "./command-listener"
 import browser from 'webextension-polyfill'
 import {Browser} from "../core/browser"
 
-let tabStates = {};
-
-function initTabState(tab) {
-    if (!tabStates[tab.id]) {
-        tabStates[tab.id] = {}
-    }
-}
-
 window.sidebarLocked = false;
 
 function pushProposalToSidebar(proposals, tid) {
@@ -29,23 +21,15 @@ const toggleInlineSidebar = async () =>
     Browser.sendMessageToActiveTab({type: "toggle-sidebar"})
 
 async function toggleSidebar(tab) {
-    initTabState(tab)
-
     if (browser.sidebarAction) {
-        // if a user input handler waits on a promise, then its status as a user input handler is lost
+        // note: if a user input handler waits on a promise, then its status as a user input handler is lost
         // and this call won't work
         // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/User_actions
-        // so, we must do this before pushing the content to sidebar
         await browser.sidebarAction.toggle()
     } else {
         // todo I actually want this one in FF too, need a setting
+        // also rn the shortcut only works with the iframe sidebar, so there need to call this function instead
         await toggleInlineSidebar()
-    }
-
-    if (tabStates[tab.id].mode === 'show_entity') {
-        await pushEnitiyToSidebar(tabStates[tab.id].entity, tab.id)
-    } else if (tabStates[tab.id].mode === 'propose_match') {
-        await pushProposalToSidebar(tabStates[tab.id].proposals, tab.id)
     }
 }
 
@@ -62,8 +46,6 @@ async function addToUrlCache(id, url) {
 
 async function handleMatchEvent(event, sender) {
     if (!sidebarLocked) {
-        tabStates[sender.tab.id].mode = 'show_entity'
-        tabStates[sender.tab.id].entity = event.wdEntityId
         await browser.browserAction.setIcon({
             path: activeIcon,
             tabId: sender.tab.id,
@@ -124,9 +106,6 @@ function clearPageLinks() {
 }
 
 async function handleMatchProposal(event, sender) {
-    tabStates[sender.tab.id].mode = 'propose_match'
-    tabStates[sender.tab.id].proposals = event.proposals
-
     await browser.browserAction.setIcon({
         path: "icons/halfactive.svg",
         tabId: sender.tab.id,
@@ -141,8 +120,6 @@ async function handleMatchProposal(event, sender) {
 }
 
 async function resetState(sender) {
-    tabStates[sender.tab.id].mode = false
-
     await browser.browserAction.setIcon({
         path: "icons/inactive.svg",
         tabId: sender.tab.id,
@@ -170,8 +147,6 @@ browser.runtime.onMessage.addListener(async (data, sender) => {
 
     // todo is this different in the inline-sidebar world?
     if (sender.tab) {
-        initTabState(sender.tab)
-
         if (data.type === 'match_event') {
             await handleMatchEvent(data, sender)
         } else if (data.type === 'match_proposal') {
