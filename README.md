@@ -1,13 +1,14 @@
-# Wikidata for Firefox
+# Wikidata browser extension
 
-[Get this Extension for 🦊 Firefox!](https://addons.mozilla.org/en-US/firefox/addon/wikidata/)
+Get this Extension for [🦊 Firefox](https://addons.mozilla.org/en-US/firefox/addon/wikidata/),
+[Chrome](https://chrome.google.com/webstore/detail/wikidata/iijkiilckldlddidhaomggfadfafpdfd)
 
 ![ Douglas Adams on Wikipedia with Wikidata for Firefox ](https://upload.wikimedia.org/wikipedia/commons/3/36/Douglas_Adams_on_Wikipedia_with_Wikidata_for_Firefox.png)
 
 ## Features
 
 * Display wikidata-Items while browsing the web.
-* Add missing IDs
+* Add missing IDs/items to Wikidata
 * Extract information from websites to wikidata
 
 ## Development-Setup
