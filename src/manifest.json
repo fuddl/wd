@@ -5,7 +5,8 @@
 	"description": "Display information from wikidata.",
 	"icons": {
 		"48": "icons/wd.svg",
-		"96": "icons/wd.svg"
+		"96": "icons/wd.svg",
+        "128": "icons/wd-128.png"
 	},
 	"browser_action": {
 		"default_icon": "icons/inactive.svg",
