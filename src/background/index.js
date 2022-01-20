@@ -135,6 +135,8 @@ const getTabId =
 browser.runtime.onMessage.addListener(async (data, sender) => {
     console.log("background message", data, sender)
 
+    if (data.type === 'get-tab-id') return sender.tab.id
+
     if (data.type === 'open_in_sidebar') {
         await pushEnitiyToSidebar(data.wdEntityId, data.tid)
     }
@@ -188,8 +190,6 @@ browser.runtime.onMessage.addListener(async (data, sender) => {
     if (data.type === 'clear_pagelinks') {
         clearPageLinks()
     }
-
-    return Promise.resolve('done')
 })
 
 browser.webNavigation.onHistoryStateUpdated.addListener(

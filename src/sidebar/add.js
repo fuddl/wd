@@ -1,11 +1,11 @@
-import { wikidataGetEntity } from '../wd-get-entity.js';
-import { getCurrentTab } from '../get-current-tab.js';
-import { getValueByLang, getAliasesByLang } from './get-value-by-lang.js';
-import { templates } from './components/templates.tpl.js';
-import { sparqlQuery } from '../sqarql-query.js';
-import { updateStatusInternal } from "../update-status.js"
+import {wikidataGetEntity} from '../wd-get-entity.js'
+import {getValueByLang} from './get-value-by-lang.js'
+import {templates} from './components/templates.tpl.js'
+import {sparqlQuery} from '../sqarql-query.js'
+import {updateStatusInternal} from "../update-status.js"
 import browser from 'webextension-polyfill'
-import { PrependNav } from './prepend-nav.js';
+import {PrependNav} from './prepend-nav.js'
+import {Browser} from "../core/browser"
 
 PrependNav();
 
@@ -63,9 +63,7 @@ content.innerHTML = '';
 	]);
 	let entities = await wikidataGetEntity(currentEntity);
 	let e = entities[currentEntity];
-    // todo run-context incompatibility
-	// let currentTab = await getCurrentTab();
-    let currentTab = null
+	let currentTab = await Browser.getCurrentTabIdForAllContexts()
 
 	let description = getValueByLang(e, 'descriptions', false);
 	let hasDescription = description != false;

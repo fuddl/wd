@@ -1,21 +1,20 @@
-import { wikidataGetEntity } from '../wd-get-entity.js';
-import { constraintsToStatements } from './constraintsToStatements.js';
-import { getFormatterUrls } from './get-formatter-urls.js';
-import { getCurrentTab } from '../get-current-tab.js';
-import { findLinkedData, enrichLinkedData } from '../content/content__collect-ld.js';
-import { ldToStatements } from './ldToStatements.js';
-import { getElementLanguage } from '../content/content__collect-strings.js';
-import { makeLanguageValid } from '../get-valid-string-languages.js';
-import { sparqlQuery } from "../sqarql-query.js"
-import { templates } from "./components/templates.tpl.js"
-import { updateStatusInternal } from "../update-status.js"
-import { findMediaWikiData } from "./mw-data.js"
-import { findMetaData, enrichMetaData } from '../content/content__collect-meta.js';
-import { metaToStatements } from './metaToStatements.js';
-import { wdGetOSMElements, OSMToSatements } from './osm.js';
-import { URL_match_pattern } from "../content/resolver__url-match-pattern.js";
+import {wikidataGetEntity} from '../wd-get-entity.js'
+import {constraintsToStatements} from './constraintsToStatements.js'
+import {getFormatterUrls} from './get-formatter-urls.js'
+import {enrichLinkedData, findLinkedData} from '../content/content__collect-ld.js'
+import {ldToStatements} from './ldToStatements.js'
+import {makeLanguageValid} from '../get-valid-string-languages.js'
+import {sparqlQuery} from "../sqarql-query.js"
+import {templates} from "./components/templates.tpl.js"
+import {updateStatusInternal} from "../update-status.js"
+import {findMediaWikiData} from "./mw-data.js"
+import {enrichMetaData, findMetaData} from '../content/content__collect-meta.js'
+import {metaToStatements} from './metaToStatements.js'
+import {OSMToSatements, wdGetOSMElements} from './osm.js'
+import {URL_match_pattern} from "../content/resolver__url-match-pattern.js"
 import browser from 'webextension-polyfill'
-import { PrependNav } from './prepend-nav.js';
+import {PrependNav} from './prepend-nav.js'
+import {Browser} from "../core/browser"
 
 PrependNav();
 
@@ -96,7 +95,7 @@ async function getAllClasses(instance) {
 	SELECT ?c WHERE {
 	  { wd:${instance} wdt:P31 ?class. }
 	  UNION
-	  { 
+	  {
 	    wd:${instance} wdt:P31 ?childClass.
 	    ?childClass wdt:P279* ?class.
 	  }
@@ -269,7 +268,7 @@ if (window.location.search) {
 	saveButton.innerText = 'Send to Wikidata';
 
 	saveButton.addEventListener('click', async function() {
-		let currentTab = await getCurrentTab();
+		let currentTab = await Browser.getCurrentTabIdForAllContexts()
 		let jobs = [];
 		const formData = new FormData(propform)
 		for (let pair of formData.entries()) {

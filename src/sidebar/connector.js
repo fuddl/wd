@@ -1,11 +1,11 @@
 import {wikidataGetEntity} from '../wd-get-entity.js'
-import {getCurrentTab} from '../get-current-tab.js'
 import {getTokens} from './wd-get-token.js'
 import {templates} from './components/templates.tpl.js'
 import {constraintsToStatements} from './constraintsToStatements.js'
 import {ldToStatements} from './ldToStatements.js'
 import {metaToStatements} from './metaToStatements.js'
 import browser from 'webextension-polyfill'
+import {Browser} from "../core/browser"
 
 class jobRedundancyChecker {
 	constructor() {
@@ -55,11 +55,9 @@ let existing = new jobRedundancyChecker();
 	let isMultiple = false;
 	content.appendChild(propform);
 	let scope = 'item';
-    // todo can't do that in content script context
-	// let currentTab = await getCurrentTab();
-    let currentTab = null;
+	let currentTab = await Browser.getCurrentTabIdForAllContexts()
 
-	const isProp = proposals.ids[0][0].hasOwnProperty('prop');
+    const isProp = proposals.ids[0][0].hasOwnProperty('prop');
 	const isSitelink = proposals.ids[0][0].hasOwnProperty('sitelink');
 
 	if (isProp) {
