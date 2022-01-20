@@ -54,33 +54,30 @@ async function findApplicables(location, openInSidebar = true) {
         });
 	}
 	return false;
-};
+}
 
-function main() {
-    // todo many listeners are superfluous for the iframe case,
-    //  need to account for that and disable them
+async function main() {
 	setupSidebar()
 
-	findApplicables(location);
+	await findApplicables(location)
 
-	browser.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
-		if (msg.action == 'find_applicables') {
-			findApplicables(location);
+	browser.runtime.onMessage.addListener(async msg => {
+		if (msg.action === 'find_applicables') {
+			return findApplicables(location)
 		} else if (msg.action === 'collect_pagelinks') {
-			return await collectPageLinks(msg.subject);
+			return collectPageLinks(msg.subject)
 		} else if (msg.action === 'clear_pagelinks') {
-			clearPageLinks();
+			clearPageLinks()
 		}
-	});
+	})
 
-	window.onpopstate = function(event) {
-		findApplicables(window.location);
-	};
+	window.onpopstate = () => findApplicables(window.location)
 
 	window.addEventListener('hashchange', function() {
 		findApplicables(window.location);
 	}, false);
 
+    // todo likely redundant in the inline-sidebar case
 	document.addEventListener('focus', function() {
 		findApplicables(window.location);
 	})
@@ -90,7 +87,7 @@ function main() {
 	let title = head.querySelector('title').innerText;
 	let titleObserver = new MutationObserver(function() {
 		let newTitle = head.querySelector('title').innerText;
-		if (newTitle != title) {
+		if (newTitle !== title) {
 			findApplicables(window.location);
 			title = newTitle;
 		}
@@ -129,7 +126,7 @@ function main() {
 					}
 				}
 
-				browser.runtime.sendMessage(message);
+				await browser.runtime.sendMessage(message);
 			}
 		})()
 	});

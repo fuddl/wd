@@ -20,7 +20,7 @@ setupCommandListener()
 const toggleInlineSidebar = async () =>
     Browser.sendMessageToActiveTab({type: "toggle-sidebar"})
 
-async function toggleSidebar(tab) {
+async function toggleSidebar() {
     if (browser.sidebarAction) {
         // note: if a user input handler waits on a promise, then its status as a user input handler is lost
         // and this call won't work
@@ -76,8 +76,7 @@ function collectPageLinks(event) {
                     action: "collect_pagelinks",
                     subject: event.subject,
                 },
-            ).then(response => {
-            }).catch((v) => {
+            ).catch((v) => {
                 console.log(JSON.stringify(v))
             })
         }
@@ -95,8 +94,7 @@ function clearPageLinks() {
             browser.tabs.sendMessage(
                 tab.id,
                 {action: "clear_pagelinks"},
-            ).then(response => {
-            }).catch((v) => {
+            ).catch((v) => {
                 console.log(JSON.stringify(v))
             })
         }
@@ -145,7 +143,6 @@ browser.runtime.onMessage.addListener(async (data, sender) => {
         await setSidebarUrl(data.tid || sender?.tab?.id, browser.runtime.getURL('sidebar/wait.html'))
     }
 
-    // todo is this different in the inline-sidebar world?
     if (sender.tab) {
         if (data.type === 'match_event') {
             await handleMatchEvent(data, sender)
@@ -193,8 +190,7 @@ browser.runtime.onMessage.addListener(async (data, sender) => {
     }
 
     return Promise.resolve('done')
-});
+})
 
-browser.webNavigation.onHistoryStateUpdated.addListener(function(e) {
-	browser.tabs.sendMessage(e.tabId, { action: "find_applicables" });
-});
+browser.webNavigation.onHistoryStateUpdated.addListener(
+    e => browser.tabs.sendMessage(e.tabId, {action: "find_applicables"}))
