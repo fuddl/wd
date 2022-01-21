@@ -4,10 +4,10 @@ import {css} from "@emotion/react"
 import {slide as Slider} from 'react-burger-menu'
 import {useEffect, useState} from "react"
 import {getInternalUrlForEntity} from "../../core/navigation"
+import {useTabLocalState} from "../../core/react"
 
-export const Container = () => {
-    // todo persist this across navigations between links
-    const [isOpen, setOpen] = useState(false)
+export const SidebarWrapper = () => {
+    const [isOpen, setOpen] = useTabLocalState("sidebarOpen", false)
     // todo show a special empty panel instead
     const [url, setUrl] = useState(getInternalUrlForEntity("Q99894727"))
 
@@ -24,7 +24,7 @@ export const Container = () => {
         browser.runtime.onMessage.addListener(messageCallback)
 
         return () => browser.runtime.onMessage.removeListener(messageCallback)
-    }, [isOpen])
+    }, [isOpen, setOpen])
 
     return <Slider
         isOpen={isOpen}
@@ -40,21 +40,21 @@ export const Container = () => {
         {/*{props.children}*/}
         <iframe
             css={css`
-              width: 100%;
-              height: 100%;
+                width: 100%;
+                height: 100%;
             `}
             src={url}/>
     </Slider>
 }
 
 const styles = {
-    bmMenu : {
-        overflow: "hidden"
+    bmMenu: {
+        overflow: "hidden",
     },
     bmCross: {
-        background: '#bdc3c7'
+        background: '#bdc3c7',
     },
     bmMenuWrap: {
-        zIndex: 99999
-    }
+        zIndex: 99999,
+    },
 }
