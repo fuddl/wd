@@ -3,13 +3,12 @@ import * as browser from "webextension-polyfill"
 import {css} from "@emotion/react"
 import {slide as Slider} from 'react-burger-menu'
 import {useEffect, useState} from "react"
-import {getInternalUrlForEntity} from "../../core/navigation"
 import {useTabLocalState} from "../../core/react"
 
 export const SidebarWrapper = () => {
     const [isOpen, setOpen] = useTabLocalState("sidebarOpen", false)
-    // todo show a special empty panel instead
-    const [url, setUrl] = useState(getInternalUrlForEntity("Q99894727"))
+    // todo show a loading indicator instead of emptiness
+    const [url, setUrl] = useState("")
 
     useEffect(() => {
         const messageCallback = (event) => {
