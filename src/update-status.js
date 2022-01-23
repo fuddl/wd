@@ -10,11 +10,4 @@ async function updateStatus(parts) {
     await Browser.sendMessageToActiveTab(message)
 }
 
-function updateStatusInternal(parts) {
-	window.postMessage({
-		type: 'status',
-		message: parts,
-	}, browser.runtime.getURL(''));
-}
-
-export { updateStatus, updateStatusInternal }
+export {updateStatus}

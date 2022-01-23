@@ -6,8 +6,15 @@ export const Browser = {
         browser.tabs.query({currentWindow: true, active: true})
             .then(tabs => tabs[0]),
 
-    sendMessageToActiveTab(message: any) {
-        return this.getActiveTab().then(tab => browser.tabs.sendMessage(tab.id!, message))
+    async sendMessageToActiveTab(message: any) {
+        /**
+         * If we're in the content script context - force context change and re-broadcast message to origin tab
+         */
+        if (browser.tabs) {
+            return browser.tabs.sendMessage((await this.getActiveTab()).id, message)
+        } else {
+            return browser.runtime.sendMessage({type: 'broadcast-to-active-tab', message})
+        }
     },
 
     async getCurrentTabIdForAllContexts() {

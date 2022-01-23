@@ -136,6 +136,7 @@ browser.runtime.onMessage.addListener(async (data, sender) => {
     console.log("background message", data, sender)
 
     if (data.type === 'get-tab-id') return sender.tab.id
+    if (data.type === 'broadcast-to-active-tab') return Browser.sendMessageToActiveTab(data.message)
 
     if (data.type === 'open_in_sidebar') {
         await pushEnitiyToSidebar(data.wdEntityId, data.tid)

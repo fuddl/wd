@@ -6,7 +6,7 @@ import {ldToStatements} from './ldToStatements.js'
 import {makeLanguageValid} from '../get-valid-string-languages.js'
 import {sparqlQuery} from "../sqarql-query.js"
 import {templates} from "./components/templates.tpl.js"
-import {updateStatusInternal} from "../update-status.js"
+import {updateStatus} from "../update-status.js"
 import {findMediaWikiData} from "./mw-data.js"
 import {enrichMetaData, findMetaData} from '../content/content__collect-meta.js'
 import {metaToStatements} from './metaToStatements.js'
@@ -132,9 +132,9 @@ if (window.location.search) {
 
 			const entities = await wikidataGetEntity(currentEntity, false);
 
-			updateStatusInternal([
-				'Searching OpenStreetMap for relevant data…',
-			]);
+            updateStatus([
+                'Searching OpenStreetMap for relevant data…',
+            ])
 			let osmElements = await wdGetOSMElements(currentEntity);
 
 			if (osmElements.length > 0) {
@@ -169,11 +169,11 @@ if (window.location.search) {
 						}
 
 						for (let url of urls) {
-							updateStatusInternal([
-								'Searching ',
-								{urlLink: url},
-								' for metadata…',
-							]);
+                            updateStatus([
+                                'Searching ',
+                                {urlLink: url},
+                                ' for metadata…',
+                            ])
 							try {
 								let result = await fetch(url);
 								let sourceUrl = result.url;
@@ -188,11 +188,11 @@ if (window.location.search) {
 									let canonical = doc.querySelector('link[rel="canonical"][href]');
 									if (canonical) {
 										sourceUrl = canonical.getAttribute('href');
-										updateStatusInternal([
-											'Searching ',
-											{urlLink: sourceUrl},
-											' for metadata…',
-										]);
+                                        updateStatus([
+                                            'Searching ',
+                                            {urlLink: sourceUrl},
+                                            ' for metadata…',
+                                        ])
 									}
 
 									if (!visitedUrls.includes(sourceUrl)) {
@@ -205,11 +205,11 @@ if (window.location.search) {
 
 										const meta = findMetaData(doc);
 										if (meta) {
-											updateStatusInternal([
-												'Found metadata in ',
-													{urlLink: url},
-												'!',
-											]);
+                                            updateStatus([
+                                                'Found metadata in ',
+                                                {urlLink: url},
+                                                '!',
+                                            ])
 											let enrichedMeta = await enrichMetaData(meta, rootLang, url);
 											await metaToStatements(enrichedMeta, propform, {
 												url: sourceUrl,
@@ -221,11 +221,11 @@ if (window.location.search) {
 
 										const ld = findLinkedData(doc);
 										if (ld) {
-											updateStatusInternal([
-												'Found structured data in ',
-													{urlLink: url},
-												'!',
-											]);
+                                            updateStatus([
+                                                'Found structured data in ',
+                                                {urlLink: url},
+                                                '!',
+                                            ])
 											let enriched = await enrichLinkedData(ld, claim, url);
 											await ldToStatements(enriched, propform, {
 												url: sourceUrl,
@@ -244,10 +244,10 @@ if (window.location.search) {
 					}
 					const property = await wikidataGetEntity(claim, false);
 					if (property[claim].claims?.P2302) {
-						updateStatusInternal([
-							'Checking constraints for ',
-							{placeholder: {entity: claim}},
-						]);
+                        updateStatus([
+                            'Checking constraints for ',
+                            {placeholder: {entity: claim}},
+                        ])
 						constraintsToStatements(claim, property[claim].claims.P2302, propform, classes);
 					}
 				}

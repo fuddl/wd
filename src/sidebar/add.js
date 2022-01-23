@@ -2,7 +2,7 @@ import {wikidataGetEntity} from '../wd-get-entity.js'
 import {getValueByLang} from './get-value-by-lang.js'
 import {templates} from './components/templates.tpl.js'
 import {sparqlQuery} from '../sqarql-query.js'
-import {updateStatusInternal} from "../update-status.js"
+import {updateStatus} from "../update-status.js"
 import browser from 'webextension-polyfill'
 import {PrependNav} from './prepend-nav.js'
 import {Browser} from "../core/browser"
@@ -56,11 +56,9 @@ browser.runtime.sendMessage({
 let content = document.getElementById('content');
 content.innerHTML = '';
 (async () => {
-
-
-	updateStatusInternal([
-		'Searching this website for links that can be correlated to wikidata…',
-	]);
+    updateStatus([
+        'Searching this website for links that can be correlated to wikidata…',
+    ])
 	let entities = await wikidataGetEntity(currentEntity);
 	let e = entities[currentEntity];
 	let currentTab = await Browser.getCurrentTabIdForAllContexts()
