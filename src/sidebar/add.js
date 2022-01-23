@@ -6,6 +6,7 @@ import {updateStatus} from "../update-status.js"
 import browser from 'webextension-polyfill'
 import {PrependNav} from './prepend-nav.js'
 import {Browser} from "../core/browser"
+import {unlockAndWait} from "./sidebar-control"
 
 PrependNav();
 
@@ -325,22 +326,15 @@ content.innerHTML = '';
 					type: 'send_to_wikidata',
 					data: jobs,
 				}),
-				browser.runtime.sendMessage({
-					type: 'unlock_sidebar',
-				}),
+                unlockAndWait(currentTab),
 				browser.runtime.sendMessage({
 					type: 'clear_pagelinks',
 				})
 			]).then((values) => {
-				if (!flipped) {
-					browser.runtime.sendMessage({
-						type: 'wait',
-						tid: currentTab,
-					});
-				} else {
-					window.location = 'entity.html?' + currentEntity;
-				}
-			});
+                if (flipped) {
+                    window.location = 'entity.html?' + currentEntity
+                }
+            });
 		}
 	});
 

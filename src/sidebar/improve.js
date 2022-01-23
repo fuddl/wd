@@ -15,6 +15,7 @@ import {URL_match_pattern} from "../content/resolver__url-match-pattern.js"
 import browser from 'webextension-polyfill'
 import {PrependNav} from './prepend-nav.js'
 import {Browser} from "../core/browser"
+import {unlockAndWait} from "./sidebar-control"
 
 PrependNav();
 
@@ -282,19 +283,12 @@ if (window.location.search) {
 			}
 		}
 
-		Promise.all([
+		return Promise.all([
 			browser.runtime.sendMessage({
 				type: 'send_to_wikidata',
 				data: jobs,
 			}),
-			browser.runtime.sendMessage({
-				type: 'unlock_sidebar',
-			}),
-		]).then((values) => {
-			browser.runtime.sendMessage({
-				type: 'wait',
-				tid: currentTab,
-			});
-		});
+            unlockAndWait(currentTab)
+		])
 	});
 }
