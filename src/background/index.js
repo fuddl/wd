@@ -159,7 +159,7 @@ browser.runtime.onMessage.addListener(async (data, sender) => {
         await addToUrlCache(data.id, data.url)
     }
     if (data.type === 'send_to_wikidata') {
-        await processJobs(data.data, sender.tab?.id)
+        await processJobs(data.data)
     }
     if (data.type === 'unlock_sidebar') {
         sidebarLocked = false
