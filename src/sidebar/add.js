@@ -1,10 +1,12 @@
-import { wikidataGetEntity } from '../wd-get-entity.js';
-import { getCurrentTab } from '../get-current-tab.js';
-import { getValueByLang, getAliasesByLang } from './get-value-by-lang.js';
-import { templates } from './components/templates.tpl.js';
-import { sparqlQuery } from '../sqarql-query.js';
-import { updateStatusInternal } from "../update-status.js"
-import { PrependNav } from './prepend-nav.js';
+import {wikidataGetEntity} from '../wd-get-entity.js'
+import {getValueByLang} from './get-value-by-lang.js'
+import {templates} from './components/templates.tpl.js'
+import {sparqlQuery} from '../sqarql-query.js'
+import {updateStatus} from "../update-status.js"
+import browser from 'webextension-polyfill'
+import {PrependNav} from './prepend-nav.js'
+import {Browser} from "../core/browser"
+import {unlockAndWait} from "./sidebar-control"
 
 PrependNav();
 
@@ -55,14 +57,12 @@ browser.runtime.sendMessage({
 let content = document.getElementById('content');
 content.innerHTML = '';
 (async () => {
-
-
-	updateStatusInternal([
-		'Searching this website for links that can be correlated to wikidata…',
-	]);
+    updateStatus([
+        'Searching this website for links that can be correlated to wikidata…',
+    ])
 	let entities = await wikidataGetEntity(currentEntity);
 	let e = entities[currentEntity];
-	let currentTab = await getCurrentTab();
+	let currentTab = await Browser.getCurrentTabIdForAllContexts()
 
 	let description = getValueByLang(e, 'descriptions', false);
 	let hasDescription = description != false;
@@ -110,11 +110,12 @@ content.innerHTML = '';
 	};
 
 	browser.runtime.onMessage.addListener(async (data, sender) => {
+        console.log("add-content event", data)
 		if (data.type === 'entity_add') {
 			clearBouncer();
 			if (!receivedEntities.includes(data.id)) {
 				receivedEntities.push(data.id);
-				
+
 				let tag = templates.express__tag({
 					id: data.id,
 					dest: propPicker.selection,
@@ -318,29 +319,22 @@ content.innerHTML = '';
 
 				}
 			}
-			
-			
+
+
 			Promise.all([
 				browser.runtime.sendMessage({
 					type: 'send_to_wikidata',
 					data: jobs,
-				}), 
-				browser.runtime.sendMessage({
-					type: 'unlock_sidebar',
 				}),
+                unlockAndWait(currentTab),
 				browser.runtime.sendMessage({
 					type: 'clear_pagelinks',
 				})
 			]).then((values) => {
-				if (!flipped) {
-					browser.runtime.sendMessage({
-						type: 'wait',
-						tid: currentTab,
-					});
-				} else {
-					window.location = 'entity.html?' + currentEntity;
-				}
-			});
+                if (flipped) {
+                    window.location = 'entity.html?' + currentEntity
+                }
+            });
 		}
 	});
 

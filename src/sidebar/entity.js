@@ -1,15 +1,12 @@
-import { Breadcrumbs, getParents } from './get-parents.js';
-import { getAutodesc } from './get-autodesc.js';
-import { getLink, resolvePlaceholders, resolveIdLinksPlaceholder, resolveBreadcrumbs } from './resolve-placeholders.js';
-import { getRelatedItems } from './get-related-items.js';
-import { getValueByLang, getAliasesByLang } from './get-value-by-lang.js';
-import { groupClaims } from './group-claims.js';
-import { sparqlQuery } from '../sqarql-query.js';
-import { templates } from './components/templates.tpl.js';
-import { wikidataGetEditToken, getTokens } from './wd-get-token.js';
-import { wikidataGetEntity } from '../wd-get-entity.js';
-import { ApplyFormatters } from './formatters.js';
-import { AddLemmaAffix } from './lemma-afixes.js';
+import {getAutodesc} from './get-autodesc.js'
+import {resolveBreadcrumbs, resolveIdLinksPlaceholder, resolvePlaceholders} from './resolve-placeholders.js'
+import {getAliasesByLang, getValueByLang} from './get-value-by-lang.js'
+import {groupClaims} from './group-claims.js'
+import {templates} from './components/templates.tpl.js'
+import {wikidataGetEntity} from '../wd-get-entity.js'
+import {ApplyFormatters} from './formatters.js'
+import {AddLemmaAffix} from './lemma-afixes.js'
+import browser from 'webextension-polyfill'
 import { PrependNav } from './prepend-nav.js';
 
 if (history.length > 1) {

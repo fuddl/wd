@@ -1,5 +1,5 @@
 async function getValidStringLanguages() {
-	let response = await fetch('https://www.wikidata.org/w/api.php?action=query&meta=wbcontentlanguages&wbclcontext=monolingualtext&wbclprop=code%7Cautonym&format=json', {cache: "force-cache"});
+	let response = await fetch('https://www.wikidata.org/w/api.php?action=query&meta=wbcontentlanguages&wbclcontext=monolingualtext&wbclprop=code%7Cautonym&format=json&origin=*', {cache: "force-cache"});
 	response = await response.json();
 	response = response.query.wbcontentlanguages;
 	return response;

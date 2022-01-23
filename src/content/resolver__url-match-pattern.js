@@ -1,8 +1,9 @@
 import { sparqlQuery } from "../sqarql-query.js";
+import browser from 'webextension-polyfill'
 
 const URL_match_pattern = {
 	aquireRegexes: async function() {
-		
+
 		let query = `
 			SELECT ?p ?s ?r ?ci WHERE {
 				?stat ps:P8966 ?s.

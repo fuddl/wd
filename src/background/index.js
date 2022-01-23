@@ -1,52 +1,39 @@
-import { processJobs } from "./background__add-to-wikidata.js"
-import { pushEnitiyToSidebar } from "./push-enitiy-to-sidebar.js"
+import {processJobs} from "./add-to-wikidata.js"
+import {pushEnitiyToSidebar} from "./push-enitiy-to-sidebar.js"
+import {setSidebarUrl} from "./navigation"
 import activeIcon from 'url:../icons/wd.svg'
+import {setupCommandListener} from "./command-listener"
+import browser from 'webextension-polyfill'
+import {Browser} from "../core/browser"
 
-let tabStates = {};
 window.sidebarLocked = false;
-
-async function openEnitiyInNewTab(id) {
-	await browser.tabs.create({
-		url: browser.runtime.getURL('sidebar/entity.html') + '?' + id
-	});
-}
 
 function pushProposalToSidebar(proposals, tid) {
 	proposals.fromTab = tid;
 	if (!sidebarLocked) {
-		browser.sidebarAction.setPanel({
-			tabId: tid,
-			panel: browser.runtime.getURL('sidebar/connector.html') + '?' + encodeURIComponent(JSON.stringify(proposals)),
-		});
+		return setSidebarUrl(tid, browser.runtime.getURL('sidebar/connector.html') + '?' + encodeURIComponent(JSON.stringify(proposals)))
 	}
 }
 
-browser.browserAction.onClicked.addListener((tab) => {
-	let tid = tab.id;
-	if (!tabStates[tid]) {
-		tabStates[tid] = {};
-	}
-	if (browser.sidebarAction) {
-		if (!tabStates[tid].sidebarOpen) {
-			if (tabStates[tid].mode === 'show_entity') {
-				(async () => {
-					pushEnitiyToSidebar(tabStates[tid].entity, tid);
-				})();
-			} else if(tabStates[tid].mode === 'propose_match') {
-				(async () => {
-					pushProposalToSidebar(tabStates[tid].proposals, tid);
-				})();
-			}
-			browser.sidebarAction.open();
-			tabStates[tid].sidebarOpen = true;
-		} else {
-			browser.sidebarAction.close();
-			tabStates[tid].sidebarOpen = false;
-		}
-	} else {
-		openEnitiyInNewTab(tabStates[tid].entity);
-	}
-});
+setupCommandListener()
+
+const toggleInlineSidebar = async () =>
+    Browser.sendMessageToActiveTab({type: "toggle-sidebar"})
+
+async function toggleSidebar() {
+    if (browser.sidebarAction) {
+        // note: if a user input handler waits on a promise, then its status as a user input handler is lost
+        // and this call won't work
+        // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/User_actions
+        await browser.sidebarAction.toggle()
+    } else {
+        // todo I actually want this one in FF too, need a setting
+        // also rn the shortcut only works with the iframe sidebar, so there need to call this function instead
+        await toggleInlineSidebar()
+    }
+}
+
+browser.browserAction.onClicked.addListener(toggleSidebar)
 
 async function addToUrlCache(id, url) {
 	let cache = await browser.storage.local.get();
@@ -54,157 +41,157 @@ async function addToUrlCache(id, url) {
 		cache.urlCache = {};
 	}
 	cache.urlCache[url] = id;
-	browser.storage.local.set(cache);
+	await browser.storage.local.set(cache);
 }
 
-async function openInSidebarIfSidebarIsOpen(entityId, tab, setPanel) {
-	if (await browser.sidebarAction.isOpen({})) {
-		pushEnitiyToSidebar(entityId, tab, setPanel);
-	}
-};
+async function handleMatchEvent(event, sender) {
+    if (!sidebarLocked) {
+        await browser.browserAction.setIcon({
+            path: activeIcon,
+            tabId: sender.tab.id,
+        })
+        await browser.browserAction.setTitle({
+            title: event.wdEntityId,
+            tabId: sender.tab.id,
+        })
+    }
 
-browser.runtime.onMessage.addListener(
-	(data, sender) => {
+    let tabDest = sender.tab?.id ? sender.tab.id : await browser.tabs.getCurrent()
+    await pushEnitiyToSidebar(event.wdEntityId, tabDest, event.openInSidebar)
 
-		if(data.type === 'open_in_sidebar') {
-			(async () => {
-				pushEnitiyToSidebar(data.wdEntityId, data.tid);
-			})()
-		}
+    return addToUrlCache(event.wdEntityId, event.url)
+}
 
-		if(data.type === 'wait') {
-			(async () => {
-				browser.sidebarAction.setPanel({
-					tabId: data.tid,
-					panel: browser.runtime.getURL('sidebar/wait.html'),
-				});
-			})()
-		}
+function collectPageLinks(event) {
+    browser.tabs.query({
+        currentWindow: true,
+        active: true,
+    }).then((tabs) => {
+        for (let tab of tabs) {
+            browser.tabs.insertCSS({file: "content/content__collect-page-links.css"})
 
-		if (sender.tab) {
-			if (!tabStates[sender.tab.id]) {
-				tabStates[sender.tab.id] = {};
-			}
-			if (data.type === 'match_event') {
-				if (!sidebarLocked) {
-					tabStates[sender.tab.id].mode = 'show_entity';
-					tabStates[sender.tab.id].entity = data.wdEntityId;
-					browser.browserAction.setIcon({
-						path: activeIcon,
-						tabId: sender.tab.id,
-					});
-					browser.browserAction.setTitle({
-						title: data.wdEntityId,
-						tabId: sender.tab.id,
-					});
-				}
-				(async () => {
-					let tabDest = sender.tab.id ? sender.tab.id : await browser.tabs.getCurrent();
-					openInSidebarIfSidebarIsOpen(data.wdEntityId, tabDest, data.openInSidebar);
-				})();
+            browser.tabs.sendMessage(
+                tab.id,
+                {
+                    action: "collect_pagelinks",
+                    subject: event.subject,
+                },
+            ).catch((v) => {
+                console.log(JSON.stringify(v))
+            })
+        }
+    }).catch((v) => {
+        console.log(v)
+    })
+}
 
-				addToUrlCache(data.wdEntityId, data.url);
-			} else if(data.type === 'match_proposal') {
-				tabStates[sender.tab.id].mode = 'propose_match';
-				tabStates[sender.tab.id].proposals = data.proposals;
+function clearPageLinks() {
+    browser.tabs.query({
+        currentWindow: true,
+        active: true,
+    }).then((tabs) => {
+        for (let tab of tabs) {
+            browser.tabs.sendMessage(
+                tab.id,
+                {action: "clear_pagelinks"},
+            ).catch((v) => {
+                console.log(JSON.stringify(v))
+            })
+        }
+    }).catch((v) => {
+        console.log(v)
+    })
+}
 
-				browser.browserAction.setIcon({
-					path: "icons/halfactive.svg",
-					tabId: sender.tab.id,
-				});
+async function handleMatchProposal(event, sender) {
+    await browser.browserAction.setIcon({
+        path: "icons/halfactive.svg",
+        tabId: sender.tab.id,
+    })
 
-				browser.browserAction.setTitle({
-					title: data.proposals.ids[0][0].value,
-					tabId: sender.tab.id,
-				});
+    await browser.browserAction.setTitle({
+        title: event.proposals.ids[0][0].value,
+        tabId: sender.tab.id,
+    })
 
-				(async () => {
-					if (await browser.sidebarAction.isOpen({})) {
-						pushProposalToSidebar(data.proposals, sender.tab.id);
-					}
-				})();
-			} else {
-				tabStates[sender.tab.id].mode = false;
+    await pushProposalToSidebar(event.proposals, sender.tab.id)
+}
 
-				browser.browserAction.setIcon({
-					path: "icons/inactive.svg",
-					tabId: sender.tab.id,
-				});
-				browser.browserAction.setTitle({
-					title: 'Wikidata',
-					tabId: sender.tab.id,
-				});
-			}
-		} else {
-			if(data.type === 'add_url_cache') {
-				addToUrlCache(data.id, data.url);
-			}
-			if(data.type === 'send_to_wikidata') {
-				processJobs(data.data);
-			}
-			if (data.type === 'open_adder') {
-					sidebarLocked = true;
-						browser.sidebarAction.setPanel({
-					panel: browser.runtime.getURL('sidebar/add.html') + '?' + data.entity,
-				});
-			}
-			if (data.type === 'unlock_sidebar') {
-				sidebarLocked = false;
-			}
-			if (data.type === 'use_in_statement') {
-				browser.runtime.sendMessage({
-					type: 'use_in_statement',
-					dataype: data.dataype,
-					value: data.value ? data.value : null,
-					wdEntityId: data.entityId ? data.entityId : null,
-					reference: data.reference ? data.reference : null,
-				});
-			}
-			if(data.type === 'collect_pagelinks') {
-				browser.tabs.query({
-					currentWindow: true,
-					active: true
-				}).then((tabs) => {
-					for (let tab of tabs) {
-						browser.tabs.insertCSS({file: "content/content__collect-page-links.css"});
+async function resetState(sender) {
+    await browser.browserAction.setIcon({
+        path: "icons/inactive.svg",
+        tabId: sender.tab.id,
+    })
+    await browser.browserAction.setTitle({
+        title: 'Wikidata',
+        tabId: sender.tab.id,
+    })
+}
 
-						browser.tabs.sendMessage(
-							tab.id,
-							{
-								action: "collect_pagelinks",
-								subject: data.subject
-							}
-						).then(response => {
-						}).catch((v) => {
-							console.log(JSON.stringify(v));
-						});
-					}
-				}).catch((v) => {
-				 	console.log(v);
-				});
-			}
-			if(data.type === 'clear_pagelinks') {
-				browser.tabs.query({
-					currentWindow: true,
-					active: true
-				}).then((tabs) => {
-					for (let tab of tabs) {
-												browser.tabs.sendMessage(
-							tab.id,
-							{ action: "clear_pagelinks" }
-						).then(response => {
-						}).catch((v) => {
-							console.log(JSON.stringify(v));
-						});
-					}
-				}).catch((v) => {
-				 	console.log(v);
-				});
-			}
-		}
-		return Promise.resolve('done');
-	});
+const getTabId =
+    async sender => sender?.tab?.id
+        || (await Browser.getActiveTab()).id
 
-browser.webNavigation.onHistoryStateUpdated.addListener(function(e) {
-	browser.tabs.sendMessage(e.tabId, { action: "find_applicables" });
-});
+browser.runtime.onMessage.addListener(async (data, sender) => {
+    console.log("background message", data, sender)
+
+    if (data.type === 'get-tab-id') return sender.tab.id
+    if (data.type === 'broadcast-to-active-tab') return Browser.sendMessageToActiveTab(data.message)
+
+    if (data.type === 'open_in_sidebar') {
+        await pushEnitiyToSidebar(data.wdEntityId, data.tid)
+    }
+
+    if (data.type === 'wait') {
+        await setSidebarUrl(data.tid || sender?.tab?.id, browser.runtime.getURL('sidebar/wait.html'))
+    }
+
+    if (sender.tab) {
+        if (data.type === 'match_event') {
+            await handleMatchEvent(data, sender)
+        } else if (data.type === 'match_proposal') {
+            await handleMatchProposal(data, sender)
+        } else {
+            await resetState(sender)
+        }
+    }
+    if (data.type === 'add_url_cache') {
+        await addToUrlCache(data.id, data.url)
+    }
+    if (data.type === 'send_to_wikidata') {
+        await processJobs(data.data)
+    }
+    if (data.type === 'unlock_sidebar') {
+        sidebarLocked = false
+    }
+
+    if (data.type === 'open_adder') {
+        sidebarLocked = true
+        await setSidebarUrl(
+            await browser.tabs.getCurrent(),
+            browser.runtime.getURL('sidebar/add.html') + '?' + data.entity)
+    }
+
+    if (data.type === 'use_in_statement') {
+        const message = {
+            type: 'use_in_statement',
+            dataype: data.dataype,
+            value: data.value ? data.value : null,
+            wdEntityId: data.entityId ? data.entityId : null,
+            reference: data.reference ? data.reference : null,
+        }
+        await browser.runtime.sendMessage(message)
+        await browser.tabs.sendMessage(await getTabId(sender), message)
+    }
+
+
+    if (data.type === 'collect_pagelinks') {
+        collectPageLinks(data)
+    }
+    if (data.type === 'clear_pagelinks') {
+        clearPageLinks()
+    }
+})
+
+browser.webNavigation.onHistoryStateUpdated.addListener(
+    e => browser.tabs.sendMessage(e.tabId, {action: "find_applicables"}))

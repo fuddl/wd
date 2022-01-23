@@ -1,3 +1,5 @@
+import browser from 'webextension-polyfill'
+
 import wikiBaseConfig from './wikibase.config.yml';
 import { getValueByLang } from './sidebar/get-value-by-lang.js';
 import WBK from 'wikibase-sdk';
@@ -26,7 +28,7 @@ function userLanguagesWithFallbacks() {
 }
 
 async function wikidataGetEntity(id, usecache = true, returnSingle = false) {
-	
+
 	let config = namespaceGetInstance(id);
 	let wbk = WBK(config);
 

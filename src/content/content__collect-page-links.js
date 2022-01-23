@@ -1,6 +1,7 @@
-import { displayMetadata } from './content__display-metadata.js';
-import { resolvers } from './resolver.js';
-import { updateStatus } from "../update-status.js"
+import {displayMetadata} from './content__display-metadata.js'
+import {resolvers} from './resolver.js'
+import {updateStatus} from "../update-status.js"
+import browser from 'webextension-polyfill'
 
 function getClosestID(element) {
 	let subject = element;
@@ -29,7 +30,7 @@ function getClosestID(element) {
 		return {
 			section: element.innerText,
 			hash: thisId,
-		};			
+		};
 	}
 
 	if (subject.closest) {
@@ -38,7 +39,7 @@ function getClosestID(element) {
 					return {
 						section: null,
 						hash: IDwrapper.getAttribute('id'),
-					}; 	
+					};
 			}
 	}
 
@@ -69,7 +70,7 @@ function highlightSelected(id, add = true) {
 				} else {
 					selector.classList.remove('entity-selector--selected');
 				}
-			}	
+			}
 		}
 	}
 }
@@ -180,19 +181,19 @@ async function collectPageLinks(subject) {
 
 					Object.assign(uniqueLinks[existing], uniqueLinks[key])
 				} else {
-					browser.runtime.sendMessage({
-						type: 'match_event',
-						wdEntityId: this.entityId,
-						openInSidebar: false,
-						url: this.links[0].href,
-						cache: !this.resolver.noCache,
-					});
+					await browser.runtime.sendMessage({
+                        type: 'match_event',
+                        wdEntityId: this.entityId,
+                        openInSidebar: false,
+                        url: this.links[0].href,
+                        cache: !this.resolver.noCache,
+                    });
 
-					browser.runtime.sendMessage({
-						type: 'add_url_cache',
-						url: this.links[0].href,
-						id: this.entityId,
-					});
+					await browser.runtime.sendMessage({
+                        type: 'add_url_cache',
+                        url: this.links[0].href,
+                        id: this.entityId,
+                    });
 				}
 
 				for (let selector of this.selectors) {
@@ -210,7 +211,7 @@ async function collectPageLinks(subject) {
 
 						let sectionData = getClosestID(e.target);
 
-						let hash = sectionData.hash ? '#' + sectionData.hash : ''; 
+						let hash = sectionData.hash ? '#' + sectionData.hash : '';
 
 						let oldId = getOldid();
 
@@ -242,31 +243,29 @@ async function collectPageLinks(subject) {
 	 			}
 	 		}
 		}
-		
+
 	}
 
-	(async () => {
 
-		let linkNumber = 0;
-		for (let key in uniqueLinks) {
-			linkNumber++;
-			if (uniqueLinks[key].applicable) {
-				await uniqueLinks[key].setup();
-			}
-		}
+    let linkNumber = 0
+    for (let key in uniqueLinks) {
+        linkNumber++
+        if (uniqueLinks[key].applicable) {
+            await uniqueLinks[key].setup()
+        }
+    }
 
-		updateStatus([
-			`There are ${linkNumber} links in `,
-			{urlLink: window.location.href},
-			' which could be associated to wikidata items. Checking now.'
-		]);
+    updateStatus([
+        `There are ${linkNumber} links in `,
+        {urlLink: window.location.href},
+        ' which could be associated to wikidata items. Checking now.',
+    ])
 
-		for (let key in uniqueLinks) {
-			if (uniqueLinks[key].applicable) {
-				await uniqueLinks[key].init();
-			}
-		}
-	})();
+    for (let key in uniqueLinks) {
+        if (uniqueLinks[key].applicable) {
+            await uniqueLinks[key].init()
+        }
+    }
 }
 
 

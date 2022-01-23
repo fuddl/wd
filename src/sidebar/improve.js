@@ -1,20 +1,21 @@
-import { wikidataGetEntity } from '../wd-get-entity.js';
-import { constraintsToStatements } from './constraintsToStatements.js';
-import { getFormatterUrls } from './get-formatter-urls.js';
-import { getCurrentTab } from '../get-current-tab.js';
-import { findLinkedData, enrichLinkedData } from '../content/content__collect-ld.js';
-import { ldToStatements } from './ldToStatements.js';
-import { getElementLanguage } from '../content/content__collect-strings.js';
-import { makeLanguageValid } from '../get-valid-string-languages.js';
-import { sparqlQuery } from "../sqarql-query.js"
-import { templates } from "./components/templates.tpl.js"
-import { updateStatusInternal } from "../update-status.js"
-import { findMediaWikiData } from "./mw-data.js"
-import { findMetaData, enrichMetaData } from '../content/content__collect-meta.js';
-import { metaToStatements } from './metaToStatements.js';
-import { wdGetOSMElements, OSMToSatements } from './osm.js';
-import { URL_match_pattern } from "../content/resolver__url-match-pattern.js";
-import { PrependNav } from './prepend-nav.js';
+import {wikidataGetEntity} from '../wd-get-entity.js'
+import {constraintsToStatements} from './constraintsToStatements.js'
+import {getFormatterUrls} from './get-formatter-urls.js'
+import {enrichLinkedData, findLinkedData} from '../content/content__collect-ld.js'
+import {ldToStatements} from './ldToStatements.js'
+import {makeLanguageValid} from '../get-valid-string-languages.js'
+import {sparqlQuery} from "../sqarql-query.js"
+import {templates} from "./components/templates.tpl.js"
+import {updateStatus} from "../update-status.js"
+import {findMediaWikiData} from "./mw-data.js"
+import {enrichMetaData, findMetaData} from '../content/content__collect-meta.js'
+import {metaToStatements} from './metaToStatements.js'
+import {OSMToSatements, wdGetOSMElements} from './osm.js'
+import {URL_match_pattern} from "../content/resolver__url-match-pattern.js"
+import browser from 'webextension-polyfill'
+import {PrependNav} from './prepend-nav.js'
+import {Browser} from "../core/browser"
+import {unlockAndWait} from "./sidebar-control"
 
 PrependNav();
 
@@ -66,7 +67,7 @@ async function checkRedirectForIds(url, propform, originalUrl, claims) {
 					]),
 				],
 			});
-			propform.appendChild(preview);		
+			propform.appendChild(preview);
 		}
 	}
 }
@@ -95,7 +96,7 @@ async function getAllClasses(instance) {
 	SELECT ?c WHERE {
 	  { wd:${instance} wdt:P31 ?class. }
 	  UNION
-	  { 
+	  {
 	    wd:${instance} wdt:P31 ?childClass.
 	    ?childClass wdt:P279* ?class.
 	  }
@@ -131,12 +132,12 @@ if (window.location.search) {
 			});
 
 			const entities = await wikidataGetEntity(currentEntity, false);
-			
-			updateStatusInternal([
-				'Searching OpenStreetMap for relevant data…',
-			]);
+
+            updateStatus([
+                'Searching OpenStreetMap for relevant data…',
+            ])
 			let osmElements = await wdGetOSMElements(currentEntity);
-			
+
 			if (osmElements.length > 0) {
 				for (let element of osmElements) {
 					OSMToSatements(element, propform, {
@@ -151,7 +152,7 @@ if (window.location.search) {
 				let classes = await getAllClasses(id);
 				for(let claim in entity.claims) {
 					if (['url', 'external-id'].includes(entity.claims[claim][0].mainsnak?.datatype) && entity?.claims[claim][0].mainsnak?.datavalue?.value) {
-						let urls = []; 
+						let urls = [];
 						switch (entity.claims[claim][0].mainsnak.datatype) {
 							case 'external-id':
 							  for (let key in entity.claims[claim]) {
@@ -162,18 +163,18 @@ if (window.location.search) {
 							case 'url':
 								for (let key in entity.claims[claim]) {
 									if(entity.claims[claim][key].mainsnak?.datavalue?.value) {
-										urls.push(entity.claims[claim][key].mainsnak.datavalue.value);	
+										urls.push(entity.claims[claim][key].mainsnak.datavalue.value);
 									}
 								}
 								break;
 						}
 
 						for (let url of urls) {
-							updateStatusInternal([
-								'Searching ',
-								{urlLink: url},
-								' for metadata…',
-							]);
+                            updateStatus([
+                                'Searching ',
+                                {urlLink: url},
+                                ' for metadata…',
+                            ])
 							try {
 								let result = await fetch(url);
 								let sourceUrl = result.url;
@@ -188,11 +189,11 @@ if (window.location.search) {
 									let canonical = doc.querySelector('link[rel="canonical"][href]');
 									if (canonical) {
 										sourceUrl = canonical.getAttribute('href');
-										updateStatusInternal([
-											'Searching ',
-											{urlLink: sourceUrl},
-											' for metadata…',
-										]);
+                                        updateStatus([
+                                            'Searching ',
+                                            {urlLink: sourceUrl},
+                                            ' for metadata…',
+                                        ])
 									}
 
 									if (!visitedUrls.includes(sourceUrl)) {
@@ -205,11 +206,11 @@ if (window.location.search) {
 
 										const meta = findMetaData(doc);
 										if (meta) {
-											updateStatusInternal([
-												'Found metadata in ',
-													{urlLink: url},
-												'!',
-											]);
+                                            updateStatus([
+                                                'Found metadata in ',
+                                                {urlLink: url},
+                                                '!',
+                                            ])
 											let enrichedMeta = await enrichMetaData(meta, rootLang, url);
 											await metaToStatements(enrichedMeta, propform, {
 												url: sourceUrl,
@@ -221,11 +222,11 @@ if (window.location.search) {
 
 										const ld = findLinkedData(doc);
 										if (ld) {
-											updateStatusInternal([
-												'Found structured data in ',
-													{urlLink: url},
-												'!',
-											]);
+                                            updateStatus([
+                                                'Found structured data in ',
+                                                {urlLink: url},
+                                                '!',
+                                            ])
 											let enriched = await enrichLinkedData(ld, claim, url);
 											await ldToStatements(enriched, propform, {
 												url: sourceUrl,
@@ -244,10 +245,10 @@ if (window.location.search) {
 					}
 					const property = await wikidataGetEntity(claim, false);
 					if (property[claim].claims?.P2302) {
-						updateStatusInternal([
-							'Checking constraints for ',
-							{placeholder: {entity: claim}},
-						]);
+                        updateStatus([
+                            'Checking constraints for ',
+                            {placeholder: {entity: claim}},
+                        ])
 						constraintsToStatements(claim, property[claim].claims.P2302, propform, classes);
 					}
 				}
@@ -266,9 +267,9 @@ if (window.location.search) {
 	let saveButton = document.createElement('button');
 	form.appendChild(saveButton);
 	saveButton.innerText = 'Send to Wikidata';
-	
+
 	saveButton.addEventListener('click', async function() {
-		let currentTab = await getCurrentTab();
+		let currentTab = await Browser.getCurrentTabIdForAllContexts()
 		let jobs = [];
 		const formData = new FormData(propform)
 		for (let pair of formData.entries()) {
@@ -282,19 +283,12 @@ if (window.location.search) {
 			}
 		}
 
-		Promise.all([
+		return Promise.all([
 			browser.runtime.sendMessage({
 				type: 'send_to_wikidata',
 				data: jobs,
-			}), 
-			browser.runtime.sendMessage({
-				type: 'unlock_sidebar',
 			}),
-		]).then((values) => {
-			browser.runtime.sendMessage({
-				type: 'wait',
-				tid: currentTab,
-			});
-		});
+            unlockAndWait(currentTab)
+		])
 	});
 }

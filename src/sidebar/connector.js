@@ -1,12 +1,11 @@
-import { wikidataGetEntity } from '../wd-get-entity.js';
-import { getCurrentTab } from '../get-current-tab.js';
-import { getAutodesc } from './get-autodesc.js';
-import { resolvePlaceholders } from './resolve-placeholders.js';
-import { getTokens } from './wd-get-token.js';
-import { templates } from './components/templates.tpl.js';
-import { constraintsToStatements } from './constraintsToStatements.js';
-import { ldToStatements } from './ldToStatements.js';
-import { metaToStatements } from './metaToStatements.js';
+import {wikidataGetEntity} from '../wd-get-entity.js'
+import {getTokens} from './wd-get-token.js'
+import {templates} from './components/templates.tpl.js'
+import {constraintsToStatements} from './constraintsToStatements.js'
+import {ldToStatements} from './ldToStatements.js'
+import {metaToStatements} from './metaToStatements.js'
+import browser from 'webextension-polyfill'
+import {Browser} from "../core/browser"
 
 class jobRedundancyChecker {
 	constructor() {
@@ -47,7 +46,7 @@ let existing = new jobRedundancyChecker();
 
 (async () => {
 	let proposals = JSON.parse(decodeURIComponent(window.location.search.replace(/^\?/, '')));
-	
+
 	let content = document.getElementById('content');
 	let propPreview;
 	let connectorProp;
@@ -56,11 +55,11 @@ let existing = new jobRedundancyChecker();
 	let isMultiple = false;
 	content.appendChild(propform);
 	let scope = 'item';
-	let currentTab = await getCurrentTab();
+	let currentTab = await Browser.getCurrentTabIdForAllContexts()
 
-	const isProp = proposals.ids[0][0].hasOwnProperty('prop');
+    const isProp = proposals.ids[0][0].hasOwnProperty('prop');
 	const isSitelink = proposals.ids[0][0].hasOwnProperty('sitelink');
-	
+
 	if (isProp) {
 		isMultiple = typeof proposals.ids[0][0].prop !== 'string'
 		connectorProp = !isMultiple ? proposals.ids[0][0].prop : proposals.ids[0][0].prop[0];
@@ -98,7 +97,7 @@ let existing = new jobRedundancyChecker();
 		if (proposals.ld) {
 			await ldToStatements(proposals.ld, propform, proposals.source, existing);
 		}
-		
+
 		if (proposals.meta) {
 			await metaToStatements(proposals.meta, propform, proposals.source, existing);
 		}
@@ -169,7 +168,7 @@ let existing = new jobRedundancyChecker();
 					fromTab: proposals.fromTab,
 					fromUrl: proposals.source.url,
 				});
-				selectedEntity = 'LAST'; 
+				selectedEntity = 'LAST';
 			}
 
 			if (isProp) {
@@ -265,8 +264,8 @@ let existing = new jobRedundancyChecker();
 		warning.style['padding'] = '1em';
 
 		let text1 = document.createTextNode(`
-			It appears that you are not logged into a wikidata account. Please note 
-			that some of your edits might fail, because of wikidata's spam protection. 
+			It appears that you are not logged into a wikidata account. Please note
+			that some of your edits might fail, because of wikidata's spam protection.
 			Also note that your public IP address will be publicly visible in the edit
 			history. It is strongly advised that you `);
 		warning.appendChild(text1);
@@ -275,7 +274,7 @@ let existing = new jobRedundancyChecker();
 		loginLink.innerText = ' log in ';
 		loginLink.setAttribute('href', 'https://www.wikidata.org/wiki/Special:UserLogin');
 		warning.appendChild(loginLink);
-		
+
 		let text2 = document.createTextNode(' or ');
 		warning.appendChild(text2);
 
@@ -283,12 +282,12 @@ let existing = new jobRedundancyChecker();
 		createAccountLink.innerText = ' create an account ';
 		createAccountLink.setAttribute('href', 'https://www.wikidata.org/wiki/Special:CreateAccount');
 		warning.appendChild(createAccountLink);
-		
+
 		let text3 = document.createTextNode(`
 			. Among other benefits, your edits will be attributed to a user name.
 		`);
 		warning.appendChild(text3);
-		
+
 		content.insertBefore(warning, labelField);
 	}
 })()

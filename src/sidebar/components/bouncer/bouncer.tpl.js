@@ -1,4 +1,5 @@
 import { templates } from '../templates.tpl.js';
+import browser from 'webextension-polyfill'
 
 function statusMessage(parts) {
 	let output = document.createDocumentFragment();
@@ -42,12 +43,6 @@ const bouncer = () => {
 			status.appendChild(statusMessage(data.message));
 		}
 	});
-	window.addEventListener("message", (event) => {
-		if (event.data.type === 'status') {
-			status.innerText = '';
-			status.appendChild(statusMessage(event.data.message));
-		}
-	}, false);
 
 	return bg;
 }

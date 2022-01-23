@@ -6,11 +6,11 @@ import { findTitles } from './pagedata__title.js';
 import { findDescriptions } from './pagedata__description.js';
 import { findLinkedData, enrichLinkedData } from './content__collect-ld.js';
 import { findMetaData, enrichMetaData } from './content__collect-meta.js';
+import {setupSidebar} from "./sidebar"
+import browser from 'webextension-polyfill'
 
 async function findApplicables(location, openInSidebar = true) {
     let applicables = [];
-	let linkedData = findLinkedData(document)
-	let metaData = findMetaData(document)
 
 	let foundMatch = false;
 	for (let id of Object.keys(resolvers)) {
@@ -20,61 +20,65 @@ async function findApplicables(location, openInSidebar = true) {
 
 			if (entityId && !foundMatch) {
 				foundMatch = true;
-				browser.runtime.sendMessage({
-					type: 'match_event',
-					wdEntityId: entityId,
-					openInSidebar: openInSidebar,
-					url: location.href,
-					cache: !resolvers[id].noCache,
-				});
+				await browser.runtime.sendMessage({
+                    type: 'match_event',
+                    wdEntityId: entityId,
+                    openInSidebar: openInSidebar,
+                    url: location.href,
+                    cache: !resolvers[id].noCache,
+                });
 				return entityId;
 			}
 			applicables.push(isApplicable);
 		}
 	}
 	if (applicables.length > 0 && !foundMatch && openInSidebar) {
-		const url = location.toString();
+        let linkedData = findLinkedData(document)
+        let metaData = findMetaData(document)
+
+        const url = location.toString();
 		const documentLang =  await makeLanguageValid(document.querySelector('html').lang);
-		browser.runtime.sendMessage({
-			type: 'match_proposal',
-			proposals: {
-				ids: applicables,
-				titles: findTitles(),
-				desc: findDescriptions(),
-				ld: await enrichLinkedData(linkedData, applicables[0], window.location.href),
-				meta: await enrichMetaData(metaData, documentLang, window.location.href),
-				source: {
-					url: url,
-					title: document.querySelector('title').innerText,
-					lang: documentLang,
-				}
-			},
-		});
+		await browser.runtime.sendMessage({
+            type: 'match_proposal',
+            proposals: {
+                ids: applicables,
+                titles: findTitles(),
+                desc: findDescriptions(),
+                ld: await enrichLinkedData(linkedData, applicables[0], window.location.href),
+                meta: await enrichMetaData(metaData, documentLang, window.location.href),
+                source: {
+                    url: url,
+                    title: document.querySelector('title').innerText,
+                    lang: documentLang,
+                }
+            },
+        });
 	}
 	return false;
-};
+}
 
-function main() {
-	findApplicables(location);
+async function main() {
+	setupSidebar()
 
-	browser.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
-		if (msg.action == 'find_applicables') {
-			findApplicables(location);
+	await findApplicables(location)
+
+	browser.runtime.onMessage.addListener(async msg => {
+		if (msg.action === 'find_applicables') {
+			return findApplicables(location)
 		} else if (msg.action === 'collect_pagelinks') {
-			return await collectPageLinks(msg.subject);
+			return collectPageLinks(msg.subject)
 		} else if (msg.action === 'clear_pagelinks') {
-			clearPageLinks();
+			clearPageLinks()
 		}
-	});
+	})
 
-	window.onpopstate = function(event) {
-		findApplicables(window.location);
-	};
+	window.onpopstate = () => findApplicables(window.location)
 
 	window.addEventListener('hashchange', function() {
 		findApplicables(window.location);
 	}, false);
 
+    // todo likely redundant in the inline-sidebar case
 	document.addEventListener('focus', function() {
 		findApplicables(window.location);
 	})
@@ -84,7 +88,7 @@ function main() {
 	let title = head.querySelector('title').innerText;
 	let titleObserver = new MutationObserver(function() {
 		let newTitle = head.querySelector('title').innerText;
-		if (newTitle != title) {
+		if (newTitle !== title) {
 			findApplicables(window.location);
 			title = newTitle;
 		}
@@ -123,7 +127,7 @@ function main() {
 					}
 				}
 
-				browser.runtime.sendMessage(message);
+				await browser.runtime.sendMessage(message);
 			}
 		})()
 	});

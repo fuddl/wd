@@ -5,7 +5,8 @@
 	"description": "Display information from wikidata.",
 	"icons": {
 		"48": "icons/wd.svg",
-		"96": "icons/wd.svg"
+		"96": "icons/wd.svg",
+        "128": "icons/wd-128.png"
 	},
 	"browser_action": {
 		"default_icon": "icons/inactive.svg",
@@ -17,7 +18,7 @@
 		"default_panel": "sidebar/entity.html",
 		"open_at_install": true
 	},
-	"permissions": ["activeTab", "storage", "webNavigation", "<all_urls>"],
+	"permissions": ["storage", "webNavigation", "<all_urls>"],
 	"background": {
 		"scripts": ["background/index.js"]
 	},
@@ -37,7 +38,16 @@
 	],
 	"browser_specific_settings": {
 		"gecko": {
+			"id": "ff@wikidata",
 			"strict_min_version": "89.0"
+		}
+	},
+	"commands": {
+		"toggle-sidebar": {
+			"suggested_key": {
+				"default": "Alt+3"
+			},
+			"description": "Show/hide sidebar"
 		}
 	}
 }

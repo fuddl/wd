@@ -2,9 +2,9 @@ import { getValidStringLanguages, makeLanguageValid } from '../../../get-valid-s
 import { wikidataGetEntity } from '../../../wd-get-entity.js';
 import { getValueByLang } from '../../get-value-by-lang.js';
 import { getAutodesc } from '../../get-autodesc.js';
+import browser from 'webextension-polyfill'
 
-
-const express = (vars) => { 
+const express = (vars) => {
 
 	const supportedProperties = [
 		"monolingualtext",
@@ -68,7 +68,7 @@ const express = (vars) => {
 				};
 				item.addEventListener('click', activationEvent);
 				item.addEventListener('keydown', (e) => {
-					if (e.key === "Enter") { 
+					if (e.key === "Enter") {
 						activationEvent();
 					}
 				});
@@ -141,10 +141,10 @@ const express = (vars) => {
 			option.setAttribute('value', response[key].code);
 			option.innerText = response[key].code;
 			languagePicker.appendChild(option);
-		}		
+		}
 	})();
 	main.appendChild(languagePicker);
-	
+
 	let summary = document.createElement('summary');
 	summary.innerText = 'Links on this page';
 	options.appendChild(summary);
