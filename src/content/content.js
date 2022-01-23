@@ -11,8 +11,6 @@ import browser from 'webextension-polyfill'
 
 async function findApplicables(location, openInSidebar = true) {
     let applicables = [];
-	let linkedData = findLinkedData(document)
-	let metaData = findMetaData(document)
 
 	let foundMatch = false;
 	for (let id of Object.keys(resolvers)) {
@@ -35,7 +33,10 @@ async function findApplicables(location, openInSidebar = true) {
 		}
 	}
 	if (applicables.length > 0 && !foundMatch && openInSidebar) {
-		const url = location.toString();
+        let linkedData = findLinkedData(document)
+        let metaData = findMetaData(document)
+
+        const url = location.toString();
 		const documentLang =  await makeLanguageValid(document.querySelector('html').lang);
 		await browser.runtime.sendMessage({
             type: 'match_proposal',
