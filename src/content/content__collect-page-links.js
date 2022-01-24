@@ -92,7 +92,6 @@ async function collectPageLinks(subject) {
 		' for links…',
 	]);
 	displayMetadata();
-	let foundEntities = [];
 
 	for (let link of document.links) {
 
@@ -138,7 +137,7 @@ async function collectPageLinks(subject) {
 	 	return 0;
 	});
 
-	updateStatus([
+    updateStatus([
 		`Checking ${uniqueLinks.length} unique links in `,
 		{urlLink: window.location.href},
 	]);
@@ -166,7 +165,6 @@ async function collectPageLinks(subject) {
 		}
 		uniqueLinks[key].init = async function() {
 			this.resolver = resolvers[this.applicable];
-			this.selected = false;
 			this.entityId = await this.resolver.getEntityId(this.links[0]);
 	 		if (this.entityId && this.entityId !== subject) {
 
@@ -246,26 +244,15 @@ async function collectPageLinks(subject) {
 
 	}
 
-
-    let linkNumber = 0
-    for (let key in uniqueLinks) {
-        linkNumber++
-        if (uniqueLinks[key].applicable) {
-            await uniqueLinks[key].setup()
-        }
-    }
+    const linksWithMatches = uniqueLinks.filter(it => it.applicable)
 
     updateStatus([
-        `There are ${linkNumber} links in `,
+        `There are ${linksWithMatches.length} links in `,
         {urlLink: window.location.href},
         ' which could be associated to wikidata items. Checking now.',
     ])
 
-    for (let key in uniqueLinks) {
-        if (uniqueLinks[key].applicable) {
-            await uniqueLinks[key].init()
-        }
-    }
+    linksWithMatches.forEach(it => it.setup().then(() => it.init()))
 }
 
 

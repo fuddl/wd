@@ -62,27 +62,17 @@ async function handleMatchEvent(event, sender) {
     return addToUrlCache(event.wdEntityId, event.url)
 }
 
-function collectPageLinks(event) {
-    browser.tabs.query({
-        currentWindow: true,
-        active: true,
-    }).then((tabs) => {
-        for (let tab of tabs) {
-            browser.tabs.insertCSS({file: "content/content__collect-page-links.css"})
+async function collectPageLinks(event) {
+    const tab = await Browser.getActiveTab()
+    browser.tabs.insertCSS(tab.id, {file: "content/content__collect-page-links.css"})
 
-            browser.tabs.sendMessage(
-                tab.id,
-                {
-                    action: "collect_pagelinks",
-                    subject: event.subject,
-                },
-            ).catch((v) => {
-                console.log(JSON.stringify(v))
-            })
-        }
-    }).catch((v) => {
-        console.log(v)
-    })
+    await browser.tabs.sendMessage(
+        tab.id,
+        {
+            action: "collect_pagelinks",
+            subject: event.subject,
+        },
+    )
 }
 
 function clearPageLinks() {
@@ -186,7 +176,7 @@ browser.runtime.onMessage.addListener(async (data, sender) => {
 
 
     if (data.type === 'collect_pagelinks') {
-        collectPageLinks(data)
+        await collectPageLinks(data)
     }
     if (data.type === 'clear_pagelinks') {
         clearPageLinks()
