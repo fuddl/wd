@@ -1,15 +1,15 @@
 {
 	"manifest_version": 2,
 	"name": "Wikidata",
-	"version": "0.216",
+	"version": "0.217",
 	"description": "Display information from wikidata.",
 	"icons": {
-		"48": "icons/wd.svg",
-		"96": "icons/wd.svg",
-		"128": "icons/wd-128.png"
+		"48": "icons/wd-48.png",
+		"96": "icons/wd-96.png",
+        "128": "icons/wd-128.png"
 	},
 	"browser_action": {
-		"default_icon": "icons/inactive.svg",
+		"default_icon": "icons/inactive-32.png",
 		"default_title": "Wikidata"
 	},
 	"sidebar_action": {
