@@ -8,6 +8,7 @@ import {ApplyFormatters} from './formatters.js'
 import {AddLemmaAffix} from './lemma-afixes.js'
 import browser from 'webextension-polyfill'
 import { PrependNav } from './prepend-nav.js';
+import { getDeducedSenseClaims } from './deduce-sense-statements.js';
 
 if (history.length > 1) {
 	PrependNav();
@@ -561,6 +562,7 @@ function updateView(id, useCache = true) {
 							}
 						}
 					}
+					senseProps = await getDeducedSenseClaims(senseProps, id, e.language);
 				}
 
 				for (let id in senseTree) {
