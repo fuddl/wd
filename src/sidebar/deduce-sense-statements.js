@@ -13,7 +13,7 @@ const mapping = {
   },
 };
 
-async function getDeducedSenseClaims(props, id, lang) {
+async function getDeducedSenseClaims(props, id, lang, sense) {
   for (let prop in props) {
     for (let m in mapping) {
       if (mapping[m].from.includes(prop)) {
@@ -41,9 +41,13 @@ async function getDeducedSenseClaims(props, id, lang) {
                   props[mapping[m].to] = {
                     claims: {},
                     datatype: 'wikibase-sense',
+                    sense: sense,
                   }
+                }
+                if (!props[mapping[m].to].claims.hasOwnProperty(id)) {
                   props[mapping[m].to].claims[id] = {
                     claim: [],
+                    sense: sense,
                   };
                 }
                 for (const result of results) {

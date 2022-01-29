@@ -562,7 +562,7 @@ function updateView(id, useCache = true) {
 							}
 						}
 					}
-					senseProps = await getDeducedSenseClaims(senseProps, id, e.language);
+					senseProps = await getDeducedSenseClaims(senseProps, id, e.language, newSense);
 				}
 
 				for (let id in senseTree) {
