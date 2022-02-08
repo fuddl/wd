@@ -1,5 +1,5 @@
 import { collectPageLinks, clearPageLinks, getClosestID, getOldid } from './content__collect-page-links.js';
-import { resolvers } from './resolver.js';
+import { resolvers } from '../resolver'
 import { getElementLanguage } from './content__collect-strings.js';
 import { makeLanguageValid } from '../get-valid-string-languages.js';
 import { findTitles } from './pagedata__title.js';

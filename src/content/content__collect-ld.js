@@ -1,4 +1,4 @@
-import { resolvers } from "./resolver.js";
+import { resolvers } from "../resolver"
 
 async function parse(thing, ids, url) {
 	if (

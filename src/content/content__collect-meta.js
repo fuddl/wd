@@ -1,5 +1,4 @@
-import { resolvers } from './resolver.js';
-import { makeLanguageValid } from '../get-valid-string-languages.js';
+import { resolvers } from '../resolver'
 
 const usefullMetatags = [
 	{
@@ -181,7 +180,7 @@ function findMetaData(document) {
 
 	let meta = {};
 	for (let tag of tags) {
-		let property = tag.getAttribute('name') || tag.getAttribute('property'); 
+		let property = tag.getAttribute('name') || tag.getAttribute('property');
 		if (property && usefullMetatags.find(v => v.name === property)) {
 			let content = tag.getAttribute('content');
 			if (content != 'null') {

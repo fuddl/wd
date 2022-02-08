@@ -11,7 +11,7 @@ import {findMediaWikiData} from "./mw-data.js"
 import {enrichMetaData, findMetaData} from '../content/content__collect-meta.js'
 import {metaToStatements} from './metaToStatements.js'
 import {OSMToSatements, wdGetOSMElements} from './osm.js'
-import {URL_match_pattern} from "../content/resolver__url-match-pattern.js"
+import {URL_match_pattern} from '../resolver/url-match-pattern.js'
 import browser from 'webextension-polyfill'
 import {PrependNav} from './prepend-nav.js'
 import {Browser} from "../core/browser"

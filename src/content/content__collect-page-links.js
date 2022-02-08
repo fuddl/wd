@@ -1,5 +1,5 @@
 import {displayMetadata} from './content__display-metadata.js'
-import {resolvers} from './resolver.js'
+import {resolvers} from '../resolver'
 import {updateStatus} from "../update-status.js"
 import browser from 'webextension-polyfill'
 
