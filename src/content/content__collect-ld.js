@@ -17,10 +17,10 @@ async function parse(thing, ids, url) {
 			link.setAttribute("href", thing["url"]);
 		}
 
-		for (let id of Object.keys(resolvers)) {
-			let isApplicable = await resolvers[id].applicable(link);
+		for (let resolver of resolvers) {
+			let isApplicable = await resolver.applicable(link)
 			if (isApplicable) {
-				let entityId = await resolvers[id].getEntityId(link);
+				let entityId = await resolver.getEntityId(link)
 				if (entityId) {
 					let wdUrl = `https://www.wikidata.org/wiki/${entityId}`;
 					if (Array.isArray(thing["sameAs"])) {

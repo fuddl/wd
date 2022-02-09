@@ -113,12 +113,12 @@ async function enrichMetaData(tags, lang, url) {
 						};
 					}
 				} else {
-					for (let id of Object.keys(resolvers)) {
+					for (let resolver of resolvers) {
 						let link = document.createElement('a');
 						link.href = tags[key][delta];
-						let isApplicable = await resolvers[id].applicable(link);
+						let isApplicable = await resolver.applicable(link)
 						if (isApplicable) {
-							let entityId = await resolvers[id].getEntityId(link);
+							let entityId = await resolver.getEntityId(link)
 							if (entityId) {
 								enriched[newKey] = {
 									verb: type.prop,

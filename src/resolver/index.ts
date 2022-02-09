@@ -10,9 +10,9 @@ import {url} from './url'
 import {googleMaps} from './google-maps'
 import {wikidata} from './wikidata'
 import {MatchSuggestion, Resolution, Resolver} from './types'
-import {findAsync} from "../core/async"
+import {findAsync} from '../core/async'
 
-const resolvers: { [key: string]: Resolver } = {
+const resolvers = [
 	wikidata,
 	hash,
 	cache,
@@ -24,10 +24,10 @@ const resolvers: { [key: string]: Resolver } = {
 	schemaOrg,
 	googleMaps,
 	url,
-}
+]
 
 export const resolve = async (location: HTMLAnchorElement | HTMLAreaElement | Location): Promise<Resolution | null> => {
-	for (const resolver of Object.values(resolvers)) {
+	for (const resolver of resolvers) {
 		if (!await resolver.applicable(location)) continue
 		const entityId = await resolver.getEntityId(location)
 
@@ -43,8 +43,7 @@ export const resolve = async (location: HTMLAnchorElement | HTMLAreaElement | Lo
 export const findMatchSuggestions = async (location: HTMLAnchorElement | HTMLAreaElement | Location)
 	: Promise<Array<Array<MatchSuggestion>>> => {
 	const suggestions = await Promise.all(
-		Object.values(resolvers)
-			.map(resolver => resolver.applicable(location)),
+		resolvers.map(resolver => resolver.applicable(location)),
 	)
 	return suggestions.filter(it => it && it !== true) as Array<Array<MatchSuggestion>>
 
@@ -57,6 +56,6 @@ export const findMatchSuggestions = async (location: HTMLAnchorElement | HTMLAre
 
 export const findFirstMatchingResolver =
 	async (location: HTMLAnchorElement | HTMLAreaElement | Location): Promise<Resolver | null> =>
-		findAsync(Object.values(resolvers), async resolver => resolver.applicable(location))
+		findAsync(resolvers, async resolver => resolver.applicable(location))
 
 export {resolvers}

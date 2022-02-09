@@ -1,10 +1,12 @@
 import { sparqlQuery } from '../sqarql-query.js'
-import browser from 'webextension-polyfill'
+import * as browser from 'webextension-polyfill'
+import {Resolver} from './types'
 
-const URL_match_pattern = {
+const URL_match_pattern: Resolver = {
+	id: 'URL_match_pattern',
 	aquireRegexes: async function() {
 
-		let query = `
+		const query = `
 			SELECT ?p ?s ?r ?ci WHERE {
 				?stat ps:P8966 ?s.
 				OPTIONAL { ?stat pq:P8967 ?r. }
@@ -16,9 +18,9 @@ const URL_match_pattern = {
 				}
 			} ORDER BY STRLEN(str(?s))
 		`
-		let patterns = await sparqlQuery(query)
-		let output = []
-		for (let prop of patterns) {
+		const patterns = await sparqlQuery(query)
+		const output = []
+		for (const prop of patterns) {
 			let isValid = true
 			let regexp = false
 			try {
@@ -38,13 +40,13 @@ const URL_match_pattern = {
 		}
 		return output
 	},
-	applicable: async function(location) {
+	async applicable(location) {
 		if (!this.patterns) {
 			this.patterns = await this.aquireRegexes()
 		}
-		let href = decodeURIComponent(location.href)
-		for (let prop of this.patterns) {
-			let match = href.match(prop.s)
+		const href = decodeURIComponent(location.href)
+		for (const prop of this.patterns) {
+			const match = href.match(prop.s)
 			if (match) {
 				return [{
 					prop: prop.p,
@@ -56,30 +58,30 @@ const URL_match_pattern = {
 		}
 		return false
 	},
-	getEntityId: async function(location) {
-		let applicable = await this.applicable(location)
+	async getEntityId(location) {
+		const applicable = await this.applicable(location)
 
-		let prop = applicable[0].prop
-		let id = applicable[0].value
-		let ci = applicable[0].valueIsCaseInsensitive
+		const prop = applicable[0].prop
+		const id = applicable[0].value
+		const ci = applicable[0].valueIsCaseInsensitive
 
 		return await this.getEntityByRegexedId(prop, id, ci)
 	},
 	getEntityByRegexedId: async function(prop, id, ci = false) {
-		let cached = await this.checkIfCached(prop, id)
+		const cached = await this.checkIfCached(prop, id)
 		if (cached) {
 			return cached
 		}
-		let query = `
+		const query = `
 			SELECT ?item
 			WHERE {
 				?item wdt:${ prop } ${ ci ? '?id' : `"${id}"`}.
 				${ ci ? `filter(lcase(?id) = "${ id.toLowerCase() }")` : ''}
 			}
 		`
-		let result = await sparqlQuery(query)
+		const result = await sparqlQuery(query)
 		if (result[0]) {
-			let entityId = result[0].item.value.match(/https?:\/\/www\.wikidata\.org\/entity\/(\w\d+)/)[1]
+			const entityId = result[0].item.value.match(/https?:\/\/www\.wikidata\.org\/entity\/(\w\d+)/)[1]
 			await this.addToExternalIDCache(prop, id, entityId)
 			return entityId
 		} else {
@@ -90,17 +92,16 @@ const URL_match_pattern = {
 		return `${prop}:${id}`
 	},
 	checkIfCached: async function(prop, id) {
-		let cache = await browser.storage.local.get('externalIDCache')
-		let cacheKey = this.formCacheKey(prop, id)
+		const cache = await browser.storage.local.get('externalIDCache')
+		const cacheKey = this.formCacheKey(prop, id)
 		if ('externalIDCache' in cache && cacheKey in cache.externalIDCache) {
-			//console.debug(`Found ${cacheKey} in externalIDCache`);
 			return cache.externalIDCache[cacheKey]
 		} else {
 			return false
 		}
 	},
 	addToExternalIDCache: async function(prop, id, entityId) {
-		let cache = await browser.storage.local.get()
+		const cache = await browser.storage.local.get()
 		if (!('externalIDCache' in cache)) {
 			cache.externalIDCache = {}
 		}

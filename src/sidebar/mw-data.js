@@ -1,5 +1,5 @@
 import { templates } from './components/templates.tpl.js';
-import { URL_match_pattern } from '../resolver/url-match-pattern.js'
+import { URL_match_pattern } from '../resolver/url-match-pattern'
 import { makeLanguageValid } from '../get-valid-string-languages.js';
 import { sparqlQuery } from "../sqarql-query.js";
 

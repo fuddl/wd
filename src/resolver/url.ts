@@ -1,6 +1,8 @@
 import { sparqlQuery } from '../sqarql-query.js'
+import {Resolver} from './types'
 
-const url = {
+const url: Resolver = {
+	id: 'url',
 	applicable: async function(location) {
 		if (location.href === window.location.href) {
 			return [{
@@ -12,7 +14,7 @@ const url = {
 	getEntityId: async function(location) {
 		const href = location.href
 		const hrefNoSlash = href.replace(/\/$/, '')
-		let query = `
+		const query = `
 			SELECT ?item {
 			  {
 			    ?item wdt:P953 <${ href }>.
@@ -33,9 +35,9 @@ const url = {
 			  }
 			}
 		`
-		let entity = await sparqlQuery(query)
+		const entity = await sparqlQuery(query)
 		if (entity[0]) {
-			let entityId = entity[0].item.value.match(/https?:\/\/www\.wikidata\.org\/entity\/(Q\d+)/)[1]
+			const entityId = entity[0].item.value.match(/https?:\/\/www\.wikidata\.org\/entity\/(Q\d+)/)[1]
 			return entityId
 		} else {
 			return false
