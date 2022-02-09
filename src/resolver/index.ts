@@ -10,6 +10,7 @@ import {url} from './url'
 import {googleMaps} from './google-maps'
 import {wikidata} from './wikidata'
 import {MatchSuggestion, Resolution, Resolver} from './types'
+import {findAsync} from "../core/async"
 
 const resolvers: { [key: string]: Resolver } = {
 	wikidata,
@@ -48,5 +49,14 @@ export const findMatchSuggestions = async (location: HTMLAnchorElement | HTMLAre
 	return suggestions.filter(it => it && it !== true) as Array<Array<MatchSuggestion>>
 
 }
+
+/**
+ * Runs all the resolvers async, then finds first resolved and matching one
+ * @param location
+ */
+
+export const findFirstMatchingResolver =
+	async (location: HTMLAnchorElement | HTMLAreaElement | Location): Promise<Resolver | null> =>
+		findAsync(Object.values(resolvers), async resolver => resolver.applicable(location))
 
 export {resolvers}
