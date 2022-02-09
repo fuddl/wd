@@ -1,60 +1,58 @@
-import { collectPageLinks, clearPageLinks, getClosestID, getOldid } from './content__collect-page-links.js';
-import { resolvers } from '../resolver'
-import { getElementLanguage } from './content__collect-strings.js';
-import { makeLanguageValid } from '../get-valid-string-languages.js';
-import { findTitles } from './pagedata__title.js';
-import { findDescriptions } from './pagedata__description.js';
-import { findLinkedData, enrichLinkedData } from './content__collect-ld.js';
-import { findMetaData, enrichMetaData } from './content__collect-meta.js';
-import { setupSidebar } from "./sidebar"
+import {clearPageLinks, collectPageLinks, getClosestID, getOldid} from './content__collect-page-links.js'
+import {findMatchSuggestions, resolve} from '../resolver'
+import {getElementLanguage} from './content__collect-strings.js'
+import {makeLanguageValid} from '../get-valid-string-languages.js'
+import {findTitles} from './pagedata__title.js'
+import {findDescriptions} from './pagedata__description.js'
+import {enrichLinkedData, findLinkedData} from './content__collect-ld.js'
+import {enrichMetaData, findMetaData} from './content__collect-meta.js'
+import {setupSidebar} from "./sidebar"
 import browser from 'webextension-polyfill'
 
-async function findApplicables(location, openInSidebar = true) {
-    let applicables = [];
+async function findDirectMatch(location) {
+	const resolution = await resolve(location)
+	if (!resolution) return null
 
-	let foundMatch = false;
-	for (let id of Object.keys(resolvers)) {
-		let isApplicable = await resolvers[id].applicable(location);
-		if (isApplicable) {
-			let entityId = await resolvers[id].getEntityId(location);
+	await browser.runtime.sendMessage({
+		type: 'match_event',
+		wdEntityId: resolution.entityId,
+		openInSidebar: true,
+		url: location.href,
+		cache: !resolution.doNotCache,
+	})
 
-			if (entityId && !foundMatch) {
-				foundMatch = true;
-				await browser.runtime.sendMessage({
-                    type: 'match_event',
-                    wdEntityId: entityId,
-                    openInSidebar: openInSidebar,
-                    url: location.href,
-                    cache: !resolvers[id].noCache,
-                });
-				return entityId;
-			}
-			applicables.push(isApplicable);
-		}
-	}
-	if (applicables.length > 0 && !foundMatch && openInSidebar) {
-        let linkedData = findLinkedData(document)
-        let metaData = findMetaData(document)
+	return resolution.entityId
+}
 
-        const url = location.toString();
-		const documentLang =  await makeLanguageValid(document.querySelector('html').lang);
-		await browser.runtime.sendMessage({
-            type: 'match_proposal',
-            proposals: {
-                ids: applicables,
-                titles: findTitles(),
-                desc: findDescriptions(),
-                ld: await enrichLinkedData(linkedData, applicables[0], window.location.href),
-                meta: await enrichMetaData(metaData, documentLang, window.location.href),
-                source: {
-                    url: url,
-                    title: document.querySelector('title').innerText,
-                    lang: documentLang,
-                }
-            },
-        });
-	}
-	return false;
+async function detectPotentialMatches(location) {
+	let matchSuggestions = await findMatchSuggestions(location)
+	if (matchSuggestions.length === 0) return
+
+	let linkedData = findLinkedData(document)
+	let metaData = findMetaData(document)
+	const lang = await makeLanguageValid(document.querySelector('html').lang)
+
+	await browser.runtime.sendMessage({
+		type: 'match_proposal',
+		proposals: {
+			ids: matchSuggestions,
+			titles: findTitles(),
+			desc: findDescriptions(),
+			ld: await enrichLinkedData(linkedData, matchSuggestions[0], window.location.href),
+			meta: await enrichMetaData(metaData, lang, window.location.href),
+			source: {
+				url: location.toString(),
+				title: document.querySelector('title').innerText,
+				lang,
+			},
+		},
+	})
+}
+
+async function findApplicables(location) {
+	if (await findDirectMatch(location )) return
+
+	await detectPotentialMatches(location)
 }
 
 async function main() {
