@@ -3,3 +3,6 @@ export async function findAsync<T>(arr: Array<T>, asyncCallback: (item: T) => Pr
 	const index = results.findIndex(result => result)
 	return arr[index]
 }
+
+export const mapAsync = async <T, R>(arr: Array<T>, asyncCallback: (item: T) => Promise<R>): Promise<Array<R>> =>
+	Promise.all(arr.map(asyncCallback))

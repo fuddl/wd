@@ -10,9 +10,9 @@ import {url} from './url'
 import {googleMaps} from './google-maps'
 import {wikidata} from './wikidata'
 import {MatchSuggestion, Resolution, Resolver} from './types'
-import {findAsync} from '../core/async'
+import {findAsync, mapAsync} from '../core/async'
 
-const resolvers = [
+export const resolvers = [
 	wikidata,
 	hash,
 	cache,
@@ -26,21 +26,38 @@ const resolvers = [
 	url,
 ]
 
-export const resolve = async (location: HTMLAnchorElement | HTMLAreaElement | Location): Promise<Resolution | null> => {
-	for (const resolver of resolvers) {
-		if (!await resolver.applicable(location)) continue
-		const entityId = await resolver.getEntityId(location)
+type LocationLike = HTMLAnchorElement | HTMLAreaElement | Location
 
-		if (entityId) return {
-			entityId,
-			doNotCache: resolver.noCache,
-		}
+export const resolve = async (location: LocationLike): Promise<Resolution | null> => {
+	for (const resolver of resolvers) {
+		const result = await checkApplicableAndResolve(resolver, location)
+		if (result) return result
 	}
 	return null
 }
 
+export const resolveAll = async (location: LocationLike): Promise<Resolution[]> => {
+	const resolutions = await mapAsync(resolvers,
+		async resolver => checkApplicableAndResolve(resolver, location))
+
+	return resolutions.filter(Boolean)
+}
+
+/**
+ * Obvious candidate for being part of the resolver class if we go that way
+ */
+async function checkApplicableAndResolve(resolver: Resolver, location: LocationLike): Promise<Resolution | null> {
+	if (!await resolver.applicable(location)) return
+	const entityId = await resolver.getEntityId(location)
+
+	if (entityId) return {
+		entityId,
+		doNotCache: resolver.noCache,
+	}
+}
+
 // todo better interface vs nested arrays
-export const findMatchSuggestions = async (location: HTMLAnchorElement | HTMLAreaElement | Location)
+export const findMatchSuggestions = async (location: LocationLike)
 	: Promise<Array<Array<MatchSuggestion>>> => {
 	const suggestions = await Promise.all(
 		resolvers.map(resolver => resolver.applicable(location)),
@@ -55,7 +72,5 @@ export const findMatchSuggestions = async (location: HTMLAnchorElement | HTMLAre
  */
 
 export const findFirstMatchingResolver =
-	async (location: HTMLAnchorElement | HTMLAreaElement | Location): Promise<Resolver | null> =>
+	async (location: LocationLike): Promise<Resolver | null> =>
 		findAsync(resolvers, async resolver => resolver.applicable(location))
-
-export {resolvers}

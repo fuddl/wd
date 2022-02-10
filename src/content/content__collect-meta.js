@@ -1,4 +1,4 @@
-import { resolvers } from '../resolver'
+import {resolveAll} from '../resolver'
 
 const usefullMetatags = [
 	{
@@ -113,23 +113,19 @@ async function enrichMetaData(tags, lang, url) {
 						};
 					}
 				} else {
-					for (let resolver of resolvers) {
-						let link = document.createElement('a');
-						link.href = tags[key][delta];
-						let isApplicable = await resolver.applicable(link)
-						if (isApplicable) {
-							let entityId = await resolver.getEntityId(link)
-							if (entityId) {
-								enriched[newKey] = {
-									verb: type.prop,
-									object: {
-										'entity-type': "item",
-										'numeric-id': entityId.replace(/^Q/, ''),
-									}
-								};
+					let link = document.createElement('a')
+					link.href = tags[key][delta]
+
+					const entities = await resolveAll(link)
+					entities.forEach(resolution => {
+						enriched[newKey] = {
+							verb: type.prop,
+							object: {
+								'entity-type': 'item',
+								'numeric-id': resolution.entityId.replace(/^Q/, ''),
 							}
 						}
-					}
+					})
 				}
 			} else if (type.type === 'String' || type.type === 'ExternalId') {
 				enriched[newKey] = {
