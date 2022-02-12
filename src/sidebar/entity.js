@@ -10,7 +10,7 @@ import browser from 'webextension-polyfill'
 import { PrependNav } from './prepend-nav.js';
 import { getDeducedSenseClaims } from './deduce-sense-statements.js';
 
-if (history.length > 1 || window.parent != window.top) {
+if (history.length > 1 || window != window.top) {
 	PrependNav();
 }
 
