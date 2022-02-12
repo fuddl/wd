@@ -1,7 +1,5 @@
 import * as browser from "webextension-polyfill"
 
-import {css} from "@emotion/react"
-import {slide as Slider} from 'react-burger-menu'
 import {useEffect, useState} from "react"
 import {useTabLocalState} from "../../core/react"
 
@@ -9,6 +7,8 @@ export const SidebarWrapper = () => {
     const [isOpen, setOpen] = useTabLocalState("sidebarOpen", false)
     // todo show a loading indicator instead of emptiness
     const [url, setUrl] = useState("")
+    const [width, setWidth] = useState(-1)
+    const [left, setLeft] = useState(false)
 
     useEffect(() => {
         const messageCallback = (event) => {
@@ -25,35 +25,26 @@ export const SidebarWrapper = () => {
         return () => browser.runtime.onMessage.removeListener(messageCallback)
     }, [isOpen, setOpen])
 
-    return <Slider
-        isOpen={isOpen}
-        width={450}
-        right
-        noOverlay
-        customBurgerIcon={false}
-        styles={styles}
-        // This is mainly here to ensure that when menu is closed
-        // by internal element logic we're aware and maintain proper state
-        onClose={() => setOpen(false)}
-    >
-        {/*{props.children}*/}
-        <iframe
-            css={css`
-                width: 100%;
-                height: 100%;
-            `}
-            src={url}/>
-    </Slider>
-}
+    const classes = [
+        'sidebar',
+        left ? 'sidebar--left' : 'sidebar--right',
+    ];
 
-const styles = {
-    bmMenu: {
-        overflow: "hidden",
-    },
-    bmCross: {
-        background: '#bdc3c7',
-    },
-    bmMenuWrap: {
-        zIndex: 99999,
-    },
+    return (
+        <div
+            className={classes.join(' ')}
+            style={{ width: width > -1 ? `${width}px` : null }}
+        >
+            {/* 
+                creating `<iframe src="">` and changing its `src` in a separate
+                step will cause firefox to create a new hostory item issue #59.
+                so we only create the iframe (and everything else) if there 
+                is a src.
+            */}
+            { url !== '' && (
+                <iframe className="sidebar__frame" frameBorder="0" src={url}/>
+            )}
+            <div className="sidebar__drag" />
+        </div>
+    )
 }

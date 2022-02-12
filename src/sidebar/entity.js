@@ -10,10 +10,9 @@ import browser from 'webextension-polyfill'
 import { PrependNav } from './prepend-nav.js';
 import { getDeducedSenseClaims } from './deduce-sense-statements.js';
 
-if (history.length > 1) {
+if (history.length > 1 || window.parent != window.top) {
 	PrependNav();
 }
-
 
 const lang = navigator.language.substr(0,2);
 const footnoteStorage = {};
