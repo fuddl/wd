@@ -93,7 +93,7 @@ export const SidebarWrapper = () => {
                 so we only create the iframe (and everything else) if there 
                 is a src.
             */}
-            { url !== '' && (
+            { url !== '' && isOpen && (
                 <iframe className="sidebar__frame" frameBorder="0" src={url}/>
             )}
             <div
