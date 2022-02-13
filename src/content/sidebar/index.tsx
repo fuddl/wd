@@ -15,7 +15,11 @@ class WikidataSidebar extends HTMLElement {
             position: fixed;
             top: 0;
             bottom: 0;
-            transition: .25s transform;
+        }
+        @media (prefers-reduced-motion: no-preference) {
+            .sidebar {
+                transition: .25s transform;
+            }
         }
 
         .sidebar--right {
@@ -57,6 +61,18 @@ class WikidataSidebar extends HTMLElement {
         }
         .sidebar--dragging > .sidebar__frame {
             pointer-events: none;
+        }
+        @media (prefers-reduced-motion) {
+            .sidebar--dragging > .sidebar__frame {
+                opacity: 0;
+            }
+            .sidebar--dragging > .sidebar__drag {
+                background: #a7d7f9;
+                border: none;
+            }
+            .sidebar--dragging {
+                background: #a7d7f955;
+            }
         }
     `;
 
