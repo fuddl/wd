@@ -15,6 +15,7 @@ class WikidataSidebar extends HTMLElement {
             position: fixed;
             top: 0;
             bottom: 0;
+            z-index: 2147483647;
         }
         @media (prefers-reduced-motion: no-preference) {
             .sidebar {
@@ -47,6 +48,7 @@ class WikidataSidebar extends HTMLElement {
             bottom: 0;
             left: 0;
             right: 0;
+            z-index: 2147483646;
         }
         .sidebar__drag {
             width: 3px;
