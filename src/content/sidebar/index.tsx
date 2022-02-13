@@ -37,8 +37,16 @@ class WikidataSidebar extends HTMLElement {
             transform: translateX(-100%)
         }
         .sidebar__frame {
-            width: calc(100% - 2px);
+            width: 100%;
             height: 100%;
+        }
+        .sidebar__background {
+            cursor: col-resize;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
         }
         .sidebar__drag {
             width: 3px;
@@ -46,13 +54,19 @@ class WikidataSidebar extends HTMLElement {
             position: absolute;
             top: 0;
             bottom: 0;
+            border: 0 solid #E6E6E6;
+        }
+        @media (prefers-color-scheme: dark) {
+            .sidebar__drag {
+                border-color: #44464A;
+            }
         }
         .sidebar--right > .sidebar__drag {
-            border-left: 1px solid #E6E6E6;
+            border-left-width: 1px;
             left: 0;
         }
         .sidebar--left > .sidebar__drag {
-            border-right: 1px solid #E6E6E6;
+            border-right-width: 1px;
             right: 0;
         }
         .sidebar--dragging {

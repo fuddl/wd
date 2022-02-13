@@ -53,15 +53,11 @@ export const SidebarWrapper = () => {
     const endDrag = () => {
         if (isDragging) {
            setDragging(false)
-            document.body.style.cursor = "";
-            document.body.style.userSelect = "";
         }
     }
 
     const startDrag = (event) => {
         setDragging(true)
-        document.body.style.cursor = 'col-resize';
-        document.body.style.userSelect = 'none';
     }
 
     useEffect(() => {
@@ -81,25 +77,28 @@ export const SidebarWrapper = () => {
     ];
 
     return (
-        <div
-            className={classes.join(' ')}
-            style={{ width: width > -1 ? `${width}vw` : null }}
-            onMouseUp={endDrag} 
-            onMouseMove={updateDrag} 
-        >
-            {/* 
-                creating `<iframe src="">` and changing its `src` in a separate
-                step will cause firefox to create a new hostory item issue #59.
-                so we only create the iframe (and everything else) if there 
-                is a src.
-            */}
-            { url !== '' && isOpen && (
-                <iframe className="sidebar__frame" frameBorder="0" src={url}/>
-            )}
+        <>
+            { isDragging && <div className="sidebar__background"></div> }
             <div
-                className="sidebar__drag"
-                onMouseDown={startDrag} 
-            />
-        </div>
+                className={classes.join(' ')}
+                style={{ width: width > -1 ? `${width}vw` : null }}
+                onMouseUp={endDrag} 
+                onMouseMove={updateDrag} 
+            >
+                {/* 
+                    creating `<iframe src="">` and changing its `src` in a separate
+                    step will cause firefox to create a new hostory item issue #59.
+                    so we only create the iframe (and everything else) if there 
+                    is a src.
+                */}
+                { url !== '' && isOpen && (
+                    <iframe className="sidebar__frame" frameBorder="0" src={url}/>
+                )}
+                <div
+                    className="sidebar__drag"
+                    onMouseDown={startDrag} 
+                />
+            </div>
+        </>
     )
 }
