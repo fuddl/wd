@@ -1,5 +1,4 @@
 import * as ReactDOM from "react-dom"
-import retargetEvents from 'react-shadow-dom-retarget-events';
 import {SidebarWrapper} from "./sidebar-wrapper"
 import "@webcomponents/custom-elements"
 
@@ -92,10 +91,9 @@ class WikidataSidebar extends HTMLElement {
         }
     `;
 
-    const shadow = this.attachShadow({ mode: 'open' });
+    const shadow = this.attachShadow({ mode: 'closed' });
 
     ReactDOM.render(<SidebarWrapper/>, shadow);
-    retargetEvents(shadow);
     shadow.appendChild(style);
   }
 }
