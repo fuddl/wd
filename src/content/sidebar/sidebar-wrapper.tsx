@@ -76,9 +76,7 @@ export const SidebarWrapper = () => {
     }
 
     const endDrag = () => {
-        if (isDragging) {
-           setDragging(false)
-        }
+        setDragging(false)
     }
 
     const startDrag = (event) => {
