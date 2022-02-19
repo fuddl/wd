@@ -4,7 +4,8 @@ import {useEffect, useState, useRef} from "react"
 import {useTabLocalState} from "../../core/react"
 
 export const SidebarWrapper = () => {
-    const ref = useRef()
+    const wrapperRef = useRef()
+    const frameRef = useRef()
 
     const [isOpen, setOpen] = useTabLocalState("sidebarOpen", false)
 
@@ -23,41 +24,48 @@ export const SidebarWrapper = () => {
     useEffect(() => {
         const messageCallback = (event) => {
             console.log('content-script container ev', event)
-            if (event.type === 'update-panel-url') {
-                setUrl(event.url)
-            // unfortunatly the messages send by Window.postMessage() have a slightly 
-            // different structure than the messages send by the browser api
-            //
-            // we should probably make sure that the message was send by the
-            // url in `url` since every website can post a message like this
-            } else if (event.type === "toggle-sidebar" || event.data.type === "toggle-sidebar") {
-                setOpen(!isOpen)
+            if ('type' in event) {
+                if (event.type === 'update-panel-url') {
+                    setUrl(event.url)
+                } else if (event.type === "toggle-sidebar") {
+                    setOpen(!isOpen)
+                }
+            }
+        }
+
+        const windowMessageCallback = (event) => {
+            // make sure the message wasn't sent by a different iframe 
+            if (frameRef?.current?.getAttribute('src').startsWith(event.origin)) {
+                if ('data' in event) {
+                    // redirect the relevant part of the message to the actual callback
+                    messageCallback(event.data)
+                }
             }
         }
 
         if (isOpen) {
             setShowIFrame(true)
         } else {
-            ref.current.addEventListener('transitionend', () => {
-                if (ref.current.classList.contains('sidebar--closed')) {
+            wrapperRef.current.addEventListener('transitionend', () => {
+                if (wrapperRef.current.classList.contains('sidebar--closed')) {
                     setShowIFrame(false)
-                    ref.current.removeListener('transitionend', this);
+                    wrapperRef.current.removeListener('transitionend', this)
                 }
             })
             // hide iFrame after 5s in case transitions are disabled or not supported
             setTimeout(() => {
-                if (ref.current.classList.contains('sidebar--closed')) {
+                if (wrapperRef.current.classList.contains('sidebar--closed')) {
                     setShowIFrame(false)
                 }
             }, 5000);
         }
 
         browser.runtime.onMessage.addListener(messageCallback)
-        window.addEventListener('message', messageCallback)
+        window.addEventListener('message', windowMessageCallback)
 
         return () => {
             browser.runtime.onMessage.removeListener(messageCallback)
-            window.removeEventListener('message', messageCallback)
+            window.removeEventListener('message', windowMessageCallback)
         }
     }, [isOpen, setOpen])
 
@@ -107,7 +115,7 @@ export const SidebarWrapper = () => {
                 style={{ width: width > -1 ? `${width}vw` : null }}
                 onMouseUp={endDrag} 
                 onMouseMove={updateDrag}
-                ref={ref}
+                ref={wrapperRef}
             >
                 {/* 
                     creating `<iframe src="">` and changing its `src` in a separate
@@ -116,7 +124,7 @@ export const SidebarWrapper = () => {
                     is a src.
                 */}
                 { url !== '' && showIFrame && (
-                    <iframe className="sidebar__frame" frameBorder="0" src={url}/>
+                    <iframe className="sidebar__frame" frameBorder="0" src={url} ref={frameRef}/>
                 )}
                 <div
                     className="sidebar__drag"
