@@ -30,11 +30,12 @@
 		}
 	],
 	"web_accessible_resources": [
-		"sqarql-query.js",
+		"**/*.css"
+		"**/*.svg",
+		"content/sidebar/sidebar.css",
 		"sidebar/*.html",
 		"sidebar/res/*",
-		"**/*.svg",
-		"**/*.css"
+		"sqarql-query.js",
 	],
 	"browser_specific_settings": {
 		"gecko": {
