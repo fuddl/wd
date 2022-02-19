@@ -184,25 +184,25 @@ function renderStatements(snak, references, type, target, scope, delta) {
 			let name = encodeURIComponent(snak.datavalue.value);
 			if (name.match(/\.svg$/i)) {
 				target.appendChild(templates.image({
-					src: `http://commons.wikimedia.org/wiki/Special:FilePath/${ name }`
+					src: `https://commons.wikimedia.org/wiki/Special:FilePath/${ name }`
 				}));
 			} else if (name.match(/\.(jpe?g|png|gif|tiff?|stl)$/i)) {
 				target.appendChild(templates.picture({
 					srcSet: {
-						250: `http://commons.wikimedia.org/wiki/Special:FilePath/${ name }?width=250px`,
-						501: `http://commons.wikimedia.org/wiki/Special:FilePath/${ name }?width=501px`,
-						801: `http://commons.wikimedia.org/wiki/Special:FilePath/${ name }?width=801px`,
-						1068: `http://commons.wikimedia.org/wiki/Special:FilePath/${ name }?width=1068px`,
+						250: `https://commons.wikimedia.org/wiki/Special:FilePath/${ name }?width=250px`,
+						501: `https://commons.wikimedia.org/wiki/Special:FilePath/${ name }?width=501px`,
+						801: `https://commons.wikimedia.org/wiki/Special:FilePath/${ name }?width=801px`,
+						1068: `https://commons.wikimedia.org/wiki/Special:FilePath/${ name }?width=1068px`,
 					}
 				}));
 			} else if (name.match(/\.(wav|og[ga])$/i)) {
 				target.appendChild(templates.audio({
-					src: `http://commons.wikimedia.org/wiki/Special:FilePath/${ name }`
+					src: `https://commons.wikimedia.org/wiki/Special:FilePath/${ name }`
 				}));
 			} else if (name.match(/\.webm$/i)) {
 				target.appendChild(templates.video({
-					poster: `http://commons.wikimedia.org/wiki/Special:FilePath/${ name }?width=801px`,
-					src: `http://commons.wikimedia.org/wiki/Special:FilePath/${ name }`
+					poster: `https://commons.wikimedia.org/wiki/Special:FilePath/${ name }?width=801px`,
+					src: `https://commons.wikimedia.org/wiki/Special:FilePath/${ name }`
 				}));
 			}
 		}
@@ -628,10 +628,10 @@ function updateView(id, useCache = true) {
 									if (fileName.match(/\.(jpe?g|png|gif|tiff?)$/i)) {
 										section.appendChild(templates.picture({
 											srcSet: {
-												250: `http://commons.wikimedia.org/wiki/Special:FilePath/${ fileName }?width=250px`,
-												501: `http://commons.wikimedia.org/wiki/Special:FilePath/${ fileName }?width=501px`,
-												801: `http://commons.wikimedia.org/wiki/Special:FilePath/${ fileName }?width=801px`,
-												1068: `http://commons.wikimedia.org/wiki/Special:FilePath/${ fileName }?width=1068px`,
+												250: `https://commons.wikimedia.org/wiki/Special:FilePath/${ fileName }?width=250px`,
+												501: `https://commons.wikimedia.org/wiki/Special:FilePath/${ fileName }?width=501px`,
+												801: `https://commons.wikimedia.org/wiki/Special:FilePath/${ fileName }?width=801px`,
+												1068: `https://commons.wikimedia.org/wiki/Special:FilePath/${ fileName }?width=1068px`,
 											},
 											tag: senseSymbol,
 										}));
