@@ -1,7 +1,7 @@
 {
 	"manifest_version": 2,
 	"name": "Wikidata",
-	"version": "0.219",
+	"version": "0.221",
 	"description": "Display information from wikidata.",
 	"icons": {
 		"48": "icons/wd-48.png",
@@ -30,11 +30,12 @@
 		}
 	],
 	"web_accessible_resources": [
-		"sqarql-query.js",
+		"**/*.css",
+		"**/*.svg",
+		"content/sidebar/sidebar.css",
 		"sidebar/*.html",
 		"sidebar/res/*",
-		"**/*.svg",
-		"**/*.css"
+		"sqarql-query.js"
 	],
 	"browser_specific_settings": {
 		"gecko": {

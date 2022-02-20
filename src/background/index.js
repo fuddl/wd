@@ -21,7 +21,7 @@ const toggleInlineSidebar = async () =>
     Browser.sendMessageToActiveTab({type: "toggle-sidebar"})
 
 async function toggleSidebar() {
-    if (browser.sidebarAction) {
+    if ('sidebarAction' in browser) {
         // note: if a user input handler waits on a promise, then its status as a user input handler is lost
         // and this call won't work
         // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/User_actions
@@ -182,6 +182,8 @@ browser.runtime.onMessage.addListener(async (data, sender) => {
         clearPageLinks()
     }
 })
+
+browser.storage.local.set({'sidebarActionSupported': 'sidebarAction' in browser})
 
 browser.webNavigation.onHistoryStateUpdated.addListener(
     e => browser.tabs.sendMessage(e.tabId, {action: "find_applicables"}))
