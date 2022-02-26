@@ -1,5 +1,5 @@
-import { resolvers } from './resolver.js';
-import { makeLanguageValid } from '../get-valid-string-languages.js';
+import { resolvers } from './resolver.js'
+import { makeLanguageValid } from '../get-valid-string-languages.js'
 
 const usefullMetatags = [
 	{
@@ -61,7 +61,7 @@ const usefullMetatags = [
 		type: 'Quantity',
 		suggested: true,
 	}
-];
+]
 
 const durations = [
 	{
@@ -94,40 +94,40 @@ const durations = [
 		wd: 'Q11574',
 		seconds: 1,
 	}
-];
+]
 
 async function enrichMetaData(tags, lang, url) {
-	let enriched = {};
+	let enriched = {}
 	for (let key in tags) {
-		let type = usefullMetatags.find(v => v.name === key);
+		let type = usefullMetatags.find(v => v.name === key)
 		for (let delta in tags[key]) {
-			const newKey = `${key}|${delta}`;
+			const newKey = `${key}|${delta}`
 			if (type.type === 'WikibaseItem') {
 				if (type.hasOwnProperty('options')) {
 					if (type.options.hasOwnProperty(tags[key])) {
 						enriched[newKey] = {
 							verb: type.prop,
 							object: {
-								'entity-type': "item",
+								'entity-type': 'item',
 								'numeric-id': type.options[tags[key][delta]].toString(),
 							}
-						};
+						}
 					}
 				} else {
 					for (let id of Object.keys(resolvers)) {
-						let link = document.createElement('a');
-						link.href = tags[key][delta];
-						let isApplicable = await resolvers[id].applicable(link);
+						let link = document.createElement('a')
+						link.href = tags[key][delta]
+						let isApplicable = await resolvers[id].applicable(link)
 						if (isApplicable) {
-							let entityId = await resolvers[id].getEntityId(link);
+							let entityId = await resolvers[id].getEntityId(link)
 							if (entityId) {
 								enriched[newKey] = {
 									verb: type.prop,
 									object: {
-										'entity-type': "item",
+										'entity-type': 'item',
 										'numeric-id': entityId.replace(/^Q/, ''),
 									}
-								};
+								}
 							}
 						}
 					}
@@ -136,16 +136,16 @@ async function enrichMetaData(tags, lang, url) {
 				enriched[newKey] = {
 					verb: type.prop,
 					object: tags[key][delta],
-				};
+				}
 			} else if (type.type === 'Quantity') {
-				let amount = tags[key][delta];
-				let unit = '1';
+				let amount = tags[key][delta]
+				let unit = '1'
 
 				for (const interval of durations) {
-					let divided = amount / interval.seconds;
+					let divided = amount / interval.seconds
 					if (divided > 1 && divided % 1 === 0 && amount !== divided) {
-						amount = divided;
-						unit = `http://www.wikidata.org/entity/${interval.wd}`;
+						amount = divided
+						unit = `http://www.wikidata.org/entity/${interval.wd}`
 					}
 				}
 
@@ -155,7 +155,7 @@ async function enrichMetaData(tags, lang, url) {
 						amount: amount,
 						unit: unit,
 					}
-				};
+				}
 			} else if (type.type === 'Monolingualtext') {
 				if (lang) {
 					enriched[newKey] = {
@@ -164,39 +164,39 @@ async function enrichMetaData(tags, lang, url) {
 							text: tags[key][delta],
 							language: lang,
 						}
-					};
+					}
 				}
 			}
 		}
 	}
-	return enriched;
+	return enriched
 }
 
 function findMetaData(document) {
-	const tags = document.querySelectorAll('meta[name], meta[property]');
+	const tags = document.querySelectorAll('meta[name], meta[property]')
 
 	if (tags.length < 1) {
 		return []
 	}
 
-	let meta = {};
+	let meta = {}
 	for (let tag of tags) {
-		let property = tag.getAttribute('name') || tag.getAttribute('property'); 
+		let property = tag.getAttribute('name') || tag.getAttribute('property') 
 		if (property && usefullMetatags.find(v => v.name === property)) {
-			let content = tag.getAttribute('content');
+			let content = tag.getAttribute('content')
 			if (content != 'null') {
 				if (!meta.hasOwnProperty(property)) {
-					meta[property] = [];
+					meta[property] = []
 				}
-				meta[property].push(content);
+				meta[property].push(content)
 			}
 		}
 	}
 	if (meta.hasOwnProperty('books:isbn') && meta.hasOwnProperty('og:type')) {
 		// it it has an isbn number it is an edition, not a book
-		meta['og:type'] = ['wdff.edition'];
+		meta['og:type'] = ['wdff.edition']
 	}
-	return meta;
+	return meta
 }
 
 export { findMetaData, enrichMetaData, usefullMetatags }

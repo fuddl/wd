@@ -1,37 +1,37 @@
 function getElementLanguage(selection) {
-	let element = selection.focusNode;
+	let element = selection.focusNode
 	while (typeof element.closest === 'undefined') {
-		element = element.parentElement;
+		element = element.parentElement
 	}
-	let closest = element.closest('[lang]');
+	let closest = element.closest('[lang]')
 	if (closest) {
-		let lang = closest.lang;
+		let lang = closest.lang
 		if (lang) {
-			return lang;
+			return lang
 		}
 	}
-	return guessLanguage(selection.toString());
+	return guessLanguage(selection.toString())
 }
 
 function guessLanguage(string) {
 	// if it contains kana, let's assume its japanese
 	if (string.match(/[ァアィイゥウェエォオカガキギクグケゲコゴサザシジスズセゼソゾタダチヂッツヅテデトドナニヌネノハバパヒビピフブプヘベペホボポマミムメモャヤュユョヨラリルレロヮワヰヱヲンヴヵヶヷヸヹヺ・ーヽヾヿぁあぃいぅうぇえぉおかがきぎくぐけげこごさざしじすずせぜそぞただちぢっつづてでとどなにぬねのはばぱひびぴふぶぷへべぺほぼぽまみむめもゃやゅゆょよらりるれろゎわゐゑをんゔゕゖ゛゜ゝゞゟ]/)) {
-		return 'ja';
+		return 'ja'
 	}
 	// if it contains a sharp s, let's assume its german
 	if (string.match(/[ßẞ]/)) {
-		return 'de';
+		return 'de'
 	}
 	// if it contains upside down punctuation, it's probably spanish
 	if (string.match(/[¿¡]/)) {
-		return 'es';
+		return 'es'
 	}
 	// if it contains a cyrillic Yo it might be russian
 	if (string.match(/[Ёё]/)) {
-		return 'ru';
+		return 'ru'
 	}
 	// if all else fails, let's assume it is something the user can read
-	return navigator.language.split("-")[0];
+	return navigator.language.split('-')[0]
 }
 
 export { getElementLanguage }

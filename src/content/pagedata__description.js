@@ -1,14 +1,14 @@
 function findDescriptions() {
-	let descs = [];
-	let metaDesc = document.querySelector('meta[name="description"]');
+	let descs = []
+	let metaDesc = document.querySelector('meta[name="description"]')
 	if (metaDesc) {
-		descs.push(metaDesc.getAttribute('content'));
+		descs.push(metaDesc.getAttribute('content'))
 	}
-	let twitterDesc = document.querySelector('meta[name="twitter:description"]');
+	let twitterDesc = document.querySelector('meta[name="twitter:description"]')
 	if (twitterDesc) {
-		descs.push(twitterDesc.getAttribute('content'));
+		descs.push(twitterDesc.getAttribute('content'))
 	}
-	return descs;
+	return descs
 }
 
 export { findDescriptions }

@@ -1,253 +1,253 @@
 en:
-  lang: Q1860
-  categories:
-    # showcase lexeme https://www.wikidata.org/wiki/Lexeme:L20554
-    noun:
-      category: Q1084
-      yAxis:
-        sigular:
-          features: ["Q110786"]
-        plural:
-          features: ["Q146786"]
-    verb:
-      # showcase lexeme https://www.wikidata.org/wiki/Lexeme:L27032
-      category: Q24905
-      yAxis:
-        simplePresent:
-          features: ["Q3910936"]
-          hidden: ["Q51929218"]
-        simplePast:
-          features: ["Q1392475"]
-        presentParticiple:
-          features: ["Q10345583"]
-        pastParticiple:
-          features: ["Q1230649"]
-      affixes:
-        - features: ["Q3910936", "Q51929218"]
-          prefix: "I, you, they "
-        - features: ["Q3910936", "Q51929447"]
-          prefix: "he, she, it "
-    adjective:
-      # showcase lexeme https://www.wikidata.org/wiki/Lexeme:L3413
-      category: Q34698
-      yAxis:
-        positive:
-          features: ["Q3482678"]
-          hidden: ["Q1931259"]
-        comperative:
-          features: ["Q14169499"]
-        superlative:
-          features: ["Q1817208"]
+	lang: Q1860
+	categories:
+		# showcase lexeme https://www.wikidata.org/wiki/Lexeme:L20554
+		noun:
+			category: Q1084
+			yAxis:
+				sigular:
+					features: ["Q110786"]
+				plural:
+					features: ["Q146786"]
+		verb:
+			# showcase lexeme https://www.wikidata.org/wiki/Lexeme:L27032
+			category: Q24905
+			yAxis:
+				simplePresent:
+					features: ["Q3910936"]
+					hidden: ["Q51929218"]
+				simplePast:
+					features: ["Q1392475"]
+				presentParticiple:
+					features: ["Q10345583"]
+				pastParticiple:
+					features: ["Q1230649"]
+			affixes:
+				- features: ["Q3910936", "Q51929218"]
+					prefix: "I, you, they "
+				- features: ["Q3910936", "Q51929447"]
+					prefix: "he, she, it "
+		adjective:
+			# showcase lexeme https://www.wikidata.org/wiki/Lexeme:L3413
+			category: Q34698
+			yAxis:
+				positive:
+					features: ["Q3482678"]
+					hidden: ["Q1931259"]
+				comperative:
+					features: ["Q14169499"]
+				superlative:
+					features: ["Q1817208"]
 de:
-  lang: Q188
-  categories:
-    nounMale: &nounMale
-      # showcase lexeme https://www.wikidata.org/wiki/Lexeme:L401933
-      # multiple variations https://www.wikidata.org/wiki/Lexeme:L34727
-      category: Q1084
-      gender: Q499327
-      xAxis:
-        singular:
-          features: ["Q110786"]
-        plural:
-          features: ["Q146786"]
-      yAxis:
-        nominative:
-          features: ["Q131105"]
-        genitive:
-          features: ["Q146233"]
-        dative:
-          features: ["Q145599"]
-        accusative:
-          features: ["Q146078"]
-      affixes:
-        - features: ["Q131105", "Q110786"]
-          prefix: "der "
-        - features: ["Q131105", "Q146786"]
-          prefix: "die "
-        - features: ["Q146233", "Q110786"]
-          prefix: "des "
-        - features: ["Q146233", "Q146786"]
-          prefix: "der "
-        - features: ["Q145599", "Q110786"]
-          prefix: "dem "
-        - features: ["Q145599", "Q146786"]
-          prefix: "den "
-        - features: ["Q146078", "Q110786"]
-          prefix: "den "
-        - features: ["Q146078", "Q146786"]
-          prefix: "die "
-    nounFemale:
-      <<: *nounMale
-      # showcase lexeme: https://www.wikidata.org/wiki/Lexeme:L626083
-      gender: Q1775415
-      affixes:
-        - features: ["Q131105", "Q110786"]
-          prefix: "die "
-        - features: ["Q131105", "Q146786"]
-          prefix: "die "
-        - features: ["Q146233", "Q110786"]
-          prefix: "der "
-        - features: ["Q146233", "Q146786"]
-          prefix: "der "
-        - features: ["Q145599", "Q110786"]
-          prefix: "der "
-        - features: ["Q145599", "Q146786"]
-          prefix: "den "
-        - features: ["Q146078", "Q110786"]
-          prefix: "die "
-        - features: ["Q146078", "Q146786"]
-          prefix: "die "
-    nounNeuter:
-      # showcase lexeme: https://www.wikidata.org/wiki/Lexeme:L2957
-      <<: *nounMale
-      gender: Q1775461
-      affixes:
-        - features: ["Q131105", "Q110786"]
-          prefix: "das "
-        - features: ["Q131105", "Q146786"]
-          prefix: "die "
-        - features: ["Q146233", "Q110786"]
-          prefix: "des "
-        - features: ["Q146233", "Q146786"]
-          prefix: "der "
-        - features: ["Q145599", "Q110786"]
-          prefix: "dem "
-        - features: ["Q145599", "Q146786"]
-          prefix: "den "
-        - features: ["Q146078", "Q110786"]
-          prefix: "das "
-        - features: ["Q146078", "Q146786"]
-          prefix: "die "
-    verb:
-      category: Q24905
-      # showcase lexeme: https://www.wikidata.org/wiki/Lexeme:L517093
-      yAxis:
-        firstPerson:
-          features: ["Q110786", "Q21714344", "Q192613", "Q682111"]
-          hidden: &hiddenLabels
-            - "Q110786"
-            - "Q21714344"
-            - "Q682111"
-            - "Q51929074"
-            - "Q51929049"
-            - "Q146786"
-        secondPerson:
-          features: ["Q110786", "Q51929049", "Q192613", "Q682111"]
-          hidden: *hiddenLabels
-        thirdPerson:
-          features: ["Q51929074", "Q192613", "Q682111", "Q110786"]
-          hidden: *hiddenLabels
-        firstPersonPreterite:
-          features: ["Q21714344", "Q442485", "Q682111", "Q110786"]
-          hidden: *hiddenLabels
-        firstPersonSecondPreterite:
-          features: ["Q3502544", "Q442485", "Q110786", "Q21714344"]
-          hidden:
-            - "Q110786"
-            - "Q21714344"
-            - "Q682111"
-            - "Q51929074"
-            - "Q51929049"
-            - "Q146786"
-            - "Q442485"
-        imperativeSingular:
-          features: ["Q22716", "Q110786"]
-          hidden: *hiddenLabels
-        imperativePlural:
-          features: ["Q22716", "Q146786"]
-          hidden: *hiddenLabels
-        pastParticiple:
-          features: ["Q12717679"]
-      affixes:
-        - features: ["Q110786", "Q21714344", "Q192613", "Q682111"]
-          prefix: "ich "
-        - features: ["Q110786", "Q51929049", "Q192613", "Q682111"]
-          prefix: "du "
-        - features: ["Q51929074", "Q192613", "Q682111", "Q110786"]
-          prefix: "er, sie, es "
-        - features: ["Q21714344", "Q442485", "Q682111", "Q110786"]
-          prefix: "ich "
-        - features: ["Q3502544", "Q442485", "Q110786", "Q21714344"]
-          prefix: "ich "
-        - features: ["Q22716", "Q110786"]
-          prefix: "du, "
-          suffix: "!"
-        - features: ["Q22716", "Q146786"]
-          prefix: "ihr, "
-          suffix: "!"
-        - features: ["Q12717679"]
-          suffix: " [auxVerb]"
-    adjective:
-      category: Q34698
-      # showcase lexeme https://www.wikidata.org/wiki/Lexeme:L623620
-      yAxis:
-        positive:
-          features: ["Q3482678"]
-          hidden: ["Q1931259"]
-        comperative:
-          features: ["Q577714"]
-        superlative:
-          features: ["Q5483481"]
-      affixes:
-        - features: ["Q5483481"]
-          prefix: "am "
+	lang: Q188
+	categories:
+		nounMale: &nounMale
+			# showcase lexeme https://www.wikidata.org/wiki/Lexeme:L401933
+			# multiple variations https://www.wikidata.org/wiki/Lexeme:L34727
+			category: Q1084
+			gender: Q499327
+			xAxis:
+				singular:
+					features: ["Q110786"]
+				plural:
+					features: ["Q146786"]
+			yAxis:
+				nominative:
+					features: ["Q131105"]
+				genitive:
+					features: ["Q146233"]
+				dative:
+					features: ["Q145599"]
+				accusative:
+					features: ["Q146078"]
+			affixes:
+				- features: ["Q131105", "Q110786"]
+					prefix: "der "
+				- features: ["Q131105", "Q146786"]
+					prefix: "die "
+				- features: ["Q146233", "Q110786"]
+					prefix: "des "
+				- features: ["Q146233", "Q146786"]
+					prefix: "der "
+				- features: ["Q145599", "Q110786"]
+					prefix: "dem "
+				- features: ["Q145599", "Q146786"]
+					prefix: "den "
+				- features: ["Q146078", "Q110786"]
+					prefix: "den "
+				- features: ["Q146078", "Q146786"]
+					prefix: "die "
+		nounFemale:
+			<<: *nounMale
+			# showcase lexeme: https://www.wikidata.org/wiki/Lexeme:L626083
+			gender: Q1775415
+			affixes:
+				- features: ["Q131105", "Q110786"]
+					prefix: "die "
+				- features: ["Q131105", "Q146786"]
+					prefix: "die "
+				- features: ["Q146233", "Q110786"]
+					prefix: "der "
+				- features: ["Q146233", "Q146786"]
+					prefix: "der "
+				- features: ["Q145599", "Q110786"]
+					prefix: "der "
+				- features: ["Q145599", "Q146786"]
+					prefix: "den "
+				- features: ["Q146078", "Q110786"]
+					prefix: "die "
+				- features: ["Q146078", "Q146786"]
+					prefix: "die "
+		nounNeuter:
+			# showcase lexeme: https://www.wikidata.org/wiki/Lexeme:L2957
+			<<: *nounMale
+			gender: Q1775461
+			affixes:
+				- features: ["Q131105", "Q110786"]
+					prefix: "das "
+				- features: ["Q131105", "Q146786"]
+					prefix: "die "
+				- features: ["Q146233", "Q110786"]
+					prefix: "des "
+				- features: ["Q146233", "Q146786"]
+					prefix: "der "
+				- features: ["Q145599", "Q110786"]
+					prefix: "dem "
+				- features: ["Q145599", "Q146786"]
+					prefix: "den "
+				- features: ["Q146078", "Q110786"]
+					prefix: "das "
+				- features: ["Q146078", "Q146786"]
+					prefix: "die "
+		verb:
+			category: Q24905
+			# showcase lexeme: https://www.wikidata.org/wiki/Lexeme:L517093
+			yAxis:
+				firstPerson:
+					features: ["Q110786", "Q21714344", "Q192613", "Q682111"]
+					hidden: &hiddenLabels
+						- "Q110786"
+						- "Q21714344"
+						- "Q682111"
+						- "Q51929074"
+						- "Q51929049"
+						- "Q146786"
+				secondPerson:
+					features: ["Q110786", "Q51929049", "Q192613", "Q682111"]
+					hidden: *hiddenLabels
+				thirdPerson:
+					features: ["Q51929074", "Q192613", "Q682111", "Q110786"]
+					hidden: *hiddenLabels
+				firstPersonPreterite:
+					features: ["Q21714344", "Q442485", "Q682111", "Q110786"]
+					hidden: *hiddenLabels
+				firstPersonSecondPreterite:
+					features: ["Q3502544", "Q442485", "Q110786", "Q21714344"]
+					hidden:
+						- "Q110786"
+						- "Q21714344"
+						- "Q682111"
+						- "Q51929074"
+						- "Q51929049"
+						- "Q146786"
+						- "Q442485"
+				imperativeSingular:
+					features: ["Q22716", "Q110786"]
+					hidden: *hiddenLabels
+				imperativePlural:
+					features: ["Q22716", "Q146786"]
+					hidden: *hiddenLabels
+				pastParticiple:
+					features: ["Q12717679"]
+			affixes:
+				- features: ["Q110786", "Q21714344", "Q192613", "Q682111"]
+					prefix: "ich "
+				- features: ["Q110786", "Q51929049", "Q192613", "Q682111"]
+					prefix: "du "
+				- features: ["Q51929074", "Q192613", "Q682111", "Q110786"]
+					prefix: "er, sie, es "
+				- features: ["Q21714344", "Q442485", "Q682111", "Q110786"]
+					prefix: "ich "
+				- features: ["Q3502544", "Q442485", "Q110786", "Q21714344"]
+					prefix: "ich "
+				- features: ["Q22716", "Q110786"]
+					prefix: "du, "
+					suffix: "!"
+				- features: ["Q22716", "Q146786"]
+					prefix: "ihr, "
+					suffix: "!"
+				- features: ["Q12717679"]
+					suffix: " [auxVerb]"
+		adjective:
+			category: Q34698
+			# showcase lexeme https://www.wikidata.org/wiki/Lexeme:L623620
+			yAxis:
+				positive:
+					features: ["Q3482678"]
+					hidden: ["Q1931259"]
+				comperative:
+					features: ["Q577714"]
+				superlative:
+					features: ["Q5483481"]
+			affixes:
+				- features: ["Q5483481"]
+					prefix: "am "
 ru:
-  lang: Q7737
-  categories:
-    noun:
-      category: Q1084
-      # showcase lexeme https://www.wikidata.org/wiki/Lexeme:L18775
-      xAxis:
-        singular:
-          features: ["Q110786"]
-        plural:
-          features: ["Q146786"]
-      yAxis:
-        nominative:
-          features: ["Q131105"]
-        genitive:
-          features: ["Q146233"]
-        dative:
-          features: ["Q145599"]
-        accusative:
-          features: ["Q146078"]
-        instrumental:
-          features: ["Q192997"]
-        prepositional:
-          features: ["Q2114906"]
+	lang: Q7737
+	categories:
+		noun:
+			category: Q1084
+			# showcase lexeme https://www.wikidata.org/wiki/Lexeme:L18775
+			xAxis:
+				singular:
+					features: ["Q110786"]
+				plural:
+					features: ["Q146786"]
+			yAxis:
+				nominative:
+					features: ["Q131105"]
+				genitive:
+					features: ["Q146233"]
+				dative:
+					features: ["Q145599"]
+				accusative:
+					features: ["Q146078"]
+				instrumental:
+					features: ["Q192997"]
+				prepositional:
+					features: ["Q2114906"]
 eo:
-  lang: Q143
-  categories:
-    noun:
-      category: Q1084
-      # showcase lexeme https://www.wikidata.org/wiki/Lexeme:L31197
-      xAxis:
-        singular:
-          features: ["Q110786"]
-        plural:
-          features: ["Q146786"]
-      yAxis:
-        nominative:
-          features: ["Q131105"]
-        accusative:
-          features: ["Q146078"]
+	lang: Q143
+	categories:
+		noun:
+			category: Q1084
+			# showcase lexeme https://www.wikidata.org/wiki/Lexeme:L31197
+			xAxis:
+				singular:
+					features: ["Q110786"]
+				plural:
+					features: ["Q146786"]
+			yAxis:
+				nominative:
+					features: ["Q131105"]
+				accusative:
+					features: ["Q146078"]
 ja:
-  lang: Q5287
-  categories:
-    verb:
-      category: Q24905
-      # showcase lexeme https://www.wikidata.org/wiki/Lexeme:L829
-      yAxis:
-        imperfective:
-          features: ["Q2898727"]
-        continuative:
-          features: ["Q2888577"]
-        attributive:
-          features: ["Q53608953"]
-        negative:
-          features: ["Q15737187"]
-        hypothetical:
-          features: ["Q53609593"]
-        imperative:
-          features: ["Q4348304"]
+	lang: Q5287
+	categories:
+		verb:
+			category: Q24905
+			# showcase lexeme https://www.wikidata.org/wiki/Lexeme:L829
+			yAxis:
+				imperfective:
+					features: ["Q2898727"]
+				continuative:
+					features: ["Q2888577"]
+				attributive:
+					features: ["Q53608953"]
+				negative:
+					features: ["Q15737187"]
+				hypothetical:
+					features: ["Q53609593"]
+				imperative:
+					features: ["Q4348304"]

@@ -9,6 +9,6 @@ async function getAllProperties() {
 					BIND (STRAFTER(STR(?prop), 'P') AS ?pid ).
 		}
 		ORDER BY ASC(xsd:integer(STRAFTER(STR(?prop), 'P')))
-	`;
-	return sparqlQuery(query);
+	`
+	return sparqlQuery(query)
 }

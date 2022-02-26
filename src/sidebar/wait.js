@@ -1,3 +1,3 @@
-import { templates } from './components/templates.tpl.js';
+import { templates } from './components/templates.tpl.js'
 
-document.body.appendChild(templates.bouncer());
+document.body.appendChild(templates.bouncer())

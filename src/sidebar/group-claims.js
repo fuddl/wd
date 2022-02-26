@@ -126,15 +126,15 @@ function groupClaims(claims) {
 				'P3828',	// wears
 			]
 		},
-	];
+	]
 
 
-	let sorted = [];
-	let remaining = [];
+	let sorted = []
+	let remaining = []
 	for (let group of groups) {
 		for (let prop of group.properties) {
 			if (claims.hasOwnProperty(prop)) {
-				sorted.push(prop);
+				sorted.push(prop)
 			}
 		}
 	}
@@ -142,32 +142,32 @@ function groupClaims(claims) {
 	let sortLabels = function (a, b) {
 		if (typeof cache != 'undefined' && 'labels' in cache) {
 			if (a in cache.labels && b in cache.labels) {
-				return cache.labels[a].toUpperCase() > cache.labels[b].toUpperCase();
+				return cache.labels[a].toUpperCase() > cache.labels[b].toUpperCase()
 			} else if (a in cache.labels) {
-				return -1;
+				return -1
 			} else if (b in cache.labels) {
-				return 1;
+				return 1
 			} else {
-				return 2;
+				return 2
 			}
 		} else {
-			return 0;
+			return 0
 		}
 	}
 
 	for (let prop of Object.keys(claims).sort(sortLabels)) {
-		if (!sorted.includes(prop) && claims[prop][0].mainsnak.datatype !== "external-id") {
-			remaining.push(prop);
+		if (!sorted.includes(prop) && claims[prop][0].mainsnak.datatype !== 'external-id') {
+			remaining.push(prop)
 		}
 	}
 
 	for (let prop of Object.keys(claims).sort(sortLabels)) {
-		if (claims[prop][0].mainsnak.datatype === "external-id") {
-			remaining.push(prop);
+		if (claims[prop][0].mainsnak.datatype === 'external-id') {
+			remaining.push(prop)
 		}
 	}
 
-	return sorted.concat(remaining);
+	return sorted.concat(remaining)
 }
 
 export { groupClaims }

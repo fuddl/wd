@@ -1,143 +1,143 @@
-import { sparqlQuery } from "../sqarql-query.js";
-import { makeLanguageValid } from '../get-valid-string-languages.js';
+import { sparqlQuery } from '../sqarql-query.js'
+import { makeLanguageValid } from '../get-valid-string-languages.js'
 
 function convertHTMLentities(string) {
 	return string
-		.replace(/&apos;/gm, "'")
+		.replace(/&apos;/gm, '\'')
 		.replace(/&quot;/gm, '"')
 		.replace(/&lt;/gm, '<')
 		.replace(/&gt;/gm, '>')
 		.replace(/&amp;/gm, '&')
 }
 
-const ratingProps = ['ratingCount', 'ratingValue'];
+const ratingProps = ['ratingCount', 'ratingValue']
 
 function makeRating(props) {
-	const best = props?.bestRating ? parseFloat(props.bestRating) : 5;
-	const worst = props?.worstRating ? parseFloat(props.worstRating) : 1;
-	const value = props.ratingValue;
-	return `${props.ratingValue}/${best}`;
+	const best = props?.bestRating ? parseFloat(props.bestRating) : 5
+	const worst = props?.worstRating ? parseFloat(props.worstRating) : 1
+	const value = props.ratingValue
+	return `${props.ratingValue}/${best}`
 }
 
 function durationToQuantity(data) {
-	let h, m, s;
-	const hMatch = data.match(/(\d+)H/);
+	let h, m, s
+	const hMatch = data.match(/(\d+)H/)
 	if (hMatch) {
-		h = parseInt(hMatch[1]);
+		h = parseInt(hMatch[1])
 	}
-	const mMatch = data.match(/(\d+)M/);
+	const mMatch = data.match(/(\d+)M/)
 	if (mMatch) {
-		m = parseInt(mMatch[1]);
+		m = parseInt(mMatch[1])
 	}
-	const sMatch = data.match(/(\d+)S/);
+	const sMatch = data.match(/(\d+)S/)
 	if (sMatch) {
-		s = parseInt(sMatch[1]);
+		s = parseInt(sMatch[1])
 	}
 	if (s) {
 		if (m) {
-			s = s + m * 60;
+			s = s + m * 60
 		}
 		if (h) {
-			s = s + h * 3600;
+			s = s + h * 3600
 		}
 		return {
 			amount: `+${s}`,
-			unit: "http://www.wikidata.org/entity/Q11574",
-		};
+			unit: 'http://www.wikidata.org/entity/Q11574',
+		}
 	} else if (m) {
 		if (h) {
-			m = m + h * 60;
+			m = m + h * 60
 		}
 		return {
 			amount: `+${m}`,
-			unit: "http://www.wikidata.org/entity/Q7727",
-		};
+			unit: 'http://www.wikidata.org/entity/Q7727',
+		}
 	} else if (h) {
 		return {
 			amount: `+${h}`,
-			unit: "http://www.wikidata.org/entity/Q25235",
+			unit: 'http://www.wikidata.org/entity/Q25235',
 		}
 	}
-	return false;
+	return false
 }
 
 function makeTypeAbsolute(data) {
 	if (data.hasOwnProperty('@type')) {
-		let type = data['@type'];
+		let type = data['@type']
 		if (typeof data['@type'] === 'string' ) {
 			if (data['@type'].match(/^https?:\/\/./)) {
 				// seems to be a full url so its fine
-				return data;
+				return data
 			} else {
 				// data seems to be mission context
 				if (data.hasOwnProperty('@context')) {
 					// so lets apply context
-					data['@type'] = `${data['@context']}/${data['@type']}`;
+					data['@type'] = `${data['@context']}/${data['@type']}`
 				} else {
 					// there is no context and the type has a relative url.
 					// lets assume schema.org is used.
-					data['@type'] = `https://schema.org/${data['@type']}`;
+					data['@type'] = `https://schema.org/${data['@type']}`
 				}
-				return data;
+				return data
 			}
 		}
 	}
 }
 
 function makeReferences(source) {
-	let references = [];
+	let references = []
 	if (source?.url) {
 		references.push(
 			{
-				"snaktype": "value",
-				"property": "P854",
-				"datavalue": {
-					"value": source.url,
-					"type": "string"
+				'snaktype': 'value',
+				'property': 'P854',
+				'datavalue': {
+					'value': source.url,
+					'type': 'string'
 				},
-				"datatype": "url"
+				'datatype': 'url'
 			}
 		)
 		if (source?.title && source?.lang) {
 			references.push(
 				{
-					"snaktype": "value",
-					"property": "P1476",
-					"datavalue": {
-						"value": {
+					'snaktype': 'value',
+					'property': 'P1476',
+					'datavalue': {
+						'value': {
 							text: source.title,
 							language: source.lang,
 						},
-						"type": "monolingualtext"
+						'type': 'monolingualtext'
 					},
-					"datatype": "string"
+					'datatype': 'string'
 				}
 			)
 		}
 	}
-	let now = new Date();
+	let now = new Date()
 	references.push({
-		"snaktype": "value",
-		"property": "P813",
-		"datavalue": {
-			"type": "time",
-			"value": {
-				"after": 0,
-				"before": 0,
-				"calendarmodel": "http://www.wikidata.org/entity/Q1985727",
-				"precision": 11,
-				"time": `+${ now.toISOString().substr(0,10) }T00:00:00Z`,
-				"timezone": 0
+		'snaktype': 'value',
+		'property': 'P813',
+		'datavalue': {
+			'type': 'time',
+			'value': {
+				'after': 0,
+				'before': 0,
+				'calendarmodel': 'http://www.wikidata.org/entity/Q1985727',
+				'precision': 11,
+				'time': `+${ now.toISOString().substr(0,10) }T00:00:00Z`,
+				'timezone': 0
 			}
 		}
-	});
-	return [references];
+	})
+	return [references]
 }
 
 async function makeJobs (connections, source) {
 	for (const i in connections) {
-		if (connections[i].value.type === "Monolingualtext") {
-			connections[i].jobs = [];
+		if (connections[i].value.type === 'Monolingualtext') {
+			connections[i].jobs = []
 			for (const ii in connections[i].prop) {
 				connections[i].jobs.push({
 					label: connections[i].prop[ii],
@@ -150,11 +150,11 @@ async function makeJobs (connections, source) {
 						},
 						references: makeReferences(source),
 					}
-			  });
+			  })
 			}
 		}
-		if (connections[i].value.type === "String" || connections[i].value.type === "Quantity") {
-			connections[i].jobs = [];
+		if (connections[i].value.type === 'String' || connections[i].value.type === 'Quantity') {
+			connections[i].jobs = []
 			for (const ii in connections[i].prop) {
 				connections[i].jobs.push({
 					label: connections[i].prop[ii],
@@ -165,11 +165,11 @@ async function makeJobs (connections, source) {
 						references: makeReferences(source),
 						qualifiers: connections[i].value?.qualifiers ? connections[i].value.qualifiers : null,
 					}
-			  });
+			  })
 			}
 		}
-		if (connections[i].value.type === "WikibaseItem") {
-			connections[i].jobs = [];
+		if (connections[i].value.type === 'WikibaseItem') {
+			connections[i].jobs = []
 			for (const ii in connections[i].prop) {
 				connections[i].jobs.push({
 					label: connections[i].prop[ii],
@@ -177,18 +177,18 @@ async function makeJobs (connections, source) {
 						type: 'set_claim',
 						verb: connections[i].prop[ii],
 						object: {
-							'entity-type': "item",
+							'entity-type': 'item',
 							'numeric-id': connections[i].value.value.replace(/^Q/, ''),
 						},
 						references: makeReferences(source),
 					}
-			  });
+			  })
 			}
 		}
-		if (connections[i].value.type === "Time") {
-			connections[i].jobs = [];
-			let dayPreciseDate = connections[i].value.value.substr(0, 10);
-			let now = new Date();
+		if (connections[i].value.type === 'Time') {
+			connections[i].jobs = []
+			let dayPreciseDate = connections[i].value.value.substr(0, 10)
+			let now = new Date()
 			for (const ii in connections[i].prop) {
 				connections[i].jobs.push({
 					label: connections[i].prop[ii],
@@ -196,16 +196,16 @@ async function makeJobs (connections, source) {
 						type: 'set_claim',
 						verb: connections[i].prop[ii],
 						object: {
-							"after": 0,
-							"before": 0,
-							"calendarmodel": "http://www.wikidata.org/entity/Q1985727",
-							"precision": 11,
-							"time": `+${dayPreciseDate}T00:00:00Z`,
-							"timezone": 0,
+							'after': 0,
+							'before': 0,
+							'calendarmodel': 'http://www.wikidata.org/entity/Q1985727',
+							'precision': 11,
+							'time': `+${dayPreciseDate}T00:00:00Z`,
+							'timezone': 0,
 						},
 						references: makeReferences(source),
 					}
-			  });
+			  })
 			}
 		}
 	}
@@ -214,11 +214,11 @@ async function makeJobs (connections, source) {
 
 async function findMatchingClass(data) {
 	if (!data.hasOwnProperty('@type')) {
-		return false;
+		return false
 	} else {
-		data = makeTypeAbsolute(data);
+		data = makeTypeAbsolute(data)
 		if (!data) {
-			return false;
+			return false
 		}
 		let query = `
 			SELECT ?item WHERE {
@@ -228,12 +228,12 @@ async function findMatchingClass(data) {
 					?item wdt:P1709 <${ data['@type'].replace(/^http\:/, 'https:') }>;
 				}
 			}
-		`;
-		let entity = await sparqlQuery(query);
+		`
+		let entity = await sparqlQuery(query)
 		if (entity[0]) {
-			return entity[0].item.value.match(/https?:\/\/www\.wikidata\.org\/entity\/(Q\d+)/)[1];
+			return entity[0].item.value.match(/https?:\/\/www\.wikidata\.org\/entity\/(Q\d+)/)[1]
 		} else {
-			return false;
+			return false
 		}
 	}
 }
@@ -256,20 +256,20 @@ async function findMatchingProp(prop, type, namespace) {
 			BIND (replace(str(?item), 'http://www.wikidata.org/entity/', '') AS ?prop)
 		  BIND (IF(?rank = wikibase:PreferredRank, 1, IF(?rank = wikibase:NormalRank, 2, 3)) as ?order) 
 		} ORDER BY ?order
-	`;
-	let result = await sparqlQuery(query);
+	`
+	let result = await sparqlQuery(query)
 	if (result.length > 0) {
 		return result.map((i) => { return i.prop.value })
 	} else {
-		return false;
+		return false
 	}
 }
 
 function isSameAsWdEntity(thing) {
 	if (thing.hasOwnProperty('sameAs')) {
-		let qid = thing.sameAs.match(/^https?:\/\/www\.wikidata\.org\/wiki\/(Q\d+)/);
+		let qid = thing.sameAs.match(/^https?:\/\/www\.wikidata\.org\/wiki\/(Q\d+)/)
 		if (qid && qid.length > 0) {
-			return qid[1];
+			return qid[1]
 		}
 	} else {
 		return false
@@ -278,19 +278,19 @@ function isSameAsWdEntity(thing) {
 
 async function findConnections(thing, source) {
 	if (!thing.hasOwnProperty('@context')) {
-		return [];
+		return []
 	}
-	let namespace = thing['@context'];
-	let connections = [];
-	let values = [];
+	let namespace = thing['@context']
+	let connections = []
+	let values = []
 	for (let prop in thing) {
 		if (prop.startsWith('@')) {
-			continue;
+			continue
 		}
 		if (Array.isArray(thing[prop])) {
 			for (let i in thing[prop]) {
 				if (typeof thing[prop][i] === 'object' && thing[prop][i].hasOwnProperty('@type')) {
-					let qid = isSameAsWdEntity(thing[prop][i]);
+					let qid = isSameAsWdEntity(thing[prop][i])
 					if (qid) {
 						values.push({
 							type: 'WikibaseItem',
@@ -301,7 +301,7 @@ async function findConnections(thing, source) {
 				}
 			}
 		} else if (typeof thing[prop] === 'object' && thing[prop].hasOwnProperty('@type')) {
-			let qid = isSameAsWdEntity(thing[prop]);
+			let qid = isSameAsWdEntity(thing[prop])
 			if (qid) {
 				values.push({
 					type: 'WikibaseItem',
@@ -337,7 +337,7 @@ async function findConnections(thing, source) {
 			}
 		}
 		if (prop === 'aggregateRating' && ratingProps.every(v => { return thing[prop].hasOwnProperty(v)})) {
-			let now = new Date();
+			let now = new Date()
 			values.push({
 				type: 'String',
 				value: makeRating(thing[prop]),
@@ -346,15 +346,15 @@ async function findConnections(thing, source) {
 					property: 'P7887',
 					value: {
 						amount: `+${thing[prop].ratingCount}`,
-						unit: "http://www.wikidata.org/entity/Q20058247",
+						unit: 'http://www.wikidata.org/entity/Q20058247',
 					},
 				},
 				{
-					property: "P585",
+					property: 'P585',
 					value: {
 						after: 0,
 						before: 0,
-						calendarmodel: "http://www.wikidata.org/entity/Q1985727",
+						calendarmodel: 'http://www.wikidata.org/entity/Q1985727',
 						precision: 11,
 						time: `+${ now.toISOString().substr(0,10) }T00:00:00Z`,
 						timezone: 0,
@@ -365,17 +365,17 @@ async function findConnections(thing, source) {
 	}
 	if (values.length > 0) {
 		for (let value of values) {
-			let property = await findMatchingProp(value.prop, value.type, namespace);
+			let property = await findMatchingProp(value.prop, value.type, namespace)
 			if (property) {
 				connections.push({
 					prop: property,
 					value: value,
-				});
+				})
 			}
 		}
 	}
 
-	return await makeJobs(connections, source);
+	return await makeJobs(connections, source)
 }
 
 export { findMatchingClass, findConnections, makeReferences }

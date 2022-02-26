@@ -1,4 +1,4 @@
-import { sparqlQuery } from '../sqarql-query.js';
+import { sparqlQuery } from '../sqarql-query.js'
 
 async function getRelatedItems(item) {
 	let query = `
@@ -17,8 +17,8 @@ async function getRelatedItems(item) {
 			hint:Query hint:optimizer "None".
 			INCLUDE %test
 		} ORDER BY ASC(?prop) LIMIT 100
-	`;
-	return sparqlQuery(query);
+	`
+	return sparqlQuery(query)
 }
 
 export { getRelatedItems }

@@ -6,16 +6,18 @@ env:
 extends:
     - plugin:react-hooks/recommended
 rules:
-  quotes: 0
+  quotes: [2, "single"]
   no-trailing-spaces: 0
   eol-last: 2
   no-unused-vars: 0
   no-underscore-dangle: 0
   no-alert: 0
   no-lone-blocks: 0
+  semi: [2, "never"]
   indent:
-    - error
-    - tab
+    - 'error'
+    - 'tab'
     - SwitchCase: 1
 parserOptions:
   ecmaVersion: 2020
+  sourceType: module
