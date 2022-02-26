@@ -1,6 +1,6 @@
-import { templates } from './components/templates.tpl.js';
-import { makeReferences } from './ld-map-wd.js';
-import { usefullMetatags } from '../content/content__collect-meta.js';
+import { templates } from './components/templates.tpl.js'
+import { makeReferences } from './ld-map-wd.js'
+import { usefullMetatags } from '../content/content__collect-meta.js'
 
 async function metaToStatements(meta, propform, source, existing) {
 	let comment = templates.smallBlock(
@@ -10,49 +10,49 @@ async function metaToStatements(meta, propform, source, existing) {
 				templates.urlLink(source.url),
 			]
 		)
-	);
+	)
 
 	for (let k in meta) {
-		let type = usefullMetatags.find(v => v.name === k.split('|')[0]);
-		let check = document.createElement('input');
-		check.setAttribute('name', `meta-${k}`);
+		let type = usefullMetatags.find(v => v.name === k.split('|')[0])
+		let check = document.createElement('input')
+		check.setAttribute('name', `meta-${k}`)
 		let job = {
 			type: 'set_claim',
 			...meta[k],
 			references: makeReferences(source),
 		}
 		if (existing.check(job)) {
-			continue;
+			continue
 		}
-		check.setAttribute('type', 'checkbox');
+		check.setAttribute('type', 'checkbox')
 		check.setAttribute('value', JSON.stringify(job))
-		check.checked = type?.suggested;
-		let preview = document.createDocumentFragment();
+		check.checked = type?.suggested
+		let preview = document.createDocumentFragment()
 		switch (type.type) {
 			case 'WikibaseItem':
 				preview = templates.placeholder({
 					entity: `Q${meta[k].object['numeric-id']}`,
-				});
-				break;
+				})
+				break
 			case 'String':
 			case 'ExternalId':
-				preview = templates.code(meta[k].object);
-				break;
+				preview = templates.code(meta[k].object)
+				break
 			case 'Quantity':
 				preview = templates.unitNumber({
 					number: `+${meta[k].object.amount}`,
 					unit: meta[k].object?.unit,
-				});
-				break;
+				})
+				break
 			case 'Monolingualtext':
 				preview = templates.title({
 					text: meta[k].object?.text,
 					lang: meta[k].object?.lang,
-				});
-				break;
+				})
+				break
 			default:
-				console.debug(type.type);
-			continue;
+				console.debug(type.type)
+				continue
 		}
 
 
@@ -68,8 +68,8 @@ async function metaToStatements(meta, propform, source, existing) {
 					comment.cloneNode(true),
 				]),
 			],
-		});
-		propform.appendChild(propertyPreview);
+		})
+		propform.appendChild(propertyPreview)
 	}
 }
 

@@ -1,11 +1,11 @@
-import { templates } from './components/templates.tpl.js';
-import { findMatchingClass, findConnections, makeReferences } from './ld-map-wd.js';
+import { templates } from './components/templates.tpl.js'
+import { findMatchingClass, findConnections, makeReferences } from './ld-map-wd.js'
 
 function uuidv4() {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-    return v.toString(16);
-  });
+	return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+		var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8)
+		return v.toString(16)
+	})
 }
 
 
@@ -19,32 +19,32 @@ async function ldToStatements(ld, propform, source, existing) {
 				templates.urlLink(source.url),
 			]
 		)
-	);
+	)
 
 	for (let d of ld) {
 		if (d.hasOwnProperty('isNeedle') && d.isNeedle) {
-			let matchingClass = await findMatchingClass(d);
+			let matchingClass = await findMatchingClass(d)
 			if (matchingClass) {
 				let job = {
 					type: 'set_claim',
 					verb: 'P31',
 					object: {
-						'entity-type': "item",
+						'entity-type': 'item',
 						'numeric-id': matchingClass.match(/Q(\d+)/)[1],
 					},
 					references: makeReferences(source),
 				}
 				
 				// if the job already exists, we head straigt to the next
-				existing.check(job);
+				existing.check(job)
 
-				let check = document.createElement('input');
-				check.setAttribute('name', uuidv4());
+				let check = document.createElement('input')
+				check.setAttribute('name', uuidv4())
 				check.setAttribute('type', 'checkbox')
 				check.setAttribute('value', JSON.stringify(job))
 				
 				// since these tend to be wrong or unprecise
-				check.checked = false;
+				check.checked = false
 
 				let instanceOfPreview = templates.remark({
 					sortKey: 'P31',
@@ -60,67 +60,67 @@ async function ldToStatements(ld, propform, source, existing) {
 							comment.cloneNode(true),
 						]),
 					],
-				});
-				propform.appendChild(instanceOfPreview);
+				})
+				propform.appendChild(instanceOfPreview)
 			}
-			let connections = await findConnections(d, source);
+			let connections = await findConnections(d, source)
 			for (let connection of connections) {
 				if (connection.jobs) {
-					let check, label, select;
+					let check, label, select
 
 					if (connection.jobs.length === 1) {
 						if (existing.check(connection.jobs[0].instructions)) {
-							continue;
+							continue
 						}
-						check = document.createElement('input');
+						check = document.createElement('input')
 						label = templates.placeholder({
 							entity: connection.jobs[0].label,
-						});
-						check.setAttribute('type', 'checkbox');
-						check.setAttribute('name', uuidv4());
-						check.setAttribute('value', JSON.stringify(connection.jobs[0].instructions));
-						check.checked = true;
+						})
+						check.setAttribute('type', 'checkbox')
+						check.setAttribute('name', uuidv4())
+						check.setAttribute('value', JSON.stringify(connection.jobs[0].instructions))
+						check.checked = true
 					} else {
-						select = document.createElement('select');
-						select.setAttribute('name', uuidv4());
-						let emptyOption = document.createElement('option');
-						select.appendChild(emptyOption);
+						select = document.createElement('select')
+						select.setAttribute('name', uuidv4())
+						let emptyOption = document.createElement('option')
+						select.appendChild(emptyOption)
 						for (let job of connection.jobs) {
 							if (existing.check(job.instructions)) {
-								continue;
+								continue
 							}
 							let option = templates.placeholder({
 								tag: 'option',
 								entity: job.label,
 								type: 'option',
-							});
-							option.setAttribute('value', JSON.stringify(job.instructions));
+							})
+							option.setAttribute('value', JSON.stringify(job.instructions))
 
-							select.appendChild(option);
+							select.appendChild(option)
 						}
 					}
-					let valuePreview;
+					let valuePreview
 					switch (connection?.value?.type) {
 						case 'WikibaseItem':
 							valuePreview = templates.placeholder({
 								entity: connection.value.value,
-							});
-							break;
+							})
+							break
 						case 'Monolingualtext':
-							valuePreview = templates.title({text: connection.value.value});
-							break;
+							valuePreview = templates.title({text: connection.value.value})
+							break
 						case 'String':
-							valuePreview = templates.code(connection.value.value);
-							break;
+							valuePreview = templates.code(connection.value.value)
+							break
 						case 'Time':
-							valuePreview = templates.time({text: document.createTextNode(connection.value.value)});
-							break;
+							valuePreview = templates.time({text: document.createTextNode(connection.value.value)})
+							break
 						case 'Quantity':
 							valuePreview = templates.unitNumber({
 								number: connection.value.value.amount,
 								unit: connection?.value.value?.unit,
-							});
-							break;
+							})
+							break
 					}
 
 					let preview = templates.remark({
@@ -133,8 +133,8 @@ async function ldToStatements(ld, propform, source, existing) {
 								comment.cloneNode(true),
 							]),
 						],
-					});
-					propform.appendChild(preview, propform);					
+					})
+					propform.appendChild(preview, propform)					
 				}
 			}
 		}

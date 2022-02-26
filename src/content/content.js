@@ -1,66 +1,66 @@
-import { collectPageLinks, clearPageLinks, getClosestID, getOldid } from './content__collect-page-links.js';
-import { resolvers } from './resolver.js';
-import { getElementLanguage } from './content__collect-strings.js';
-import { makeLanguageValid } from '../get-valid-string-languages.js';
-import { findTitles } from './pagedata__title.js';
-import { findDescriptions } from './pagedata__description.js';
-import { findLinkedData, enrichLinkedData } from './content__collect-ld.js';
-import { findMetaData, enrichMetaData } from './content__collect-meta.js';
-import { setupSidebar } from "./sidebar"
+import { collectPageLinks, clearPageLinks, getClosestID, getOldid } from './content__collect-page-links.js'
+import { resolvers } from './resolver.js'
+import { getElementLanguage } from './content__collect-strings.js'
+import { makeLanguageValid } from '../get-valid-string-languages.js'
+import { findTitles } from './pagedata__title.js'
+import { findDescriptions } from './pagedata__description.js'
+import { findLinkedData, enrichLinkedData } from './content__collect-ld.js'
+import { findMetaData, enrichMetaData } from './content__collect-meta.js'
+import { setupSidebar } from './sidebar'
 import browser from 'webextension-polyfill'
 
 async function findApplicables(location, openInSidebar = true) {
-    let applicables = [];
+	let applicables = []
 
-	let foundMatch = false;
+	let foundMatch = false
 	for (let id of Object.keys(resolvers)) {
-		let isApplicable = await resolvers[id].applicable(location);
+		let isApplicable = await resolvers[id].applicable(location)
 		if (isApplicable) {
-			let entityId = await resolvers[id].getEntityId(location);
+			let entityId = await resolvers[id].getEntityId(location)
 
 			if (entityId && !foundMatch) {
-				foundMatch = true;
+				foundMatch = true
 				await browser.runtime.sendMessage({
-                    type: 'match_event',
-                    wdEntityId: entityId,
-                    openInSidebar: openInSidebar,
-                    url: location.href,
-                    cache: !resolvers[id].noCache,
-                });
-				return entityId;
+					type: 'match_event',
+					wdEntityId: entityId,
+					openInSidebar: openInSidebar,
+					url: location.href,
+					cache: !resolvers[id].noCache,
+				})
+				return entityId
 			}
-			applicables.push(isApplicable);
+			applicables.push(isApplicable)
 		}
 	}
 	if (applicables.length > 0 && !foundMatch && openInSidebar) {
-        let linkedData = findLinkedData(document)
-        let metaData = findMetaData(document)
+		let linkedData = findLinkedData(document)
+		let metaData = findMetaData(document)
 
-        const url = location.toString();
-		const documentLang =  await makeLanguageValid(document.querySelector('html').lang);
+		const url = location.toString()
+		const documentLang =  await makeLanguageValid(document.querySelector('html').lang)
 		await browser.runtime.sendMessage({
-            type: 'match_proposal',
-            proposals: {
-                ids: applicables,
-                titles: findTitles(),
-                desc: findDescriptions(),
-                ld: await enrichLinkedData(linkedData, applicables[0], window.location.href),
-                meta: await enrichMetaData(metaData, documentLang, window.location.href),
-                source: {
-                    url: url,
-                    title: document.querySelector('title').innerText,
-                    lang: documentLang,
-                }
-            },
-        });
+			type: 'match_proposal',
+			proposals: {
+				ids: applicables,
+				titles: findTitles(),
+				desc: findDescriptions(),
+				ld: await enrichLinkedData(linkedData, applicables[0], window.location.href),
+				meta: await enrichMetaData(metaData, documentLang, window.location.href),
+				source: {
+					url: url,
+					title: document.querySelector('title').innerText,
+					lang: documentLang,
+				}
+			},
+		})
 	}
-	return false;
+	return false
 }
 
 async function main() {
-	const support = await browser.storage.local.get("sidebarActionSupported");
+	const support = await browser.storage.local.get('sidebarActionSupported')
 	if (support.sidebarActionSupported === false) {
-		setupSidebar();
+		setupSidebar()
 	}
 
 	await findApplicables(location)
@@ -78,44 +78,44 @@ async function main() {
 	window.onpopstate = () => findApplicables(window.location)
 
 	window.addEventListener('hashchange', function() {
-		findApplicables(window.location);
-	}, false);
+		findApplicables(window.location)
+	}, false)
 
-    // todo likely redundant in the inline-sidebar case
+	// todo likely redundant in the inline-sidebar case
 	document.addEventListener('focus', function() {
-		findApplicables(window.location);
+		findApplicables(window.location)
 	})
 
-	let head = document.querySelector('head');
+	let head = document.querySelector('head')
 
-	let title = head.querySelector('title').innerText;
+	let title = head.querySelector('title').innerText
 	let titleObserver = new MutationObserver(function() {
-		let newTitle = head.querySelector('title').innerText;
+		let newTitle = head.querySelector('title').innerText
 		if (newTitle !== title) {
-			findApplicables(window.location);
-			title = newTitle;
+			findApplicables(window.location)
+			title = newTitle
 		}
-	});
+	})
 
-	titleObserver.observe(head, { characterData: true });
+	titleObserver.observe(head, { characterData: true })
 
 	document.addEventListener('selectionchange', (e) => {
 		(async () => {
-			let text = document.getSelection().toString().trim();
+			let text = document.getSelection().toString().trim()
 			if (text) {
 
-				let sectionData = getClosestID(document.getSelection().focusNode);
+				let sectionData = getClosestID(document.getSelection().focusNode)
 
-				let hash = sectionData.hash ? '#' + sectionData.hash : '';
+				let hash = sectionData.hash ? '#' + sectionData.hash : ''
 
-				let oldId = getOldid();
+				let oldId = getOldid()
 
-				let search = oldId ? '?oldid=' + oldId : location.search;
+				let search = oldId ? '?oldid=' + oldId : location.search
 
-				let pageTitle = document.title;
-				let pageLanguage = document.querySelector('html').lang;
+				let pageTitle = document.title
+				let pageLanguage = document.querySelector('html').lang
 
-				let url = location.protocol + '//' + location.host + location.pathname + search + hash;
+				let url = location.protocol + '//' + location.host + location.pathname + search + hash
 
 				let message = {
 					type: 'use_in_statement',
@@ -124,16 +124,16 @@ async function main() {
 					valueLang: await makeLanguageValid(getElementLanguage(document.getSelection())),
 					reference: {
 						url: url,
-						section: sectionData.section ? sectionData.section.trim().replace("\n", '␤') : null,
+						section: sectionData.section ? sectionData.section.trim().replace('\n', '␤') : null,
 						title: pageTitle ? pageTitle.trim() : null,
 						language: pageLanguage ? await makeLanguageValid(pageLanguage) : 'und',
 					}
 				}
 
-				await browser.runtime.sendMessage(message);
+				await browser.runtime.sendMessage(message)
 			}
 		})()
-	});
+	})
 }
 
 export { main }

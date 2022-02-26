@@ -4,20 +4,20 @@ import {getFormatterUrls} from './get-formatter-urls.js'
 import {enrichLinkedData, findLinkedData} from '../content/content__collect-ld.js'
 import {ldToStatements} from './ldToStatements.js'
 import {makeLanguageValid} from '../get-valid-string-languages.js'
-import {sparqlQuery} from "../sqarql-query.js"
-import {templates} from "./components/templates.tpl.js"
-import {updateStatus} from "../update-status.js"
-import {findMediaWikiData} from "./mw-data.js"
+import {sparqlQuery} from '../sqarql-query.js'
+import {templates} from './components/templates.tpl.js'
+import {updateStatus} from '../update-status.js'
+import {findMediaWikiData} from './mw-data.js'
 import {enrichMetaData, findMetaData} from '../content/content__collect-meta.js'
 import {metaToStatements} from './metaToStatements.js'
 import {OSMToSatements, wdGetOSMElements} from './osm.js'
-import {URL_match_pattern} from "../content/resolver__url-match-pattern.js"
+import {URL_match_pattern} from '../content/resolver__url-match-pattern.js'
 import browser from 'webextension-polyfill'
 import {PrependNav} from './prepend-nav.js'
-import {Browser} from "../core/browser"
-import {unlockAndWait} from "./sidebar-control"
+import {Browser} from '../core/browser'
+import {unlockAndWait} from './sidebar-control'
 
-PrependNav();
+PrependNav()
 
 async function checkRedirectForIds(url, propform, originalUrl, claims) {
 	let comment = templates.smallBlock(
@@ -29,33 +29,33 @@ async function checkRedirectForIds(url, propform, originalUrl, claims) {
 				templates.urlLink(url),
 			]
 		)
-	);
+	)
 	const location = {
 		href: url
-	};
-	let isApplicable = await URL_match_pattern.applicable(location);
+	}
+	let isApplicable = await URL_match_pattern.applicable(location)
 	if (isApplicable) {
-		let entityId = await URL_match_pattern.getEntityId(location);
+		let entityId = await URL_match_pattern.getEntityId(location)
 		if (!entityId) {
 			let label = templates.placeholder({
 				entity: isApplicable[0].prop,
-			});
+			})
 
 			if (claims.hasOwnProperty(isApplicable[0].prop)) {
-				return false;
+				return false
 			}
 
-			let check = document.createElement('input');
-			check.setAttribute('type', 'checkbox');
-			check.setAttribute('name', isApplicable[0].value);
+			let check = document.createElement('input')
+			check.setAttribute('type', 'checkbox')
+			check.setAttribute('name', isApplicable[0].value)
 			check.setAttribute('value', JSON.stringify({
 				type: 'set_claim',
 				verb: isApplicable[0].prop,
 				object: isApplicable[0].value,
-			}));
+			}))
 
 			// these need to be checked
-			check.checked = false;
+			check.checked = false
 			let preview = templates.remark({
 				sortKey: isApplicable[0].prop,
 				check: check,
@@ -66,30 +66,30 @@ async function checkRedirectForIds(url, propform, originalUrl, claims) {
 						comment,
 					]),
 				],
-			});
-			propform.appendChild(preview);
+			})
+			propform.appendChild(preview)
 		}
 	}
 }
 
-let content = document.getElementById('content');
-let propform = document.createElement('form');
+let content = document.getElementById('content')
+let propform = document.createElement('form')
 
-content.appendChild(propform);
-let numberOfProposals = 0;
+content.appendChild(propform)
+let numberOfProposals = 0
 const observer = new MutationObserver((change) => {
 	if (numberOfProposals < propform.children.length) {
 		[...propform.children]
 		  .sort((a,b) => a.getAttribute('data-sortkey') > b.getAttribute('data-sortkey') ? 1 : -1)
-		  .forEach(node => propform.appendChild(node));
-		 numberOfProposals = propform.children.length;
+		  .forEach(node => propform.appendChild(node))
+		 numberOfProposals = propform.children.length
 	}
-});
-observer.observe(propform, {childList: true});
+})
+observer.observe(propform, {childList: true})
 
-const parser = new DOMParser();
+const parser = new DOMParser()
 
-let visitedUrls = [];
+let visitedUrls = []
 
 async function getAllClasses(instance) {
 	const query = `
@@ -103,183 +103,183 @@ async function getAllClasses(instance) {
 		BIND (replace(str(?class), 'http://www.wikidata.org/entity/', '') AS ?c)
 	}
 	`
-	let classes = await sparqlQuery(query);
-	let output = [];
+	let classes = await sparqlQuery(query)
+	let output = []
 	for(let cl of classes) {
-		output.push(cl.c.value);
+		output.push(cl.c.value)
 	}
-	return output;
+	return output
 }
 
-let bouncer = templates.bouncer();
+let bouncer = templates.bouncer()
 let message = templates.intertitle({
 	icon: {
 		src: 'https://upload.wikimedia.org/wikipedia/commons/a/a5/OpenMoji-color_1F44C.svg',
 		alt: '👌',
 	},
 	text: 'Could not find possible improvements. Add external identifers and try again.',
-});
+})
 
 if (window.location.search) {
-	let currentEntity = window.location.search.match(/^\?(\w\d+)/, '')[1];
+	let currentEntity = window.location.search.match(/^\?(\w\d+)/, '')[1]
 	if (currentEntity.match(/[QMPL]\d+/)) {
 		( async()=> {
 
-			document.body.appendChild(bouncer);
+			document.body.appendChild(bouncer)
 
 			browser.runtime.sendMessage({
 				type: 'lock_sidebar',
-			});
+			})
 
-			const entities = await wikidataGetEntity(currentEntity, false);
+			const entities = await wikidataGetEntity(currentEntity, false)
 
-            updateStatus([
-                'Searching OpenStreetMap for relevant data…',
-            ])
-			let osmElements = await wdGetOSMElements(currentEntity);
+			updateStatus([
+				'Searching OpenStreetMap for relevant data…',
+			])
+			let osmElements = await wdGetOSMElements(currentEntity)
 
 			if (osmElements.length > 0) {
 				for (let element of osmElements) {
 					OSMToSatements(element, propform, {
 						url: element.sourceUrl,
 						title: element.title,
-					});
+					})
 				}
 			}
 
 			for (let id of Object.keys(entities)) {
-				let entity = entities[id];
-				let classes = await getAllClasses(id);
+				let entity = entities[id]
+				let classes = await getAllClasses(id)
 				for(let claim in entity.claims) {
 					if (['url', 'external-id'].includes(entity.claims[claim][0].mainsnak?.datatype) && entity?.claims[claim][0].mainsnak?.datavalue?.value) {
-						let urls = [];
+						let urls = []
 						switch (entity.claims[claim][0].mainsnak.datatype) {
 							case 'external-id':
 							  for (let key in entity.claims[claim]) {
-							  	let moreUrls = await getFormatterUrls(claim, entity.claims[claim][key].mainsnak.datavalue.value);
-									urls = [...urls, ...moreUrls];
+							  	let moreUrls = await getFormatterUrls(claim, entity.claims[claim][key].mainsnak.datavalue.value)
+									urls = [...urls, ...moreUrls]
 							  }
-							  break;
+							  break
 							case 'url':
 								for (let key in entity.claims[claim]) {
 									if(entity.claims[claim][key].mainsnak?.datavalue?.value) {
-										urls.push(entity.claims[claim][key].mainsnak.datavalue.value);
+										urls.push(entity.claims[claim][key].mainsnak.datavalue.value)
 									}
 								}
-								break;
+								break
 						}
 
 						for (let url of urls) {
-                            updateStatus([
-                                'Searching ',
-                                {urlLink: url},
-                                ' for metadata…',
-                            ])
+							updateStatus([
+								'Searching ',
+								{urlLink: url},
+								' for metadata…',
+							])
 							try {
-								let result = await fetch(url);
-								let sourceUrl = result.url;
-								let text = await result.text();
+								let result = await fetch(url)
+								let sourceUrl = result.url
+								let text = await result.text()
 
 								if (result.redirected) {
-									await checkRedirectForIds(result.url, propform, url, entity.claims);
+									await checkRedirectForIds(result.url, propform, url, entity.claims)
 								}
 
 								if (text) {
-									const doc = parser.parseFromString(text, "text/html");
-									let canonical = doc.querySelector('link[rel="canonical"][href]');
+									const doc = parser.parseFromString(text, 'text/html')
+									let canonical = doc.querySelector('link[rel="canonical"][href]')
 									if (canonical) {
-										sourceUrl = canonical.getAttribute('href');
-                                        updateStatus([
-                                            'Searching ',
-                                            {urlLink: sourceUrl},
-                                            ' for metadata…',
-                                        ])
+										sourceUrl = canonical.getAttribute('href')
+										updateStatus([
+											'Searching ',
+											{urlLink: sourceUrl},
+											' for metadata…',
+										])
 									}
 
 									if (!visitedUrls.includes(sourceUrl)) {
-										visitedUrls.push(sourceUrl);
+										visitedUrls.push(sourceUrl)
 
-										let title = doc.querySelector('title');
-										let root = doc.querySelector('html');
-										let rootLang = root.hasAttribute('lang') ? root.getAttribute('lang') : '';
-										let validRootLang = await makeLanguageValid(rootLang);
+										let title = doc.querySelector('title')
+										let root = doc.querySelector('html')
+										let rootLang = root.hasAttribute('lang') ? root.getAttribute('lang') : ''
+										let validRootLang = await makeLanguageValid(rootLang)
 
-										const meta = findMetaData(doc);
+										const meta = findMetaData(doc)
 										if (meta) {
-                                            updateStatus([
-                                                'Found metadata in ',
-                                                {urlLink: url},
-                                                '!',
-                                            ])
-											let enrichedMeta = await enrichMetaData(meta, rootLang, url);
+											updateStatus([
+												'Found metadata in ',
+												{urlLink: url},
+												'!',
+											])
+											let enrichedMeta = await enrichMetaData(meta, rootLang, url)
 											await metaToStatements(enrichedMeta, propform, {
 												url: sourceUrl,
 												title: title ? title.innerText.trim() : null,
 												lang: validRootLang,
-											});
+											})
 										}
 
 
-										const ld = findLinkedData(doc);
+										const ld = findLinkedData(doc)
 										if (ld) {
-                                            updateStatus([
-                                                'Found structured data in ',
-                                                {urlLink: url},
-                                                '!',
-                                            ])
-											let enriched = await enrichLinkedData(ld, claim, url);
+											updateStatus([
+												'Found structured data in ',
+												{urlLink: url},
+												'!',
+											])
+											let enriched = await enrichLinkedData(ld, claim, url)
 											await ldToStatements(enriched, propform, {
 												url: sourceUrl,
 												title: title ? title.innerText.trim() : null,
 												lang: validRootLang,
-											});
+											})
 										}
-										const mwData = await findMediaWikiData(doc, propform, sourceUrl ?? url);
+										const mwData = await findMediaWikiData(doc, propform, sourceUrl ?? url)
 
 									}
 								}
 							} catch (error) {
-								console.error(`Something went wrong fetching ${url}`);
+								console.error(`Something went wrong fetching ${url}`)
 							}
 						}
 					}
-					const property = await wikidataGetEntity(claim, false);
+					const property = await wikidataGetEntity(claim, false)
 					if (property[claim].claims?.P2302) {
-                        updateStatus([
-                            'Checking constraints for ',
-                            {placeholder: {entity: claim}},
-                        ])
-						constraintsToStatements(claim, property[claim].claims.P2302, propform, classes);
+						updateStatus([
+							'Checking constraints for ',
+							{placeholder: {entity: claim}},
+						])
+						constraintsToStatements(claim, property[claim].claims.P2302, propform, classes)
 					}
 				}
-				document.body.removeChild(bouncer);
+				document.body.removeChild(bouncer)
 				if (propform.children.length < 1) {
-					document.body.appendChild(message);
+					document.body.appendChild(message)
 				}
 			}
 		})()
 	}
 
-	let form = document.createElement('div');
-	form.classList.add('submit-actions');
-	content.appendChild(form);
+	let form = document.createElement('div')
+	form.classList.add('submit-actions')
+	content.appendChild(form)
 
-	let saveButton = document.createElement('button');
-	form.appendChild(saveButton);
-	saveButton.innerText = 'Send to Wikidata';
+	let saveButton = document.createElement('button')
+	form.appendChild(saveButton)
+	saveButton.innerText = 'Send to Wikidata'
 
 	saveButton.addEventListener('click', async function() {
 		let currentTab = await Browser.getCurrentTabIdForAllContexts()
-		let jobs = [];
+		let jobs = []
 		const formData = new FormData(propform)
 		for (let pair of formData.entries()) {
 			if (pair[1] != '') {
-			 	let job = JSON.parse(pair[1]);
+			 	let job = JSON.parse(pair[1])
 			 	if (!job.subject) {
-			 		job.subject = currentEntity;
-			 		job.fromTab = currentTab;
+			 		job.subject = currentEntity
+			 		job.fromTab = currentTab
 			 	}
-			 	jobs.push(job);
+			 	jobs.push(job)
 			}
 		}
 
@@ -288,7 +288,7 @@ if (window.location.search) {
 				type: 'send_to_wikidata',
 				data: jobs,
 			}),
-            unlockAndWait(currentTab)
+			unlockAndWait(currentTab)
 		])
-	});
+	})
 }

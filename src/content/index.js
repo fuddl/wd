@@ -1,3 +1,3 @@
-import {main} from "./content"
+import {main} from './content'
 
 main()

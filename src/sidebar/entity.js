@@ -7,31 +7,31 @@ import {wikidataGetEntity} from '../wd-get-entity.js'
 import {ApplyFormatters} from './formatters.js'
 import {AddLemmaAffix} from './lemma-afixes.js'
 import browser from 'webextension-polyfill'
-import { PrependNav } from './prepend-nav.js';
-import { getDeducedSenseClaims } from './deduce-sense-statements.js';
+import { PrependNav } from './prepend-nav.js'
+import { getDeducedSenseClaims } from './deduce-sense-statements.js'
 
 if (history.length > 1 || window != window.top) {
-	PrependNav();
+	PrependNav()
 }
 
-const lang = navigator.language.substr(0,2);
-const footnoteStorage = {};
-let refCounter = {};
+const lang = navigator.language.substr(0,2)
+const footnoteStorage = {}
+let refCounter = {}
 
 let cache = {}
 
 function highlightWord(el, text) {
-  let t = el.textContent;
-  el.textContent = '';
-  let idx, prev = 0;
-  while((idx = t.indexOf(text, prev)) !== -1){
-    el.append(t.slice(prev, idx));
-    const mark = document.createElement('mark');
-    mark.textContent = text;
-    el.appendChild(mark);
-    prev = idx + text.length;
-  }
-  el.append(t.slice(prev));
+	let t = el.textContent
+	el.textContent = ''
+	let idx, prev = 0
+	while((idx = t.indexOf(text, prev)) !== -1){
+		el.append(t.slice(prev, idx))
+		const mark = document.createElement('mark')
+		mark.textContent = text
+		el.appendChild(mark)
+		prev = idx + text.length
+	}
+	el.append(t.slice(prev))
 }
 
 function checkNested(obj, level,	...rest) {
@@ -41,27 +41,27 @@ function checkNested(obj, level,	...rest) {
 }
 
 if (window.location.search) {
-	let currentEntity = window.location.search.match(/^\?(\w\d+)/, '')[1];
+	let currentEntity = window.location.search.match(/^\?(\w\d+)/, '')[1]
 	if (currentEntity.match(/[QMPL]\d+/)) {
-		updateView(currentEntity, window.location.hash !== '#nocache');
+		updateView(currentEntity, window.location.hash !== '#nocache')
 	}
 }
 
 function dateToString(value) {
-	let wiso = value.time;
-	let prec = value.precision;
+	let wiso = value.time
+	let prec = value.precision
 
 	if (prec <= 6) {
-		return false;
+		return false
 	}
 
-	let suffix = wiso.startsWith('-') ? ' BCE' : '';
+	let suffix = wiso.startsWith('-') ? ' BCE' : ''
 
 	let pad = function (i) {
 		if (i < 10) {
-			return '0' + i;
+			return '0' + i
 		}
-		return i;
+		return i
 	}
 
 	let iso = wiso
@@ -69,13 +69,13 @@ function dateToString(value) {
 		.replace(/Z$/, '')
 		.replace(/^(\d+)-00/, '$1-01')
 		.replace(/^(\d+)-(\d+)-00/, '$1-$2-01')
-		+ 'Z';
+		+ 'Z'
 
-	let date = new Date(iso);
+	let date = new Date(iso)
 
-	let output = [];
+	let output = []
 	if (prec === 7) {
-		let text = date.getFullYear().toString().slice(0, -2) + 'XX' + suffix;
+		let text = date.getFullYear().toString().slice(0, -2) + 'XX' + suffix
 		return templates.proxy({
 			query: `
 				SELECT ?innerText WHERE {
@@ -89,9 +89,9 @@ function dateToString(value) {
 				}
 				LIMIT 1`,
 			text: text,
-		});
+		})
 	} else if (prec === 8) {
-		let text =	date.getFullYear().toString().slice(0, -1) + 'X';
+		let text =	date.getFullYear().toString().slice(0, -1) + 'X'
 		return templates.proxy({
 			query: `
 				SELECT ?innerText WHERE {
@@ -105,86 +105,86 @@ function dateToString(value) {
 				}
 				LIMIT 1`,
 			text: text,
-		});
+		})
 	} else {
 		if (prec > 8) {
-			output.push(date.getUTCFullYear());
+			output.push(date.getUTCFullYear())
 		}
 		if (prec > 9) {
-			output.push(pad(date.getUTCMonth() + 1));
+			output.push(pad(date.getUTCMonth() + 1))
 		}
 		if (prec > 10) {
-			output.push(pad(date.getUTCDate()));
+			output.push(pad(date.getUTCDate()))
 		}
 	}
 
-	return document.createTextNode(output.join('-') + suffix);
+	return document.createTextNode(output.join('-') + suffix)
 }
 
 function insertAfter(referenceNode, newNode) {
-	referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
+	referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling)
 }
 
 function renderStatements(snak, references, type, target, scope, delta) {
-	let valueType = snak.datatype ? snak.datatype : snak.datavalue.type ;
+	let valueType = snak.datatype ? snak.datatype : snak.datavalue.type 
 	if (type === 'preformatted') {
-		target.appendChild(snak.datavalue.value);
+		target.appendChild(snak.datavalue.value)
 	}
 	if (type === 'value' || scope === 'reference') {
-		if (valueType === "time") {
-			let date = dateToString(snak.datavalue.value);
+		if (valueType === 'time') {
+			let date = dateToString(snak.datavalue.value)
 			if (date) {
 				target.appendChild(templates.time({
 					text: date,
-				}));
+				}))
 			}
 		}
-		if (valueType === "wikibase-item" || valueType === "wikibase-entityid" || valueType === "wikibase-lexeme" || valueType === "wikibase-form"	|| valueType === "wikibase-sense") {
-			let vid = snak.datavalue.value.id;
+		if (valueType === 'wikibase-item' || valueType === 'wikibase-entityid' || valueType === 'wikibase-lexeme' || valueType === 'wikibase-form'	|| valueType === 'wikibase-sense') {
+			let vid = snak.datavalue.value.id
 			if (snak.datavalue.parents) {
-				target.appendChild(templates.breadcrumbsPlaceholder(snak.datavalue.parents));
+				target.appendChild(templates.breadcrumbsPlaceholder(snak.datavalue.parents))
 			}
 			target.appendChild(templates.placeholder({
 				entity: vid,
-			}, cache));
+			}, cache))
 		}
-		if (valueType === "external-id") {
-			target.appendChild(templates.code(snak.datavalue.value));
+		if (valueType === 'external-id') {
+			target.appendChild(templates.code(snak.datavalue.value))
 		}
-		if (valueType === "string") {
-			target.appendChild(document.createTextNode(snak.datavalue.value));
+		if (valueType === 'string') {
+			target.appendChild(document.createTextNode(snak.datavalue.value))
 		}
-		if (valueType === "url") {
-			let humanReadable = snak.datavalue.value;
-			target.appendChild(templates.urlLink(snak.datavalue.value));
+		if (valueType === 'url') {
+			let humanReadable = snak.datavalue.value
+			target.appendChild(templates.urlLink(snak.datavalue.value))
 		}
 		if (valueType === 'quantity') {
 			target.appendChild(templates.unitNumber({
 				number: snak.datavalue.value.amount,
 				unit: snak?.datavalue?.value?.unit,
-			}));
+			}))
 		}
-		if (valueType === "globe-coordinate" || valueType ===	'globecoordinate') {
+		if (valueType === 'globe-coordinate' || valueType ===	'globecoordinate') {
 			target.appendChild(templates.mercator({
 				lat: snak.datavalue.value.latitude,
 				lon: snak.datavalue.value.longitude,
 				pre: snak.datavalue.value.precision,
 				height: 500,
 				width: 500,
-			}));
+			}))
 		}
-		if (valueType === "monolingualtext") {
+		if (valueType === 'monolingualtext') {
 			target.appendChild(templates.title({
 				text: snak.datavalue.value.text,
 				lang: snak.datavalue.value.language
-			}));
+			}))
 		}
-		if (valueType === "commonsMedia") {
-			let name = encodeURIComponent(snak.datavalue.value);
+		if (valueType === 'commonsMedia') {
+			let name = encodeURIComponent(snak.datavalue.value)
 			if (name.match(/\.svg$/i)) {
 				target.appendChild(templates.image({
 					src: `https://commons.wikimedia.org/wiki/Special:FilePath/${ name }`
-				}));
+				}))
 			} else if (name.match(/\.(jpe?g|png|gif|tiff?|stl)$/i)) {
 				target.appendChild(templates.picture({
 					srcSet: {
@@ -193,90 +193,90 @@ function renderStatements(snak, references, type, target, scope, delta) {
 						801: `https://commons.wikimedia.org/wiki/Special:FilePath/${ name }?width=801px`,
 						1068: `https://commons.wikimedia.org/wiki/Special:FilePath/${ name }?width=1068px`,
 					}
-				}));
+				}))
 			} else if (name.match(/\.(wav|og[ga])$/i)) {
 				target.appendChild(templates.audio({
 					src: `https://commons.wikimedia.org/wiki/Special:FilePath/${ name }`
-				}));
+				}))
 			} else if (name.match(/\.webm$/i)) {
 				target.appendChild(templates.video({
 					poster: `https://commons.wikimedia.org/wiki/Special:FilePath/${ name }?width=801px`,
 					src: `https://commons.wikimedia.org/wiki/Special:FilePath/${ name }`
-				}));
+				}))
 			}
 		}
 	} else if(type === 'novalue') {
-		target.appendChild(document.createTextNode('—'));
+		target.appendChild(document.createTextNode('—'))
 	} else if(type === 'somevalue') {
-		target.appendChild(document.createTextNode('?'));
+		target.appendChild(document.createTextNode('?'))
 	}
 	if (target) {
-		target.appendChild(document.createTextNode('\xa0'));
-		let sup = document.createElement('sup');
-		let c = 0;
+		target.appendChild(document.createTextNode('\xa0'))
+		let sup = document.createElement('sup')
+		let c = 0
 		for (let reference of references) {
 			if (c > 0) {
-				sup.appendChild(document.createTextNode('/'));
+				sup.appendChild(document.createTextNode('/'))
 			}
-			sup.appendChild(reference);
-			c++;
+			sup.appendChild(reference)
+			c++
 		}
 		if (sup.hasChildNodes()) {
-			target.appendChild(sup);
+			target.appendChild(sup)
 		}
 	}
-	if (valueType === "external-id" && snak.snaktype === "value") {
-		target.appendChild(templates.idLinksPlaceholder(snak.property, snak.datavalue.value));
+	if (valueType === 'external-id' && snak.snaktype === 'value') {
+		target.appendChild(templates.idLinksPlaceholder(snak.property, snak.datavalue.value))
 	}
 	if (scope === 'statement' && typeof delta != 'undefined' && delta.hasOwnProperty('qualifiers')) {
-		let qualifiers = [];
+		let qualifiers = []
 		for (let prop of Object.keys(delta.qualifiers)) {
-			let qvalues = [];
+			let qvalues = []
 			for (let qv of delta.qualifiers[prop]) {
-				let qualvalue = new DocumentFragment();
-				renderStatements(qv,[], qv.snaktype, qualvalue, 'qualifier');
-				qvalues.push(qualvalue);
+				let qualvalue = new DocumentFragment()
+				renderStatements(qv,[], qv.snaktype, qualvalue, 'qualifier')
+				qvalues.push(qualvalue)
 			}
 
 			qualifiers.push({
 				prop: templates.placeholder({ entity: prop }),
 				vals: qvalues,
-			});
+			})
 		}
-		target.appendChild(templates.annote(qualifiers));
+		target.appendChild(templates.annote(qualifiers))
 	}
 }
 
 function renderStatement(value) {
 	if (value[0].mainsnak) {
-		let pid = value[0].mainsnak.property;
+		let pid = value[0].mainsnak.property
 		let label = templates.placeholder({
 			entity: pid,
-		}, cache);
+		}, cache)
 
-		let values = [];
-		let hasPreferred = false;
+		let values = []
+		let hasPreferred = false
 		for (let delta of value) {
-			if (delta.rank == "preferred") {
-				hasPreferred = true;
+			if (delta.rank == 'preferred') {
+				hasPreferred = true
 			}
 		}
 		for (const [key, delta] of Object.entries(value)) {
-			if (delta.rank == "deprecated" || (delta.rank == "normal" && hasPreferred)) {
-				delete value[key];
+			if (delta.rank == 'deprecated' || (delta.rank == 'normal' && hasPreferred)) {
+				delete value[key]
 			}
 		}
 		for (let delta of value) {
 			if (delta && delta.hasOwnProperty('mainsnak') && delta.mainsnak) {
-				let thisvalue = new DocumentFragment();
-				let type = delta.mainsnak.snaktype;
-				let refs = [];
+				let thisvalue = new DocumentFragment()
+				let type = delta.mainsnak.snaktype
+				let refs = []
 				if (delta.references) {
 					for (let ref of delta.references) {
-						let listItem;
-						let refvalues = [];
+						let listItem
+						let refvalues = []
 						if (typeof refCounter[ref.hash] === 'undefined') {
-							listItem = document.createElement('li');
+							listItem = document.createElement('li')
 							refCounter[ref.hash] = {
 								item: listItem,
 							}
@@ -287,10 +287,10 @@ function renderStatement(value) {
 							for (let key in formatted) {
 								for (let refthing of formatted[key]) {
 									if (refthing.datavalue) {
-										let refvalue = new DocumentFragment();
+										let refvalue = new DocumentFragment()
 
-										renderStatements(refthing, [], refthing.datavalue.type, refvalue, 'reference');
-										refvalues.push(refvalue);
+										renderStatements(refthing, [], refthing.datavalue.type, refvalue, 'reference')
+										refvalues.push(refvalue)
 									}
 								}
 								if (key.match(/^P\d+/)) {
@@ -299,8 +299,8 @@ function renderStatement(value) {
 											entity: key,
 										}, cache),
 										vals: refvalues,
-									});
-									listItem.appendChild(refStatement);
+									})
+									listItem.appendChild(refStatement)
 								} else {
 									for (let refvalue of refvalues) {
 										listItem.appendChild(refvalue)
@@ -308,23 +308,23 @@ function renderStatement(value) {
 								}
 							}
 						} else {
-							listItem = refCounter[ref.hash].item;
+							listItem = refCounter[ref.hash].item
 						}
-						listItem.setAttribute('id', ref.hash);
+						listItem.setAttribute('id', ref.hash)
 						refs.push(templates.footnoteRef({
 							text: '▐',
 							link: '#' + ref.hash,
 							title: listItem.innerText,
-						}));
+						}))
 						footnoteStorage[ref.hash] = {
 							content: listItem,
-						};
+						}
 					}
 				}
 
-				renderStatements(delta.mainsnak, refs, type, thisvalue, 'statement', delta);
+				renderStatements(delta.mainsnak, refs, type, thisvalue, 'statement', delta)
 
-				values.push(thisvalue);
+				values.push(thisvalue)
 
 			}
 		}
@@ -335,95 +335,95 @@ function renderStatement(value) {
 			}, cache),
 			vals: values,
 			id: pid,
-		});
+		})
 
-		let firstValue = value.find(x=>x!==undefined);
+		let firstValue = value.find(x=>x!==undefined)
 
 		if (firstValue) {
 			return {
 				rendered: statement,
 				type: firstValue.mainsnak.snaktype,
-			};
+			}
 		}
 	}
 }
 
 function updateView(id, useCache = true) {
-	let content = document.getElementById('content');
+	let content = document.getElementById('content')
 
-	let footer = document.getElementById('footer');
+	let footer = document.getElementById('footer')
 	content.innerHTML = '';
 	(async () => {
-		let entities = await wikidataGetEntity(id, useCache);
-		cache = await browser.storage.local.get();
+		let entities = await wikidataGetEntity(id, useCache)
+		cache = await browser.storage.local.get()
 
 		for (let id of Object.keys(entities)) {
-			let e = entities[id];
+			let e = entities[id]
 
-			let wrapper = document.createElement('div');
+			let wrapper = document.createElement('div')
 
 			if (e.lemmas) {
-				let labels = document.createDocumentFragment();
+				let labels = document.createDocumentFragment()
 				for (let lang in e.lemmas) {
 					let lemma = AddLemmaAffix(e.lemmas[lang].value, {
 						category: e.lexicalCategory,
 						lang: e.language,
 						gender: typeof e.claims?.P5185 === 'object' ? e.claims?.P5185[0]?.mainsnak?.datavalue?.value?.id : null,
-					});
+					})
 
 					if (labels.childNodes.length !== 0) {
-						labels.appendChild(document.createTextNode(' ‧ '));
+						labels.appendChild(document.createTextNode(' ‧ '))
 					}
-					labels.appendChild(lemma);
+					labels.appendChild(lemma)
 				}
 
-				let lexemeDescription = document.createDocumentFragment();
+				let lexemeDescription = document.createDocumentFragment()
 
 				lexemeDescription.appendChild(templates.placeholder({
 					entity: e.language
-				}, cache));
+				}, cache))
 
-				lexemeDescription.appendChild(document.createTextNode(', '));
+				lexemeDescription.appendChild(document.createTextNode(', '))
 
 				lexemeDescription.appendChild(templates.placeholder({
 					entity: e.lexicalCategory
-				}, cache));
+				}, cache))
 
 				wrapper.appendChild(templates.ensign({
 					revid: e.lastrevid,
 					id: id,
 					label: labels,
 					description: { text: lexemeDescription },
-				}));
+				}))
 			}
 
 
-			let metaCanon = document.createElement('meta');
-			metaCanon.setAttribute('name', 'canonical');
-			metaCanon.setAttribute('content', 'https://www.wikidata.org/wiki/' + id);
-			document.head.appendChild(metaCanon);
+			let metaCanon = document.createElement('meta')
+			metaCanon.setAttribute('name', 'canonical')
+			metaCanon.setAttribute('content', 'https://www.wikidata.org/wiki/' + id)
+			document.head.appendChild(metaCanon)
 
 			if (e.labels || e.descriptions) {
 
-				document.title = getValueByLang(e, 'labels', e.title);
-				let description = getValueByLang(e, 'descriptions', false);
+				document.title = getValueByLang(e, 'labels', e.title)
+				let description = getValueByLang(e, 'descriptions', false)
 
-				let hasDescription = description != false;
-				let titleFragment = document.createElement('div');
-				wrapper.appendChild(titleFragment);
+				let hasDescription = description != false
+				let titleFragment = document.createElement('div')
+				wrapper.appendChild(titleFragment)
 
 				if (!description) {
-					description = '???';
+					description = '???'
 				} else {
-					let metaDesc = document.createElement('meta');
-					metaDesc.setAttribute('name', 'description');
-					metaDesc.setAttribute('content', description);
-					document.head.appendChild(metaDesc);
+					let metaDesc = document.createElement('meta')
+					metaDesc.setAttribute('name', 'description')
+					metaDesc.setAttribute('content', description)
+					document.head.appendChild(metaDesc)
 				}
 
 				const setTitle = (description) => {
 					if (titleFragment.firstChild) {
-						titleFragment.removeChild(titleFragment.firstChild);
+						titleFragment.removeChild(titleFragment.firstChild)
 					}
 					titleFragment.appendChild(templates.ensign({
 						revid: e.lastrevid,
@@ -433,25 +433,25 @@ function updateView(id, useCache = true) {
 							text: description,
 							provisional: !hasDescription
 						},
-					}));
+					}))
 				}
 
-				setTitle(description);
+				setTitle(description)
 
 				if (!hasDescription && 'claims' in e && 'P31' in e.claims) {
 					(async () => {
-						description = await getAutodesc(id);
-						setTitle(description);
+						description = await getAutodesc(id)
+						setTitle(description)
 					})()
 				}
 			}
 
-			let aliases = getAliasesByLang(e);
+			let aliases = getAliasesByLang(e)
 			if (aliases) {
-				let metaKeys = document.createElement('meta');
-				metaKeys.setAttribute('name', 'keywords');
-				metaKeys.setAttribute('content', aliases.join(', '));
-				document.head.appendChild(metaKeys);
+				let metaKeys = document.createElement('meta')
+				metaKeys.setAttribute('name', 'keywords')
+				metaKeys.setAttribute('content', aliases.join(', '))
+				document.head.appendChild(metaKeys)
 			}
 
 			footer.appendChild(templates.actions('Actions', [
@@ -464,7 +464,7 @@ function updateView(id, useCache = true) {
 						browser.runtime.sendMessage({
 							type: 'open_adder',
 							entity: id,
-						});
+						})
 					}
 				},
 				{
@@ -473,8 +473,8 @@ function updateView(id, useCache = true) {
 					title: 'Reload data',
 					desc: 'Display an uncached version',
 					callback: (e) => {
-						location.hash = '#nocache';
-						location.reload();
+						location.hash = '#nocache'
+						location.reload()
 					},
 				},
 				{
@@ -489,37 +489,37 @@ function updateView(id, useCache = true) {
 					title: 'Improve',
 					desc: 'Automatic suggestions on how to improve this item',
 				},
-			]));
+			]))
 
-			let identifiers = document.createElement('div');
-			let items = document.createElement('div');
-			let glosses = document.createElement('div');
+			let identifiers = document.createElement('div')
+			let items = document.createElement('div')
+			let glosses = document.createElement('div')
 
-			wrapper.appendChild(glosses);
-			wrapper.appendChild(items);
-			wrapper.appendChild(identifiers);
-			content.appendChild(wrapper);
+			wrapper.appendChild(glosses)
+			wrapper.appendChild(items)
+			wrapper.appendChild(identifiers)
+			content.appendChild(wrapper)
 
 			if (e.claims || e.statements) {
-				let statements = await enrichStatements(e.claims ? e.claims : e.statements);
+				let statements = await enrichStatements(e.claims ? e.claims : e.statements)
 				for (let prop of groupClaims(statements)) {
-					let statement = renderStatement(statements[prop]);
+					let statement = renderStatement(statements[prop])
 					if (statement) {
-						if (statement.type !== "external-id") {
-							items.appendChild(statement.rendered);
+						if (statement.type !== 'external-id') {
+							items.appendChild(statement.rendered)
 						} else {
-							identifiers.appendChild(statement.rendered);
+							identifiers.appendChild(statement.rendered)
 						}
 					}
 				}
 			}
 			if (e['senses']) {
-				const singleSense = e['senses'].length === 1;
-				let senseTree = {};
-				let senseFlat = {};
-				let senseProps = {};
+				const singleSense = e['senses'].length === 1
+				let senseTree = {}
+				let senseFlat = {}
+				let senseProps = {}
 				for (let sense of e['senses']) {
-					let id = sense.id;
+					let id = sense.id
 					let newSense = {
 						sense: sense,
 						children: {},
@@ -527,24 +527,24 @@ function updateView(id, useCache = true) {
 						field: null,
 						gloss: getValueByLang(sense, 'glosses', false),
 					}
-					senseTree[id] = newSense;
-					senseFlat[id] = newSense;
+					senseTree[id] = newSense
+					senseFlat[id] = newSense
 					if (!senseTree[id].gloss && senseTree[id].sense?.claims?.P5137?.[0].mainsnak?.datavalue?.value?.id) {
 						senseTree[id].gloss = templates.placeholder({
 							type: 'span',
 							entity: senseTree[id].sense.claims.P5137[0].mainsnak.datavalue.value.id,
 							desiredInner: 'descriptions',
-						});
+						})
 					}
 
 					if (senseTree[id].sense?.claims?.P5137?.[0].mainsnak?.datavalue?.value?.id) {
-						senseTree[id].item = senseTree[id].sense.claims.P5137[0].mainsnak.datavalue.value.id;
+						senseTree[id].item = senseTree[id].sense.claims.P5137[0].mainsnak.datavalue.value.id
 					} else if (senseTree[id].sense?.claims?.P9970?.[0].mainsnak?.datavalue?.value?.id) {
-						senseTree[id].item = senseTree[id].sense.claims.P9970[0].mainsnak.datavalue.value.id;
+						senseTree[id].item = senseTree[id].sense.claims.P9970[0].mainsnak.datavalue.value.id
 					}
 
 					if (senseTree[id].sense?.claims?.P9488?.[0].mainsnak?.datavalue?.value?.id) {
-						senseTree[id].field = senseTree[id].sense.claims.P9488[0].mainsnak.datavalue.value.id;
+						senseTree[id].field = senseTree[id].sense.claims.P9488[0].mainsnak.datavalue.value.id
 					}
 
 					if (sense?.claims) {
@@ -553,7 +553,7 @@ function updateView(id, useCache = true) {
 								senseProps[cid] = {
 									datatype: sense.claims[cid][0].mainsnak.datatype,
 									claims: {},
-								};
+								}
 							}
 							senseProps[cid].claims[id] = {
 								claim: sense.claims[cid],
@@ -561,68 +561,68 @@ function updateView(id, useCache = true) {
 							}
 						}
 					}
-					senseProps = await getDeducedSenseClaims(senseProps, id, e.language, newSense);
+					senseProps = await getDeducedSenseClaims(senseProps, id, e.language, newSense)
 				}
 
 				for (let id in senseTree) {
 					if (senseTree[id].sense?.claims?.P6593?.[0].mainsnak?.datavalue?.value?.id) {
-						let parentSense = senseTree[id].sense.claims.P6593[0].mainsnak.datavalue.value.id;
+						let parentSense = senseTree[id].sense.claims.P6593[0].mainsnak.datavalue.value.id
 						if (senseTree.hasOwnProperty(parentSense) && parentSense !== id) {
-							senseTree[parentSense].children[id] = senseTree[id];
-							delete senseTree[id];
+							senseTree[parentSense].children[id] = senseTree[id]
+							delete senseTree[id]
 						}
 					}
 				}
 
 				const number2Letter = (i) => {
-					const previousLetters = (i-1 >= 26 ? getColumnName(Math.floor(i-1 / 26) -1 ) : '');
-					const lastLetter = 'abcdefghijklmnopqrstuvwxyz'[(i-1) % 26];
-					return previousLetters + lastLetter;
+					const previousLetters = (i-1 >= 26 ? getColumnName(Math.floor(i-1 / 26) -1 ) : '')
+					const lastLetter = 'abcdefghijklmnopqrstuvwxyz'[(i-1) % 26]
+					return previousLetters + lastLetter
 				}
 
 				let assignSymbols = (tree, parent = '') => {
-					let counter = 0;
+					let counter = 0
 					for (let id in tree) {
-						counter++;
-						let child = counter.toString();
+						counter++
+						let child = counter.toString()
 						if (parent.length > 0) {
-							child = number2Letter(counter);
+							child = number2Letter(counter)
 						}
-						let thisSymbol = `${parent}${child}`;
-						tree[id].symbol = templates.symbol(thisSymbol, id);
+						let thisSymbol = `${parent}${child}`
+						tree[id].symbol = templates.symbol(thisSymbol, id)
 						if (tree[id].children) {
-							tree[id].children = assignSymbols(tree[id].children, thisSymbol);
+							tree[id].children = assignSymbols(tree[id].children, thisSymbol)
 						}
 					}
-					return tree;
+					return tree
 				}
 
 				if (!singleSense) {
-					senseTree = assignSymbols(senseTree);
+					senseTree = assignSymbols(senseTree)
 				}
 
-				let root = templates.glossary(senseTree);
-				glosses.appendChild(root);
+				let root = templates.glossary(senseTree)
+				glosses.appendChild(root)
 				for (let pid in senseProps) {
 					if (senseProps[pid].datatype === 'commonsMedia') {
 
-						let section = document.createElement('section');
-						let heading = document.createElement('h2');
+						let section = document.createElement('section')
+						let heading = document.createElement('h2')
 						let headingText = templates.placeholder({
 							entity: pid,
 							type: 'span',
-						});
-						heading.appendChild(headingText);
-						section.appendChild(heading);
+						})
+						heading.appendChild(headingText)
+						section.appendChild(heading)
 
 						for (let sid in senseProps[pid].claims) {
 							for (let stid in senseProps[pid].claims[sid].claim) {
-								let claim = senseProps[pid].claims[sid].claim[stid];
+								let claim = senseProps[pid].claims[sid].claim[stid]
 								if (claim?.mainsnak?.datavalue?.value) {
-									let fileName = encodeURIComponent(claim?.mainsnak?.datavalue?.value);
-									let senseSymbol = false;
+									let fileName = encodeURIComponent(claim?.mainsnak?.datavalue?.value)
+									let senseSymbol = false
 									if (senseProps[pid].claims[sid].sense?.symbol) {
-										senseSymbol = senseProps[pid].claims[sid].sense.symbol.cloneNode(true);
+										senseSymbol = senseProps[pid].claims[sid].sense.symbol.cloneNode(true)
 									}
 									if (fileName.match(/\.(jpe?g|png|gif|tiff?)$/i)) {
 										section.appendChild(templates.picture({
@@ -633,7 +633,7 @@ function updateView(id, useCache = true) {
 												1068: `https://commons.wikimedia.org/wiki/Special:FilePath/${ fileName }?width=1068px`,
 											},
 											tag: senseSymbol,
-										}));
+										}))
 									}
 
 								}
@@ -641,70 +641,70 @@ function updateView(id, useCache = true) {
 							}
 						}
 
-						glosses.appendChild(section);
+						glosses.appendChild(section)
 					} else if (senseProps[pid].datatype === 'wikibase-sense') {
-						let section = document.createElement('section');
-						let heading = document.createElement('h2');
+						let section = document.createElement('section')
+						let heading = document.createElement('h2')
 						let headingText = templates.placeholder({
 							entity: pid,
 							type: 'span',
-						});
-						heading.appendChild(headingText);
-						section.appendChild(heading);
+						})
+						heading.appendChild(headingText)
+						section.appendChild(heading)
 
-						let translations = {};
+						let translations = {}
 						for (let sid in senseProps[pid].claims) {
 							for (let stid in senseProps[pid].claims[sid].claim) {
-								let claim = senseProps[pid].claims[sid].claim[stid];
+								let claim = senseProps[pid].claims[sid].claim[stid]
 								if (claim?.mainsnak?.datavalue?.value) {
-									const senseId = claim.mainsnak.datavalue.value.id;
-									const lexemeId = senseId.split('-')[0];
-									const lexeme = await wikidataGetEntity(lexemeId);
-									const lexemeLanguage = lexeme[lexemeId].language;
+									const senseId = claim.mainsnak.datavalue.value.id
+									const lexemeId = senseId.split('-')[0]
+									const lexeme = await wikidataGetEntity(lexemeId)
+									const lexemeLanguage = lexeme[lexemeId].language
 									if (!translations.hasOwnProperty(lexemeLanguage)) {
-										translations[lexemeLanguage] = {};
+										translations[lexemeLanguage] = {}
 									}
 									if (!translations[lexemeLanguage].hasOwnProperty(sid)) {
 										translations[lexemeLanguage][sid] = {
 											symbol: senseProps[pid].claims[sid].sense?.symbol ?  senseProps[pid].claims[sid].sense.symbol.cloneNode(true) : false,
 											senses: [],
-										};
+										}
 									}
-									translations[lexemeLanguage][sid].senses.push(senseId);
+									translations[lexemeLanguage][sid].senses.push(senseId)
 								}
 							}
 						}
 
-						section.appendChild(templates.rosetta(translations, e.language));
+						section.appendChild(templates.rosetta(translations, e.language))
 
-						glosses.appendChild(section);
+						glosses.appendChild(section)
 					}
 				}
 				if (e.claims) {
 					for (let cid in e.claims) {
 						if(e.claims[cid]?.[0].mainsnak?.datatype === 'monolingualtext') {
-							let section = document.createElement('section');
-							let heading = document.createElement('h2');
+							let section = document.createElement('section')
+							let heading = document.createElement('h2')
 							let headingText = templates.placeholder({
 								entity: cid,
 								type: 'span',
-							});
-							heading.appendChild(headingText);
-							section.appendChild(heading);
+							})
+							heading.appendChild(headingText)
+							section.appendChild(heading)
 							for (let claim of e.claims[cid]) {
 								if(claim?.mainsnak?.datavalue?.value?.text) {
-									let quote = claim.mainsnak.datavalue.value.text;
-									let lang = claim.mainsnak.datavalue.value.language;
-									let bq = templates.blockquote(quote, lang);
+									let quote = claim.mainsnak.datavalue.value.text
+									let lang = claim.mainsnak.datavalue.value.language
+									let bq = templates.blockquote(quote, lang)
 									if (claim?.qualifiers?.P5830?.[0]?.datavalue?.value?.id) {
 										for (let form of claim.qualifiers.P5830) {
-											let subjectForm = form.datavalue.value.id;
+											let subjectForm = form.datavalue.value.id
 											for (let fid in e.forms) {
 												if (e.forms[fid]?.id === subjectForm) {
 													for (let rep in e.forms[fid].representations) {
 														if (e.forms[fid].representations[rep]) {
-															let repString = e.forms[fid].representations[rep].value;
-															highlightWord(bq, repString);
+															let repString = e.forms[fid].representations[rep].value
+															highlightWord(bq, repString)
 
 														}
 													}
@@ -713,21 +713,21 @@ function updateView(id, useCache = true) {
 										}
 									}
 									if (claim?.qualifiers?.P6072?.[0]?.datavalue?.value?.id) {
-										let subjectSense = claim.qualifiers.P6072;
+										let subjectSense = claim.qualifiers.P6072
 										for (let sense of claim.qualifiers.P6072) {
 											if(senseFlat.hasOwnProperty(sense.datavalue.value.id)) {
 												if (senseFlat[sense.datavalue.value.id].symbol) {
-													let symbol = senseFlat[sense.datavalue.value.id].symbol.cloneNode(true);
-													bq.insertBefore(symbol, bq.firstChild);
-													bq.insertBefore(document.createTextNode(' '), symbol.nextSibling);
+													let symbol = senseFlat[sense.datavalue.value.id].symbol.cloneNode(true)
+													bq.insertBefore(symbol, bq.firstChild)
+													bq.insertBefore(document.createTextNode(' '), symbol.nextSibling)
 												}
 											}
 										}
 									}
-									section.appendChild(bq);
+									section.appendChild(bq)
 								}
 							}
-							glosses.appendChild(section);
+							glosses.appendChild(section)
 						}
 					}
 				}
@@ -735,21 +735,21 @@ function updateView(id, useCache = true) {
 
 
 			if (e.forms) {
-				let section = document.createElement('section');
-				let heading = document.createElement('h2');
+				let section = document.createElement('section')
+				let heading = document.createElement('h2')
 				let headingText = templates.placeholder({
 					json: `https://www.wikidata.org/w/api.php?action=parse&page=Translations:Help:Data_type/87/${lang}&disableeditsection=true&format=json`,
 					type: 'span',
 					extractor: (input) => {
 						if (input?.parse?.text?.['*']) {
-							return input.parse.text['*'].replace(/<\/?[^>]+(>|$)/g, "").trim();
+							return input.parse.text['*'].replace(/<\/?[^>]+(>|$)/g, '').trim()
 						} else {
-							headingText.parentNode.removeChild(headingText);
+							headingText.parentNode.removeChild(headingText)
 						}
 					}
-				});
-				heading.appendChild(headingText);
-				section.appendChild(heading);
+				})
+				heading.appendChild(headingText)
+				section.appendChild(heading)
 
 				section.appendChild(templates.flex({
 					forms: e.forms,
@@ -757,61 +757,61 @@ function updateView(id, useCache = true) {
 					lang: e.language,
 					gender: typeof e.claims?.P5185 === 'object' ? e.claims?.P5185[0]?.mainsnak?.datavalue?.value?.id : null,
 					auxVerb: typeof e.claims?.P5401 === 'object' ? e.claims?.P5401[0]?.mainsnak?.datavalue?.value?.id : null,
-				}));
+				}))
 
-				glosses.appendChild(section);
+				glosses.appendChild(section)
 			}
 		}
 
 
-		let footnotes = content.querySelectorAll('.footnote');
+		let footnotes = content.querySelectorAll('.footnote')
 
-		let references = document.createElement('ol');
+		let references = document.createElement('ol')
 
-		let footnoteNumber = 1;
+		let footnoteNumber = 1
 		Array.from(footnotes).reduce((k, footnote) => {
-			let footnoteId = footnote.getAttribute('href').substr(1);
-			let referenceItem = footnoteStorage[footnoteId].content;
+			let footnoteId = footnote.getAttribute('href').substr(1)
+			let referenceItem = footnoteStorage[footnoteId].content
 			if (!footnoteStorage[footnoteId].number) {
-				references.appendChild(referenceItem);
-				footnoteStorage[footnoteId].number = footnoteNumber;
-				footnoteNumber++;
+				references.appendChild(referenceItem)
+				footnoteStorage[footnoteId].number = footnoteNumber
+				footnoteNumber++
 			}
-			footnote.innerText = footnoteStorage[footnoteId].number;
-			content.appendChild(references);
+			footnote.innerText = footnoteStorage[footnoteId].number
+			content.appendChild(references)
 			footnote.addEventListener('mouseover', () => {
-				footnote.setAttribute('title', referenceItem.innerText);
-			});
-		}, 0);
+				footnote.setAttribute('title', referenceItem.innerText)
+			})
+		}, 0)
 
-		resolvePlaceholders();
-		resolveBreadcrumbs(cache);
+		resolvePlaceholders()
+		resolveBreadcrumbs(cache)
 
-		resolveIdLinksPlaceholder();
-	})();
+		resolveIdLinksPlaceholder()
+	})()
 }
 
 browser.runtime.onMessage.addListener( async (data, sender) => {
-	let thisTab = await browser.tabs.getCurrent();
+	let thisTab = await browser.tabs.getCurrent()
 	if (data.match || thisTab == sender.tab.id) {
-		const result = await getEntityByAuthorityId(data.prop, data.id);
-		updateView(result[0].item.value);
+		const result = await getEntityByAuthorityId(data.prop, data.id)
+		updateView(result[0].item.value)
 	}
-});
+})
 
-let breadcrumbProperties = ['P31', 'P279', 'P1647', 'P171', 'P1074', 'P1889', 'P5137', 'P136'];
+let breadcrumbProperties = ['P31', 'P279', 'P1647', 'P171', 'P1074', 'P1889', 'P5137', 'P136']
 
 async function enrichStatements(statements) {
 	for (let prop in statements) {
 		for (let value of statements[prop]) {
 			if (breadcrumbProperties.includes(prop)) {
 			  if (value?.mainsnak?.datavalue?.value?.id) {
-					let vid = value.mainsnak.datavalue.value.id;
-					value.mainsnak.datavalue.parents = vid;
+					let vid = value.mainsnak.datavalue.value.id
+					value.mainsnak.datavalue.parents = vid
 			  }
 			}
 		}
 	}
-	return statements;
+	return statements
 }
 
