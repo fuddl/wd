@@ -47,17 +47,20 @@ export const resolveAll = async (location: LocationLike): Promise<Resolution[]> 
  * Obvious candidate for being part of the resolver class if we go that way
  */
 async function checkApplicableAndResolve(resolver: Resolver, location: LocationLike): Promise<Resolution | null> {
-	if (!await resolver.applicable(location)) return
+	const matchSuggestions = await resolver.applicable(location)
+	if (!matchSuggestions) return
+
 	const entityId = await resolver.getEntityId(location)
 
 	if (entityId) return {
 		entityId,
+		matchSuggestions: matchSuggestions === true ? [] : matchSuggestions,
 		doNotCache: resolver.noCache,
 	}
 }
 
 // todo better interface vs nested arrays
-export const findMatchSuggestions = async (location: LocationLike)
+export const getMatchSuggestions = async (location: LocationLike)
 	: Promise<Array<Array<MatchSuggestion>>> => {
 	const suggestions = await Promise.all(
 		resolvers.map(resolver => resolver.applicable(location)),

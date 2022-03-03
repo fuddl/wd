@@ -20,6 +20,7 @@ export interface Resolver {
 
 export interface Resolution {
 	entityId: string
+	matchSuggestions: Array<MatchSuggestion>
 	doNotCache?: boolean
 }
 

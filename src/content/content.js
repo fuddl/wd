@@ -1,5 +1,5 @@
 import {clearPageLinks, collectPageLinks, getClosestID, getOldid} from './content__collect-page-links.js'
-import {findMatchSuggestions, resolve} from '../resolver'
+import {getMatchSuggestions, resolve} from '../resolver'
 import {getElementLanguage} from './content__collect-strings.js'
 import {makeLanguageValid} from '../get-valid-string-languages.js'
 import {findTitles} from './pagedata__title.js'
@@ -25,7 +25,7 @@ async function findDirectMatch(location) {
 }
 
 async function detectPotentialMatches(location) {
-	let matchSuggestions = await findMatchSuggestions(location)
+	let matchSuggestions = await getMatchSuggestions(location)
 	if (matchSuggestions.length === 0) return
 
 	let linkedData = findLinkedData(document)
@@ -50,7 +50,7 @@ async function detectPotentialMatches(location) {
 }
 
 async function findApplicables(location) {
-	if (await findDirectMatch(location )) return
+	if (await findDirectMatch(location)) return
 
 	await detectPotentialMatches(location)
 }

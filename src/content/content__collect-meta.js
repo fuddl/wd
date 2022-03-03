@@ -116,8 +116,8 @@ async function enrichMetaData(tags, lang, url) {
 					let link = document.createElement('a')
 					link.href = tags[key][delta]
 
-					const entities = await resolveAll(link)
-					entities.forEach(resolution => {
+					const resolutions = await resolveAll(link)
+					resolutions.forEach(resolution => {
 						enriched[newKey] = {
 							verb: type.prop,
 							object: {
