@@ -183,7 +183,5 @@ browser.runtime.onMessage.addListener(async (data, sender) => {
     }
 })
 
-browser.storage.local.set({'sidebarActionSupported': 'sidebarAction' in browser})
-
 browser.webNavigation.onHistoryStateUpdated.addListener(
     e => browser.tabs.sendMessage(e.tabId, {action: "find_applicables"}))

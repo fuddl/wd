@@ -58,10 +58,7 @@ async function findApplicables(location, openInSidebar = true) {
 }
 
 async function main() {
-	const support = await browser.storage.local.get("sidebarActionSupported");
-	if (support.sidebarActionSupported === false) {
-		setupSidebar();
-	}
+	setupSidebar()
 
 	await findApplicables(location)
 
