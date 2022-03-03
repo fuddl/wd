@@ -1,15 +1,15 @@
 import * as ReactDOM from "react-dom"
 import {SidebarWrapper} from "./sidebar-wrapper"
 
+import css from './sidebar.module.css';
+
 export const setupSidebar = () => {
     let sidebar = document.createElement('wd-sidebar');
     let shadow = sidebar.attachShadow({ mode: 'closed' });
-    let link = document.createElement('link');
-    const path = chrome.extension.getURL('/content/sidebar/sidebar.css');
-    link.setAttribute('rel', 'stylesheet');
-    link.setAttribute('href', path);
+    let style = document.createElement('style');
+    style.innerText = css;
 
     ReactDOM.render(<SidebarWrapper/>, shadow);
-    shadow.appendChild(link);
+    shadow.appendChild(style);
     document.body.appendChild(sidebar);
 }

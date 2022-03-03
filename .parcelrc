@@ -1,3 +1,6 @@
 {
-	"extends": "@parcel/config-webextension"
+	"extends": "@parcel/config-webextension",
+	"transformers": {
+		"*.module.css": ["parcel-transformer-css-to-string"]
+	}
 }

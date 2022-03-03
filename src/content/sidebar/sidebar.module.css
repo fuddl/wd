@@ -3,7 +3,15 @@
     top: 0;
     bottom: 0;
     z-index: 2147483647;
+    background: #F8FAFB;
 }
+
+@media (prefers-color-scheme: dark) {
+    .sidebar {
+        background: #F8FAFB;
+    }
+}
+
 @media (prefers-reduced-motion: no-preference) {
     .sidebar {
         transition: .25s transform;
@@ -21,13 +29,28 @@
 .sidebar--right.sidebar--closed {
     transform: translateX(100%)
 }
+
+
 .sidebar--left.sidebar--closed {
     transform: translateX(-100%)
 }
+
+
 .sidebar__frame {
     width: 100%;
     height: 100%;
 }
+
+.sidebar--closed > .sidebar__frame {
+    visibility: hidden;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .sidebar--closed > .sidebar__frame {
+        transition: 0s .25s visibility;
+    }
+}
+
 .sidebar__background {
     cursor: col-resize;
     position: fixed;

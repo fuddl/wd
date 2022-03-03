@@ -32,7 +32,6 @@
 	"web_accessible_resources": [
 		"**/*.css",
 		"**/*.svg",
-		"content/sidebar/sidebar.css",
 		"sidebar/*.html",
 		"sidebar/res/*",
 		"sqarql-query.js"
