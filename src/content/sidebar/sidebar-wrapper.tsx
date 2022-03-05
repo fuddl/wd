@@ -3,22 +3,45 @@ import * as browser from "webextension-polyfill"
 import {useEffect, useState, useRef} from "react"
 import {useTabLocalState} from "../../core/react"
 
-export const SidebarWrapper = () => {
+export const SidebarWrapper = (options) => {
     const wrapperRef = useRef()
     const frameRef = useRef()
 
-    const [isOpen, setOpen] = useTabLocalState("sidebarOpen", false)
+    const [isOpen, setOpen] = useState(options.open ?? 0)
 
     // todo show a loading indicator instead of emptiness
     const [url, setUrl] = useState("")
 
-    const [width, setWidth] = useState(0)
-    const [isLeft, setLeft] = useState(false)
+    useEffect(() => {
+        // when the sidebar was opened before navigation occured
+        // the url will be empty we need to trigger `findApplicables`
+        // there is probably a better way to do that
+        if (isOpen && url === '') {
+            let event = document.createEvent("HTMLEvents");
+            event.initEvent("focus", true, true);
+            event.eventName = "focus";
+            document.dispatchEvent(event);
+        }
+    }, [url, isOpen])
+
+    const [width, setWidth] = useState(options.initialWidth ?? 0)
+    const [isLeft, setLeft] = useState(options.left ?? false)
     const [isDragging, setDragging] = useState(false)
 
     const loaded = frameRef?.current?.getAttribute('src');
 
     useEffect(() => {
+        browser.storage.local.set({
+            sidebarState: {
+                initialWidth: width,
+                left: isLeft,
+                open: isOpen,
+            }
+        })
+    }, [width, isLeft, isOpen])
+
+    useEffect(() => {
+
         const messageCallback = (event) => {
             console.log('content-script container ev', event)
             if ('type' in event) {
@@ -31,12 +54,10 @@ export const SidebarWrapper = () => {
         }
 
         const windowMessageCallback = (event) => {
-            // make sure the message wasn't sent by a different iframe 
-            if (frameRef?.current?.getAttribute('src').startsWith(event.origin)) {
-                if ('data' in event) {
-                    // redirect the relevant part of the message to the actual callback
-                    messageCallback(event.data)
-                }
+            const messageIsFromSidebar = url.startsWith(event.origin)
+            if (messageIsFromSidebar && 'data' in event) {
+                // redirect the relevant part of the message to the actual callback
+                messageCallback(event.data)
             }
         }
 
@@ -47,7 +68,7 @@ export const SidebarWrapper = () => {
             browser.runtime.onMessage.removeListener(messageCallback)
             window.removeEventListener('message', windowMessageCallback)
         }
-    }, [isOpen, setOpen])
+    }, [isOpen, url])
 
 
     const updateDrag = (event) => {
@@ -97,7 +118,7 @@ export const SidebarWrapper = () => {
                 onMouseMove={updateDrag}
                 ref={wrapperRef}
             >
-                { url !== ''  && (
+                { url !== '' && (
                     <iframe className="sidebar__frame" frameBorder="0" src={isOpen || loaded ? url : ''} ref={frameRef}/>
                 )}
                 <div

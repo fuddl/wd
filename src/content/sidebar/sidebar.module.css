@@ -4,6 +4,7 @@
     bottom: 0;
     z-index: 2147483647;
     background: #F8FAFB;
+    width: 24vw;
 }
 
 @media (prefers-color-scheme: dark) {

@@ -3,13 +3,15 @@ import {SidebarWrapper} from "./sidebar-wrapper"
 
 import css from './sidebar.module.css';
 
-export const setupSidebar = () => {
+export const setupSidebar = async () => {
     let sidebar = document.createElement('wd-sidebar');
     let shadow = sidebar.attachShadow({ mode: 'closed' });
     let style = document.createElement('style');
     style.innerText = css;
 
-    ReactDOM.render(<SidebarWrapper/>, shadow);
-    shadow.appendChild(style);
+    const lastState = await browser.storage.local.get("sidebarState");
+
+    ReactDOM.render(<SidebarWrapper { ...lastState.sidebarState } />, shadow)
+    shadow.appendChild(style)
     document.body.appendChild(sidebar);
 }
