@@ -1,6 +1,5 @@
 import { getRelatedItems } from './get-related-items.js';
 import { templates } from './components/templates.tpl.js';
-import { resolvePlaceholders } from './resolve-placeholders.js';
 import { PrependNav } from './prepend-nav.js';
 
 PrependNav();
@@ -69,6 +68,5 @@ async function updateView(id, useCache = true) {
 			vals: reverseProps[prop].values,
 		});
 		whatLinksHere.appendChild(statement);
-		resolvePlaceholders();
 	}
 }

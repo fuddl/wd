@@ -1,5 +1,5 @@
 import {getAutodesc} from './get-autodesc.js'
-import {resolveBreadcrumbs, resolveIdLinksPlaceholder, resolvePlaceholders} from './resolve-placeholders.js'
+import {resolveBreadcrumbs, resolveIdLinksPlaceholder} from './resolve-placeholders.js'
 import {getAliasesByLang, getValueByLang} from './get-value-by-lang.js'
 import {groupClaims} from './group-claims.js'
 import {templates} from './components/templates.tpl.js'
@@ -7,8 +7,8 @@ import {wikidataGetEntity} from '../wd-get-entity.js'
 import {ApplyFormatters} from './formatters.js'
 import {AddLemmaAffix} from './lemma-afixes.js'
 import browser from 'webextension-polyfill'
-import { PrependNav } from './prepend-nav.js';
-import { getDeducedSenseClaims } from './deduce-sense-statements.js';
+import {PrependNav} from './prepend-nav.js'
+import {getDeducedSenseClaims} from './deduce-sense-statements.js'
 
 if (history.length > 1 || window != window.top) {
 	PrependNav();
@@ -119,10 +119,6 @@ function dateToString(value) {
 	}
 
 	return document.createTextNode(output.join('-') + suffix);
-}
-
-function insertAfter(referenceNode, newNode) {
-	referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
 }
 
 function renderStatements(snak, references, type, target, scope, delta) {
@@ -250,9 +246,6 @@ function renderStatements(snak, references, type, target, scope, delta) {
 function renderStatement(value) {
 	if (value[0].mainsnak) {
 		let pid = value[0].mainsnak.property;
-		let label = templates.placeholder({
-			entity: pid,
-		}, cache);
 
 		let values = [];
 		let hasPreferred = false;
@@ -348,6 +341,130 @@ function renderStatement(value) {
 	}
 }
 
+function createLemmaEnsign(entity) {
+	let labels = document.createDocumentFragment()
+	for (let lang in entity.lemmas) {
+		let lemma = AddLemmaAffix(entity.lemmas[lang].value, {
+			category: entity.lexicalCategory,
+			lang: entity.language,
+			gender: typeof entity.claims?.P5185 === 'object' ? entity.claims?.P5185[0]?.mainsnak?.datavalue?.value?.id : null,
+		})
+
+		if (labels.childNodes.length !== 0) {
+			labels.appendChild(document.createTextNode(' ‧ '))
+		}
+		labels.appendChild(lemma)
+	}
+
+	let lexemeDescription = document.createDocumentFragment()
+
+	lexemeDescription.appendChild(templates.placeholder({
+		entity: entity.language,
+	}, cache))
+
+	lexemeDescription.appendChild(document.createTextNode(', '))
+
+	lexemeDescription.appendChild(templates.placeholder({
+		entity: entity.lexicalCategory,
+	}, cache))
+
+	return templates.ensign({
+		revid: entity.lastrevid,
+		id: entity.id,
+		label: labels,
+		description: {text: lexemeDescription},
+	})
+}
+
+function createCanonicalMeta(id) {
+	let metaCanon = document.createElement('meta')
+	metaCanon.setAttribute('name', 'canonical')
+	metaCanon.setAttribute('content', 'https://www.wikidata.org/wiki/' + id)
+	return metaCanon
+}
+
+function createDescriptionMeta(description) {
+	let metaDesc = document.createElement('meta')
+	metaDesc.setAttribute('name', 'description')
+	metaDesc.setAttribute('content', description)
+	return metaDesc
+}
+
+function createKeywordsMeta(aliases) {
+	let metaKeys = document.createElement('meta')
+	metaKeys.setAttribute('name', 'keywords')
+	metaKeys.setAttribute('content', aliases.join(', '))
+	return metaKeys
+}
+
+function createTitleFragment(entity, initialDescription) {
+	let titleFragment = document.createElement('div')
+	let hasDescription = initialDescription !== false
+
+	const setTitle = (description) => {
+		if (titleFragment.firstChild) {
+			titleFragment.removeChild(titleFragment.firstChild)
+		}
+		titleFragment.appendChild(templates.ensign({
+			revid: entity.lastrevid,
+			id: entity.id,
+			label: getValueByLang(entity, 'labels', entity.title),
+			description: {
+				text: description,
+				provisional: !hasDescription,
+			},
+		}))
+	}
+
+	setTitle(initialDescription)
+
+	if (!hasDescription && 'claims' in entity && 'P31' in entity.claims) {
+		(async () => {
+			setTitle(await getAutodesc(entity.id))
+		})()
+	}
+	return titleFragment
+}
+
+function createActionElements(id) {
+	return templates.actions('Actions', [
+		{
+			link: 'add.html?' + id,
+			moji: './icons/u270Eu002B-addStatement.svg',
+			title: 'Add a statement',
+			desc: 'Extract data from this website',
+			callback: (e) => {
+				browser.runtime.sendMessage({
+					type: 'open_adder',
+					entity: id,
+				})
+			},
+		},
+		{
+			link: '#nocache',
+			moji: './icons/u2B6E-refresh.svg',
+			title: 'Reload data',
+			desc: 'Display an uncached version',
+			callback: (e) => {
+				location.hash = '#nocache'
+				location.reload()
+			},
+		},
+		{
+			link: 'links.html?' + id,
+			moji: './icons/u2BA9u1F4C4uFE0E-articleRedirect.svg',
+			title: 'What links here',
+			desc: 'A list of item that link to this',
+		},
+		{
+			link: 'improve.html?' + id,
+			moji: './icons/u2728-specialPages.svg',
+			title: 'Improve',
+			desc: 'Automatic suggestions on how to improve this item',
+		},
+	])
+}
+
 function updateView(id, useCache = true) {
 	let content = document.getElementById('content');
 
@@ -363,133 +480,32 @@ function updateView(id, useCache = true) {
 			let wrapper = document.createElement('div');
 
 			if (e.lemmas) {
-				let labels = document.createDocumentFragment();
-				for (let lang in e.lemmas) {
-					let lemma = AddLemmaAffix(e.lemmas[lang].value, {
-						category: e.lexicalCategory,
-						lang: e.language,
-						gender: typeof e.claims?.P5185 === 'object' ? e.claims?.P5185[0]?.mainsnak?.datavalue?.value?.id : null,
-					});
-
-					if (labels.childNodes.length !== 0) {
-						labels.appendChild(document.createTextNode(' ‧ '));
-					}
-					labels.appendChild(lemma);
-				}
-
-				let lexemeDescription = document.createDocumentFragment();
-
-				lexemeDescription.appendChild(templates.placeholder({
-					entity: e.language
-				}, cache));
-
-				lexemeDescription.appendChild(document.createTextNode(', '));
-
-				lexemeDescription.appendChild(templates.placeholder({
-					entity: e.lexicalCategory
-				}, cache));
-
-				wrapper.appendChild(templates.ensign({
-					revid: e.lastrevid,
-					id: id,
-					label: labels,
-					description: { text: lexemeDescription },
-				}));
+				wrapper.appendChild(createLemmaEnsign(e))
 			}
-
-
-			let metaCanon = document.createElement('meta');
-			metaCanon.setAttribute('name', 'canonical');
-			metaCanon.setAttribute('content', 'https://www.wikidata.org/wiki/' + id);
-			document.head.appendChild(metaCanon);
+			document.head.appendChild(createCanonicalMeta(id))
 
 			if (e.labels || e.descriptions) {
 
-				document.title = getValueByLang(e, 'labels', e.title);
-				let description = getValueByLang(e, 'descriptions', false);
+				document.title = getValueByLang(e, 'labels', e.title)
 
-				let hasDescription = description != false;
-				let titleFragment = document.createElement('div');
-				wrapper.appendChild(titleFragment);
+				let description = getValueByLang(e, 'descriptions', false)
 
 				if (!description) {
 					description = '???';
 				} else {
-					let metaDesc = document.createElement('meta');
-					metaDesc.setAttribute('name', 'description');
-					metaDesc.setAttribute('content', description);
-					document.head.appendChild(metaDesc);
+					document.head.appendChild(createDescriptionMeta(description))
 				}
+				let titleFragment = createTitleFragment(e, description)
 
-				const setTitle = (description) => {
-					if (titleFragment.firstChild) {
-						titleFragment.removeChild(titleFragment.firstChild);
-					}
-					titleFragment.appendChild(templates.ensign({
-						revid: e.lastrevid,
-						id: id,
-						label: getValueByLang(e, 'labels', e.title),
-						description: {
-							text: description,
-							provisional: !hasDescription
-						},
-					}));
-				}
-
-				setTitle(description);
-
-				if (!hasDescription && 'claims' in e && 'P31' in e.claims) {
-					(async () => {
-						description = await getAutodesc(id);
-						setTitle(description);
-					})()
-				}
+				wrapper.appendChild(titleFragment);
 			}
 
 			let aliases = getAliasesByLang(e);
 			if (aliases) {
-				let metaKeys = document.createElement('meta');
-				metaKeys.setAttribute('name', 'keywords');
-				metaKeys.setAttribute('content', aliases.join(', '));
-				document.head.appendChild(metaKeys);
+				document.head.appendChild(createKeywordsMeta(aliases))
 			}
 
-			footer.appendChild(templates.actions('Actions', [
-				{
-					link: 'add.html?' + id,
-					moji: './icons/u270Eu002B-addStatement.svg',
-					title: 'Add a statement',
-					desc: 'Extract data from this website',
-					callback: (e) => {
-						browser.runtime.sendMessage({
-							type: 'open_adder',
-							entity: id,
-						});
-					}
-				},
-				{
-					link: '#nocache',
-					moji: './icons/u2B6E-refresh.svg',
-					title: 'Reload data',
-					desc: 'Display an uncached version',
-					callback: (e) => {
-						location.hash = '#nocache';
-						location.reload();
-					},
-				},
-				{
-					link: 'links.html?' + id,
-					moji: './icons/u2BA9u1F4C4uFE0E-articleRedirect.svg',
-					title: 'What links here',
-					desc: 'A list of item that link to this',
-				},
-				{
-					link: 'improve.html?' + id,
-					moji: './icons/u2728-specialPages.svg',
-					title: 'Improve',
-					desc: 'Automatic suggestions on how to improve this item',
-				},
-			]));
+			footer.appendChild(createActionElements(id))
 
 			let identifiers = document.createElement('div');
 			let items = document.createElement('div');
@@ -784,7 +800,6 @@ function updateView(id, useCache = true) {
 			});
 		}, 0);
 
-		resolvePlaceholders();
 		resolveBreadcrumbs(cache);
 
 		resolveIdLinksPlaceholder();

@@ -1,10 +1,7 @@
-import { wikidataGetEntity } from '../wd-get-entity.js';
 import { getParents, Breadcrumbs } from './get-parents.js';
 import { templates } from './components/templates.tpl.js';
 import { getFormatterUrls } from './get-formatter-urls.js';
-import { sparqlQuery } from '../sqarql-query.js';
 import { breadcrumbs } from './components/breadcrumbs/breadcrumbs.tpl.js';
-import { getValueByLang } from './get-value-by-lang.js';
 
 function getLink(entityId) {
 	let ns = entityId.charAt(0);
@@ -14,10 +11,6 @@ function getLink(entityId) {
 		L: 'https://www.wikidata.org/wiki/Lexeme:',
 	}
 	return prefixes[ns] + entityId;
-}
-
-function resolvePlaceholders(scope) {
-
 }
 
 function resolveBreadcrumbs(cache) {
@@ -44,7 +37,6 @@ function resolveBreadcrumbs(cache) {
 				}, cache));
 			}
 			placeholder.parentNode.replaceChild(breadcrumbs(trail), placeholder);
-			resolvePlaceholders(placeholder.parentNode);
 		})();
 	}, 0);
 }
@@ -79,4 +71,4 @@ function resolveIdLinksPlaceholder() {
 	}, 0);
 }
 
-export { getLink, resolvePlaceholders, resolveIdLinksPlaceholder, resolveBreadcrumbs }
+export { getLink, resolveIdLinksPlaceholder, resolveBreadcrumbs }

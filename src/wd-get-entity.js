@@ -42,7 +42,7 @@ async function wikidataGetEntity(id, usecache = true, returnSingle = false) {
 			cache: usecache ? 'default' : 'reload',
 		});
 		response = await response.json();
-		let cached = await addToLabelCache(id, response.entities);
+		await addToLabelCache(id, response.entities);
 		return returnSingle ? response.entities[id] : response.entities;
 	} catch(error) {
 		throw ['Fetch Error :-S', error];
