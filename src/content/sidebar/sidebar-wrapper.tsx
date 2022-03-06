@@ -1,7 +1,7 @@
 import * as browser from "webextension-polyfill"
 
 import {useEffect, useState, useRef} from "react"
-import {useTabLocalState} from "../../core/react"
+import {useBrowserLocalState, useTabLocalState} from "../../core/react"
 
 export const SidebarWrapper = () => {
     const frameRef = useRef()
@@ -11,8 +11,8 @@ export const SidebarWrapper = () => {
     // todo show a loading indicator instead of emptiness
     const [url, setUrl] = useState("")
 
-    const [width, setWidth] = useTabLocalState("sidebar.width", 0)
-    const [isLeft, setLeft] = useState(false)
+    const [width, setWidth] = useBrowserLocalState("sidebar.width", 0)
+    const [isLeft, setLeft] = useBrowserLocalState("sidebar.isOnTheLeft", false)
     const [isDragging, setDragging] = useState(false)
 
     const loaded = frameRef?.current?.getAttribute('src')
