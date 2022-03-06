@@ -1,22 +1,21 @@
 import * as browser from "webextension-polyfill"
 
 import {useEffect, useState, useRef} from "react"
-import {useTabLocalState} from "../../core/react"
+import {useBrowserLocalState, useTabLocalState} from "../../core/react"
 
 export const SidebarWrapper = () => {
-    const wrapperRef = useRef()
     const frameRef = useRef()
 
-    const [isOpen, setOpen] = useTabLocalState("sidebarOpen", false)
+    const [isOpen, setOpen] = useTabLocalState("sidebar.open", false)
 
     // todo show a loading indicator instead of emptiness
     const [url, setUrl] = useState("")
 
-    const [width, setWidth] = useState(0)
-    const [isLeft, setLeft] = useState(false)
+    const [width, setWidth] = useBrowserLocalState("sidebar.width", 0)
+    const [isLeft, setLeft] = useBrowserLocalState("sidebar.isOnTheLeft", false)
     const [isDragging, setDragging] = useState(false)
 
-    const loaded = frameRef?.current?.getAttribute('src');
+    const loaded = frameRef?.current?.getAttribute('src')
 
     useEffect(() => {
         const messageCallback = (event) => {
@@ -31,8 +30,8 @@ export const SidebarWrapper = () => {
         }
 
         const windowMessageCallback = (event) => {
-            // make sure the message wasn't sent by a different iframe 
-            if (frameRef?.current?.getAttribute('src').startsWith(event.origin)) {
+			const messageIsFromSidebar = url.startsWith(event.origin)
+			if (messageIsFromSidebar) {
                 if ('data' in event) {
                     // redirect the relevant part of the message to the actual callback
                     messageCallback(event.data)
@@ -78,7 +77,7 @@ export const SidebarWrapper = () => {
             document.removeEventListener('mousemove', updateDrag)
             document.removeEventListener('mouseup', endDrag)
         }
-    }, [isDragging])
+    }, [isDragging, setWidth])
 
     const classes = [
         'sidebar',
@@ -89,20 +88,19 @@ export const SidebarWrapper = () => {
 
     return (
         <>
-            { isDragging && <div className="sidebar__background"></div> }
+            { isDragging && <div className="sidebar__background"/> }
             <div
                 className={classes.join(' ')}
                 style={{ width: width ? `${width}vw` : null }}
-                onMouseUp={endDrag} 
+                onMouseUp={endDrag}
                 onMouseMove={updateDrag}
-                ref={wrapperRef}
             >
                 { url !== ''  && (
                     <iframe className="sidebar__frame" frameBorder="0" src={isOpen || loaded ? url : ''} ref={frameRef}/>
                 )}
                 <div
                     className="sidebar__drag"
-                    onMouseDown={startDrag} 
+                    onMouseDown={startDrag}
                 />
             </div>
         </>
