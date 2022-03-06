@@ -46,12 +46,6 @@
     visibility: hidden;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-    .sidebar--closed > .sidebar__frame {
-        transition: 0s .25s visibility;
-    }
-}
-
 .sidebar__background {
     cursor: col-resize;
     position: fixed;
