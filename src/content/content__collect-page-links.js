@@ -21,14 +21,16 @@ function getClosestID(element) {
 			thisId = element.querySelector('[id]').getAttribute('id');
 			}
 
+			let cleanElement = element.cloneNode(true);
+
 			// removing the edit section link from mediawiki articles
-			let editSectionLink = element.querySelector('.mw-editsection');
+			let editSectionLink = cleanElement.querySelector('.mw-editsection');
 			if (editSectionLink) {
 				editSectionLink.remove();
 			}
 
 		return {
-			section: element.innerText,
+			section: cleanElement.innerText,
 			hash: thisId,
 		};
 	}
