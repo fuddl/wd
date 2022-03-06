@@ -9,6 +9,7 @@ import {AddLemmaAffix} from './lemma-afixes.js'
 import browser from 'webextension-polyfill'
 import {PrependNav} from './prepend-nav.js'
 import {getDeducedSenseClaims} from './deduce-sense-statements.js'
+import {filterNotEmpty} from "../core/collections"
 
 if (history.length > 1 || window != window.top) {
 	PrependNav();
@@ -121,126 +122,146 @@ function dateToString(value) {
 	return document.createTextNode(output.join('-') + suffix);
 }
 
-function renderStatements(snak, references, type, target, scope, delta) {
-	let valueType = snak.datatype ? snak.datatype : snak.datavalue.type ;
+function renderReferences(references) {
+	let sup = document.createElement('sup')
+	let c = 0
+	for (let reference of references) {
+		if (c > 0) {
+			sup.appendChild(document.createTextNode('/'))
+		}
+		sup.appendChild(reference)
+		c++
+	}
+
+	return filterNotEmpty([
+		document.createTextNode('\xa0'),
+		sup.hasChildNodes() ? sup : null,
+	])
+}
+
+function renderQualifiers(scope, delta) {
+	if (!(scope === 'statement' && typeof delta != 'undefined' && delta.hasOwnProperty('qualifiers'))) {
+		return []
+	}
+
+	let qualifiers = []
+	for (let prop of Object.keys(delta.qualifiers)) {
+		let qvalues = []
+		for (let qv of delta.qualifiers[prop]) {
+			let qualvalue = new DocumentFragment()
+			qualvalue.append(...renderStatements(qv, [], qv.snaktype, 'qualifier'))
+			qvalues.push(qualvalue)
+		}
+
+		qualifiers.push({
+			prop: templates.placeholder({entity: prop}),
+			vals: qvalues,
+		})
+	}
+
+	return [templates.annote(qualifiers)]
+}
+
+function renderIdLinks(valueType, snak) {
+	if (valueType === 'external-id' && snak.snaktype === 'value') {
+		return [templates.idLinksPlaceholder(snak.property, snak.datavalue.value)]
+	}
+
+	return []
+}
+
+function renderStatementCore(snak, type, scope, valueType) {
 	if (type === 'preformatted') {
-		target.appendChild(snak.datavalue.value);
+		return [snak.datavalue.value]
 	}
 	if (type === 'value' || scope === 'reference') {
 		if (valueType === "time") {
-			let date = dateToString(snak.datavalue.value);
+			let date = dateToString(snak.datavalue.value)
 			if (date) {
-				target.appendChild(templates.time({
+				return [templates.time({
 					text: date,
-				}));
+				})]
 			}
 		}
-		if (valueType === "wikibase-item" || valueType === "wikibase-entityid" || valueType === "wikibase-lexeme" || valueType === "wikibase-form"	|| valueType === "wikibase-sense") {
-			let vid = snak.datavalue.value.id;
-			if (snak.datavalue.parents) {
-				target.appendChild(templates.breadcrumbsPlaceholder(snak.datavalue.parents));
-			}
-			target.appendChild(templates.placeholder({
-				entity: vid,
-			}, cache));
+		if (valueType === "wikibase-item" || valueType === "wikibase-entityid" || valueType === "wikibase-lexeme" || valueType === "wikibase-form" || valueType === "wikibase-sense") {
+			let vid = snak.datavalue.value.id
+			return filterNotEmpty([
+				snak.datavalue.parents ? templates.breadcrumbsPlaceholder(snak.datavalue.parents) : null,
+				templates.placeholder({entity: vid}, cache),
+			])
 		}
 		if (valueType === "external-id") {
-			target.appendChild(templates.code(snak.datavalue.value));
+			return [templates.code(snak.datavalue.value)]
 		}
 		if (valueType === "string") {
-			target.appendChild(document.createTextNode(snak.datavalue.value));
+			return [document.createTextNode(snak.datavalue.value)]
 		}
 		if (valueType === "url") {
-			let humanReadable = snak.datavalue.value;
-			target.appendChild(templates.urlLink(snak.datavalue.value));
+			return [templates.urlLink(snak.datavalue.value)]
 		}
 		if (valueType === 'quantity') {
-			target.appendChild(templates.unitNumber({
+			return [templates.unitNumber({
 				number: snak.datavalue.value.amount,
 				unit: snak?.datavalue?.value?.unit,
-			}));
+			})]
 		}
-		if (valueType === "globe-coordinate" || valueType ===	'globecoordinate') {
-			target.appendChild(templates.mercator({
+		if (valueType === "globe-coordinate" || valueType === 'globecoordinate') {
+			return [templates.mercator({
 				lat: snak.datavalue.value.latitude,
 				lon: snak.datavalue.value.longitude,
 				pre: snak.datavalue.value.precision,
 				height: 500,
 				width: 500,
-			}));
+			})]
 		}
 		if (valueType === "monolingualtext") {
-			target.appendChild(templates.title({
+			return [templates.title({
 				text: snak.datavalue.value.text,
-				lang: snak.datavalue.value.language
-			}));
+				lang: snak.datavalue.value.language,
+			})]
 		}
 		if (valueType === "commonsMedia") {
-			let name = encodeURIComponent(snak.datavalue.value);
+			let name = encodeURIComponent(snak.datavalue.value)
 			if (name.match(/\.svg$/i)) {
-				target.appendChild(templates.image({
-					src: `https://commons.wikimedia.org/wiki/Special:FilePath/${ name }`
-				}));
+				return [templates.image({
+					src: `https://commons.wikimedia.org/wiki/Special:FilePath/${name}`,
+				})]
 			} else if (name.match(/\.(jpe?g|png|gif|tiff?|stl)$/i)) {
-				target.appendChild(templates.picture({
+				return [templates.picture({
 					srcSet: {
-						250: `https://commons.wikimedia.org/wiki/Special:FilePath/${ name }?width=250px`,
-						501: `https://commons.wikimedia.org/wiki/Special:FilePath/${ name }?width=501px`,
-						801: `https://commons.wikimedia.org/wiki/Special:FilePath/${ name }?width=801px`,
-						1068: `https://commons.wikimedia.org/wiki/Special:FilePath/${ name }?width=1068px`,
-					}
-				}));
+						250: `https://commons.wikimedia.org/wiki/Special:FilePath/${name}?width=250px`,
+						501: `https://commons.wikimedia.org/wiki/Special:FilePath/${name}?width=501px`,
+						801: `https://commons.wikimedia.org/wiki/Special:FilePath/${name}?width=801px`,
+						1068: `https://commons.wikimedia.org/wiki/Special:FilePath/${name}?width=1068px`,
+					},
+				})]
 			} else if (name.match(/\.(wav|og[ga])$/i)) {
-				target.appendChild(templates.audio({
-					src: `https://commons.wikimedia.org/wiki/Special:FilePath/${ name }`
-				}));
+				return [templates.audio({
+					src: `https://commons.wikimedia.org/wiki/Special:FilePath/${name}`,
+				})]
 			} else if (name.match(/\.webm$/i)) {
-				target.appendChild(templates.video({
-					poster: `https://commons.wikimedia.org/wiki/Special:FilePath/${ name }?width=801px`,
-					src: `https://commons.wikimedia.org/wiki/Special:FilePath/${ name }`
-				}));
+				return [templates.video({
+					poster: `https://commons.wikimedia.org/wiki/Special:FilePath/${name}?width=801px`,
+					src: `https://commons.wikimedia.org/wiki/Special:FilePath/${name}`,
+				})]
 			}
 		}
-	} else if(type === 'novalue') {
-		target.appendChild(document.createTextNode('—'));
-	} else if(type === 'somevalue') {
-		target.appendChild(document.createTextNode('?'));
+	} else if (type === 'novalue') {
+		return [document.createTextNode('—')]
+	} else if (type === 'somevalue') {
+		return [document.createTextNode('?')]
 	}
-	if (target) {
-		target.appendChild(document.createTextNode('\xa0'));
-		let sup = document.createElement('sup');
-		let c = 0;
-		for (let reference of references) {
-			if (c > 0) {
-				sup.appendChild(document.createTextNode('/'));
-			}
-			sup.appendChild(reference);
-			c++;
-		}
-		if (sup.hasChildNodes()) {
-			target.appendChild(sup);
-		}
-	}
-	if (valueType === "external-id" && snak.snaktype === "value") {
-		target.appendChild(templates.idLinksPlaceholder(snak.property, snak.datavalue.value));
-	}
-	if (scope === 'statement' && typeof delta != 'undefined' && delta.hasOwnProperty('qualifiers')) {
-		let qualifiers = [];
-		for (let prop of Object.keys(delta.qualifiers)) {
-			let qvalues = [];
-			for (let qv of delta.qualifiers[prop]) {
-				let qualvalue = new DocumentFragment();
-				renderStatements(qv,[], qv.snaktype, qualvalue, 'qualifier');
-				qvalues.push(qualvalue);
-			}
+	return []
+}
 
-			qualifiers.push({
-				prop: templates.placeholder({ entity: prop }),
-				vals: qvalues,
-			});
-		}
-		target.appendChild(templates.annote(qualifiers));
-	}
+function renderStatements(snak, references, type, scope, delta) {
+	const valueType = snak.datatype ? snak.datatype : snak.datavalue.type
+	return [
+		...renderStatementCore(snak, type, scope, valueType),
+		...renderReferences(references),
+		...renderIdLinks(valueType, snak),
+		...renderQualifiers(scope, delta),
+	]
 }
 
 function renderStatement(value) {
@@ -282,7 +303,7 @@ function renderStatement(value) {
 									if (refthing.datavalue) {
 										let refvalue = new DocumentFragment();
 
-										renderStatements(refthing, [], refthing.datavalue.type, refvalue, 'reference');
+										refvalue.append(...renderStatements(refthing, [], refthing.datavalue.type, 'reference'))
 										refvalues.push(refvalue);
 									}
 								}
@@ -315,8 +336,7 @@ function renderStatement(value) {
 					}
 				}
 
-				renderStatements(delta.mainsnak, refs, type, thisvalue, 'statement', delta);
-
+				thisvalue.append(...renderStatements(delta.mainsnak, refs, type, 'statement', delta))
 				values.push(thisvalue);
 
 			}
@@ -426,8 +446,8 @@ function createTitleFragment(entity, initialDescription) {
 	return titleFragment
 }
 
-function createActionElements(id) {
-	return templates.actions('Actions', [
+const createActionElements = id =>
+	templates.actions('Actions', [
 		{
 			link: 'add.html?' + id,
 			moji: './icons/u270Eu002B-addStatement.svg',
@@ -463,7 +483,6 @@ function createActionElements(id) {
 			desc: 'Automatic suggestions on how to improve this item',
 		},
 	])
-}
 
 function updateView(id, useCache = true) {
 	let content = document.getElementById('content');
