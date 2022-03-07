@@ -1,23 +1,19 @@
 import {getAutodesc} from './get-autodesc.js'
 import {resolveBreadcrumbs, resolveIdLinksPlaceholder} from './resolve-placeholders.js'
 import {getAliasesByLang, getValueByLang} from './get-value-by-lang.js'
-import {groupClaims} from './group-claims.js'
 import {templates} from './components/templates.tpl.js'
 import {wikidataGetEntity} from '../wd-get-entity.js'
-import {ApplyFormatters} from './formatters.js'
 import {AddLemmaAffix} from './lemma-afixes.js'
 import browser from 'webextension-polyfill'
 import {PrependNav} from './prepend-nav.js'
 import {getDeducedSenseClaims} from './deduce-sense-statements.js'
-import {filterNotEmpty} from "../core/collections"
+import * as ReactDOM from 'react-dom'
+import {Claims} from './components/claims'
+import {localLanguage} from '../core/env'
 
 if (history.length > 1 || window != window.top) {
 	PrependNav();
 }
-
-const lang = navigator.language.substr(0,2);
-const footnoteStorage = {};
-let refCounter = {};
 
 let cache = {}
 
@@ -45,319 +41,6 @@ if (window.location.search) {
 	let currentEntity = window.location.search.match(/^\?(\w\d+)/, '')[1];
 	if (currentEntity.match(/[QMPL]\d+/)) {
 		updateView(currentEntity, window.location.hash !== '#nocache');
-	}
-}
-
-function dateToString(value) {
-	let wiso = value.time;
-	let prec = value.precision;
-
-	if (prec <= 6) {
-		return false;
-	}
-
-	let suffix = wiso.startsWith('-') ? ' BCE' : '';
-
-	let pad = function (i) {
-		if (i < 10) {
-			return '0' + i;
-		}
-		return i;
-	}
-
-	let iso = wiso
-		.replace(/^(\+|-)/, '')
-		.replace(/Z$/, '')
-		.replace(/^(\d+)-00/, '$1-01')
-		.replace(/^(\d+)-(\d+)-00/, '$1-$2-01')
-		+ 'Z';
-
-	let date = new Date(iso);
-
-	let output = [];
-	if (prec === 7) {
-		let text = date.getFullYear().toString().slice(0, -2) + 'XX' + suffix;
-		return templates.proxy({
-			query: `
-				SELECT ?innerText WHERE {
-					?century wdt:P31 wd:Q578.
-					?century wdt:P585 "${ iso }Z"^^xsd:dateTime.
-					SERVICE wikibase:label
-					{
-						bd:serviceParam wikibase:language "[AUTO_LANGUAGE],${ lang }".
-						?century rdfs:label ?innerText.
-					}
-				}
-				LIMIT 1`,
-			text: text,
-		});
-	} else if (prec === 8) {
-		let text =	date.getFullYear().toString().slice(0, -1) + 'X';
-		return templates.proxy({
-			query: `
-				SELECT ?innerText WHERE {
-					?decade wdt:P31 wd:Q39911.
-					?decade wdt:P585 "${ iso }Z"^^xsd:dateTime.
-					SERVICE wikibase:label
-					{
-						bd:serviceParam wikibase:language "[AUTO_LANGUAGE],${ lang }".
-						?decade rdfs:label ?innerText.
-					}
-				}
-				LIMIT 1`,
-			text: text,
-		});
-	} else {
-		if (prec > 8) {
-			output.push(date.getUTCFullYear());
-		}
-		if (prec > 9) {
-			output.push(pad(date.getUTCMonth() + 1));
-		}
-		if (prec > 10) {
-			output.push(pad(date.getUTCDate()));
-		}
-	}
-
-	return document.createTextNode(output.join('-') + suffix);
-}
-
-function renderReferences(references) {
-	let sup = document.createElement('sup')
-	let c = 0
-	for (let reference of references) {
-		if (c > 0) {
-			sup.appendChild(document.createTextNode('/'))
-		}
-		sup.appendChild(reference)
-		c++
-	}
-
-	return filterNotEmpty([
-		document.createTextNode('\xa0'),
-		sup.hasChildNodes() ? sup : null,
-	])
-}
-
-function renderQualifiers(scope, delta) {
-	if (!(scope === 'statement' && typeof delta != 'undefined' && delta.hasOwnProperty('qualifiers'))) {
-		return []
-	}
-
-	let qualifiers = []
-	for (let prop of Object.keys(delta.qualifiers)) {
-		let qvalues = []
-		for (let qv of delta.qualifiers[prop]) {
-			let qualvalue = new DocumentFragment()
-			qualvalue.append(...renderStatements(qv, [], qv.snaktype, 'qualifier'))
-			qvalues.push(qualvalue)
-		}
-
-		qualifiers.push({
-			prop: templates.placeholder({entity: prop}),
-			vals: qvalues,
-		})
-	}
-
-	return [templates.annote(qualifiers)]
-}
-
-function renderIdLinks(valueType, snak) {
-	if (valueType === 'external-id' && snak.snaktype === 'value') {
-		return [templates.idLinksPlaceholder(snak.property, snak.datavalue.value)]
-	}
-
-	return []
-}
-
-function renderStatementCore(snak, type, scope, valueType) {
-	if (type === 'preformatted') {
-		return [snak.datavalue.value]
-	}
-	if (type === 'value' || scope === 'reference') {
-		if (valueType === "time") {
-			let date = dateToString(snak.datavalue.value)
-			if (date) {
-				return [templates.time({
-					text: date,
-				})]
-			}
-		}
-		if (valueType === "wikibase-item" || valueType === "wikibase-entityid" || valueType === "wikibase-lexeme" || valueType === "wikibase-form" || valueType === "wikibase-sense") {
-			let vid = snak.datavalue.value.id
-			return filterNotEmpty([
-				snak.datavalue.parents ? templates.breadcrumbsPlaceholder(snak.datavalue.parents) : null,
-				templates.placeholder({entity: vid}, cache),
-			])
-		}
-		if (valueType === "external-id") {
-			return [templates.code(snak.datavalue.value)]
-		}
-		if (valueType === "string") {
-			return [document.createTextNode(snak.datavalue.value)]
-		}
-		if (valueType === "url") {
-			return [templates.urlLink(snak.datavalue.value)]
-		}
-		if (valueType === 'quantity') {
-			return [templates.unitNumber({
-				number: snak.datavalue.value.amount,
-				unit: snak?.datavalue?.value?.unit,
-			})]
-		}
-		if (valueType === "globe-coordinate" || valueType === 'globecoordinate') {
-			return [templates.mercator({
-				lat: snak.datavalue.value.latitude,
-				lon: snak.datavalue.value.longitude,
-				pre: snak.datavalue.value.precision,
-				height: 500,
-				width: 500,
-			})]
-		}
-		if (valueType === "monolingualtext") {
-			return [templates.title({
-				text: snak.datavalue.value.text,
-				lang: snak.datavalue.value.language,
-			})]
-		}
-		if (valueType === "commonsMedia") {
-			let name = encodeURIComponent(snak.datavalue.value)
-			if (name.match(/\.svg$/i)) {
-				return [templates.image({
-					src: `https://commons.wikimedia.org/wiki/Special:FilePath/${name}`,
-				})]
-			} else if (name.match(/\.(jpe?g|png|gif|tiff?|stl)$/i)) {
-				return [templates.picture({
-					srcSet: {
-						250: `https://commons.wikimedia.org/wiki/Special:FilePath/${name}?width=250px`,
-						501: `https://commons.wikimedia.org/wiki/Special:FilePath/${name}?width=501px`,
-						801: `https://commons.wikimedia.org/wiki/Special:FilePath/${name}?width=801px`,
-						1068: `https://commons.wikimedia.org/wiki/Special:FilePath/${name}?width=1068px`,
-					},
-				})]
-			} else if (name.match(/\.(wav|og[ga])$/i)) {
-				return [templates.audio({
-					src: `https://commons.wikimedia.org/wiki/Special:FilePath/${name}`,
-				})]
-			} else if (name.match(/\.webm$/i)) {
-				return [templates.video({
-					poster: `https://commons.wikimedia.org/wiki/Special:FilePath/${name}?width=801px`,
-					src: `https://commons.wikimedia.org/wiki/Special:FilePath/${name}`,
-				})]
-			}
-		}
-	} else if (type === 'novalue') {
-		return [document.createTextNode('—')]
-	} else if (type === 'somevalue') {
-		return [document.createTextNode('?')]
-	}
-	return []
-}
-
-function renderStatements(snak, references, type, scope, delta) {
-	const valueType = snak.datatype ? snak.datatype : snak.datavalue.type
-	return [
-		...renderStatementCore(snak, type, scope, valueType),
-		...renderReferences(references),
-		...renderIdLinks(valueType, snak),
-		...renderQualifiers(scope, delta),
-	]
-}
-
-function renderStatement(value) {
-	if (value[0].mainsnak) {
-		let pid = value[0].mainsnak.property;
-
-		let values = [];
-		let hasPreferred = false;
-		for (let delta of value) {
-			if (delta.rank == "preferred") {
-				hasPreferred = true;
-			}
-		}
-		for (const [key, delta] of Object.entries(value)) {
-			if (delta.rank == "deprecated" || (delta.rank == "normal" && hasPreferred)) {
-				delete value[key];
-			}
-		}
-		for (let delta of value) {
-			if (delta && delta.hasOwnProperty('mainsnak') && delta.mainsnak) {
-				let thisvalue = new DocumentFragment();
-				let type = delta.mainsnak.snaktype;
-				let refs = [];
-				if (delta.references) {
-					for (let ref of delta.references) {
-						let listItem;
-						let refvalues = [];
-						if (typeof refCounter[ref.hash] === 'undefined') {
-							listItem = document.createElement('li');
-							refCounter[ref.hash] = {
-								item: listItem,
-							}
-
-							let formatted = ApplyFormatters(ref.snaks, 'reference')
-
-
-							for (let key in formatted) {
-								for (let refthing of formatted[key]) {
-									if (refthing.datavalue) {
-										let refvalue = new DocumentFragment();
-
-										refvalue.append(...renderStatements(refthing, [], refthing.datavalue.type, 'reference'))
-										refvalues.push(refvalue);
-									}
-								}
-								if (key.match(/^P\d+/)) {
-									let refStatement = templates.proof({
-										prop: templates.placeholder({
-											entity: key,
-										}, cache),
-										vals: refvalues,
-									});
-									listItem.appendChild(refStatement);
-								} else {
-									for (let refvalue of refvalues) {
-										listItem.appendChild(refvalue)
-									}
-								}
-							}
-						} else {
-							listItem = refCounter[ref.hash].item;
-						}
-						listItem.setAttribute('id', ref.hash);
-						refs.push(templates.footnoteRef({
-							text: '▐',
-							link: '#' + ref.hash,
-							title: listItem.innerText,
-						}));
-						footnoteStorage[ref.hash] = {
-							content: listItem,
-						};
-					}
-				}
-
-				thisvalue.append(...renderStatements(delta.mainsnak, refs, type, 'statement', delta))
-				values.push(thisvalue);
-
-			}
-		}
-
-		let statement = templates.remark({
-			prop: templates.placeholder({
-				entity: pid,
-			}, cache),
-			vals: values,
-			id: pid,
-		});
-
-		let firstValue = value.find(x=>x!==undefined);
-
-		if (firstValue) {
-			return {
-				rendered: statement,
-				type: firstValue.mainsnak.snaktype,
-			};
-		}
 	}
 }
 
@@ -485,6 +168,8 @@ const createActionElements = id =>
 	])
 
 function updateView(id, useCache = true) {
+	const footnoteStorage = {}
+
 	let content = document.getElementById('content');
 
 	let footer = document.getElementById('footer');
@@ -527,7 +212,9 @@ function updateView(id, useCache = true) {
 			footer.appendChild(createActionElements(id))
 
 			let identifiers = document.createElement('div');
+			identifiers.className = 'identifiers'
 			let items = document.createElement('div');
+			items.className = 'items'
 			let glosses = document.createElement('div');
 
 			wrapper.appendChild(glosses);
@@ -537,16 +224,7 @@ function updateView(id, useCache = true) {
 
 			if (e.claims || e.statements) {
 				let statements = await enrichStatements(e.claims ? e.claims : e.statements);
-				for (let prop of groupClaims(statements)) {
-					let statement = renderStatement(statements[prop]);
-					if (statement) {
-						if (statement.type !== "external-id") {
-							items.appendChild(statement.rendered);
-						} else {
-							identifiers.appendChild(statement.rendered);
-						}
-					}
-				}
+				ReactDOM.render(<Claims claims={statements}/>, items)
 			}
 			if (e['senses']) {
 				const singleSense = e['senses'].length === 1;
@@ -773,7 +451,7 @@ function updateView(id, useCache = true) {
 				let section = document.createElement('section');
 				let heading = document.createElement('h2');
 				let headingText = templates.placeholder({
-					json: `https://www.wikidata.org/w/api.php?action=parse&page=Translations:Help:Data_type/87/${lang}&disableeditsection=true&format=json`,
+					json: `https://www.wikidata.org/w/api.php?action=parse&page=Translations:Help:Data_type/87/${(localLanguage())}&disableeditsection=true&format=json`,
 					type: 'span',
 					extractor: (input) => {
 						if (input?.parse?.text?.['*']) {
