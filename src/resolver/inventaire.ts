@@ -7,7 +7,7 @@ const inventaire: RegexResolver = {
 		return await this.getEntityId(location) !== null
 	},
 	async getEntityId(location) {
-		return location.href.match(this.inventaireRegex) != null ? location.href.match(this.inventaireRegex)[1] : null
+		return location.href.match(this.regex) != null ? location.href.match(this.regex)[1] : null
 	},
 }
 

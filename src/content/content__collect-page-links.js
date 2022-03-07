@@ -244,7 +244,7 @@ async function collectPageLinks(subject) {
         ' which could be associated to wikidata items. Checking now.',
     ])
 
-    linksWithMatches.forEach(it => it.setup().then(() => it.init()))
+    linksWithMatches.forEach(it => it.setup().then(() => it.init()).catch(console.error))
 }
 
 

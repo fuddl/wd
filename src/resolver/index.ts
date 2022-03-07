@@ -76,4 +76,4 @@ export const getMatchSuggestions = async (location: LocationLike)
 
 export const findFirstMatchingResolver =
 	async (location: LocationLike): Promise<Resolver | null> =>
-		findAsync(resolvers, async resolver => resolver.applicable(location))
+		findAsync(resolvers, resolver => resolver.applicable(location))
