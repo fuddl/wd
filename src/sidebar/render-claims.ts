@@ -1,12 +1,8 @@
 import {templates} from './components/templates.tpl'
 import {filterNotEmpty} from '../core/collections'
-import {ApplyFormatters} from './formatters'
 import {localLanguage} from '../core/env'
 
-const cache = {} //todo broken now!!
-
 const lang = localLanguage()
-
 
 function dateToString(value) {
 	const wiso = value.time
@@ -99,7 +95,7 @@ function renderReferences(references) {
 	])
 }
 
-function renderQualifiers(scope, delta) {
+function renderQualifiers(scope, delta, renderingCache: any) {
 	if (!(scope === 'statement' && typeof delta != 'undefined' && delta.hasOwnProperty('qualifiers'))) {
 		return []
 	}
@@ -109,7 +105,7 @@ function renderQualifiers(scope, delta) {
 		const qvalues = []
 		for (const qv of delta.qualifiers[prop]) {
 			const qualvalue = new DocumentFragment()
-			qualvalue.append(...renderStatements(qv, [], qv.snaktype, 'qualifier', undefined))
+			qualvalue.append(...renderStatements(qv, [], qv.snaktype, 'qualifier', undefined, renderingCache))
 			qvalues.push(qualvalue)
 		}
 
@@ -130,7 +126,7 @@ function renderIdLinks(valueType, snak) {
 	return []
 }
 
-function renderStatementCore(snak, type, scope, valueType) {
+function renderStatementCore(snak, type, scope, valueType, renderingCache: any) {
 	if (type === 'preformatted') {
 		return [snak.datavalue.value]
 	}
@@ -147,7 +143,7 @@ function renderStatementCore(snak, type, scope, valueType) {
 			const vid = snak.datavalue.value.id
 			return filterNotEmpty([
 				snak.datavalue.parents ? templates.breadcrumbsPlaceholder(snak.datavalue.parents) : null,
-				templates.placeholder({entity: vid}, cache),
+				templates.placeholder({entity: vid}, renderingCache),
 			])
 		}
 		if (valueType === 'external-id') {
@@ -214,13 +210,13 @@ function renderStatementCore(snak, type, scope, valueType) {
 	return []
 }
 
-export function renderStatements(snak, references, type, scope, delta) {
+export function renderStatements(snak, references, type, scope, delta, renderingCache: any) {
 	const valueType = snak.datatype ? snak.datatype : snak.datavalue.type
 	return [
-		...renderStatementCore(snak, type, scope, valueType),
+		...renderStatementCore(snak, type, scope, valueType, renderingCache),
 		...renderReferences(references),
 		...renderIdLinks(valueType, snak),
-		...renderQualifiers(scope, delta),
+		...renderQualifiers(scope, delta, renderingCache),
 	]
 }
 
@@ -234,7 +230,7 @@ export interface Claim {
 	// todo improve
 }
 
-export function renderStatement(claims: Claim[]) {
+export function renderStatement(claims: Claim[], renderingCache: any) {
 	if (!claims[0]?.mainsnak) return
 
 	const pid = claims[0].mainsnak.property
@@ -253,7 +249,7 @@ export function renderStatement(claims: Claim[]) {
 				}
 			}
 
-			thisvalue.append(...renderStatements(delta.mainsnak, refs, type, 'statement', delta))
+			thisvalue.append(...renderStatements(delta.mainsnak, refs, type, 'statement', delta, renderingCache))
 			values.push(thisvalue)
 
 		}
@@ -261,7 +257,7 @@ export function renderStatement(claims: Claim[]) {
 	const statement = templates.remark({
 		prop: templates.placeholder({
 			entity: pid,
-		}, cache),
+		}, renderingCache),
 		vals: values,
 		id: pid,
 	})

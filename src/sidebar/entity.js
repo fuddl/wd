@@ -189,7 +189,7 @@ function createReferenceItem(ref) {
 				if (refthing.datavalue) {
 					const refvalue = new DocumentFragment()
 
-					refvalue.append(...renderStatements(refthing, [], refthing.datavalue.type, 'reference', undefined))
+					refvalue.append(...renderStatements(refthing, [], refthing.datavalue.type, 'reference', undefined, cache))
 					refvalues.push(refvalue)
 				}
 			}
@@ -331,7 +331,7 @@ function updateView(id, useCache = true) {
 
 				const statementsToRender = getStatementsToRender(statements)
 
-				ReactDOM.render(<Claims statements={statementsToRender}/>, items, )
+				ReactDOM.render(<Claims statements={statementsToRender} renderingCache={cache}/>, items, )
 				renderFootnotes(content, collectFootnotes(statementsToRender))
 			}
 			if (e['senses']) {
@@ -584,7 +584,10 @@ function updateView(id, useCache = true) {
 			}
 		}
 
-		resolveBreadcrumbs(cache);
+		// Let react render main set of claims first
+		await delay(0)
+
+		resolveBreadcrumbs(cache)
 
 		resolveIdLinksPlaceholder();
 	})();
