@@ -214,7 +214,7 @@ function renderStatementCore(snak, type, scope, valueType) {
 	return []
 }
 
-function renderStatements(snak, references, type, scope, delta) {
+export function renderStatements(snak, references, type, scope, delta) {
 	const valueType = snak.datatype ? snak.datatype : snak.datavalue.type
 	return [
 		...renderStatementCore(snak, type, scope, valueType),
@@ -224,84 +224,32 @@ function renderStatements(snak, references, type, scope, delta) {
 	]
 }
 
-const refCounter = {}
 
-function createRefLink(ref) {
-	let listItem
-	const refvalues = []
-	if (typeof refCounter[ref.hash] === 'undefined') {
-		listItem = document.createElement('li')
-		refCounter[ref.hash] = {
-			item: listItem,
-		}
 
-		const formatted = ApplyFormatters(ref.snaks, 'reference')
-
-		for (const key in formatted) {
-			for (const refthing of formatted[key]) {
-				if (refthing.datavalue) {
-					const refvalue = new DocumentFragment()
-
-					refvalue.append(...renderStatements(refthing, [], refthing.datavalue.type, 'reference', undefined))
-					refvalues.push(refvalue)
-				}
-			}
-			if (key.match(/^P\d+/)) {
-				const refStatement = templates.proof({
-					prop: templates.placeholder({
-						entity: key,
-					}, cache),
-					vals: refvalues,
-				})
-				listItem.appendChild(refStatement)
-			} else {
-				for (const refvalue of refvalues) {
-					listItem.appendChild(refvalue)
-				}
-			}
-		}
-	} else {
-		listItem = refCounter[ref.hash].item
-	}
-	listItem.setAttribute('id', ref.hash)
-	return listItem
+export interface Claim {
+	rank: 'deprecated' | 'normal' | 'preferred'
+	mainsnak: any
+	references: any
+	type: string
+	// todo improve
 }
 
-export function renderStatement(value, footnoteStorage) {
-	if (!value[0].mainsnak) {
-		return
-	}
+export function renderStatement(claims: Claim[]) {
+	if (!claims[0]?.mainsnak) return
 
-	const pid = value[0].mainsnak.property
+	const pid = claims[0].mainsnak.property
 	const values = []
-	let hasPreferred = false
-	for (const delta of value) {
-		if (delta.rank == 'preferred') {
-			hasPreferred = true
-		}
-	}
-	for (const [key, delta] of Object.entries(value)) {
-		if (delta.rank == 'deprecated' || (delta.rank == 'normal' && hasPreferred)) {
-			delete value[key]
-		}
-	}
-	for (const delta of value) {
+	for (const delta of claims) {
 		if (delta?.mainsnak) {
 			const thisvalue = new DocumentFragment()
 			const type = delta.mainsnak.snaktype
 			const refs = []
 			if (delta.references) {
 				for (const ref of delta.references) {
-					const listItem = createRefLink(ref)
 					refs.push(templates.footnoteRef({
 						text: '▐',
 						link: '#' + ref.hash,
-						// todo commit current state
-						// title: listItem.innerText,
 					}))
-					footnoteStorage[ref.hash] = {
-						content: listItem,
-					}
 				}
 			}
 
@@ -317,7 +265,7 @@ export function renderStatement(value, footnoteStorage) {
 		vals: values,
 		id: pid,
 	})
-	const firstValue = value.find(x => x !== undefined)
+	const firstValue = claims.find(x => x !== undefined)
 	if (firstValue) {
 		return {
 			rendered: statement,

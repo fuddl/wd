@@ -1,21 +1,16 @@
 import {useEffect, useRef} from 'react'
-import {groupClaims} from '../group-claims'
-import {renderStatement} from "../render-claims"
+import {Claim, renderStatement} from "../render-claims"
 
-interface Claim {
-	// todo
+export interface ClaimsProps {
+	statements: {id: string, claims: Claim[]}[]
 }
 
-interface ClaimsProps {
-	claims: Claim[]
-}
-
-export const Claims = ({claims}: ClaimsProps) => {
+// Integration based on https://reactjs.org/docs/integrating-with-other-libraries.html
+export const Claims = ({statements}: ClaimsProps) => {
 	const reference = useRef<HTMLDivElement>(null)
 	useEffect(() => {
-		// todo footnotes broken
-		const rendered = groupClaims(claims)
-			.map(prop => renderStatement(claims[prop], {}))
+		const rendered = statements
+			.map(it => renderStatement(it.claims))
 			.filter(Boolean)
 			.map(claim => claim.rendered)
 

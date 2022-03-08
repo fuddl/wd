@@ -10,6 +10,10 @@ import {getDeducedSenseClaims} from './deduce-sense-statements.js'
 import * as ReactDOM from 'react-dom'
 import {Claims} from './components/claims'
 import {localLanguage} from '../core/env'
+import {groupClaims} from "./group-claims"
+import {ApplyFormatters} from "./formatters"
+import {renderStatements} from "./render-claims"
+import {delay} from "../core/async"
 
 if (history.length > 1 || window != window.top) {
 	PrependNav();
@@ -167,9 +171,109 @@ const createActionElements = id =>
 		},
 	])
 
-function updateView(id, useCache = true) {
-	const footnoteStorage = {}
+const refCounter = {}
 
+function createReferenceItem(ref) {
+	let listItem
+	const refvalues = []
+	if (typeof refCounter[ref.hash] === 'undefined') {
+		listItem = document.createElement('li')
+		refCounter[ref.hash] = {
+			item: listItem,
+		}
+
+		const formatted = ApplyFormatters(ref.snaks, 'reference')
+
+		for (const key in formatted) {
+			for (const refthing of formatted[key]) {
+				if (refthing.datavalue) {
+					const refvalue = new DocumentFragment()
+
+					refvalue.append(...renderStatements(refthing, [], refthing.datavalue.type, 'reference', undefined))
+					refvalues.push(refvalue)
+				}
+			}
+			if (key.match(/^P\d+/)) {
+				const refStatement = templates.proof({
+					prop: templates.placeholder({
+						entity: key,
+					}, cache),
+					vals: refvalues,
+				})
+				listItem.appendChild(refStatement)
+			} else {
+				for (const refvalue of refvalues) {
+					listItem.appendChild(refvalue)
+				}
+			}
+		}
+	} else {
+		listItem = refCounter[ref.hash].item
+	}
+	listItem.setAttribute('id', ref.hash)
+	return listItem
+}
+
+function collectFootnotes(statements) {
+	const footnotes = statements
+		.flatMap(it => it.claims)
+		.filter(it => it?.mainsnak && it?.references)
+		.flatMap(it => it.references)
+		.map(ref =>
+			[ref.hash, {content: createReferenceItem(ref)}],
+		)
+	return Object.fromEntries(footnotes)
+}
+
+function getHigherPriorityClaims(claims) {
+	const hasPreferred = claims.find(it => it.rank == 'preferred')
+	const highPriority = (it) => !hasPreferred && it.rank == 'normal' || it.rank == 'preferred'
+
+	return claims.filter(highPriority)
+}
+
+
+const getStatementsToRender = statements =>
+	groupClaims(statements).map(it => ({
+		id: it.id,
+		claims: getHigherPriorityClaims(it.claims),
+	}))
+
+async function renderFootnotes(content, footnoteStorage) {
+	/**
+	 * todo a better way
+	 * the issue right now is that things are rendered asynchronously in React (via useEffect)
+	 * and as footnote rendering relies on elements existing in the DOM,
+	 * it'll fail to render
+	 *
+	 * delay(0) pushes this back to async queue, but this is likely not reliable
+	 *
+	 * one potential way to deal with this is to send event whe main claims are rendered
+	 * another to have these both under react management
+	 */
+	await delay(0)
+	let footnotes = content.querySelectorAll('.footnote')
+
+	let references = document.createElement('ol')
+
+	let footnoteNumber = 1
+	Array.from(footnotes).reduce((k, footnote) => {
+		let footnoteId = footnote.getAttribute('href').substr(1)
+		let referenceItem = footnoteStorage[footnoteId].content
+		if (!footnoteStorage[footnoteId].number) {
+			references.appendChild(referenceItem)
+			footnoteStorage[footnoteId].number = footnoteNumber
+			footnoteNumber++
+		}
+		footnote.innerText = footnoteStorage[footnoteId].number
+		content.appendChild(references)
+		footnote.addEventListener('mouseover', () => {
+			footnote.setAttribute('title', referenceItem.innerText)
+		})
+	}, 0)
+}
+
+function updateView(id, useCache = true) {
 	let content = document.getElementById('content');
 
 	let footer = document.getElementById('footer');
@@ -223,8 +327,12 @@ function updateView(id, useCache = true) {
 			content.appendChild(wrapper);
 
 			if (e.claims || e.statements) {
-				let statements = await enrichStatements(e.claims ? e.claims : e.statements);
-				ReactDOM.render(<Claims claims={statements}/>, items)
+				const statements = await enrichStatements(e.claims ? e.claims : e.statements);
+
+				const statementsToRender = getStatementsToRender(statements)
+
+				ReactDOM.render(<Claims statements={statementsToRender}/>, items, )
+				renderFootnotes(content, collectFootnotes(statementsToRender))
 			}
 			if (e['senses']) {
 				const singleSense = e['senses'].length === 1;
@@ -475,27 +583,6 @@ function updateView(id, useCache = true) {
 				glosses.appendChild(section);
 			}
 		}
-
-
-		let footnotes = content.querySelectorAll('.footnote');
-
-		let references = document.createElement('ol');
-
-		let footnoteNumber = 1;
-		Array.from(footnotes).reduce((k, footnote) => {
-			let footnoteId = footnote.getAttribute('href').substr(1);
-			let referenceItem = footnoteStorage[footnoteId].content;
-			if (!footnoteStorage[footnoteId].number) {
-				references.appendChild(referenceItem);
-				footnoteStorage[footnoteId].number = footnoteNumber;
-				footnoteNumber++;
-			}
-			footnote.innerText = footnoteStorage[footnoteId].number;
-			content.appendChild(references);
-			footnote.addEventListener('mouseover', () => {
-				footnote.setAttribute('title', referenceItem.innerText);
-			});
-		}, 0);
 
 		resolveBreadcrumbs(cache);
 
