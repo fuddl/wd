@@ -1,5 +1,4 @@
-import { resolvers } from './resolver.js';
-import { makeLanguageValid } from '../get-valid-string-languages.js';
+import {resolveAll} from '../resolver'
 
 const usefullMetatags = [
 	{
@@ -114,23 +113,19 @@ async function enrichMetaData(tags, lang, url) {
 						};
 					}
 				} else {
-					for (let id of Object.keys(resolvers)) {
-						let link = document.createElement('a');
-						link.href = tags[key][delta];
-						let isApplicable = await resolvers[id].applicable(link);
-						if (isApplicable) {
-							let entityId = await resolvers[id].getEntityId(link);
-							if (entityId) {
-								enriched[newKey] = {
-									verb: type.prop,
-									object: {
-										'entity-type': "item",
-										'numeric-id': entityId.replace(/^Q/, ''),
-									}
-								};
+					let link = document.createElement('a')
+					link.href = tags[key][delta]
+
+					const resolutions = await resolveAll(link)
+					resolutions.forEach(resolution => {
+						enriched[newKey] = {
+							verb: type.prop,
+							object: {
+								'entity-type': 'item',
+								'numeric-id': resolution.entityId.replace(/^Q/, ''),
 							}
 						}
-					}
+					})
 				}
 			} else if (type.type === 'String' || type.type === 'ExternalId') {
 				enriched[newKey] = {
@@ -181,7 +176,7 @@ function findMetaData(document) {
 
 	let meta = {};
 	for (let tag of tags) {
-		let property = tag.getAttribute('name') || tag.getAttribute('property'); 
+		let property = tag.getAttribute('name') || tag.getAttribute('property');
 		if (property && usefullMetatags.find(v => v.name === property)) {
 			let content = tag.getAttribute('content');
 			if (content != 'null') {

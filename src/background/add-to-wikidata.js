@@ -1,9 +1,9 @@
 import {getTokens} from '../sidebar/wd-get-token.js'
 import {wikidataGetEntity} from '../wd-get-entity.js'
-import {resolvers} from '../content/resolver.js'
 import {pushEnitiyToSidebar} from "./push-enitiy-to-sidebar.js"
 import {updateStatus} from "../update-status.js"
 import browser from 'webextension-polyfill'
+import {URL_match_pattern} from "../resolver/url-match-pattern"
 
 
 function groupJobs(jobs) {
@@ -172,7 +172,7 @@ async function setClaim(subjectId, property, value) {
 	data.append('property', property);
 
 	if (typeof value === "string") {
-		await resolvers.URL_match_pattern.addToExternalIDCache(property, value, subject[subjectId].id);
+		await URL_match_pattern.addToExternalIDCache(property, value, subject[subjectId].id);
 		data.append('value', '"' + value + '"');
 	} else {
 		data.append('value', JSON.stringify(value));

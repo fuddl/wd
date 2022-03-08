@@ -1,5 +1,5 @@
 import { templates } from './components/templates.tpl.js';
-import { URL_match_pattern } from "../content/resolver__url-match-pattern.js";
+import { URL_match_pattern } from '../resolver/url-match-pattern'
 import { makeLanguageValid } from '../get-valid-string-languages.js';
 import { sparqlQuery } from "../sqarql-query.js";
 
@@ -49,8 +49,8 @@ async function findMediaWikiData(doc, propform, url) {
 						)
 					);
 
-					
-					
+
+
 
 					const langlinks = jsonResponse.query.pages[pageID].langlinks;
 					for (let langlink of langlinks) {
@@ -85,7 +85,7 @@ async function findMediaWikiData(doc, propform, url) {
 									},
 									"datatype": "string"
 								}];
-								
+
 								let result = await fetch(location.href);
 								let text = await result.text();
 								let wgArticleId;
@@ -134,7 +134,7 @@ async function findMediaWikiData(doc, propform, url) {
 										]),
 									],
 								});
-								propform.appendChild(preview);		
+								propform.appendChild(preview);
 							}
 						}
 					}

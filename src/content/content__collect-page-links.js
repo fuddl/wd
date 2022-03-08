@@ -1,6 +1,6 @@
 import {displayMetadata} from './content__display-metadata.js'
-import {resolvers} from './resolver.js'
-import {updateStatus} from "../update-status.js"
+import {findFirstMatchingResolver} from '../resolver'
+import {updateStatus} from '../update-status'
 import browser from 'webextension-polyfill'
 
 function getClosestID(element) {
@@ -146,16 +146,7 @@ async function collectPageLinks(subject) {
 
 	// mark	links that are not applicable to wikidata as not-applicable
 	for (let key in uniqueLinks) {
-		let applicableTo = null;
-		for (let id of Object.keys(resolvers)) {
-			if (!applicableTo) {
-				let resolverApplicable = await resolvers[id].applicable(uniqueLinks[key].links[0]);
-				if (resolverApplicable) {
-					applicableTo = id;
-				}
-			}
-		}
-		uniqueLinks[key].applicable = applicableTo;
+		uniqueLinks[key].resolver = await findFirstMatchingResolver(uniqueLinks[key].links[0])
 		uniqueLinks[key].setup = async function() {
 			this.selectors = [];
 			for (let link of this.links) {
@@ -166,7 +157,6 @@ async function collectPageLinks(subject) {
 			}
 		}
 		uniqueLinks[key].init = async function() {
-			this.resolver = resolvers[this.applicable];
 			this.entityId = await this.resolver.getEntityId(this.links[0]);
 	 		if (this.entityId && this.entityId !== subject) {
 
@@ -246,7 +236,7 @@ async function collectPageLinks(subject) {
 
 	}
 
-    const linksWithMatches = uniqueLinks.filter(it => it.applicable)
+	const linksWithMatches = uniqueLinks.filter(it => it.resolver)
 
     updateStatus([
         `There are ${linksWithMatches.length} links in `,
@@ -254,7 +244,7 @@ async function collectPageLinks(subject) {
         ' which could be associated to wikidata items. Checking now.',
     ])
 
-    linksWithMatches.forEach(it => it.setup().then(() => it.init()))
+    linksWithMatches.forEach(it => it.setup().then(() => it.init()).catch(console.error))
 }
 
 

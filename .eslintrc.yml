@@ -3,19 +3,34 @@ env:
   browser: true
   webextensions: true
   es6: true
+parser: '@typescript-eslint/parser'
+plugins:
+  - '@typescript-eslint'
+  - 'react-hooks'
 extends:
-    - plugin:react-hooks/recommended
+  - eslint:recommended
+  - plugin:@typescript-eslint/recommended
+  - plugin:react-hooks/recommended
 rules:
-  quotes: 0
+  quotes:
+    - 'warn'
+    - 'single'
+    - avoidEscape: true
+      allowTemplateLiterals: true
   no-trailing-spaces: 0
   eol-last: 2
   no-unused-vars: 0
   no-underscore-dangle: 0
   no-alert: 0
   no-lone-blocks: 0
+  semi:
+    - error
+    - never
+    - beforeStatementContinuationChars: "always"
   indent:
     - error
     - tab
     - SwitchCase: 1
 parserOptions:
   ecmaVersion: 2020
+  sourceType: module

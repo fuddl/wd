@@ -1,40 +1,40 @@
-import { resolvers } from "./resolver.js";
+import {getMatchSuggestions, resolveAll} from '../resolver'
+
+function createLink(thing, url) {
+	let link = document.createElement("a")
+	if (thing?.["url"]?.startsWith("/") || thing?.["url"]?.startsWith(".")) {
+		link.setAttribute("href", url)
+		link.pathname = thing["url"]
+	} else {
+		link.setAttribute("href", thing["url"])
+	}
+	return link
+}
 
 async function parse(thing, ids, url) {
-	if (
-		thing.hasOwnProperty("@type") &&
+	if (thing.hasOwnProperty("@type") &&
 		["BreadcrumbList"].includes(thing["@type"])
 	) {
-		return null;
+		return null
 	}
 
 	if (thing.hasOwnProperty("url")) {
-		let link = document.createElement("a");
-		if (thing?.["url"]?.startsWith("/") || thing?.["url"]?.startsWith(".")) {
-			link.setAttribute("href", url);
-			link.pathname = thing["url"];
-		} else {
-			link.setAttribute("href", thing["url"]);
-		}
+		let link = createLink(thing, url)
 
-		for (let id of Object.keys(resolvers)) {
-			let isApplicable = await resolvers[id].applicable(link);
-			if (isApplicable) {
-				let entityId = await resolvers[id].getEntityId(link);
-				if (entityId) {
-					let wdUrl = `https://www.wikidata.org/wiki/${entityId}`;
-					if (Array.isArray(thing["sameAs"])) {
-						thing["sameAs"].push(wdUrl);
-					} else {
-						thing["sameAs"] = wdUrl;
-					}
-				} else {
-					if (JSON.stringify(isApplicable) === JSON.stringify(ids)) {
-						thing.isNeedle = true;
-					}
-				}
+		const resolutions = await resolveAll(link)
+		resolutions.forEach(it => {
+			let wdUrl = `https://www.wikidata.org/wiki/${it.entityId}`
+			if (Array.isArray(thing['sameAs'])) {
+				thing['sameAs'].push(wdUrl)
+			} else {
+				thing['sameAs'] = wdUrl
 			}
-		}
+		})
+
+		// Todo: with the new interface this requires us to iterate over resolvers twice.
+		// Check perf impact
+		const matchSuggestions = await getMatchSuggestions(link)
+		thing.isNeedle = Boolean(matchSuggestions.find(it => JSON.stringify(it) === JSON.stringify(ids)))
 	}
 	for (let prop in thing) {
 		if (Array.isArray(thing[prop])) {
@@ -61,7 +61,7 @@ function jsonParse(i) {
 	return JSON.parse(i.replace(/\/\*[\s\S]*?\*\//g, ""));
 }
 
-async function enrichLinkedData(snippeds, ids, url) {
+export async function enrichLinkedData(snippeds, ids, url) {
 	let parsed = [];
 
 	for (let snipped of snippeds) {
@@ -82,7 +82,7 @@ async function enrichLinkedData(snippeds, ids, url) {
 	return parsed;
 }
 
-function findLinkedData(document) {
+export function findLinkedData(document) {
 	const snippeds = document.querySelectorAll(
 		'script[type="application/ld+json"]'
 	);
@@ -93,5 +93,3 @@ function findLinkedData(document) {
 
 	return snippeds;
 }
-
-export { findLinkedData, enrichLinkedData };
