@@ -27,7 +27,7 @@ function groupClaims(claims) {
 		{
 			name: 'Naming',
 			properties: [
-				'P6333',	// title of broader work 	
+				'P6333',	// title of broader work
 				'P1448',	// official name
 				'P1476',	// title
 				'P1680',	// subtitle
@@ -39,7 +39,7 @@ function groupClaims(claims) {
 		{
 			name: 'Work Credit',
 			properties: [
-				'P50',		// author	
+				'P50',		// author
 				'P58',		// screenwriter
 				'P3174',	// art director
 				'P161',		// cast member
@@ -167,7 +167,12 @@ function groupClaims(claims) {
 		}
 	}
 
-	return sorted.concat(remaining);
+	return sorted
+		.concat(remaining)
+		.map(id => ({
+			id,
+			claims: claims[id],
+		}))
 }
 
 export { groupClaims }

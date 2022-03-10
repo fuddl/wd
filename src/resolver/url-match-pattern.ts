@@ -65,7 +65,7 @@ const URL_match_pattern: Resolver = {
 		const id = applicable[0].value
 		const ci = applicable[0].valueIsCaseInsensitive
 
-		return await this.getEntityByRegexedId(prop, id, ci)
+		return this.getEntityByRegexedId(prop, id, ci)
 	},
 	getEntityByRegexedId: async function(prop, id, ci = false) {
 		const cached = await this.checkIfCached(prop, id)
@@ -106,7 +106,7 @@ const URL_match_pattern: Resolver = {
 			cache.externalIDCache = {}
 		}
 		cache.externalIDCache[this.formCacheKey(prop, id)] = entityId
-		browser.storage.local.set(cache)
+		return browser.storage.local.set(cache)
 	}
 }
 

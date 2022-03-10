@@ -1,22 +1,23 @@
 import {getAutodesc} from './get-autodesc.js'
-import {resolveBreadcrumbs, resolveIdLinksPlaceholder, resolvePlaceholders} from './resolve-placeholders.js'
+import {resolveBreadcrumbs, resolveIdLinksPlaceholder} from './resolve-placeholders.js'
 import {getAliasesByLang, getValueByLang} from './get-value-by-lang.js'
-import {groupClaims} from './group-claims.js'
 import {templates} from './components/templates.tpl.js'
 import {wikidataGetEntity} from '../wd-get-entity.js'
-import {ApplyFormatters} from './formatters.js'
 import {AddLemmaAffix} from './lemma-afixes.js'
 import browser from 'webextension-polyfill'
-import { PrependNav } from './prepend-nav.js';
-import { getDeducedSenseClaims } from './deduce-sense-statements.js';
+import {PrependNav} from './prepend-nav.js'
+import {getDeducedSenseClaims} from './deduce-sense-statements.js'
+import * as ReactDOM from 'react-dom'
+import {Claims} from './components/claims'
+import {localLanguage} from '../core/env'
+import {groupClaims} from "./group-claims"
+import {ApplyFormatters} from "./formatters"
+import {renderStatements} from "./render-claims"
+import {delay} from "../core/async"
 
 if (history.length > 1 || window != window.top) {
 	PrependNav();
 }
-
-const lang = navigator.language.substr(0,2);
-const footnoteStorage = {};
-let refCounter = {};
 
 let cache = {}
 
@@ -47,305 +48,229 @@ if (window.location.search) {
 	}
 }
 
-function dateToString(value) {
-	let wiso = value.time;
-	let prec = value.precision;
+function createLemmaEnsign(entity) {
+	let labels = document.createDocumentFragment()
+	for (let lang in entity.lemmas) {
+		let lemma = AddLemmaAffix(entity.lemmas[lang].value, {
+			category: entity.lexicalCategory,
+			lang: entity.language,
+			gender: typeof entity.claims?.P5185 === 'object' ? entity.claims?.P5185[0]?.mainsnak?.datavalue?.value?.id : null,
+		})
 
-	if (prec <= 6) {
-		return false;
-	}
-
-	let suffix = wiso.startsWith('-') ? ' BCE' : '';
-
-	let pad = function (i) {
-		if (i < 10) {
-			return '0' + i;
+		if (labels.childNodes.length !== 0) {
+			labels.appendChild(document.createTextNode(' ‧ '))
 		}
-		return i;
+		labels.appendChild(lemma)
 	}
 
-	let iso = wiso
-		.replace(/^(\+|-)/, '')
-		.replace(/Z$/, '')
-		.replace(/^(\d+)-00/, '$1-01')
-		.replace(/^(\d+)-(\d+)-00/, '$1-$2-01')
-		+ 'Z';
+	let lexemeDescription = document.createDocumentFragment()
 
-	let date = new Date(iso);
+	lexemeDescription.appendChild(templates.placeholder({
+		entity: entity.language,
+	}, cache))
 
-	let output = [];
-	if (prec === 7) {
-		let text = date.getFullYear().toString().slice(0, -2) + 'XX' + suffix;
-		return templates.proxy({
-			query: `
-				SELECT ?innerText WHERE {
-					?century wdt:P31 wd:Q578.
-					?century wdt:P585 "${ iso }Z"^^xsd:dateTime.
-					SERVICE wikibase:label
-					{
-						bd:serviceParam wikibase:language "[AUTO_LANGUAGE],${ lang }".
-						?century rdfs:label ?innerText.
-					}
+	lexemeDescription.appendChild(document.createTextNode(', '))
+
+	lexemeDescription.appendChild(templates.placeholder({
+		entity: entity.lexicalCategory,
+	}, cache))
+
+	return templates.ensign({
+		revid: entity.lastrevid,
+		id: entity.id,
+		label: labels,
+		description: {text: lexemeDescription},
+	})
+}
+
+function createCanonicalMeta(id) {
+	let metaCanon = document.createElement('meta')
+	metaCanon.setAttribute('name', 'canonical')
+	metaCanon.setAttribute('content', 'https://www.wikidata.org/wiki/' + id)
+	return metaCanon
+}
+
+function createDescriptionMeta(description) {
+	let metaDesc = document.createElement('meta')
+	metaDesc.setAttribute('name', 'description')
+	metaDesc.setAttribute('content', description)
+	return metaDesc
+}
+
+function createKeywordsMeta(aliases) {
+	let metaKeys = document.createElement('meta')
+	metaKeys.setAttribute('name', 'keywords')
+	metaKeys.setAttribute('content', aliases.join(', '))
+	return metaKeys
+}
+
+function createTitleFragment(entity, initialDescription) {
+	let titleFragment = document.createElement('div')
+	let hasDescription = initialDescription !== false
+
+	const setTitle = (description) => {
+		if (titleFragment.firstChild) {
+			titleFragment.removeChild(titleFragment.firstChild)
+		}
+		titleFragment.appendChild(templates.ensign({
+			revid: entity.lastrevid,
+			id: entity.id,
+			label: getValueByLang(entity, 'labels', entity.title),
+			description: {
+				text: description,
+				provisional: !hasDescription,
+			},
+		}))
+	}
+
+	setTitle(initialDescription)
+
+	if (!hasDescription && 'claims' in entity && 'P31' in entity.claims) {
+		(async () => {
+			setTitle(await getAutodesc(entity.id))
+		})()
+	}
+	return titleFragment
+}
+
+const createActionElements = id =>
+	templates.actions('Actions', [
+		{
+			link: 'add.html?' + id,
+			moji: './icons/u270Eu002B-addStatement.svg',
+			title: 'Add a statement',
+			desc: 'Extract data from this website',
+			callback: (e) => {
+				browser.runtime.sendMessage({
+					type: 'open_adder',
+					entity: id,
+				})
+			},
+		},
+		{
+			link: '#nocache',
+			moji: './icons/u2B6E-refresh.svg',
+			title: 'Reload data',
+			desc: 'Display an uncached version',
+			callback: (e) => {
+				location.hash = '#nocache'
+				location.reload()
+			},
+		},
+		{
+			link: 'links.html?' + id,
+			moji: './icons/u2BA9u1F4C4uFE0E-articleRedirect.svg',
+			title: 'What links here',
+			desc: 'A list of item that link to this',
+		},
+		{
+			link: 'improve.html?' + id,
+			moji: './icons/u2728-specialPages.svg',
+			title: 'Improve',
+			desc: 'Automatic suggestions on how to improve this item',
+		},
+	])
+
+const refCounter = {}
+
+function createReferenceItem(ref) {
+	let listItem
+	const refvalues = []
+	if (typeof refCounter[ref.hash] === 'undefined') {
+		listItem = document.createElement('li')
+		refCounter[ref.hash] = {
+			item: listItem,
+		}
+
+		const formatted = ApplyFormatters(ref.snaks, 'reference')
+
+		for (const key in formatted) {
+			for (const refthing of formatted[key]) {
+				if (refthing.datavalue) {
+					const refvalue = new DocumentFragment()
+
+					refvalue.append(...renderStatements(refthing, [], refthing.datavalue.type, 'reference', undefined, cache))
+					refvalues.push(refvalue)
 				}
-				LIMIT 1`,
-			text: text,
-		});
-	} else if (prec === 8) {
-		let text =	date.getFullYear().toString().slice(0, -1) + 'X';
-		return templates.proxy({
-			query: `
-				SELECT ?innerText WHERE {
-					?decade wdt:P31 wd:Q39911.
-					?decade wdt:P585 "${ iso }Z"^^xsd:dateTime.
-					SERVICE wikibase:label
-					{
-						bd:serviceParam wikibase:language "[AUTO_LANGUAGE],${ lang }".
-						?decade rdfs:label ?innerText.
-					}
+			}
+			if (key.match(/^P\d+/)) {
+				const refStatement = templates.proof({
+					prop: templates.placeholder({
+						entity: key,
+					}, cache),
+					vals: refvalues,
+				})
+				listItem.appendChild(refStatement)
+			} else {
+				for (const refvalue of refvalues) {
+					listItem.appendChild(refvalue)
 				}
-				LIMIT 1`,
-			text: text,
-		});
+			}
+		}
 	} else {
-		if (prec > 8) {
-			output.push(date.getUTCFullYear());
-		}
-		if (prec > 9) {
-			output.push(pad(date.getUTCMonth() + 1));
-		}
-		if (prec > 10) {
-			output.push(pad(date.getUTCDate()));
-		}
+		listItem = refCounter[ref.hash].item
 	}
-
-	return document.createTextNode(output.join('-') + suffix);
+	listItem.setAttribute('id', ref.hash)
+	return listItem
 }
 
-function insertAfter(referenceNode, newNode) {
-	referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
+function collectFootnotes(statements) {
+	const footnotes = statements
+		.flatMap(it => it.claims)
+		.filter(it => it?.mainsnak && it?.references)
+		.flatMap(it => it.references)
+		.map(ref =>
+			[ref.hash, {content: createReferenceItem(ref)}],
+		)
+	return Object.fromEntries(footnotes)
 }
 
-function renderStatements(snak, references, type, target, scope, delta) {
-	let valueType = snak.datatype ? snak.datatype : snak.datavalue.type ;
-	if (type === 'preformatted') {
-		target.appendChild(snak.datavalue.value);
-	}
-	if (type === 'value' || scope === 'reference') {
-		if (valueType === "time") {
-			let date = dateToString(snak.datavalue.value);
-			if (date) {
-				target.appendChild(templates.time({
-					text: date,
-				}));
-			}
-		}
-		if (valueType === "wikibase-item" || valueType === "wikibase-entityid" || valueType === "wikibase-lexeme" || valueType === "wikibase-form"	|| valueType === "wikibase-sense") {
-			let vid = snak.datavalue.value.id;
-			if (snak.datavalue.parents) {
-				target.appendChild(templates.breadcrumbsPlaceholder(snak.datavalue.parents));
-			}
-			target.appendChild(templates.placeholder({
-				entity: vid,
-			}, cache));
-		}
-		if (valueType === "external-id") {
-			target.appendChild(templates.code(snak.datavalue.value));
-		}
-		if (valueType === "string") {
-			target.appendChild(document.createTextNode(snak.datavalue.value));
-		}
-		if (valueType === "url") {
-			let humanReadable = snak.datavalue.value;
-			target.appendChild(templates.urlLink(snak.datavalue.value));
-		}
-		if (valueType === 'quantity') {
-			target.appendChild(templates.unitNumber({
-				number: snak.datavalue.value.amount,
-				unit: snak?.datavalue?.value?.unit,
-			}));
-		}
-		if (valueType === "globe-coordinate" || valueType ===	'globecoordinate') {
-			target.appendChild(templates.mercator({
-				lat: snak.datavalue.value.latitude,
-				lon: snak.datavalue.value.longitude,
-				pre: snak.datavalue.value.precision,
-				height: 500,
-				width: 500,
-			}));
-		}
-		if (valueType === "monolingualtext") {
-			target.appendChild(templates.title({
-				text: snak.datavalue.value.text,
-				lang: snak.datavalue.value.language
-			}));
-		}
-		if (valueType === "commonsMedia") {
-			let name = encodeURIComponent(snak.datavalue.value);
-			if (name.match(/\.svg$/i)) {
-				target.appendChild(templates.image({
-					src: `https://commons.wikimedia.org/wiki/Special:FilePath/${ name }`
-				}));
-			} else if (name.match(/\.(jpe?g|png|gif|tiff?|stl)$/i)) {
-				target.appendChild(templates.picture({
-					srcSet: {
-						250: `https://commons.wikimedia.org/wiki/Special:FilePath/${ name }?width=250px`,
-						501: `https://commons.wikimedia.org/wiki/Special:FilePath/${ name }?width=501px`,
-						801: `https://commons.wikimedia.org/wiki/Special:FilePath/${ name }?width=801px`,
-						1068: `https://commons.wikimedia.org/wiki/Special:FilePath/${ name }?width=1068px`,
-					}
-				}));
-			} else if (name.match(/\.(wav|og[ga])$/i)) {
-				target.appendChild(templates.audio({
-					src: `https://commons.wikimedia.org/wiki/Special:FilePath/${ name }`
-				}));
-			} else if (name.match(/\.webm$/i)) {
-				target.appendChild(templates.video({
-					poster: `https://commons.wikimedia.org/wiki/Special:FilePath/${ name }?width=801px`,
-					src: `https://commons.wikimedia.org/wiki/Special:FilePath/${ name }`
-				}));
-			}
-		}
-	} else if(type === 'novalue') {
-		target.appendChild(document.createTextNode('—'));
-	} else if(type === 'somevalue') {
-		target.appendChild(document.createTextNode('?'));
-	}
-	if (target) {
-		target.appendChild(document.createTextNode('\xa0'));
-		let sup = document.createElement('sup');
-		let c = 0;
-		for (let reference of references) {
-			if (c > 0) {
-				sup.appendChild(document.createTextNode('/'));
-			}
-			sup.appendChild(reference);
-			c++;
-		}
-		if (sup.hasChildNodes()) {
-			target.appendChild(sup);
-		}
-	}
-	if (valueType === "external-id" && snak.snaktype === "value") {
-		target.appendChild(templates.idLinksPlaceholder(snak.property, snak.datavalue.value));
-	}
-	if (scope === 'statement' && typeof delta != 'undefined' && delta.hasOwnProperty('qualifiers')) {
-		let qualifiers = [];
-		for (let prop of Object.keys(delta.qualifiers)) {
-			let qvalues = [];
-			for (let qv of delta.qualifiers[prop]) {
-				let qualvalue = new DocumentFragment();
-				renderStatements(qv,[], qv.snaktype, qualvalue, 'qualifier');
-				qvalues.push(qualvalue);
-			}
+function getHigherPriorityClaims(claims) {
+	const hasPreferred = claims.find(it => it.rank == 'preferred')
+	const highPriority = (it) => !hasPreferred && it.rank == 'normal' || it.rank == 'preferred'
 
-			qualifiers.push({
-				prop: templates.placeholder({ entity: prop }),
-				vals: qvalues,
-			});
-		}
-		target.appendChild(templates.annote(qualifiers));
-	}
+	return claims.filter(highPriority)
 }
 
-function renderStatement(value) {
-	if (value[0].mainsnak) {
-		let pid = value[0].mainsnak.property;
-		let label = templates.placeholder({
-			entity: pid,
-		}, cache);
 
-		let values = [];
-		let hasPreferred = false;
-		for (let delta of value) {
-			if (delta.rank == "preferred") {
-				hasPreferred = true;
-			}
+const getStatementsToRender = statements =>
+	groupClaims(statements).map(it => ({
+		id: it.id,
+		claims: getHigherPriorityClaims(it.claims),
+	}))
+
+async function renderFootnotes(content, footnoteStorage) {
+	/**
+	 * todo a better way
+	 * the issue right now is that things are rendered asynchronously in React (via useEffect)
+	 * and as footnote rendering relies on elements existing in the DOM,
+	 * it'll fail to render
+	 *
+	 * delay(0) pushes this back to async queue, but this is likely not reliable
+	 *
+	 * one potential way to deal with this is to send event whe main claims are rendered
+	 * another to have these both under react management
+	 */
+	await delay(0)
+	let footnotes = content.querySelectorAll('.footnote')
+
+	let references = document.createElement('ol')
+
+	let footnoteNumber = 1
+	Array.from(footnotes).reduce((k, footnote) => {
+		let footnoteId = footnote.getAttribute('href').substr(1)
+		let referenceItem = footnoteStorage[footnoteId].content
+		if (!footnoteStorage[footnoteId].number) {
+			references.appendChild(referenceItem)
+			footnoteStorage[footnoteId].number = footnoteNumber
+			footnoteNumber++
 		}
-		for (const [key, delta] of Object.entries(value)) {
-			if (delta.rank == "deprecated" || (delta.rank == "normal" && hasPreferred)) {
-				delete value[key];
-			}
-		}
-		for (let delta of value) {
-			if (delta && delta.hasOwnProperty('mainsnak') && delta.mainsnak) {
-				let thisvalue = new DocumentFragment();
-				let type = delta.mainsnak.snaktype;
-				let refs = [];
-				if (delta.references) {
-					for (let ref of delta.references) {
-						let listItem;
-						let refvalues = [];
-						if (typeof refCounter[ref.hash] === 'undefined') {
-							listItem = document.createElement('li');
-							refCounter[ref.hash] = {
-								item: listItem,
-							}
-
-							let formatted = ApplyFormatters(ref.snaks, 'reference')
-
-
-							for (let key in formatted) {
-								for (let refthing of formatted[key]) {
-									if (refthing.datavalue) {
-										let refvalue = new DocumentFragment();
-
-										renderStatements(refthing, [], refthing.datavalue.type, refvalue, 'reference');
-										refvalues.push(refvalue);
-									}
-								}
-								if (key.match(/^P\d+/)) {
-									let refStatement = templates.proof({
-										prop: templates.placeholder({
-											entity: key,
-										}, cache),
-										vals: refvalues,
-									});
-									listItem.appendChild(refStatement);
-								} else {
-									for (let refvalue of refvalues) {
-										listItem.appendChild(refvalue)
-									}
-								}
-							}
-						} else {
-							listItem = refCounter[ref.hash].item;
-						}
-						listItem.setAttribute('id', ref.hash);
-						refs.push(templates.footnoteRef({
-							text: '▐',
-							link: '#' + ref.hash,
-							title: listItem.innerText,
-						}));
-						footnoteStorage[ref.hash] = {
-							content: listItem,
-						};
-					}
-				}
-
-				renderStatements(delta.mainsnak, refs, type, thisvalue, 'statement', delta);
-
-				values.push(thisvalue);
-
-			}
-		}
-
-		let statement = templates.remark({
-			prop: templates.placeholder({
-				entity: pid,
-			}, cache),
-			vals: values,
-			id: pid,
-		});
-
-		let firstValue = value.find(x=>x!==undefined);
-
-		if (firstValue) {
-			return {
-				rendered: statement,
-				type: firstValue.mainsnak.snaktype,
-			};
-		}
-	}
+		footnote.innerText = footnoteStorage[footnoteId].number
+		content.appendChild(references)
+		footnote.addEventListener('mouseover', () => {
+			footnote.setAttribute('title', referenceItem.innerText)
+		})
+	}, 0)
 }
 
 function updateView(id, useCache = true) {
@@ -363,136 +288,37 @@ function updateView(id, useCache = true) {
 			let wrapper = document.createElement('div');
 
 			if (e.lemmas) {
-				let labels = document.createDocumentFragment();
-				for (let lang in e.lemmas) {
-					let lemma = AddLemmaAffix(e.lemmas[lang].value, {
-						category: e.lexicalCategory,
-						lang: e.language,
-						gender: typeof e.claims?.P5185 === 'object' ? e.claims?.P5185[0]?.mainsnak?.datavalue?.value?.id : null,
-					});
-
-					if (labels.childNodes.length !== 0) {
-						labels.appendChild(document.createTextNode(' ‧ '));
-					}
-					labels.appendChild(lemma);
-				}
-
-				let lexemeDescription = document.createDocumentFragment();
-
-				lexemeDescription.appendChild(templates.placeholder({
-					entity: e.language
-				}, cache));
-
-				lexemeDescription.appendChild(document.createTextNode(', '));
-
-				lexemeDescription.appendChild(templates.placeholder({
-					entity: e.lexicalCategory
-				}, cache));
-
-				wrapper.appendChild(templates.ensign({
-					revid: e.lastrevid,
-					id: id,
-					label: labels,
-					description: { text: lexemeDescription },
-				}));
+				wrapper.appendChild(createLemmaEnsign(e))
 			}
-
-
-			let metaCanon = document.createElement('meta');
-			metaCanon.setAttribute('name', 'canonical');
-			metaCanon.setAttribute('content', 'https://www.wikidata.org/wiki/' + id);
-			document.head.appendChild(metaCanon);
+			document.head.appendChild(createCanonicalMeta(id))
 
 			if (e.labels || e.descriptions) {
 
-				document.title = getValueByLang(e, 'labels', e.title);
-				let description = getValueByLang(e, 'descriptions', false);
+				document.title = getValueByLang(e, 'labels', e.title)
 
-				let hasDescription = description != false;
-				let titleFragment = document.createElement('div');
-				wrapper.appendChild(titleFragment);
+				let description = getValueByLang(e, 'descriptions', false)
 
 				if (!description) {
 					description = '???';
 				} else {
-					let metaDesc = document.createElement('meta');
-					metaDesc.setAttribute('name', 'description');
-					metaDesc.setAttribute('content', description);
-					document.head.appendChild(metaDesc);
+					document.head.appendChild(createDescriptionMeta(description))
 				}
+				let titleFragment = createTitleFragment(e, description)
 
-				const setTitle = (description) => {
-					if (titleFragment.firstChild) {
-						titleFragment.removeChild(titleFragment.firstChild);
-					}
-					titleFragment.appendChild(templates.ensign({
-						revid: e.lastrevid,
-						id: id,
-						label: getValueByLang(e, 'labels', e.title),
-						description: {
-							text: description,
-							provisional: !hasDescription
-						},
-					}));
-				}
-
-				setTitle(description);
-
-				if (!hasDescription && 'claims' in e && 'P31' in e.claims) {
-					(async () => {
-						description = await getAutodesc(id);
-						setTitle(description);
-					})()
-				}
+				wrapper.appendChild(titleFragment);
 			}
 
 			let aliases = getAliasesByLang(e);
 			if (aliases) {
-				let metaKeys = document.createElement('meta');
-				metaKeys.setAttribute('name', 'keywords');
-				metaKeys.setAttribute('content', aliases.join(', '));
-				document.head.appendChild(metaKeys);
+				document.head.appendChild(createKeywordsMeta(aliases))
 			}
 
-			footer.appendChild(templates.actions('Actions', [
-				{
-					link: 'add.html?' + id,
-					moji: './icons/u270Eu002B-addStatement.svg',
-					title: 'Add a statement',
-					desc: 'Extract data from this website',
-					callback: (e) => {
-						browser.runtime.sendMessage({
-							type: 'open_adder',
-							entity: id,
-						});
-					}
-				},
-				{
-					link: '#nocache',
-					moji: './icons/u2B6E-refresh.svg',
-					title: 'Reload data',
-					desc: 'Display an uncached version',
-					callback: (e) => {
-						location.hash = '#nocache';
-						location.reload();
-					},
-				},
-				{
-					link: 'links.html?' + id,
-					moji: './icons/u2BA9u1F4C4uFE0E-articleRedirect.svg',
-					title: 'What links here',
-					desc: 'A list of item that link to this',
-				},
-				{
-					link: 'improve.html?' + id,
-					moji: './icons/u2728-specialPages.svg',
-					title: 'Improve',
-					desc: 'Automatic suggestions on how to improve this item',
-				},
-			]));
+			footer.appendChild(createActionElements(id))
 
 			let identifiers = document.createElement('div');
+			identifiers.className = 'identifiers'
 			let items = document.createElement('div');
+			items.className = 'items'
 			let glosses = document.createElement('div');
 
 			wrapper.appendChild(glosses);
@@ -501,17 +327,12 @@ function updateView(id, useCache = true) {
 			content.appendChild(wrapper);
 
 			if (e.claims || e.statements) {
-				let statements = await enrichStatements(e.claims ? e.claims : e.statements);
-				for (let prop of groupClaims(statements)) {
-					let statement = renderStatement(statements[prop]);
-					if (statement) {
-						if (statement.type !== "external-id") {
-							items.appendChild(statement.rendered);
-						} else {
-							identifiers.appendChild(statement.rendered);
-						}
-					}
-				}
+				const statements = await enrichStatements(e.claims ? e.claims : e.statements);
+
+				const statementsToRender = getStatementsToRender(statements)
+
+				ReactDOM.render(<Claims statements={statementsToRender} renderingCache={cache}/>, items, )
+				renderFootnotes(content, collectFootnotes(statementsToRender))
 			}
 			if (e['senses']) {
 				const singleSense = e['senses'].length === 1;
@@ -738,7 +559,7 @@ function updateView(id, useCache = true) {
 				let section = document.createElement('section');
 				let heading = document.createElement('h2');
 				let headingText = templates.placeholder({
-					json: `https://www.wikidata.org/w/api.php?action=parse&page=Translations:Help:Data_type/87/${lang}&disableeditsection=true&format=json`,
+					json: `https://www.wikidata.org/w/api.php?action=parse&page=Translations:Help:Data_type/87/${(localLanguage())}&disableeditsection=true&format=json`,
 					type: 'span',
 					extractor: (input) => {
 						if (input?.parse?.text?.['*']) {
@@ -763,29 +584,10 @@ function updateView(id, useCache = true) {
 			}
 		}
 
+		// Let react render main set of claims first
+		await delay(0)
 
-		let footnotes = content.querySelectorAll('.footnote');
-
-		let references = document.createElement('ol');
-
-		let footnoteNumber = 1;
-		Array.from(footnotes).reduce((k, footnote) => {
-			let footnoteId = footnote.getAttribute('href').substr(1);
-			let referenceItem = footnoteStorage[footnoteId].content;
-			if (!footnoteStorage[footnoteId].number) {
-				references.appendChild(referenceItem);
-				footnoteStorage[footnoteId].number = footnoteNumber;
-				footnoteNumber++;
-			}
-			footnote.innerText = footnoteStorage[footnoteId].number;
-			content.appendChild(references);
-			footnote.addEventListener('mouseover', () => {
-				footnote.setAttribute('title', referenceItem.innerText);
-			});
-		}, 0);
-
-		resolvePlaceholders();
-		resolveBreadcrumbs(cache);
+		resolveBreadcrumbs(cache)
 
 		resolveIdLinksPlaceholder();
 	})();
