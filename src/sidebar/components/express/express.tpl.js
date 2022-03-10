@@ -4,6 +4,9 @@ import { getValueByLang } from '../../get-value-by-lang.js';
 import { getAutodesc } from '../../get-autodesc.js';
 import browser from 'webextension-polyfill'
 
+import './express.css'
+
+
 const express = (vars) => {
 
 	const supportedProperties = [
@@ -86,12 +89,6 @@ const express = (vars) => {
 	});
 
 	main.appendChild(input);
-
-	let style = document.createElement('link');
-	style.setAttribute('rel',	"stylesheet");
-	style.setAttribute('href', "components/express/express.css");
-
-	wrapper.appendChild(style);
 
 	main.appendChild(autocomplete);
 	main.appendChild(desc);
@@ -182,11 +179,8 @@ const express = (vars) => {
 		selection: selection,
 		options: options,
 		composer: composer,
+		// todo pass in setLanguage instead
 		languagePicker: languagePicker,
-		loadingFinished: function() {
-			progress.remove();
-			input.focus();
-		}
 	}
 }
 

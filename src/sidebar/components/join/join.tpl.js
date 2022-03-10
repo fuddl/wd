@@ -3,10 +3,10 @@ import { getAutodesc } from '../../get-autodesc.js';
 
 let joinCounter = 0;
 
-const join = (vars) => { 
+const join = (vars) => {
 	let wrapper = document.createElement('div');
 	wrapper.classList.add('join');
-	
+
 	let humanField = document.createElement('input');
 	humanField.classList.add('join__field');
 	humanField.setAttribute('type', 'search');
@@ -50,7 +50,7 @@ const join = (vars) => {
 			});
 		}
 
-		if (suggestions) { 
+		if (suggestions) {
 			for (let suggestion of suggestions) {
 				let item = document.createElement('button');
 				item.setAttribute('tabindex', '0');
@@ -76,13 +76,12 @@ const join = (vars) => {
 				});
 			}
 		}
-		for (let placeholder of proposals.querySelectorAll('.join__proposal__desc--placeholder')) {	
+		for (let placeholder of proposals.querySelectorAll('.join__proposal__desc--placeholder')) {
 			let entityWithoutDesc = placeholder.parentNode.getAttribute('data-entity');
 			placeholder.innerText = await getAutodesc(entityWithoutDesc);
 		}
 	}
 
-	//humanField.addEventListener('change', updateList);
 	humanField.addEventListener('focus', updateList);
 	humanField.addEventListener('keyup', updateList);
 
