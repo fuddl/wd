@@ -194,9 +194,12 @@ const flex = (vars) => {
 			}
 		}
 	}
-	return table;
+	if (table.childNodes.length > 0) {
+		return table;
+	} else {
+		return false;
+	}
 
-	return table;
 };
 
 export { flex };

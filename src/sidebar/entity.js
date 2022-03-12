@@ -732,9 +732,8 @@ function updateView(id, useCache = true) {
 					}
 				}
 			}
-
-
-			if (e.forms) {
+			
+			if (e.forms.length > 0) {
 				let section = document.createElement('section');
 				let heading = document.createElement('h2');
 				let headingText = templates.placeholder({
@@ -751,13 +750,32 @@ function updateView(id, useCache = true) {
 				heading.appendChild(headingText);
 				section.appendChild(heading);
 
-				section.appendChild(templates.flex({
+				const flex = templates.flex({
 					forms: e.forms,
 					category: e.lexicalCategory,
 					lang: e.language,
 					gender: typeof e.claims?.P5185 === 'object' ? e.claims?.P5185[0]?.mainsnak?.datavalue?.value?.id : null,
 					auxVerb: typeof e.claims?.P5401 === 'object' ? e.claims?.P5401[0]?.mainsnak?.datavalue?.value?.id : null,
-				}));
+				});
+
+				if (flex) {
+					section.appendChild(flex);
+				} else {
+					let counter = 0;
+					for (let form of e.forms) {
+						if (counter > 0) {
+							section.appendChild(
+								document.createTextNode(', ')
+							);
+						}
+						counter++;
+						section.appendChild(
+							templates.placeholder({
+								entity: form.id,
+							})
+						);
+					}
+				}
 
 				glosses.appendChild(section);
 			}
