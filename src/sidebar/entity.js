@@ -732,8 +732,8 @@ function updateView(id, useCache = true) {
 					}
 				}
 			}
-			
-			if (e.forms.length > 0) {
+
+			if (e?.forms?.length > 0) {
 				let section = document.createElement('section');
 				let heading = document.createElement('h2');
 				let headingText = templates.placeholder({
