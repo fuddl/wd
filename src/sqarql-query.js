@@ -15,8 +15,8 @@ async function sparqlQuery(query) {
 			return json;
 		}
 	} catch(error) {
-		const delay = Math.floor(Math.random() * 100)
-		console.warn(`Sparql Query failed, retring in ${delay / 60} seconds`)
+		const delay = Math.floor(Math.random() * 1000)
+		console.warn(`Sparql Query failed, retring in ${delay / 1000} seconds`)
 		console.log(error)
 
 		await new Promise(resolve => setTimeout(resolve, delay));
