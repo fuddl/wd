@@ -7,15 +7,16 @@ const URL_match_pattern: Resolver = {
 	aquireRegexes: async function() {
 
 		const query = `
-			SELECT ?p ?s ?r ?ci WHERE {
+			SELECT ?p ?s ?r ?c WHERE {
 				?stat ps:P8966 ?s.
 				OPTIONAL { ?stat pq:P8967 ?r. }
 				?prop	p:P8966 ?stat.
+				BIND(IF(EXISTS{?prop wdt:P1552 wd:Q3960579}, 'upper',
+					IF(EXISTS{?prop wdt:P1552 wd:Q65048529}, 'lower',
+						IF(EXISTS{?prop wdt:P1552 wd:Q55121183}, 'insensitive', '')
+					)
+				) AS ?c)
 				BIND(REPLACE(STR(?prop), 'http://www.wikidata.org/entity/', '')	AS ?p ).
-				OPTIONAL {
-					?prop p:P1552 ?ci.
-					?ci ps:P1552 wd:Q55121297.
-				}
 			} ORDER BY STRLEN(str(?s))
 		`
 		const patterns = await sparqlQuery(query)
@@ -34,7 +35,7 @@ const URL_match_pattern: Resolver = {
 					p: prop.p.value,
 					s: regexp,
 					r: 'r' in prop ? prop.r.value.replace(/\\(\d+)/g, '$$$1') : '$1',
-					ci: 'ci' in prop ? typeof prop.ci.value === 'string' : false,
+					c: 'c' in prop ? prop.c.value : '',
 				})
 			}
 		}
@@ -48,10 +49,23 @@ const URL_match_pattern: Resolver = {
 		for (const prop of this.patterns) {
 			const match = href.match(prop.s)
 			if (match) {
+			
+				let id = href.replace(prop.s, prop.r);
+				let desiredId = id;
+				switch (prop.c) {
+					case 'upper':
+						desiredId = id.toUpperCase();
+						break;
+					case 'lower':
+					case 'insensitive':
+						desiredId = id.toLowerCase();
+						break;
+				}
+
 				return [{
 					prop: prop.p,
-					value: href.replace(prop.s, prop.r),
-					valueIsCaseInsensitive: prop?.ci,
+					value: desiredId,
+					case: prop.c ?? '',
 					recommended: true,
 				}]
 			}
@@ -63,22 +77,25 @@ const URL_match_pattern: Resolver = {
 
 		const prop = applicable[0].prop
 		const id = applicable[0].value
-		const ci = applicable[0].valueIsCaseInsensitive
+		const c = applicable[0].case
 
-		return await this.getEntityByRegexedId(prop, id, ci)
+
+		return await this.getEntityByRegexedId(prop, id, c)
 	},
-	getEntityByRegexedId: async function(prop, id, ci = false) {
+	getEntityByRegexedId: async function(prop, id, c = '') {
 		const cached = await this.checkIfCached(prop, id)
 		if (cached) {
 			return cached
 		}
+
 		const query = `
 			SELECT ?item
 			WHERE {
-				?item wdt:${ prop } ${ ci ? '?id' : `"${id}"`}.
-				${ ci ? `filter(lcase(?id) = "${ id.toLowerCase() }")` : ''}
+				?item wdt:${ prop } ${ c == 'insensitive' ? '?id' : `"${ id }"`}.
+				${ c == 'insensitive' ? `filter(lcase(?id) = "${ id }")` : ''}
 			}
 		`
+
 		const result = await sparqlQuery(query)
 		if (result[0]) {
 			const entityId = result[0].item.value.match(/https?:\/\/www\.wikidata\.org\/entity\/(\w\d+)/)[1]
