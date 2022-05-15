@@ -16,8 +16,11 @@ import browser from 'webextension-polyfill'
 import {PrependNav} from './prepend-nav.js'
 import {Browser} from "../core/browser"
 import {unlockAndWait} from "./sidebar-control"
+import jobRedundancyChecker from './redundancy-checker.js'
 
 PrependNav();
+
+let existing = new jobRedundancyChecker();
 
 async function checkRedirectForIds(url, propform, originalUrl, claims) {
 	let comment = templates.smallBlock(
@@ -216,7 +219,7 @@ if (window.location.search) {
 												url: sourceUrl,
 												title: title ? title.innerText.trim() : null,
 												lang: validRootLang,
-											});
+											}, existing);
 										}
 
 
@@ -232,7 +235,7 @@ if (window.location.search) {
 												url: sourceUrl,
 												title: title ? title.innerText.trim() : null,
 												lang: validRootLang,
-											});
+											}, existing);
 										}
 										const mwData = await findMediaWikiData(doc, propform, sourceUrl ?? url);
 
