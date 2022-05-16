@@ -1,4 +1,6 @@
-async function sparqlQuery(query) {
+import { wait } from './core/async'
+
+async function sparqlQuery(query, attempt = 1) {
 	let url = 'https://query.wikidata.org/sparql?format=json&query=' + encodeURIComponent(query.split(/\s+/).join(' '));
 	try {
 		const response = await fetch(url);
@@ -15,7 +17,18 @@ async function sparqlQuery(query) {
 			return json;
 		}
 	} catch(error) {
-		throw ['Fetch Error :-S', error];
+		if (attempt > 5) {
+			throw ['Fetch Error :-S', error];
+		}
+		
+		const delay = Math.floor(Math.random() * 1000 * attempt)
+		console.warn(`Sparql Query failed, retring in ${delay / 1000} seconds`)
+		console.log(error)
+
+		await wait(delay);
+
+		console.log('retring…');
+		return await sparqlQuery(query, attempt + 1)
 	}
 }
 
