@@ -13,7 +13,7 @@ function createLink(thing, url) {
 
 async function parse(thing, ids, url) {
 	if (thing.hasOwnProperty("@type") &&
-		["BreadcrumbList"].includes(thing["@type"])
+		["BreadcrumbList", "WebSite"].includes(thing["@type"])
 	) {
 		return null
 	}
