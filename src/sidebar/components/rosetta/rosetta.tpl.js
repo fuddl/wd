@@ -49,7 +49,7 @@ const rosetta = (translations, mainLanguage) => {
 					let genderSuffix = document.createElement('sup');
 					genderSuffix.appendChild(document.createTextNode('('))
 					let first = true
-					for (gender of tsense.gender) {
+					for (const gender of tsense.gender) {
 						if (!first) {
 							genderSuffix.appendChild(document.createTextNode('/'))
 						}
