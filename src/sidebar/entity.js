@@ -658,9 +658,25 @@ function updateView(id, useCache = true) {
 								let claim = senseProps[pid].claims[sid].claim[stid];
 								if (claim?.mainsnak?.datavalue?.value) {
 									const senseId = claim.mainsnak.datavalue.value.id;
+									const sense = {
+										id: senseId,
+									}
 									const lexemeId = senseId.split('-')[0];
 									const lexeme = await wikidataGetEntity(lexemeId);
 									const lexemeLanguage = lexeme[lexemeId].language;
+									const senseInfos = {
+										'P10339': 'gender',
+									}
+									for (const name in senseInfos) {
+										if (claim?.qualifiers?.[name]) {
+											sense[senseInfos[name]] = [];
+											for (const qualItem of claim.qualifiers[name]) {
+												if (qualItem?.datavalue?.value?.id) {
+													sense[senseInfos[name]].push(qualItem.datavalue.value.id)
+												}
+											}
+										}
+									}
 									if (!translations.hasOwnProperty(lexemeLanguage)) {
 										translations[lexemeLanguage] = {};
 									}
@@ -670,7 +686,7 @@ function updateView(id, useCache = true) {
 											senses: [],
 										};
 									}
-									translations[lexemeLanguage][sid].senses.push(senseId);
+									translations[lexemeLanguage][sid].senses.push(sense);
 								}
 							}
 						}
