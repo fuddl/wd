@@ -66,7 +66,7 @@ async function getDeducedSenseClaims(props, id, lang, sense) {
                 }
                 for (const result of results) {
                   let qualifiers = {};
-                  if (result?.g && (myGenders.length == 0 || myGenders.includes(result.g.value))) {
+                  if (result?.g && (myGenders.length == 0 || !myGenders.includes(result.g.value))) {
                     qualifiers.P10339 = []
                     qualifiers.P10339.push({
                       datavalue: {
