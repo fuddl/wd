@@ -267,9 +267,14 @@ async function findMatchingProp(prop, type, namespace) {
 
 function isSameAsWdEntity(thing) {
 	if (thing.hasOwnProperty('sameAs')) {
-		let qid = thing.sameAs.match(/^https?:\/\/www\.wikidata\.org\/wiki\/(Q\d+)/);
-		if (qid && qid.length > 0) {
-			return qid[1];
+		if (typeof thing.sameAs === 'string') {
+			thing.sameAs = [thing.sameAs]
+		}
+		for (const item of thing.sameAs) {
+			let qid = item.match(/^https?:\/\/www\.wikidata\.org\/wiki\/(Q\d+)/);
+			if (qid && qid.length > 0) {
+				return qid[1];
+			}
 		}
 	} else {
 		return false
