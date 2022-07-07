@@ -1,4 +1,7 @@
-import {sparqlQuery} from '../sqarql-query.js';
+import { sparqlQuery } from '../sqarql-query.js';
+import { userLanguagesWithFallbacks } from '../wd-get-entity.js'
+
+const userLanguages = userLanguagesWithFallbacks()
 
 const mapping = {
   translations: {
@@ -39,6 +42,9 @@ async function getDeducedSenseClaims(props, id, lang, sense) {
                     dct:language ?language;
                     wikibase:lemma ?lemma.
                   ?sense wdt:${prop} wd:${qid}.
+                  ?language wdt:P218 ?lcode.
+                  FILTER (CONTAINS("${userLanguages.join('|')}", ?lcode))
+
                   OPTIONAL {
                     ?sense wdt:P10339 ?gender.
                     BIND(REPLACE(STR(?gender), "http://www.wikidata.org/entity/", "") as ?g)

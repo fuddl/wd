@@ -74,4 +74,4 @@ async function addToLabelCache(id, entity) {
 	}
 }
 
-export { wikidataGetEntity };
+export { wikidataGetEntity, userLanguagesWithFallbacks };
