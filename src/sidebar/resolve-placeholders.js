@@ -13,7 +13,7 @@ function getLink(entityId) {
 		P: 'https://www.wikidata.org/wiki/Property:',
 		L: 'https://www.wikidata.org/wiki/Lexeme:',
 	}
-	return prefixes[ns] + entityId;
+	return prefixes[ns] + entityId.replace(/-(\w\d+)$/, '#$1');
 }
 
 function resolvePlaceholders(scope) {
