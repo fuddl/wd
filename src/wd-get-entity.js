@@ -13,7 +13,9 @@ function namespaceGetInstance(id) {
 	}
 }
 
-function userLanguagesWithFallbacks() {
+let babelLangs = []
+
+async function userLanguagesWithFallbacks() {
 	let langs = navigator.languages;
 	let langsFallback = [];
 	for (let lang of langs) {
@@ -24,7 +26,26 @@ function userLanguagesWithFallbacks() {
 			}
 		}
 	}
-	return [...langs, ...langsFallback];
+
+	if (babelLangs.length == 0) {
+		try {
+			const userResponse = await fetch('https://www.wikidata.org/w/api.php?action=query&meta=userinfo&format=json');
+			let userJson = JSON.parse(await userResponse.text());
+			if (userJson?.query?.userinfo?.name) {
+
+				const response = await fetch(`https://www.wikidata.org/w/api.php?action=query&meta=babel&babuser=${userJson.query.userinfo.name}&format=json`);
+				let json = JSON.parse(await response.text());
+				if (json?.query?.babel) {
+					for (let lang of Object.keys(json.query.babel)) {
+						babelLangs.push(lang)
+					}
+				}
+			}
+		} catch(error) {
+			console.error('Failed fetching babel user data')
+		}
+	}
+	return [...langs, ...langsFallback, ...babelLangs];
 }
 
 async function wikidataGetEntity(id, usecache = true, returnSingle = false) {
@@ -34,7 +55,7 @@ async function wikidataGetEntity(id, usecache = true, returnSingle = false) {
 
 	let url = wbk.getEntities({
 		ids: id,
-		languages: userLanguagesWithFallbacks(),
+		languages: await userLanguagesWithFallbacks(),
 	});
 
 	try {

@@ -1,7 +1,6 @@
 import { sparqlQuery } from '../sqarql-query.js';
 import { userLanguagesWithFallbacks } from '../wd-get-entity.js'
 
-const userLanguages = userLanguagesWithFallbacks()
 
 const mapping = {
   translations: {
@@ -17,6 +16,8 @@ const mapping = {
 };
 
 async function getDeducedSenseClaims(props, id, lang, sense) {
+  
+  const userLanguages = await userLanguagesWithFallbacks()
 
   let myGenders = []
   if (sense?.sense?.claims?.P10339) {
