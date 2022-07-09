@@ -3556,6 +3556,13 @@ functional-red-black-tree@^1.0.1:
   resolved "https://registry.yarnpkg.com/functional-red-black-tree/-/functional-red-black-tree-1.0.1.tgz#1b0ab3bd553b2a0d6399d29c0e3ea0b252078327"
   integrity sha1-GwqzvVU7Kg1jmdKcDj6gslIHgyc=
 
+furigana@^0.19.3:
+  version "0.19.3"
+  resolved "https://registry.yarnpkg.com/furigana/-/furigana-0.19.3.tgz#b6510ee84b746ac6a4a423223d98fca929285dd5"
+  integrity sha512-Glc8eJzxFTes4OVAfy8CyDxJkAoJdO6s+mSFEdwlNDlNVEXvycDzqOIsCQF/P1oI336xRlx9Wa79gbKee86ywA==
+  dependencies:
+    kyarakuta "^0.19.3"
+
 generic-names@^2.0.1:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/generic-names/-/generic-names-2.0.1.tgz#f8a378ead2ccaa7a34f0317b05554832ae41b872"
@@ -4554,6 +4561,11 @@ known-css-properties@^0.21.0:
   version "0.21.0"
   resolved "https://registry.npmjs.org/known-css-properties/-/known-css-properties-0.21.0.tgz"
   integrity sha512-sZLUnTqimCkvkgRS+kbPlYW5o8q5w1cu+uIisKpEWkj31I8mx8kNG162DwRav8Zirkva6N5uoFsm9kzK4mUXjw==
+
+kyarakuta@^0.19.3:
+  version "0.19.3"
+  resolved "https://registry.yarnpkg.com/kyarakuta/-/kyarakuta-0.19.3.tgz#d0824fdfa33f46212a294e03f8740feb2caf3b45"
+  integrity sha512-Vafj6dEcD50CiKkA9WBzlFmVB2uY4OvJnCp27LqEZWmfNoEZwyIlRUZYdscj3/1sC3EVq+Y3lugCT5rUnkecRA==
 
 levn@^0.4.1:
   version "0.4.1"

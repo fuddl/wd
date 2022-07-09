@@ -19,6 +19,7 @@ import { remark } from './remark/remark.tpl.js';
 import { rosetta } from './rosetta/rosetta.tpl.js';
 import { symbol } from './symbol/symbol.tpl.js';
 import { title } from './title/title.tpl.js';
+import { ruby } from './ruby/ruby.tpl.js';
 
 const templates = {
 	actions: actions,
@@ -42,6 +43,7 @@ const templates = {
 	join: join,
 	bouncer: bouncer,
 	intertitle: intertitle,
+	ruby: ruby,
 	br: () => { return document.createElement('br') },
 	code: (text) => {
 		let tag = document.createElement('code');

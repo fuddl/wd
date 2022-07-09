@@ -51,7 +51,7 @@ body {
 }
 
 mark {
-	background: #7198F7;
+	background: var(--mark);
 	display: inline-block;
 	padding: 0 .25em;
 }
