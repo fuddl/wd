@@ -43,8 +43,12 @@ async function getDeducedSenseClaims(props, id, lang, sense) {
                     dct:language ?language;
                     wikibase:lemma ?lemma.
                   ?sense wdt:${prop} wd:${qid}.
-                  ?language wdt:P218 ?lcode.
-                  FILTER (CONTAINS("${userLanguages.join('|')}", ?lcode))
+                  {
+                    ?language wdt:P218 ?code.
+                  } UNION {
+                    ?language wdt:P424 ?code.
+                  }
+                  FILTER (?code IN ("${userLanguages.join('", "')}"))
 
                   OPTIONAL {
                     ?sense wdt:P10339 ?gender.

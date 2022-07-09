@@ -45,7 +45,7 @@ async function userLanguagesWithFallbacks() {
 			console.error('Failed fetching babel user data')
 		}
 	}
-	return [...langs, ...langsFallback, ...babelLangs];
+	return [... new Set([...langs, ...babelLangs, ...langsFallback])];
 }
 
 async function wikidataGetEntity(id, usecache = true, returnSingle = false) {
