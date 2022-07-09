@@ -1,4 +1,6 @@
 import { placeholder } from "../placeholder/placeholder.tpl.js";
+import { fit } from 'furigana'
+import { ruby } from '../ruby/ruby.tpl.js'
 
 import rules from "./flex-rules.yml";
 
@@ -11,18 +13,24 @@ function buildRepresentations(target, form, affix = {}, lexeme) {
 
 	const hyphenisation = form?.claims?.P5279?.[0]?.mainsnak?.datavalue?.value;
 
-	for (let rep in form.representations) {
-		if (formLink.innerText !== "") {
-			formLink.appendChild(document.createTextNode(" / "));
+	if ('ja' in form.representations && 'ja-hira' in form.representations) {
+		const fitted = fit(form.representations.ja.value, form.representations['ja-hira'].value, {type: 'object'});
+		formLink.appendChild(ruby(fitted));
+	} else {
+		for (let rep in form.representations) {
+			if (formLink.innerText !== "") {
+				formLink.appendChild(document.createTextNode(" / "));
+			}
+
+			let repSpan = document.createElement("span");
+			repSpan.setAttribute("lang", form.representations[rep].language);
+			let formStr = form.representations[rep].value;
+			if (hyphenisation && hyphenisation.replace(/‧/g, "") === formStr) {
+				formStr = hyphenisation.replace(/‧/g, String.fromCodePoint(173));
+			}
+			repSpan.innerText = formStr;
+			formLink.appendChild(repSpan);
 		}
-		let repSpan = document.createElement("span");
-		repSpan.setAttribute("lang", form.representations[rep].language);
-		let formStr = form.representations[rep].value;
-		if (hyphenisation && hyphenisation.replace(/‧/g, "") === formStr) {
-			formStr = hyphenisation.replace(/‧/g, String.fromCodePoint(173));
-		}
-		repSpan.innerText = formStr;
-		formLink.appendChild(repSpan);
 	}
 	if (affix?.prefix) {
 		buildAffix(variation, affix.prefix, "before", lexeme);
