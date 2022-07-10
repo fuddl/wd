@@ -67,10 +67,14 @@ const rubifyLemma = function (lemmas) {
 		}
 	}
 	if ('tlh-piqd' in lemmas && 'tlh-latn' in lemmas) {
-		const fitted = fitKlingon(lemmas['tlh-piqd' ].value, lemmas['tlh-latn'].value);
-		output.rubified = ruby(fitted, 'tlh');
-		delete lemmas['tlh-piqd'];
-		delete lemmas['tlh-latn'];
+		try {
+			const fitted = fitKlingon(lemmas['tlh-piqd' ].value, lemmas['tlh-latn'].value);
+			output.rubified = ruby(fitted, 'tlh');
+			delete lemmas['tlh-piqd'];
+			delete lemmas['tlh-latn'];
+		} catch (error) {
+			console.error('tlh-piqd and tlh-latn representations of this lexeme are probably invalid')
+		}
 	}
 	output.unrubified = lemmas
 	return output			
