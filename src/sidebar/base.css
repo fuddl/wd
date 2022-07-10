@@ -67,6 +67,10 @@ a {
 	text-decoration: none;
 }
 
+rt:lang(tlh) {
+	margin-bottom: -.555em;
+}
+
 [hidden] {
 	display: none !important;
 }
