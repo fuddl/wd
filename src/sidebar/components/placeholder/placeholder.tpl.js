@@ -1,8 +1,7 @@
 import { getLink } from '../../resolve-placeholders.js';
 import { wikidataGetEntity } from '../../../wd-get-entity.js';
 import { getValueByLang } from '../../get-value-by-lang.js';
-import { fit } from 'furigana'
-import { ruby } from '../ruby/ruby.tpl.js'
+import { rubifyLemma } from '../../rubifyLemma.js';
 
 const placeholder = (vars, cache) => {
 	let tagName = vars?.tag ?? 'a';
@@ -59,31 +58,35 @@ const placeholder = (vars, cache) => {
 					link.setAttribute('title', getValueByLang(entity[id], 'descriptions'));
 				}
 				link.innerText = getValueByLang(entity[id], vars.desiredInner ?? 'labels', id);
-			} else if (entity[id].lemmas) {
-				if ('ja' in entity[id].lemmas && 'ja-hira' in entity[id].lemmas) {
-					const fitted = fit(entity[id].lemmas.ja.value, entity[id].lemmas['ja-hira'].value, {type: 'object'});
-					link.appendChild(ruby(fitted));
-				} else {
-					let labels = [];
-					for (let lang in entity[id].lemmas) {
-						labels.push(entity[id].lemmas[lang].value)
-					}
-					link.innerText = labels.join(' ‧ ');
+			} else if (entity[id].lemmas || entity[id].glosses) {
+
+				let lemmas = entity?.[id]?.lemmas ?? null;
+				if (!lemmas) {
+					let baseEntityId = id.replace(/-.+/, '');
+					let baseEntity = await wikidataGetEntity(baseEntityId);
+					lemmas = baseEntity[baseEntityId].lemmas
 				}
-			} else if (entity[id].representations){
+
+
+				const ruby = rubifyLemma(lemmas)
+
+				if (ruby.rubified) {
+					link.appendChild(ruby.rubified);
+				}
+
+				for (let lang in ruby.unrubified) {
+					if (link.innerText != '') {
+						link.appendChild(document.createTextNode(' ‧ '))
+					}
+					link.appendChild(document.createTextNode(lemmas[lang].value))
+				}
+			} else if (entity[id].representations) {
 				let labels = [];
 				for (let lang in entity[id].representations) {
 					labels.push(entity[id].representations[lang].value)
 				}
 				link.innerText = labels.join(' ‧ ');
 			} else if (entity[id].glosses) {
-				let baseEntityId = id.replace(/-.+/, '');
-				let baseEntity = await wikidataGetEntity(baseEntityId);
-				let labels = [];
-				for (let lang in baseEntity[baseEntityId].lemmas) {
-					labels.push(baseEntity[baseEntityId].lemmas[lang].value)
-				}
-				link.innerText = labels.join(' ‧ ');
 
 				if (vars?.displayGloss ?? true) {
 					let gloss = document.createElement('small');

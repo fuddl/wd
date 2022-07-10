@@ -6,9 +6,9 @@ import {templates} from './components/templates.tpl.js'
 import {wikidataGetEntity} from '../wd-get-entity.js'
 import {ApplyFormatters} from './formatters.js'
 import {AddLemmaAffix} from './lemma-afixes.js'
-import { fit } from 'furigana'
 import browser from 'webextension-polyfill'
 import { PrependNav } from './prepend-nav.js';
+import { rubifyLemma } from './rubifyLemma.js';
 import { getDeducedSenseClaims } from './deduce-sense-statements.js';
 
 if (history.length > 1 || window != window.top) {
@@ -365,24 +365,24 @@ function updateView(id, useCache = true) {
 
 			if (e.lemmas) {
 				let labels = document.createDocumentFragment();
-				if ('ja' in e.lemmas && 'ja-hira' in e.lemmas) {
-				  const fitted = fit(e.lemmas.ja.value, e.lemmas['ja-hira'].value, {type: 'object'});
-					labels.appendChild(templates.ruby(fitted));
-				
-				} else {
 
-					for (let lang in e.lemmas) {
-						let lemma = AddLemmaAffix(e.lemmas[lang].value, {
-							category: e.lexicalCategory,
-							lang: e.language,
-							gender: typeof e.claims?.P5185 === 'object' ? e.claims?.P5185[0]?.mainsnak?.datavalue?.value?.id : null,
-						});
+				const ruby = rubifyLemma(e.lemmas)
 
-						if (labels.childNodes.length !== 0) {
-							labels.appendChild(document.createTextNode(' ‧ '));
-						}
-						labels.appendChild(lemma);
+				if (ruby.rubified) {
+					labels.appendChild(ruby.rubified);
+				}
+
+				for (let lang in ruby.unrubified) {
+					let lemma = AddLemmaAffix(e.lemmas[lang].value, {
+						category: e.lexicalCategory,
+						lang: e.language,
+						gender: typeof e.claims?.P5185 === 'object' ? e.claims?.P5185[0]?.mainsnak?.datavalue?.value?.id : null,
+					});
+
+					if (labels.childNodes.length !== 0) {
+						labels.appendChild(document.createTextNode(' ‧ '));
 					}
+					labels.appendChild(lemma);
 				}
 
 				let lexemeDescription = document.createDocumentFragment();

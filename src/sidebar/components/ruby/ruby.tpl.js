@@ -1,5 +1,8 @@
-const ruby = (fragments) => {
+const ruby = (fragments, lang = '') => {
 	const ruby = document.createElement('ruby');
+	if (lang) {
+		ruby.setAttribute('lang', lang)
+	}
 	for (const fragment of fragments) {
 		if (fragment.w) {
 			ruby.appendChild(document.createTextNode(fragment.w))
