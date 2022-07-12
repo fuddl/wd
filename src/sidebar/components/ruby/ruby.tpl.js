@@ -1,13 +1,14 @@
 const ruby = (fragments, lang = '') => {
-	const ruby = document.createElement('ruby');
+	const wrapper = document.createElement('span')
 	if (lang) {
-		ruby.setAttribute('lang', lang)
+		wrapper.setAttribute('lang', lang)
 	}
 	for (const fragment of fragments) {
-		if (fragment.w) {
+		if (fragment.w && fragment.r) {
+			const ruby = document.createElement('ruby')
+			
 			ruby.appendChild(document.createTextNode(fragment.w))
-		}
-		if (fragment.r) {
+
 			const start = document.createElement('rp')
 			start.innerText = '('
 			const end = document.createElement('rp')
@@ -17,10 +18,13 @@ const ruby = (fragments, lang = '') => {
 			ruby.appendChild(start)
 			ruby.appendChild(t)
 			ruby.appendChild(end)
+			wrapper.appendChild(ruby)
+		} else if (fragment.w) {
+			wrapper.appendChild(document.createTextNode(fragment.w))
 		}
 	}
 
-	return ruby;
+	return wrapper;
 }
 
 export { ruby };

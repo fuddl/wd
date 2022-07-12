@@ -30,7 +30,7 @@ const fitKlingon = function (pIqaD, latin) {
  		'Y': '',
  		"'": '',
  	}
- 	output = []
+ 	const output = []
  	for (const letter of pIqaD) {
  		if (letter.match(/\s/) && latin.match(/^\s+/)) {
  			output.push({r: letter})
@@ -59,6 +59,12 @@ const rubifyLemma = function (lemmas) {
 	if ('ja' in lemmas && 'ja-hira' in lemmas) {
 		try {
 			const fitted = fit(lemmas.ja.value, lemmas['ja-hira'].value, {type: 'object'});
+			// undo the katakana → hiragana transliteration
+			for (let i in fitted) {
+				if(fitted[i].w.match(/^[゠-ヿ]+$/)) {
+					fitted[i].r = ''
+				}
+			}
 			output.rubified = ruby(fitted, 'ja');
 			delete lemmas['ja'];
 			delete lemmas['ja-hira'];

@@ -58,15 +58,14 @@ const placeholder = (vars, cache) => {
 					link.setAttribute('title', getValueByLang(entity[id], 'descriptions'));
 				}
 				link.innerText = getValueByLang(entity[id], vars.desiredInner ?? 'labels', id);
-			} else if (entity[id].lemmas || entity[id].glosses) {
+			} else if (entity[id].lemmas || entity[id].glosses || entity[id].representations) {
 
-				let lemmas = entity?.[id]?.lemmas ?? null;
+				let lemmas = entity?.[id]?.lemmas || entity?.[id]?.representations;
 				if (!lemmas) {
 					let baseEntityId = id.replace(/-.+/, '');
 					let baseEntity = await wikidataGetEntity(baseEntityId);
 					lemmas = baseEntity[baseEntityId].lemmas
 				}
-
 
 				const ruby = rubifyLemma(lemmas)
 
@@ -80,12 +79,6 @@ const placeholder = (vars, cache) => {
 					}
 					link.appendChild(document.createTextNode(lemmas[lang].value))
 				}
-			} else if (entity[id].representations) {
-				let labels = [];
-				for (let lang in entity[id].representations) {
-					labels.push(entity[id].representations[lang].value)
-				}
-				link.innerText = labels.join(' ‧ ');
 			} else if (entity[id].glosses) {
 
 				if (vars?.displayGloss ?? true) {
