@@ -4,12 +4,12 @@ import { userLanguagesWithFallbacks } from '../wd-get-entity.js'
 
 const mapping = {
   translations: {
-    from: ['P5137', 'P9970'],
+    from: ['P5137', 'P9970', 'P6271'],
     to: 'P5972',
     lang: 'exclude',
   },
   synonyms: {
-    from: ['P5137', 'P9970'],
+    from: ['P5137', 'P9970', 'P6271'],
     to: 'P5973',
     lang: 'require',
   },
