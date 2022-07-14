@@ -653,6 +653,9 @@ function updateView(id, useCache = true) {
 
 						glosses.appendChild(section);
 					} else if (senseProps[pid].datatype === 'wikibase-sense') {
+						if (pid == 'P8471') {
+							continue
+						}
 						let section = document.createElement('section');
 						let heading = document.createElement('h2');
 						let headingText = templates.placeholder({
