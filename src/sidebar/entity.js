@@ -549,6 +549,8 @@ function updateView(id, useCache = true) {
 						senseTree[id].item = senseTree[id].sense.claims.P5137[0].mainsnak.datavalue.value.id;
 					} else if (senseTree[id].sense?.claims?.P9970?.[0].mainsnak?.datavalue?.value?.id) {
 						senseTree[id].item = senseTree[id].sense.claims.P9970[0].mainsnak.datavalue.value.id;
+					} else if (senseTree[id].sense?.claims?.P6271?.[0].mainsnak?.datavalue?.value?.id) {
+						senseTree[id].item = senseTree[id].sense.claims.P6271[0].mainsnak.datavalue.value.id;
 					}
 
 					if (senseTree[id].sense?.claims?.P9488?.[0].mainsnak?.datavalue?.value?.id) {
