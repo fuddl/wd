@@ -243,3 +243,7 @@ h2 {
 section {
 	margin: 1em 0;
 }
+
+math[display="block"] {
+	margin: 2em 0;
+}

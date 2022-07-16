@@ -229,7 +229,39 @@ const templates = {
 			}));
 		}
 		return o;
-	}
+	},
+	blender: (parts, result) => {
+		const ns = 'http://www.w3.org/1998/Math/MathML';
+		const math = document.createElementNS(ns, "math");
+		math.setAttribute('display', 'block');
+		const main = document.createElementNS(ns, 'munder')
+		math.appendChild(main)
+		const top = document.createElementNS(ns, 'mrow')
+		main.appendChild(top)
+		for (const part of parts) {
+			if (top.childNodes.length > 0) {
+				const operator = document.createElementNS(ns, 'mo')
+				operator.appendChild(document.createTextNode(' + '))
+				top.appendChild(operator)
+			}
+			const wrapper = document.createElementNS(ns, 'mtext')
+			wrapper.appendChild(part.element)
+			top.appendChild(wrapper)
+		}
+		const bottom = document.createElementNS(ns, 'munder')
+		main.appendChild(bottom)
+		const bottomIntro = document.createElementNS(ns, 'mo')
+		bottomIntro.appendChild(document.createTextNode('⏟'))
+		console.debug(bottomIntro)
+		bottom.appendChild(bottomIntro)
+		const resultWrapper = document.createElementNS(ns, 'mrow')
+		bottom.appendChild(resultWrapper)
+		const results = document.createElementNS(ns, 'mtext')
+		results.appendChild(result)
+		resultWrapper.appendChild(results)
+
+		return math
+	},
 };
 
 export { templates }

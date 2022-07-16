@@ -84,7 +84,6 @@ async function getDeducedSenseClaims(props, id, lang, sense) {
                   }
                   ORDER BY (LCASE(?language))
                 `;
-                console.debug(query)
                 let results = await sparqlQuery(query);
                 if (results.length > 0) {
                   if (!props.hasOwnProperty(mapping[m].to)) {

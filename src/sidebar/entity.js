@@ -758,6 +758,30 @@ function updateView(id, useCache = true) {
 							}
 							glosses.appendChild(section);
 						}
+						if (cid == 'P5238') {
+							const parts = [];
+							for (let part of e.claims[cid]) {
+								if (part?.mainsnak?.datavalue?.value?.id) {
+									let sortkey = part?.qualifiers?.P1545?.[0]?.datavalue?.value ?? null;
+									parts.push({
+										element: templates.placeholder({ entity: part?.mainsnak?.datavalue?.value?.id }),
+										order: sortkey, 
+									})
+								}
+							}
+							parts.sort((a,b) => a.order - b.order); 
+
+							let section = document.createElement('section');
+							let heading = document.createElement('h2');
+							let headingText = templates.placeholder({
+								entity: cid,
+								type: 'span',
+							});
+							heading.appendChild(headingText);
+							section.appendChild(heading);
+							section.appendChild(templates.blender(parts, templates.placeholder({entity: id, type: 'span'})));
+							glosses.appendChild(section);
+						}
 					}
 				}
 			}
