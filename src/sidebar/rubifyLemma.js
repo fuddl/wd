@@ -33,7 +33,7 @@ const fitKlingon = function (pIqaD, latin) {
  	const output = []
  	for (const letter of pIqaD) {
  		if (letter.match(/\s/) && latin.match(/^\s+/)) {
- 			output.push({r: letter})
+ 			output.push({w: letter})
  			latin = latin.replace(/^\s+/, '')
  			continue
  		}
@@ -75,9 +75,11 @@ const rubifyLemma = function (lemmas) {
 	if ('tlh-piqd' in lemmas && 'tlh-latn' in lemmas) {
 		try {
 			const fitted = fitKlingon(lemmas['tlh-piqd' ].value, lemmas['tlh-latn'].value);
-			output.rubified = ruby(fitted, 'tlh');
-			delete lemmas['tlh-piqd'];
-			delete lemmas['tlh-latn'];
+			if (fitted.length > 0) {
+				output.rubified = ruby(fitted, 'tlh');
+				delete lemmas['tlh-piqd'];
+				delete lemmas['tlh-latn'];
+			}
 		} catch (error) {
 			console.error('tlh-piqd and tlh-latn representations of this lexeme are probably invalid')
 		}
