@@ -123,7 +123,7 @@ const getTabId =
         || (await Browser.getActiveTab()).id
 
 browser.runtime.onMessage.addListener(async (data, sender) => {
-    console.log("background message", data, sender)
+    //console.log("background message", data, sender)
 
     if (data.type === 'get-tab-id') return sender.tab.id
     if (data.type === 'broadcast-to-active-tab') return Browser.sendMessageToActiveTab(data.message)

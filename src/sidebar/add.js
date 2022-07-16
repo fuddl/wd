@@ -110,7 +110,7 @@ content.innerHTML = '';
 	};
 
 	browser.runtime.onMessage.addListener(async (data, sender) => {
-        console.log("add-content event", data)
+        //console.log("add-content event", data)
 		if (data.type === 'entity_add') {
 			clearBouncer();
 			if (!receivedEntities.includes(data.id)) {
@@ -198,6 +198,7 @@ content.innerHTML = '';
 
 			let jobs = [];
 
+			let currentEntityType = currentEntity.startsWith('L') ? 'lexeme' : 'item'
 			let currentEntityNummericId = parseInt(currentEntity.replace(/\w/,''));
 			if (stringTypes.includes(propPicker.element.getAttribute('data-datatype'))) {
 				let reference = [];
@@ -263,6 +264,7 @@ content.innerHTML = '';
 				for (let selected of selecteds) {
 
 					let selectedId = selected.getAttribute('data-entity');
+					let selectedType = selectedId.startsWith('L') ? 'lexeme' : 'item'
 					let selectedNummericId = parseInt(selectedId.replace(/\w/,''));
 
 					let reference = [];
@@ -304,14 +306,15 @@ content.innerHTML = '';
 							"datatype": "string"
 						});
 					}
-
+					
 					jobs.push({
 						type: 'set_claim',
 						subject: !flipped ? currentEntity : selectedId,
 						verb: propPicker.element.getAttribute('data-prop'),
 						object: {
-							'entity-type': "item",
+							'entity-type': !flipped ? selectedType : currentEntityType,
 							'numeric-id': !flipped ? selectedNummericId : currentEntityNummericId,
+							'id': !flipped ? selectedId : currentEntity,
 						},
 						fromTab: currentTab,
 						references: reference ? [reference] : null,

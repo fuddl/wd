@@ -19,7 +19,7 @@ export const SidebarWrapper = () => {
 
     useEffect(() => {
         const messageCallback = (event) => {
-            console.log('content-script container ev', event)
+            //console.log('content-script container ev', event)
             if ('type' in event) {
                 if (event.type === 'update-panel-url') {
                     setUrl(event.url)
