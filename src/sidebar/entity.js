@@ -758,11 +758,11 @@ function updateView(id, useCache = true) {
 							}
 							glosses.appendChild(section);
 						}
-						if (cid == 'P5238') {
+						if (['P5238', 'P5191'].includes(cid)) {
 							const parts = [];
 							for (let part of e.claims[cid]) {
 								if (part?.mainsnak?.datavalue?.value?.id) {
-									let sortkey = part?.qualifiers?.P1545?.[0]?.datavalue?.value ?? null;
+									let sortkey = part?.qualifiers?.[cid]?.[0]?.datavalue?.value ?? null;
 									parts.push({
 										element: templates.placeholder({ entity: part?.mainsnak?.datavalue?.value?.id }),
 										order: sortkey, 
