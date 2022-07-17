@@ -245,6 +245,19 @@ section {
 }
 
 math[display="block"] {
-	margin: 2em 0;
+	padding: 2em 1em;
+	background: #f8f9fa;
 	font-size: 1.5em;
+	border: 1px solid #eaecf0;
+}
+
+@media (prefers-color-scheme: dark) {
+	math[display="block"] {
+		background: #27292d;
+		border-color: #44464a;
+	}
+}
+
+mrow + munder {
+	pointer-events: none;
 }
