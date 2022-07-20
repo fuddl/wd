@@ -11,9 +11,7 @@ import { PrependNav } from './prepend-nav.js';
 import { rubifyLemma } from './rubifyLemma.js';
 import { getDeducedSenseClaims } from './deduce-sense-statements.js';
 
-if (history.length > 1 || window != window.top) {
-	PrependNav();
-}
+PrependNav();
 
 const lang = navigator.language.substr(0,2);
 const footnoteStorage = {};

@@ -14,7 +14,7 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
-    .sidebar {
+    .sidebar--initiated {
         transition: .25s transform;
     }
 }

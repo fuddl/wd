@@ -7,6 +7,10 @@ import {metaToStatements} from './metaToStatements.js'
 import browser from 'webextension-polyfill'
 import {Browser} from "../core/browser"
 import jobRedundancyChecker from './redundancy-checker.js'
+import {PrependNav} from './prepend-nav.js'
+
+
+PrependNav()
 
 function getPropertyScope(property) {
 	let scopes = {

@@ -252,7 +252,6 @@ const templates = {
 		main.appendChild(bottom)
 		const bottomIntro = document.createElementNS(ns, 'mo')
 		bottomIntro.appendChild(document.createTextNode(parts.length > 1 ? '⏟' : '↓'))
-		console.debug(bottomIntro)
 		bottom.appendChild(bottomIntro)
 		const resultWrapper = document.createElementNS(ns, 'mrow')
 		bottom.appendChild(resultWrapper)

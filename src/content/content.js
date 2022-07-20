@@ -56,7 +56,7 @@ async function findApplicables(location) {
 }
 
 async function main() {
-	setupSidebar()
+	await setupSidebar()
 
 	await findApplicables(location)
 
