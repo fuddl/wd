@@ -1,22 +1,7 @@
 import { templates } from './components/templates.tpl.js';
 import { URL_match_pattern } from '../resolver/url-match-pattern'
-import { makeLanguageValid } from '../get-valid-string-languages.js';
+import { makeLanguageValid, getLangQid } from '../get-valid-string-languages.js';
 import { sparqlQuery } from "../sqarql-query.js";
-
-async function getLangQid(iso) {
-	const query = `
-		SELECT ?n WHERE {
-		  ?q wdt:P218 "${iso}".
-		  BIND(REPLACE(STR(?q), "http://www.wikidata.org/entity/Q", "") as ?n)
-		}
-	`;
-	const response = await sparqlQuery(query);
-	if (response.length > 0 && response[0].n?.value) {
-		return parseInt(response[0].n.value);
-	} else {
-		return false;
-	}
-}
 
 async function findMediaWikiData(doc, propform, url) {
 	const scripts = doc.querySelectorAll('script');

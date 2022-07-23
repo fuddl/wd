@@ -1,3 +1,5 @@
+import { sparqlQuery } from "./sqarql-query.js";
+
 async function getValidStringLanguages() {
 	let response = await fetch('https://www.wikidata.org/w/api.php?action=query&meta=wbcontentlanguages&wbclcontext=monolingualtext&wbclprop=code%7Cautonym&format=json&origin=*', {cache: "force-cache"});
 	response = await response.json();
@@ -21,4 +23,19 @@ async function makeLanguageValid(invalidLang) {
 	return 'und';
 }
 
-export { getValidStringLanguages, makeLanguageValid }
+async function getLangQid(iso) {
+	const query = `
+		SELECT ?n WHERE {
+		  ?q wdt:P218 "${iso}".
+		  BIND(REPLACE(STR(?q), "http://www.wikidata.org/entity/Q", "") as ?n)
+		}
+	`;
+	const response = await sparqlQuery(query);
+	if (response.length > 0 && response[0].n?.value) {
+		return parseInt(response[0].n.value);
+	} else {
+		return false;
+	}
+}
+
+export { getValidStringLanguages, makeLanguageValid, getLangQid }

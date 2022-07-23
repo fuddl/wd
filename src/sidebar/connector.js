@@ -8,6 +8,7 @@ import browser from 'webextension-polyfill'
 import {Browser} from "../core/browser"
 import jobRedundancyChecker from './redundancy-checker.js'
 import {PrependNav} from './prepend-nav.js'
+import { getLangQid } from '../get-valid-string-languages.js';
 
 
 PrependNav()
@@ -168,6 +169,13 @@ let existing = new jobRedundancyChecker();
 					verb: connectorProp,
 					object: proposals.ids[0][0].value,
 					fromTab: currentTab,
+					qualifiers: (proposals?.source?.lang && proposals.source.lang != 'und') ? [{
+						property: "P407",
+						value: {
+							'entity-type': "item",
+							'numeric-id': await getLangQid( proposals.source.lang),
+						}
+					}] : [],
 					references: [{
 						"P854": [{
 							"snaktype": "value",
