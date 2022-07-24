@@ -5,6 +5,17 @@ import {updateStatus} from "../update-status.js"
 import browser from 'webextension-polyfill'
 import {URL_match_pattern} from "../resolver/url-match-pattern"
 
+async function makeExtensionLink() {
+	let browserInfo
+	if ('getBrowserInfo' in browser?.runtime) {
+	  browserInfo = await browser?.runtime?.getBrowserInfo()
+	}
+
+	let moji = browserInfo?.name == 'Firefox' ? '🦊' : '🌐'
+	let platform = browserInfo?.name == 'Firefox' ? 'Firefox' : 'Web'
+
+	return `[[d:Wikidata:Tools/Wikidata for ${platform}|Wikidata for ${platform} ${moji}]]`
+}
 
 function groupJobs(jobs) {
 	let groupedJobs = {};
@@ -125,6 +136,7 @@ async function processJobs(jobsUngrouped) {
 
 async function createEntity(label, lang) {
 	let token = await getTokens();
+	const extensionLink = await makeExtensionLink()
 
 	let labels = { labels: {} };
 	labels.labels[lang] = {
@@ -137,7 +149,7 @@ async function createEntity(label, lang) {
 	data.append('new', 'item');
 	data.append('data', JSON.stringify(labels));
 
-	data.append('summary', 'created with [[d:Wikidata:Tools/Wikidata for Firefox|Wikidata for Firefox 🦊]]');
+	data.append('summary', `created with ${extensionLink}`);
 	data.append('token', token);
 	data.append('bot', '1');
 	data.append('format', "json");
@@ -164,6 +176,7 @@ async function setSiteLink(subjectId, property, value) {
 async function setClaim(subjectId, property, value) {
 	let token = await getTokens();
 	let subject = await wikidataGetEntity(subjectId);
+	const extensionLink = await makeExtensionLink()
 
 	let data = new FormData();
 	data.append('action', 'wbcreateclaim');
@@ -178,7 +191,7 @@ async function setClaim(subjectId, property, value) {
 		data.append('value', JSON.stringify(value));
 	}
 
-	data.append('summary', 'connected with [[d:Wikidata:Tools/Wikidata for Firefox|Wikidata for Firefox 🦊]]');
+	data.append('summary', `connected with ${extensionLink}`);
 	data.append('token', token);
 	data.append('baserevid', subject[subjectId].lastrevid);
 	data.append('bot', '1');
@@ -195,12 +208,13 @@ async function setClaim(subjectId, property, value) {
 
 async function addReference(claimId, references) {
 	let token = await getTokens();
+	const extensionLink = await makeExtensionLink()
 
 	let data = new FormData();
 	data.append('action', 'wbsetreference');
 	data.append('statement', claimId);
 	data.append('snaks', JSON.stringify(references));
-	data.append('summary', 'added with [[d:Wikidata:Tools/Wikidata for Firefox|Wikidata for Firefox 🦊]]');
+	data.append('summary', `added with ${extensionLink}`);
 	data.append('token', token);
 	data.append('bot', '1');
 	data.append('format', "json");
@@ -215,6 +229,7 @@ async function addReference(claimId, references) {
 
 async function addQualifier(claimId, qualifier) {
 	let token = await getTokens();
+	const extensionLink = await makeExtensionLink()
 
 	let data = new FormData();
 	data.append('action', 'wbsetqualifier');
@@ -222,7 +237,7 @@ async function addQualifier(claimId, qualifier) {
 	data.append('property', qualifier.property);
 	data.append('snaktype', 'value');
 	data.append('value', JSON.stringify(qualifier.value));
-	data.append('summary', 'added with [[d:Wikidata:Tools/Wikidata for Firefox|Wikidata for Firefox 🦊]]');
+	data.append('summary', `added with ${extensionLink}`);
 	data.append('token', token);
 	data.append('bot', '1');
 	data.append('format', "json");
