@@ -8,6 +8,7 @@ const url: Resolver = {
 			return [{
 				prop: ['P953', 'P973', 'P856', 'P2699'],
 				value: location.href,
+				langRequired: true,
 			}]
 		}
 	},

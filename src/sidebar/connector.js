@@ -38,6 +38,7 @@ let existing = new jobRedundancyChecker();
 	let content = document.getElementById('content');
 	let propPreview;
 	let connectorProp;
+	let langRequired = false
 	let propform = document.createElement('form');
 	let preview = document.createDocumentFragment();
 	let isMultiple = false;
@@ -51,6 +52,8 @@ let existing = new jobRedundancyChecker();
 	if (isProp) {
 		isMultiple = typeof proposals.ids[0][0].prop !== 'string'
 		connectorProp = !isMultiple ? proposals.ids[0][0].prop : proposals.ids[0][0].prop[0];
+		langRequired = proposals.ids[0][0]?.langRequired ?? false
+
 		let property = !isMultiple ? await wikidataGetEntity(proposals.ids[0][0].prop) : null;
 
 		scope = !isMultiple ? getPropertyScope(property[proposals.ids[0][0].prop]) : 'item';
@@ -169,11 +172,11 @@ let existing = new jobRedundancyChecker();
 					verb: connectorProp,
 					object: proposals.ids[0][0].value,
 					fromTab: currentTab,
-					qualifiers: (proposals?.source?.lang && proposals.source.lang != 'und') ? [{
+					qualifiers: (langRequired && proposals?.source?.lang && proposals.source.lang != 'und') ? [{
 						property: "P407",
-						value: {
+						value:  {
 							'entity-type': "item",
-							'numeric-id': await getLangQid( proposals.source.lang),
+							'numeric-id': await getLangQid(proposals.source.lang),
 						}
 					}] : [],
 					references: [{
