@@ -3,32 +3,32 @@ import { fit } from 'furigana'
 
 const fitKlingon = function (pIqaD, latin) {
  	const trans = {
- 		'TLH': '',
- 		'CH': '',
- 		'GH': '',
- 		'NG': '',
- 		'QH': '',
- 		'A': '',
- 		'B': '',
  		'D': '',
- 		'E': '',
  		'H': '',
- 		'I': '', 
- 		'J': '',
- 		'L': '',
- 		'M': '',
- 		'N': '',
- 		'O': '',
- 		'P': '',
- 		'Q': '',
- 		'R': '',
- 		'S': '',
- 		'T': '',
- 		'U': '',
- 		'V': '',
- 		'W': '',
- 		'Y': '',
+ 		'Q': '',
+ 		'ch': '',
+ 		'gh': '',
+ 		'ng': '',
+ 		'tlh': '',
  		"'": '',
+ 		'a': '',
+ 		'b': '',
+ 		'e': '',
+ 		'i': '', 
+ 		'j': '',
+ 		'l': '',
+ 		'm': '',
+ 		'n': '',
+ 		'o': '',
+ 		'p': '',
+ 		'q': '',
+ 		'r': '',
+ 		'S': '',
+ 		't': '',
+ 		'u': '',
+ 		'v': '',
+ 		'w': '',
+ 		'y': '',
  	}
  	const output = []
  	for (const letter of pIqaD) {
@@ -38,7 +38,7 @@ const fitKlingon = function (pIqaD, latin) {
  			continue
  		}
  		for (const i in trans) {
- 			if (letter == trans[i] && latin.toUpperCase().startsWith(i)) {
+ 			if (letter == trans[i] && latin.startsWith(i)) {
  				output.push({
  					w: letter,
  					r: latin.substring(0,i.length),
