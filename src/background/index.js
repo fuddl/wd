@@ -8,6 +8,15 @@ import {Browser} from "../core/browser"
 
 window.sidebarLocked = false;
 
+let sidebarLayout = 'sidebarLayout' || ('sidebarAction' in browser ? 'browser' : 'inline')
+console.debug(sidebarLayout)
+let gettingSidebarLayout = browser.storage.sync.get("sidebarLayout");
+gettingSidebarLayout.then((result) => {
+    sidebarLayout = result['sidebarAction'] || 'browser'
+    console.debug(sidebarLayout)
+})
+console.debug(sidebarLayout)
+
 function pushProposalToSidebar(proposals, tid) {
 	proposals.fromTab = tid;
 	if (!sidebarLocked) {
@@ -21,7 +30,8 @@ const toggleInlineSidebar = async () =>
     Browser.sendMessageToActiveTab({type: "toggle-sidebar"})
 
 async function toggleSidebar() {
-    if ('sidebarAction' in browser) {
+    console.debug(sidebarLayout)
+    if (sidebarLayout == 'browser') {
         // note: if a user input handler waits on a promise, then its status as a user input handler is lost
         // and this call won't work
         // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/User_actions

@@ -292,7 +292,10 @@ async function findConnections(thing, source) {
 		if (prop.startsWith('@')) {
 			continue;
 		}
-		if (Array.isArray(thing[prop])) {
+
+		if (thing[prop] === null) {
+			continue
+		} else if (Array.isArray(thing[prop])) {
 			for (let i in thing[prop]) {
 				if (typeof thing[prop][i] === 'object' && thing[prop][i].hasOwnProperty('@type')) {
 					let qid = isSameAsWdEntity(thing[prop][i]);

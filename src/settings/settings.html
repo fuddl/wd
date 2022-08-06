@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <style>
+      [type="radio"],
+      img {
+        vertical-align: middle;
+      }
+      label {
+        display: block;
+        margin: 1em 0;
+      }
+      div {
+        display: inline;
+      }
+      fieldset {
+        border: none;
+        margin: 1em 0;
+      }
+      legend {
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <form>
+        <fieldset>
+          <legend>Sidebar layout</legend>
+          <label>
+            <input type="radio" name="sidebarLayout" value="browser">
+            <img src="res/browser-sidebar.svg" width="128">
+          </label>
+          <label>
+            <input type="radio" name="sidebarLayout" value="inline">
+            <img src="res/inline-sidebar.svg" width="128">
+          </label>
+        </fieldset>
+    </form>
+    <script src="settings.js"></script>
+  </body>
+</html>
