@@ -251,3 +251,13 @@ ja:
           features: ["Q53609593"]
         imperative:
           features: ["Q4348304"]
+tlh:
+  lang: Q10134
+  categories:
+    noun:
+      category: Q1084
+      yAxis:
+        sigular:
+          features: ["Q110786"]
+        plural:
+          features: ["Q146786"]
