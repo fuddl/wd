@@ -20,6 +20,11 @@ let refCounter = {};
 let cache = {}
 
 function highlightWord(el, text) {
+	if (el.childNodes.length > 1) {
+		// there already is a highlight for a different
+		// representation. abort.
+		return
+	}
   let t = el.textContent;
   el.textContent = '';
   let idx, prev = 0;
