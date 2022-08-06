@@ -30,11 +30,13 @@ const usefullMetatags = [
 		type: 'Quantity',
 		prop: 'P2047',
 		suggested: true,
+		hasTimeUnit: true,
 	},	{
 		name: 'video:duration',
 		type: 'Quantity',
 		prop: 'P2047',
 		suggested: true,
+		hasTimeUnit: true,
 	},
 	{
 		name: 'video:series',
@@ -136,11 +138,13 @@ async function enrichMetaData(tags, lang, url) {
 				let amount = tags[key][delta];
 				let unit = '1';
 
-				for (const interval of durations) {
-					let divided = amount / interval.seconds;
-					if (divided > 1 && divided % 1 === 0 && amount !== divided) {
-						amount = divided;
-						unit = `http://www.wikidata.org/entity/${interval.wd}`;
+				if (type?.hasTimeUnit) {
+					for (const interval of durations) {
+						let divided = amount / interval.seconds;
+						if (divided > 1 && divided % 1 === 0 && amount !== divided) {
+							amount = divided;
+							unit = `http://www.wikidata.org/entity/${interval.wd}`;
+						}
 					}
 				}
 
