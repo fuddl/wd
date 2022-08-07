@@ -582,7 +582,7 @@ function updateView(id, useCache = true) {
 						let parentSense = senseTree[id].sense.claims.P6593[0].mainsnak.datavalue.value.id;
 						if (senseTree.hasOwnProperty(parentSense) && parentSense !== id) {
 							senseTree[parentSense].children[id] = senseTree[id];
-							delete senseTree[id];
+							delete senseTree[id]
 						}
 					}
 				}

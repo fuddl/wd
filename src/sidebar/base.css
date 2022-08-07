@@ -67,8 +67,12 @@ a {
 	text-decoration: none;
 }
 
+ruby:lang(tlh) {
+	font-family: pIqaD, monospace;
+}
+
 rt:lang(tlh) {
-	margin-bottom: -.555em;
+	margin-bottom: .4em;
 }
 
 [hidden] {
