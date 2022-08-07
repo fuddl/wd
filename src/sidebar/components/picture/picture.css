@@ -2,7 +2,7 @@
 	position: relative;
 }
 
-.picture > img {
+.picture img {
 	vertical-align: bottom;
 }
 
@@ -10,4 +10,13 @@
 	position: absolute;
 	top: 1em;
 	left: 1em;
+}
+
+.picture__caption {
+	position: absolute;
+	right: 0;
+	bottom: 0;
+	padding: .5em;
+	background: #000000cc;
+	color: white;
 }

@@ -7,12 +7,22 @@ const picture = (vars) => {
 	tag.setAttribute('srcset', srcset.join(','));
 	tag.setAttribute('loading', 'lazy');
 
-	tag.setAttribute('src', vars.srcSet[0]);
+	tag.setAttribute('src', vars.srcSet[0])
+
+	const link = document.createElement('a')
+	link.setAttribute('href', vars.link)
+	link.appendChild(tag)
 
 	let wrapper = document.createElement('figure');
 	wrapper.classList.add('picture');
-	wrapper.appendChild(tag);
+	wrapper.appendChild(link);
 
+	if (vars?.caption) {
+		let caption = document.createElement('figcaption')
+		caption.classList.add('picture__caption')
+		caption.innerText = vars.caption
+		wrapper.appendChild(caption)
+	}
 
 	let style = document.createElement('link');
 	style.setAttribute('rel',	"stylesheet");

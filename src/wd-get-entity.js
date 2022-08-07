@@ -70,6 +70,18 @@ async function wikidataGetEntity(id, usecache = true, returnSingle = false) {
 	}
 }
 
+async function commonsGetEntity(filename, usecache = true) {
+	try {
+		let response = await fetch(`https://commons.wikimedia.org/w/api.php?action=wbgetentities&sites=commonswiki&titles=File:${filename}&format=json`, {
+			cache: usecache ? 'default' : 'reload',
+		});
+		response = await response.json();
+		return response.entities[Object.keys(response.entities)[0]];
+	} catch(error) {
+		throw ['Fetch Error :-S', error];
+	}
+}
+
 async function addToLabelCache(id, entity) {
 	const label = getValueByLang(entity[id], 'labels', false);
 	const description = getValueByLang(entity[id], 'descriptions', false);
@@ -95,4 +107,4 @@ async function addToLabelCache(id, entity) {
 	}
 }
 
-export { wikidataGetEntity, userLanguagesWithFallbacks };
+export { wikidataGetEntity, commonsGetEntity, userLanguagesWithFallbacks };

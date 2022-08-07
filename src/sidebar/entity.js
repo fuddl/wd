@@ -3,7 +3,7 @@ import {resolveBreadcrumbs, resolveIdLinksPlaceholder, resolvePlaceholders} from
 import {getAliasesByLang, getValueByLang} from './get-value-by-lang.js'
 import {groupClaims} from './group-claims.js'
 import {templates} from './components/templates.tpl.js'
-import {wikidataGetEntity} from '../wd-get-entity.js'
+import { wikidataGetEntity, commonsGetEntity } from '../wd-get-entity.js'
 import {ApplyFormatters} from './formatters.js'
 import {AddLemmaAffix} from './lemma-afixes.js'
 import browser from 'webextension-polyfill'
@@ -633,12 +633,19 @@ function updateView(id, useCache = true) {
 								let claim = senseProps[pid].claims[sid].claim[stid];
 								if (claim?.mainsnak?.datavalue?.value) {
 									let fileName = encodeURIComponent(claim?.mainsnak?.datavalue?.value);
-									let senseSymbol = false;
-									if (senseProps[pid].claims[sid].sense?.symbol) {
-										senseSymbol = senseProps[pid].claims[sid].sense.symbol.cloneNode(true);
-									}
-									if (fileName.match(/\.(jpe?g|png|gif|tiff?)$/i)) {
-										section.appendChild(templates.picture({
+										if (fileName.match(/\.(jpe?g|png|gif|tiff?)$/i)) {
+										let senseSymbol = false;
+										if (senseProps[pid].claims[sid].sense?.symbol) {
+											senseSymbol = senseProps[pid].claims[sid].sense.symbol.cloneNode(true);
+										}
+										let caption = ''
+										for (const captionQual of claim?.qualifiers?.P2096 ?? []) {
+											if (captionQual?.datavalue?.value?.language == lang) {
+												caption = captionQual.datavalue.value.text
+											}
+										}
+										const pictureVars = {
+											link: `https://commons.wikimedia.org/wiki/File:${ fileName }`,
 											srcSet: {
 												250: `https://commons.wikimedia.org/wiki/Special:FilePath/${ fileName }?width=250px`,
 												501: `https://commons.wikimedia.org/wiki/Special:FilePath/${ fileName }?width=501px`,
@@ -646,7 +653,21 @@ function updateView(id, useCache = true) {
 												1068: `https://commons.wikimedia.org/wiki/Special:FilePath/${ fileName }?width=1068px`,
 											},
 											tag: senseSymbol,
-										}));
+											caption: caption,
+										}
+										let picture = templates.picture(pictureVars)
+										section.appendChild(picture);
+										
+										(async () => {
+											let media = await commonsGetEntity(fileName)
+											if (media?.labels?.[lang]?.value && pictureVars.caption == '') {
+												pictureVars.caption = media.labels[lang].value
+												console.debug(pictureVars)
+												let improvedPicture = templates.picture(pictureVars)
+												section.replaceChild(improvedPicture, picture)
+											}
+										})()
+
 									}
 
 								}
