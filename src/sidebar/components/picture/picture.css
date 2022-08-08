@@ -19,4 +19,23 @@
 	padding: .5em;
 	background: #000000cc;
 	color: white;
+	line-height: 1.2;
+	text-align: right;
+	font-size: .75em;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+@media (max-width: 340px) {
+	.picture__caption {
+		font-size: 3vw;
+	}
+}
+
+.picture__attribution {
+	text-align: right;
+}
+
+.picture__caption a {
+	color: inherit;
 }

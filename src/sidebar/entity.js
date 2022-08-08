@@ -647,7 +647,10 @@ function updateView(id, useCache = true) {
 										const pictureVars = {
 											link: `https://commons.wikimedia.org/wiki/File:${ fileName }`,
 											srcSet: {
+												140: `https://commons.wikimedia.org/wiki/Special:FilePath/${ fileName }?width=140px`,
 												250: `https://commons.wikimedia.org/wiki/Special:FilePath/${ fileName }?width=250px`,
+												280: `https://commons.wikimedia.org/wiki/Special:FilePath/${ fileName }?width=280px`,
+												404: `https://commons.wikimedia.org/wiki/Special:FilePath/${ fileName }?width=404px`,
 												501: `https://commons.wikimedia.org/wiki/Special:FilePath/${ fileName }?width=501px`,
 												801: `https://commons.wikimedia.org/wiki/Special:FilePath/${ fileName }?width=801px`,
 												1068: `https://commons.wikimedia.org/wiki/Special:FilePath/${ fileName }?width=1068px`,
@@ -662,7 +665,38 @@ function updateView(id, useCache = true) {
 											let media = await commonsGetEntity(fileName)
 											if (media?.labels?.[lang]?.value && pictureVars.caption == '') {
 												pictureVars.caption = media.labels[lang].value
-												console.debug(pictureVars)
+												const creators = document.createDocumentFragment()
+												if (media?.statements?.P170) {
+													for (const creator of media?.statements?.P170) {
+														if (creators.childNodes.length > 0) {
+															creators.appendChild(document.createTextNode(', '))
+														}
+														if (creator?.mainsnak?.datavalue?.value?.id) {
+															creators.appendChild(templates.placeholder({entity: creator.mainsnak.datavalue.value.id}))
+														} else {
+															if (creator?.qualifiers?.P2699?.[0]?.datavalue?.value && creator?.qualifiers?.P2093?.[0]?.datavalue?.value) {
+																const link = document.createElement('a')
+																link.setAttribute('href', creator.qualifiers.P2699?.[0].datavalue.value)
+																link.innerText = creator.qualifiers.P2093?.[0].datavalue.value
+																creators.appendChild(link)
+															}
+														}
+													}
+												}
+												if (creators.childNodes.length > 0) {
+													pictureVars.creators = creators
+												}
+
+												if (media?.statements?.P275?.[0]?.mainsnak?.datavalue?.value) {
+													const mediaId = media.statements.P275[0].mainsnak.datavalue.value.id
+													pictureVars.licence = templates.proxy({
+														query: `
+															SELECT ?innerText WHERE {
+																wd:${ mediaId } wdt:P1813 ?innerText.
+															} order by asc(strlen(?innerText))`
+													})
+												}
+
 												let improvedPicture = templates.picture(pictureVars)
 												section.replaceChild(improvedPicture, picture)
 											}

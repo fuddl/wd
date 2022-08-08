@@ -17,11 +17,31 @@ const picture = (vars) => {
 	wrapper.classList.add('picture');
 	wrapper.appendChild(link);
 
-	if (vars?.caption) {
-		let caption = document.createElement('figcaption')
-		caption.classList.add('picture__caption')
-		caption.innerText = vars.caption
+	let caption = document.createElement('figcaption')
+	caption.classList.add('picture__caption')
+	
+
+	let attribution = document.createElement('div')
+	attribution.classList.add('picture__attribution')
+
+	if (vars?.licence) {
+		attribution.appendChild(vars.licence)
+		attribution.appendChild(document.createTextNode(' '))
+	}
+
+	if (vars?.creators) {
+		attribution.appendChild(vars.creators)
+	}
+
+	if (attribution.childNodes.length > 0) {
+		caption.appendChild(attribution)
+	}
+	if (caption.childNodes.length > 0) {
 		wrapper.appendChild(caption)
+	}
+
+	if (vars?.caption) {
+		caption.appendChild(document.createTextNode(vars.caption))
 	}
 
 	let style = document.createElement('link');
