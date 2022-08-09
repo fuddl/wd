@@ -14,7 +14,7 @@ const fitKlingon = function (pIqaD, latin) {
  		'a': '',
  		'b': '',
  		'e': '',
- 		'i': '', 
+ 		'I': '', 
  		'j': '',
  		'l': '',
  		'm': '',
