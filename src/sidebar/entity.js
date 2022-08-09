@@ -665,41 +665,42 @@ function updateView(id, useCache = true) {
 											let media = await commonsGetEntity(fileName)
 											if (media?.labels?.[lang]?.value && pictureVars.caption == '') {
 												pictureVars.caption = media.labels[lang].value
-												const creators = document.createDocumentFragment()
-												if (media?.statements?.P170) {
-													for (const creator of media?.statements?.P170) {
-														if (creators.childNodes.length > 0) {
-															creators.appendChild(document.createTextNode(', '))
-														}
-														if (creator?.mainsnak?.datavalue?.value?.id) {
-															creators.appendChild(templates.placeholder({entity: creator.mainsnak.datavalue.value.id}))
-														} else {
-															if (creator?.qualifiers?.P2699?.[0]?.datavalue?.value && creator?.qualifiers?.P2093?.[0]?.datavalue?.value) {
-																const link = document.createElement('a')
-																link.setAttribute('href', creator.qualifiers.P2699?.[0].datavalue.value)
-																link.innerText = creator.qualifiers.P2093?.[0].datavalue.value
-																creators.appendChild(link)
-															}
+											}
+											
+											const creators = document.createDocumentFragment()
+											if (media?.statements?.P170) {
+												for (const creator of media?.statements?.P170) {
+													if (creators.childNodes.length > 0) {
+														creators.appendChild(document.createTextNode(', '))
+													}
+													if (creator?.mainsnak?.datavalue?.value?.id) {
+														creators.appendChild(templates.placeholder({entity: creator.mainsnak.datavalue.value.id}))
+													} else {
+														if (creator?.qualifiers?.P2699?.[0]?.datavalue?.value && creator?.qualifiers?.P2093?.[0]?.datavalue?.value) {
+															const link = document.createElement('a')
+															link.setAttribute('href', creator.qualifiers.P2699?.[0].datavalue.value)
+															link.innerText = creator.qualifiers.P2093?.[0].datavalue.value
+															creators.appendChild(link)
 														}
 													}
 												}
-												if (creators.childNodes.length > 0) {
-													pictureVars.creators = creators
-												}
-
-												if (media?.statements?.P275?.[0]?.mainsnak?.datavalue?.value) {
-													const mediaId = media.statements.P275[0].mainsnak.datavalue.value.id
-													pictureVars.licence = templates.proxy({
-														query: `
-															SELECT ?innerText WHERE {
-																wd:${ mediaId } wdt:P1813 ?innerText.
-															} order by asc(strlen(?innerText))`
-													})
-												}
-
-												let improvedPicture = templates.picture(pictureVars)
-												section.replaceChild(improvedPicture, picture)
 											}
+											if (creators.childNodes.length > 0) {
+												pictureVars.creators = creators
+											}
+
+											if (media?.statements?.P275?.[0]?.mainsnak?.datavalue?.value) {
+												const mediaId = media.statements.P275[0].mainsnak.datavalue.value.id
+												pictureVars.licence = templates.proxy({
+													query: `
+														SELECT ?innerText WHERE {
+															wd:${ mediaId } wdt:P1813 ?innerText.
+														} order by asc(strlen(?innerText))`
+												})
+											}
+
+											let improvedPicture = templates.picture(pictureVars)
+											section.replaceChild(improvedPicture, picture)
 										})()
 
 									}
