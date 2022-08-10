@@ -19,8 +19,8 @@ async function wikidataGetEditToken(query, lang) {
 	}
 }
 
-async function getTokens() {
-	let response = await fetch('https://www.wikidata.org/w/api.php?action=query&meta=tokens&type=csrf&format=json');
+async function getTokens(instance = 'https://www.wikidata.org') {
+	let response = await fetch(`${instance}/w/api.php?action=query&meta=tokens&type=csrf&format=json`);
 	let json = JSON.parse(await response.text());
 	return json.query.tokens.csrftoken;
 }

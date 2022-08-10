@@ -130,7 +130,7 @@ function insertAfter(referenceNode, newNode) {
 }
 
 function renderStatements(snak, references, type, target, scope, delta) {
-	let valueType = snak.datatype ? snak.datatype : snak.datavalue.type ;
+	let valueType = snak?.datatype ? snak.datatype : snak?.datavalue?.type ;
 	if (type === 'preformatted') {
 		target.appendChild(snak.datavalue.value);
 	}

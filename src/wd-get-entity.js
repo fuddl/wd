@@ -107,4 +107,4 @@ async function addToLabelCache(id, entity) {
 	}
 }
 
-export { wikidataGetEntity, commonsGetEntity, userLanguagesWithFallbacks };
+export { wikidataGetEntity, commonsGetEntity, userLanguagesWithFallbacks, namespaceGetInstance };

@@ -7680,17 +7680,17 @@ which@^2.0.1:
   dependencies:
     isexe "^2.0.0"
 
-wikibase-sdk@^7.14.2:
-  version "7.14.2"
-  resolved "https://registry.npmjs.org/wikibase-sdk/-/wikibase-sdk-7.14.2.tgz"
-  integrity sha512-s+U23nKhP+ZA9yfxH/fe5mjZRvcb8/YtinMoKUkr/05MNNWbofUPRZAgQa1B3i0xvQ37zbkhaOP5K3HkC1apwQ==
+wikibase-sdk@^8.0.1:
+  version "8.0.1"
+  resolved "https://registry.yarnpkg.com/wikibase-sdk/-/wikibase-sdk-8.0.1.tgz#e711df333aa7ca6c92cf5d4258a4e692d3e3a765"
+  integrity sha512-UHhxfsg7yzUZBJ7aKbzmVRdioFYTBEsC3v35cJ0Bb3MxUNSmh/4VES7Os1VJG/RNn6bzfBBUXfuIIUFo36UuhA==
 
-wikidata-sdk@^7.14.2:
-  version "7.14.2"
-  resolved "https://registry.npmjs.org/wikidata-sdk/-/wikidata-sdk-7.14.2.tgz"
-  integrity sha512-+7cVBKAqaJAfnCTfJZ3rs55mn56TykNh7tm1V17jUtp6yMTt6PoS+GDW0sDaL60fIl+qOHnca4oknHMaTmcBVg==
+wikidata-sdk@^8.0.1:
+  version "8.0.1"
+  resolved "https://registry.yarnpkg.com/wikidata-sdk/-/wikidata-sdk-8.0.1.tgz#42f81e3a70e4243a4ce7ecc107cfc8248af1aa1c"
+  integrity sha512-V/xTI/v0vDo+a2wC20GxO0r3vX6RmNOSFJhdLZ9YQ+eUp4bq8xZSMeYjIuMwuuKtrNQURL2gVNIgLroCj9x2Bw==
   dependencies:
-    wikibase-sdk "^7.14.2"
+    wikibase-sdk "^8.0.1"
 
 word-wrap@^1.2.3, word-wrap@~1.2.3:
   version "1.2.3"

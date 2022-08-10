@@ -3,7 +3,7 @@ import {RegexResolver} from './types'
 
 const wikipedia: RegexResolver = {
 	id: 'wikipedia',
-	regex: /^https?:\/\/([\w]+)(?:\.m)?\.(wikipedia|wikibooks|wikiversity|wikivoyage|wikisource|wikiquote|wikinews|wikimedia)\.org\/wiki\/([^?#]+)/,
+	regex: /^https?:\/\/([\w]+)(?:\.m)?\.(wikipedia|wikibooks|wikiversity|wikivoyage|wikisource|wikiquote|wikinews)\.org\/wiki\/([^?#]+)/,
 	sites: {
 		wikipedia: 'wiki',
 		wikibooks: 'wikibooks',
@@ -12,7 +12,6 @@ const wikipedia: RegexResolver = {
 		wikisource: 'wikisource',
 		wikiversity: 'wikiversity',
 		wikivoyage: 'wikivoyage',
-		wikimedia: 'commonswiki',
 	},
 	async applicable (location){
 		if(location.href.match(this.regex) !== null ) {
@@ -40,7 +39,6 @@ const wikipedia: RegexResolver = {
 					schema:name "${title}"@${language}.
 			}
 		`
-		console.debug(query)
 		const entity = await sparqlQuery(query)
 		if (entity[0]) {
 			const entityId = entity[0].item.value.match(/https?:\/\/www\.wikidata\.org\/entity\/(Q\d+)/)[1]

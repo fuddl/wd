@@ -1,5 +1,5 @@
 import {getTokens} from '../sidebar/wd-get-token.js'
-import {wikidataGetEntity} from '../wd-get-entity.js'
+import {wikidataGetEntity, namespaceGetInstance} from '../wd-get-entity.js'
 import {pushEnitiyToSidebar} from "./push-enitiy-to-sidebar.js"
 import {updateStatus} from "../update-status.js"
 import browser from 'webextension-polyfill'
@@ -174,7 +174,8 @@ async function setSiteLink(subjectId, property, value) {
 }
 
 async function setClaim(subjectId, property, value) {
-	let token = await getTokens();
+	const config = namespaceGetInstance(subjectId)
+	let token = await getTokens(config.instance);
 	let subject = await wikidataGetEntity(subjectId);
 	const extensionLink = await makeExtensionLink()
 
@@ -196,8 +197,8 @@ async function setClaim(subjectId, property, value) {
 	data.append('baserevid', subject[subjectId].lastrevid);
 	data.append('bot', '1');
 	data.append('format', "json");
-
-	let response = await fetch('https://www.wikidata.org/w/api.php', {
+	
+	let response = await fetch(`${config.instance}/w/api.php`, {
 		method: 'post',
 		body: new URLSearchParams(data),
 	});
@@ -251,8 +252,9 @@ async function addQualifier(claimId, qualifier) {
 }
 
 async function getExistingStatement(object, verb, subject) {
+	const config = namespaceGetInstance(subject)
 	try {
-		const response = await fetch(`https://www.wikidata.org/w/api.php?action=wbgetentities&ids=${subject}&props=claims&format=json`, {
+		const response = await fetch(`${config.instance}/w/api.php?action=wbgetentities&ids=${subject}&props=claims&format=json`, {
 			cache: 'reload',
 		});
 
@@ -261,7 +263,7 @@ async function getExistingStatement(object, verb, subject) {
 		}
 
 		const json = await response.json();
-		const claims = json.entities[subject].claims;
+		const claims = json.entities[subject].claims ?? json.entities[subject].statements
 
 		if (!claims.hasOwnProperty(verb)) {
 			return false;

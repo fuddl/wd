@@ -1,14 +1,15 @@
-import {Resolver} from './types'
+import { Resolver } from './types'
+import { commonsGetEntity } from '../wd-get-entity.js'
 
 const commons: Resolver = {
 	id: 'commons',
-	async applicable(location) {
-		return location.href.match(/^https:\/\/commons(\.m)?\.wikimedia\.org\/wiki\/File:/) !== null
+	regex: /^https:\/\/commons(?:\.m)?\.wikimedia\.org\/wiki\/File:([^#\/]+)/,
+	applicable(location) {
+		return location.href.match(this.regex) !== null
 	},
 	async getEntityId(location) {
-		const link = document.querySelector('link[href^="https://commons.wikimedia.org/wiki/Special:EntityData/M"][type="application/json"]')
-		const href = link.getAttribute('href')
-		return href.match(/https:\/\/commons\.wikimedia\.org\/wiki\/Special:EntityData\/(M\d+)\.json/)[1]
+		let entity = await commonsGetEntity(location.href.match(this.regex)[1])
+		return entity.id
 	}
 }
 
