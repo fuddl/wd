@@ -44,11 +44,22 @@ function checkNested(obj, level,	...rest) {
 	return checkNested(obj[level], ...rest)
 }
 
-if (window.location.search) {
-	let currentEntity = window.location.search.match(/^\?(\w\d+)/, '')[1];
-	if (currentEntity.match(/[QMPL]\d+/)) {
-		updateView(currentEntity, window.location.hash !== '#nocache');
+function getCurrentEntity() {
+	const seachRegex = /^\?(\w\d+)/
+	if (window.location.search) {
+		const currentEntity = window.location.search.match(seachRegex)[1]
+		if (currentEntity?.match(/[QMPL]\d+/)) {
+			return window.location.search.match(seachRegex, '')[1]
+		}
+	} else {
+		return false
 	}
+}
+
+
+const currentEntity = getCurrentEntity()
+if (currentEntity) {
+	updateView(currentEntity, window.location.hash !== '#nocache');
 }
 
 function dateToString(value) {
@@ -175,6 +186,7 @@ function renderStatements(snak, references, type, target, scope, delta) {
 				pre: snak.datavalue.value.precision,
 				height: 500,
 				width: 500,
+				entity: getCurrentEntity(),
 			}));
 		}
 		if (valueType === "monolingualtext") {

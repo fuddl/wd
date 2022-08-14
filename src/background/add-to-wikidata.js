@@ -5,16 +5,20 @@ import {updateStatus} from "../update-status.js"
 import browser from 'webextension-polyfill'
 import {URL_match_pattern} from "../resolver/url-match-pattern"
 
-async function makeExtensionLink() {
+async function makeExtensionTag(fallback = false) {
 	let browserInfo
 	if ('getBrowserInfo' in browser?.runtime) {
 	  browserInfo = await browser?.runtime?.getBrowserInfo()
 	}
 
-	let moji = browserInfo?.name == 'Firefox' ? '🦊' : '🌐'
-	let platform = browserInfo?.name == 'Firefox' ? 'Firefox' : 'Web'
+	let platform = browserInfo?.name == 'Firefox' ? 'firefox' : 'web'
+	let moji = platform == 'firefox' ? '🦊' : '🌐'
 
-	return `[[d:Wikidata:Tools/Wikidata for ${platform}|Wikidata for ${platform} ${moji}]]`
+	if (fallback) {
+		return  `[[d:Wikidata:Tools/Wikidata for Web|Wikidata for ${platform[0].toUpperCase()}${platform.substring(1)} ${moji}]]`
+	} else {
+		return `wikidata-for-${platform}`
+	}
 }
 
 function groupJobs(jobs) {
@@ -91,11 +95,15 @@ async function processJobs(jobsUngrouped) {
 			}
 
 			if (job?.references && answer.success && answer.success == 1) {
-				updateStatus([
-					'Adding references to statement ', {placeholder:{entity:job.verb}},' of ', {placeholder:{entity:subject}},
-				]);
-				for (let reference of job.references) {
-					refAnswer = await addReference(answer.claim.id, reference);
+				
+				// references are not supported on mediainfos
+				if (!subject.startsWith('M')) {
+					updateStatus([
+						'Adding references to statement ', {placeholder:{entity:job.verb}},' of ', {placeholder:{entity:subject}},
+					]);
+					for (let reference of job.references) {
+						refAnswer = await addReference(answer.claim.id, reference);
+					}
 				}
 			}
 			if (job?.qualifiers && answer.success && answer.success == 1) {
@@ -136,7 +144,7 @@ async function processJobs(jobsUngrouped) {
 
 async function createEntity(label, lang) {
 	let token = await getTokens();
-	const extensionLink = await makeExtensionLink()
+	const extensionTag = await makeExtensionTag()
 
 	let labels = { labels: {} };
 	labels.labels[lang] = {
@@ -149,7 +157,7 @@ async function createEntity(label, lang) {
 	data.append('new', 'item');
 	data.append('data', JSON.stringify(labels));
 
-	data.append('summary', `created with ${extensionLink}`);
+	data.append('tags', extensionTag);
 	data.append('token', token);
 	data.append('bot', '1');
 	data.append('format', "json");
@@ -177,7 +185,7 @@ async function setClaim(subjectId, property, value) {
 	const config = namespaceGetInstance(subjectId)
 	let token = await getTokens(config.instance);
 	let subject = await wikidataGetEntity(subjectId);
-	const extensionLink = await makeExtensionLink()
+	const extensionTag = await makeExtensionTag()
 
 	let data = new FormData();
 	data.append('action', 'wbcreateclaim');
@@ -192,7 +200,7 @@ async function setClaim(subjectId, property, value) {
 		data.append('value', JSON.stringify(value));
 	}
 
-	data.append('summary', `connected with ${extensionLink}`);
+	data.append('tags', extensionTag);
 	data.append('token', token);
 	data.append('baserevid', subject[subjectId].lastrevid);
 	data.append('bot', '1');
@@ -203,20 +211,33 @@ async function setClaim(subjectId, property, value) {
 		body: new URLSearchParams(data),
 	});
 
+	let parsedResponse = JSON.parse(await response.text())
 
-	return JSON.parse(await response.text());
+	// fallback for when tags are not supported
+	if (parsedResponse?.error?.code == 'badtags') {
+		data.delete('tags');
+		const extensionTagFallback = await makeExtensionTag(true)
+		data.append('summary', extensionTagFallback);
+		response = await fetch(`${config.instance}/w/api.php`, {
+			method: 'post',
+			body: new URLSearchParams(data),
+		});
+		parsedResponse = JSON.parse(await response.text())
+	}
+
+	return parsedResponse;
 }
 
 async function addReference(claimId, references) {
 	let token = await getTokens();
-	const extensionLink = await makeExtensionLink()
+	const extensionTag = await makeExtensionTag()
 
 	let data = new FormData();
 	data.append('action', 'wbsetreference');
 	data.append('statement', claimId);
 	data.append('snaks', JSON.stringify(references));
-	data.append('summary', `added with ${extensionLink}`);
 	data.append('token', token);
+	data.append('tags', extensionTag);
 	data.append('bot', '1');
 	data.append('format', "json");
 
@@ -230,15 +251,15 @@ async function addReference(claimId, references) {
 
 async function addQualifier(claimId, qualifier) {
 	let token = await getTokens();
-	const extensionLink = await makeExtensionLink()
+	const extensionTag = await makeExtensionTag()
 
 	let data = new FormData();
 	data.append('action', 'wbsetqualifier');
 	data.append('claim', claimId);
 	data.append('property', qualifier.property);
 	data.append('snaktype', 'value');
+	data.append('tags', extensionTag);
 	data.append('value', JSON.stringify(qualifier.value));
-	data.append('summary', `added with ${extensionLink}`);
 	data.append('token', token);
 	data.append('bot', '1');
 	data.append('format', "json");
