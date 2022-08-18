@@ -203,6 +203,7 @@ function renderStatements(snak, references, type, target, scope, delta) {
 				}));
 			} else if (name.match(/\.(jpe?g|png|gif|tiff?|stl)$/i)) {
 				target.appendChild(templates.picture({
+					link: `https://commons.wikimedia.org/wiki/File:${ name }`,
 					srcSet: {
 						250: `https://commons.wikimedia.org/wiki/Special:FilePath/${ name }?width=250px`,
 						501: `https://commons.wikimedia.org/wiki/Special:FilePath/${ name }?width=501px`,
@@ -511,6 +512,27 @@ function updateView(id, useCache = true) {
 					moji: './icons/u2728-specialPages.svg',
 					title: 'Improve',
 					desc: 'Automatic suggestions on how to improve this item',
+				},
+				{
+					link: `https://query.wikidata.org/embed.html#${encodeURIComponent(`
+						#defaultView:Map
+						SELECT ?item ?itemLabel ?property ?propertyLabel ?coord
+						WHERE 
+						{ 
+							VALUES ?item { wd:${ id } }
+							?item ?pred1 ?stat1 .
+							?property wikibase:claim ?pred1 .
+							?stat1 ?pred2 ?stat2 .
+							?property wikibase:statementValue ?pred2 .
+							?stat2 a wikibase:GlobecoordinateValue.
+							?stat1 ?pred3 ?coord. 
+							?property wikibase:statementProperty ?pred3 . 
+							SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". } 
+						}
+					`)}#wd:${ id }`,
+					moji: './icons/u2728-specialPages.svg',
+					title: 'Show on map',
+					desc: 'Summerise geo coordinates in this item',
 				},
 			]));
 
