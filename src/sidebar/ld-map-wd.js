@@ -305,7 +305,7 @@ async function findConnections(thing, source) {
 					}
 				}
 			}
-		} else if (typeof thing[prop] === 'object' && thing[prop].hasOwnProperty('@type')) {
+		} else if (thing?.[prop]?.['@type']) {
 			let qid = isSameAsWdEntity(thing[prop]);
 			if (qid) {
 				values.push({
