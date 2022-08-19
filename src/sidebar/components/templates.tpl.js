@@ -148,6 +148,13 @@ const templates = {
 
 		tag.setAttribute('src', vars.src);
 
+		if (vars?.link) {
+			const link = document.createElement('a')
+			link.setAttribute('href', vars.link)
+			link.appendChild(tag)
+			return link
+		}
+
 		return tag;
 	},
 	audio: (vars) => {

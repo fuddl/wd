@@ -9,8 +9,10 @@ const picture = (vars) => {
 
 	tag.setAttribute('src', vars.srcSet[0])
 
-	const link = document.createElement('a')
-	link.setAttribute('href', vars.link)
+	const link = document.createElement(vars?.link ? 'a' : 'span')
+	if (vars?.link) {
+		link.setAttribute('href', vars.link)
+	}
 	link.appendChild(tag)
 
 	let wrapper = document.createElement('figure');

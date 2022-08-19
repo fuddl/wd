@@ -199,6 +199,7 @@ function renderStatements(snak, references, type, target, scope, delta) {
 			let name = encodeURIComponent(snak.datavalue.value);
 			if (name.match(/\.svg$/i)) {
 				target.appendChild(templates.image({
+					link: `https://commons.wikimedia.org/wiki/File:${ name }`,
 					src: `https://commons.wikimedia.org/wiki/Special:FilePath/${ name }`
 				}));
 			} else if (name.match(/\.(jpe?g|png|gif|tiff?|stl)$/i)) {
@@ -387,7 +388,6 @@ function updateView(id, useCache = true) {
 				if (ruby.rubified) {
 					labels.appendChild(ruby.rubified);
 				}
-
 				for (let lang in ruby.unrubified) {
 					let lemma = AddLemmaAffix(e.lemmas[lang].value, {
 						category: e.lexicalCategory,
@@ -427,6 +427,31 @@ function updateView(id, useCache = true) {
 			metaCanon.setAttribute('content', 'https://www.wikidata.org/wiki/' + id);
 			document.head.appendChild(metaCanon);
 
+			const isMedia = e?.title?.startsWith('File:')
+			
+			if (isMedia) {
+				const fileName = e.title.match(/^File:(.*)$/)[1].replace(/ /g, '_')
+				if (fileName.match(/\.svg$/i)) {
+					content.appendChild(templates.image({
+						src: `https://commons.wikimedia.org/wiki/Special:FilePath/${ fileName }`
+					}));
+				} else if (fileName.match(/\.(jpe?g|png|gif|tiff?)$/i)) {
+					const pictureVars = {
+						srcSet: {
+							140: `https://commons.wikimedia.org/wiki/Special:FilePath/${ fileName }?width=140px`,
+							250: `https://commons.wikimedia.org/wiki/Special:FilePath/${ fileName }?width=250px`,
+							280: `https://commons.wikimedia.org/wiki/Special:FilePath/${ fileName }?width=280px`,
+							404: `https://commons.wikimedia.org/wiki/Special:FilePath/${ fileName }?width=404px`,
+							501: `https://commons.wikimedia.org/wiki/Special:FilePath/${ fileName }?width=501px`,
+							801: `https://commons.wikimedia.org/wiki/Special:FilePath/${ fileName }?width=801px`,
+							1068: `https://commons.wikimedia.org/wiki/Special:FilePath/${ fileName }?width=1068px`,
+						},
+					}
+					let picture = templates.picture(pictureVars)
+					content.parentNode.insertBefore(picture, content)
+				}
+			}
+
 			if (e.labels || e.descriptions) {
 
 				document.title = getValueByLang(e, 'labels', e.title);
@@ -453,10 +478,10 @@ function updateView(id, useCache = true) {
 						revid: e.lastrevid,
 						id: id,
 						label: getValueByLang(e, 'labels', e.title),
-						description: {
+						description: !isMedia ? {
 							text: description,
 							provisional: !hasDescription
-						},
+						} : {},
 					}));
 				}
 
