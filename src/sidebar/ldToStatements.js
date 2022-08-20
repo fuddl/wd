@@ -23,39 +23,67 @@ async function ldToStatements(ld, propform, source, existing) {
 
 	for (let d of ld) {
 		if (d.hasOwnProperty('isNeedle') && d.isNeedle) {
-			let matchingClass = await findMatchingClass(d);
-			if (matchingClass) {
-				let job = {
-					type: 'set_claim',
-					verb: 'P31',
-					object: {
-						'entity-type': "item",
-						'numeric-id': matchingClass.match(/Q(\d+)/)[1],
-					},
-					references: makeReferences(source),
+			let matchingClasses = await findMatchingClass(d)
+			if (matchingClasses?.[0]) {
+				let check, select;
+
+				if (matchingClasses.length == 1) {
+					let job = {
+						type: 'set_claim',
+						verb: 'P31',
+						object: {
+							'entity-type': "item",
+							'numeric-id': matchingClasses[0].match(/Q(\d+)/)[1],
+						},
+						references: makeReferences(source),
+					}
+					
+					// if the job already exists, we head straigt to the next
+					existing.check(job);
+
+					check = document.createElement('input');
+					check.setAttribute('name', uuidv4());
+					check.setAttribute('type', 'checkbox')
+					check.setAttribute('value', JSON.stringify(job))
+					
+					// since these tend to be wrong or unprecise
+					check.checked = false;
+				} else {
+					select = document.createElement('select');
+					select.setAttribute('name', uuidv4());
+					let emptyOption = document.createElement('option');
+					select.appendChild(emptyOption)
+
+					for (let item of matchingClasses) {
+						const instructions = {
+							type: 'set_claim',
+							verb: 'P31',
+							object: {
+								'entity-type': "item",
+								'numeric-id': item.match(/Q(\d+)/)[1],
+							},
+							references: makeReferences(source),
+						}
+
+						let option = templates.placeholder({
+							tag: 'option',
+							entity: item,
+							type: 'option',
+						});
+						option.setAttribute('value', JSON.stringify(instructions));
+
+						select.appendChild(option);
+					}
 				}
-				
-				// if the job already exists, we head straigt to the next
-				existing.check(job);
-
-				let check = document.createElement('input');
-				check.setAttribute('name', uuidv4());
-				check.setAttribute('type', 'checkbox')
-				check.setAttribute('value', JSON.stringify(job))
-				
-				// since these tend to be wrong or unprecise
-				check.checked = false;
-
 				let instanceOfPreview = templates.remark({
 					sortKey: 'P31',
-					check: check,
+					check: check ? check : document.createTextNode(''),
 					prop: templates.placeholder({
 						entity: 'P31',
 					}),
-					vals: [
-						templates.text([
-							templates.placeholder({
-								entity: matchingClass,
+					vals: [ templates.text([
+							select ?? templates.placeholder({
+								entity: matchingClasses[0],
 							}),
 							comment.cloneNode(true),
 						]),

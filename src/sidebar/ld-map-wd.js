@@ -72,7 +72,7 @@ function makeTypeAbsolute(data) {
 				// data seems to be mission context
 				if (data.hasOwnProperty('@context')) {
 					// so lets apply context
-					data['@type'] = `${data['@context']}/${data['@type']}`;
+					data['@type'] = `${data['@context'].replace(/\/$/, '')}/${data['@type']}`;
 				} else {
 					// there is no context and the type has a relative url.
 					// lets assume schema.org is used.
@@ -220,18 +220,32 @@ async function findMatchingClass(data) {
 		if (!data) {
 			return false;
 		}
+		const http = data['@type'].replace(/^https?\:/, 'http:')
+		const https = data['@type'].replace(/^https?\:/, 'https:')
 		let query = `
-			SELECT ?item WHERE {
+			SELECT DISTINCT ?i WHERE {
 				{
-					?item wdt:P1709 <${ data['@type'] }>;
+					{
+						?item wdt:P1709 <${ http }>;
+					} UNION {
+						?item wdt:P1709 <${ https }>;
+					}
 				} UNION {
-					?item wdt:P1709 <${ data['@type'].replace(/^http\:/, 'https:') }>;
+					{
+						?parent wdt:P1709 <${ http }>;
+					} UNION {
+						?parent wdt:P1709 <${ https }>;
+					}
+					?item wdt:P279 * ?parent.
 				}
+				BIND (REPLACE(STR(?item), 'http://www.wikidata.org/entity/', '') AS ?i)
+
 			}
 		`;
-		let entity = await sparqlQuery(query);
-		if (entity[0]) {
-			return entity[0].item.value.match(/https?:\/\/www\.wikidata\.org\/entity\/(Q\d+)/)[1];
+
+		let result = await sparqlQuery(query);
+		if (result[0]) {
+			return result.map((i) => { return i.i.value });
 		} else {
 			return false;
 		}
