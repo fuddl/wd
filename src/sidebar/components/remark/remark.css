@@ -32,6 +32,7 @@
 	position: sticky;
 	top: var(--top-offset, 7px);
 	transition: top .25s;
+	min-width: 0;
 }
 
 @media (max-width: 299px) {

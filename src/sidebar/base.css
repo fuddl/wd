@@ -270,3 +270,7 @@ math[display="block"] {
 mrow + munder {
 	pointer-events: none;
 }
+
+select {
+	max-width: 100%;
+}

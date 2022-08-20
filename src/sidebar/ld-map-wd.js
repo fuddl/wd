@@ -241,21 +241,25 @@ async function findMatchingClass(data) {
 async function findMatchingProp(prop, type, namespace) {
 
 	let query = `
-		SELECT DISTINCT ?prop WHERE {
+		SELECT DISTINCT ?prop ?parent {
 			{
-				?item p:P1628/ps:P1628 <${ namespace.replace(/^https\:/, 'http:') }/${ prop }>.
+				?property p:P1628/ps:P1628 <${ namespace.replace(/^https?\:/, 'https:') }/${ prop }>.
 			} UNION {
-				?item p:P1628/ps:P1628 <${ namespace.replace(/^http\:/, 'https:') }/${ prop }>.
-			}	UNION {
-				?item p:P2235/ps:P2235 <${ namespace.replace(/^https\:/, 'http:') }/${ prop }>.
-			} UNION {
-				?item p:P2235/ps:P2235 <${ namespace.replace(/^http\:/, 'https:') }/${ prop }>.
+				?property p:P1628/ps:P1628 <${ namespace.replace(/^https?\:/, 'http:') }/${ prop }>.
 			}
-			?item wikibase:propertyType wikibase:${type}.
-		  ?item p:P1628 [ wikibase:rank ?rank ]. 
-			BIND (replace(str(?item), 'http://www.wikidata.org/entity/', '') AS ?prop)
-		  BIND (IF(?rank = wikibase:PreferredRank, 1, IF(?rank = wikibase:NormalRank, 2, 3)) as ?order) 
-		} ORDER BY ?order
+			?property wikibase:propertyType wikibase:${type}.
+			?subproperty wdt:P1647 * ?property.
+
+			?subproperty p:P2302 ?psc.
+			?psc ps:P2302 wd:Q53869507.
+			?psc pq:P5314 wd:Q54828448.
+
+			OPTIONAL { ?subproperty p:P1628 [ wikibase:rank ?rank ] }
+			BIND (REPLACE(STR(?subproperty), 'http://www.wikidata.org/entity/', '') AS ?prop)
+			BIND (IF(?property = ?subproperty, "", REPLACE(STR(?property), 'http://www.wikidata.org/entity/', '')) AS ?parent)  
+			BIND (IF(?rank = wikibase:PreferredRank, 1, IF(?rank = wikibase:NormalRank, 2, 3)) AS ?order) 
+		}
+		ORDER BY ?order
 	`;
 	let result = await sparqlQuery(query);
 	if (result.length > 0) {
