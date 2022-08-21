@@ -236,11 +236,12 @@ async function findMatchingClass(data) {
 					} UNION {
 						?parent wdt:P1709 <${ https }>;
 					}
-					?item wdt:P279 * ?parent.
+					?item wdt:P279 ?parent.
 				}
 				BIND (REPLACE(STR(?item), 'http://www.wikidata.org/entity/', '') AS ?i)
 
 			}
+			LIMIT 20
 		`;
 
 		let result = await sparqlQuery(query);

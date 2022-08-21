@@ -61,13 +61,13 @@ function constraintsToStatements(prop, contraints, propform, classes) {
 						const query = `
 							SELECT ?s WHERE {
 								{ 	${
-										options.map((option) => { return `?subclass wdt:P279 + wd:${option.id}.` })
+										options.map((option) => { return `?subclass wdt:P279 wd:${option.id}.` })
 											.join('} UNION {')
 									}
 								}
 								BIND (REPLACE(STR(?subclass), 'http://www.wikidata.org/entity/', '') AS ?s)
 							}
-							LIMIT 300
+							LIMIT 20
 						`
 						console.debug(query)
 						let result = await sparqlQuery(query);
