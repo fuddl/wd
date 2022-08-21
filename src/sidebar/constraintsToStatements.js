@@ -1,4 +1,5 @@
 import { templates } from './components/templates.tpl.js';
+import { sparqlQuery } from "../sqarql-query.js";
 
 function addConstraintComment(value, constraintId, propId) {
 	let comment = templates.smallBlock(
@@ -36,7 +37,9 @@ function constraintsToStatements(prop, contraints, propform, classes) {
 		const contraintType = contraint.mainsnak.datavalue.value.id;
 		switch (contraintType) {
 			case 'Q21503250': // type constraint
-				if (contraint?.qualifiers?.P2309[0]?.datavalue?.value?.id === 'Q21503252') {
+				const requiresInstanceOf = contraint?.qualifiers?.P2309[0]?.datavalue?.value?.id === 'Q21503252'
+				const requiresInstanceOrSubclassOf = contraint?.qualifiers?.P2309[0]?.datavalue?.value?.id === 'Q30208840'
+				if (requiresInstanceOf || requiresInstanceOrSubclassOf) {
 					let value = null;
 					let check = null;
 
@@ -49,57 +52,92 @@ function constraintsToStatements(prop, contraints, propform, classes) {
 						continue;
 					}
 
-					if(contraint?.qualifiers?.P2308.length > 1) {
+					(async () => {
+						const options = []
 
-						value = document.createElement('select');
-						value.setAttribute('name', prop + 'Q21503250');
-						let emptyOption = document.createElement('option');
-						value.appendChild(emptyOption);
 						for (let entity of contraint?.qualifiers?.P2308) {
-							let option = templates.placeholder({
-								tag: 'option',
-								entity: entity.datavalue?.value?.id,
-								type: 'option',
-							});
-							value.appendChild(option);
-							let job = {
-								type: 'set_claim',
-								verb: 'P31',
-								object: {
-									'entity-type': "item",
-									'numeric-id': entity.datavalue?.value['numeric-id'],
-								},
-							}
-							option.setAttribute('value', JSON.stringify(job))
+							options.push(entity.datavalue?.value)
 						}
-					} else {
-						check = document.createElement('input');
-						check.setAttribute('type', 'checkbox');
-						check.setAttribute('name', prop + 'Q21503250');
-						let job = {
-							type: 'set_claim',
-							verb: 'P31',
-							object: {
-								'entity-type': "item",
-								'numeric-id': contraint?.qualifiers?.P2308[0]?.datavalue?.value['numeric-id'],
-							},
-						}
-						check.setAttribute('value', JSON.stringify(job))
-						check.checked = true;
-						value = templates.placeholder({
-							entity: contraint?.qualifiers?.P2308[0]?.datavalue?.value?.id,
-						})
-					}
-					let instanceOfPreview = templates.remark({
-						sortKey: 'P31',
-						check: check ? check : null,
-						prop: templates.placeholder({
-							entity: 'P31',
-						}),
-						vals: addConstraintComment(value, contraintType, prop),
-					});
 
-					propform.appendChild(instanceOfPreview);
+						if (requiresInstanceOrSubclassOf) {
+							const query = `
+								SELECT ?s WHERE {
+									{ 	${
+											options.map((option) => { return `?subclass wdt:P279 + wd:${option.id}.` })
+												.join('} UNION {')
+										}
+									}
+									BIND (REPLACE(STR(?subclass), 'http://www.wikidata.org/entity/', '') AS ?s)
+								}
+								LIMIT 300
+							`
+							let result = await sparqlQuery(query);
+							if (result[0]) {
+								let more = result.map((i) => {
+										return {
+											id: i.s.value,
+											'numeric-id': parseInt(i.s.value.replace('^\w', '')),
+										}
+									}
+								)
+								options.push(...more)
+							}
+						}
+
+						if (options.length != 0) {
+							if (options.length > 1) {
+
+								value = document.createElement('select');
+								value.setAttribute('name', prop + 'Q21503250');
+								let emptyOption = document.createElement('option');
+								value.appendChild(emptyOption);
+								for (let entity of options) {
+									let option = templates.placeholder({
+										tag: 'option',
+										entity: entity.id,
+										type: 'option',
+									});
+									value.appendChild(option);
+									let job = {
+										type: 'set_claim',
+										verb: 'P31',
+										object: {
+											'entity-type': "item",
+											'numeric-id': entity['numeric-id'],
+										},
+									}
+									option.setAttribute('value', JSON.stringify(job))
+								}
+							} else {
+								check = document.createElement('input');
+								check.setAttribute('type', 'checkbox');
+								check.setAttribute('name', prop + 'Q21503250');
+								let job = {
+									type: 'set_claim',
+									verb: 'P31',
+									object: {
+										'entity-type': "item",
+										'numeric-id': options[0]['numeric-id'],
+									},
+								}
+								check.setAttribute('value', JSON.stringify(job))
+								check.checked = true;
+								value = templates.placeholder({
+									entity: options[0].id,
+								})
+							}
+							let instanceOfPreview = templates.remark({
+								sortKey: 'P31',
+								check: check ? check : null,
+								prop: templates.placeholder({
+									entity: 'P31',
+								}),
+								vals: addConstraintComment(value, contraintType, prop),
+							});
+
+							propform.insertBefore(instanceOfPreview, propform.firstChild);
+						}
+					})()
 				}
 				break;
 			case 'Q21503247': // item-requires-statement constraint
