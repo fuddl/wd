@@ -1,6 +1,7 @@
 import {displayMetadata} from './content__display-metadata.js'
 import {findFirstMatchingResolver} from '../resolver'
 import {updateStatus} from '../update-status'
+import { getLangQid, makeLanguageValid} from '../get-valid-string-languages.js';
 import browser from 'webextension-polyfill'
 
 function getClosestID(element) {
@@ -195,7 +196,7 @@ async function collectPageLinks(subject) {
 					if (selectedEntities.includes(this.entityId)) {
 						selector.classList.add('entity-selector--selected');
 					}
-					selector.addEventListener('click', (e) => {
+					selector.addEventListener('click', async (e) => {
 						toggleSelectedEntities(this.entityId);
 						e.preventDefault();
 
@@ -218,7 +219,7 @@ async function collectPageLinks(subject) {
 								url: location.protocol + '//' + location.host + location.pathname + search + hash,
 								section: sectionData.section ? sectionData.section.trim().replace("\n", '␤') : null,
 								title: pageTitle ? pageTitle.trim() : null,
-								language: pageLanguage ? pageLanguage : 'und',
+								language: pageLanguage ? await makeLanguageValid(pageLanguage) : 'und',
 							}
 						};
 
