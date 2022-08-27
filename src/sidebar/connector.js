@@ -105,9 +105,16 @@ let existing = new jobRedundancyChecker();
 
 	propform.appendChild(preview);
 
+	let allLabels = [];
+
+	proposals.ids.forEach((item) => {
+		if (item?.[0]?.label) {
+			allLabels.push(item?.[0]?.label)
+		}
+	})
 
 	let labelField = templates.join({
-		human: proposals.titles[0],
+		human: allLabels?.[0] ?? proposals.titles[0],
 		scope: scope,
 		id: 'joiner',
 	});

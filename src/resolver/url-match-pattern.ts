@@ -7,10 +7,11 @@ const URL_match_pattern: Resolver = {
 	aquireRegexes: async function() {
 
 		const query = `
-			SELECT ?p ?s ?r ?c WHERE {
+			SELECT ?p ?s ?r ?c ?t WHERE {
 				?stat ps:P8966 ?s.
 				OPTIONAL { ?stat pq:P8967 ?r. }
-				?prop	p:P8966 ?stat.
+                OPTIONAL { ?stat pq:P10999 ?t }
+				?prop p:P8966 ?stat.
 				BIND(IF(EXISTS{?prop wdt:P1552 wd:Q3960579}, 'upper',
 					IF(EXISTS{?prop wdt:P1552 wd:Q65048529}, 'lower',
 						IF(EXISTS{?prop wdt:P1552 wd:Q55121183}, 'insensitive', '')
@@ -36,6 +37,7 @@ const URL_match_pattern: Resolver = {
 					s: regexp,
 					r: 'r' in prop ? prop.r.value.replace(/\\(\d+)/g, '$$$1') : '$1',
 					c: 'c' in prop ? prop.c.value : '',
+					t: 't' in prop ? prop.t.value : '',
 				})
 			}
 		}
@@ -51,6 +53,7 @@ const URL_match_pattern: Resolver = {
 			if (match) {
 			
 				let id = href.replace(prop.s, prop.r);
+				let label = null
 				let desiredId = id;
 				switch (prop.c) {
 					case 'upper':
@@ -62,8 +65,21 @@ const URL_match_pattern: Resolver = {
 						break;
 				}
 
+				if (prop?.t && document?.title) {
+					try {
+						const titleExtractionResult = new RegExp(prop.t , 'g').exec(document.title)
+						if (titleExtractionResult?.[1]) {
+							label = titleExtractionResult[1]
+						}
+					} catch(e) {
+						isValid = false
+						console.warn('This title extractor regex is not valid', JSON.stringify(prop, null, 2))
+					}
+				}
+
 				return [{
 					prop: prop.p,
+					label: label, 
 					value: desiredId,
 					case: prop.c ?? '',
 					recommended: true,

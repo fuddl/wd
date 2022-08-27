@@ -69,9 +69,7 @@ function constraintsToStatements(prop, contraints, propform, classes) {
 							}
 							LIMIT 20
 						`
-						console.debug(query)
 						let result = await sparqlQuery(query);
-						console.debug(result)
 						if (result[0]) {
 							let more = result.map((i) => {
 									return {

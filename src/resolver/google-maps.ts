@@ -6,9 +6,19 @@ const googleMaps: RegexResolver = {
 	regex: /^https:\/\/www\.google\.\w+\/maps\/place\/[^ #]*\/data=[^ #]*(0x[0-9a-f]+)/,
 	async applicable(location) {
 		const matches = location.href.match(this.regex)
+		let label = null
+
+		if (document?.title) {
+			const titleExtractionResult = /^(.+)\s+- Google Maps$/.exec(document.title)
+			if (titleExtractionResult?.[1]) {
+				label = titleExtractionResult[1]
+			}
+		}
+
 		if (matches !== null) {
 			return [{
 				prop: 'P3749',
+				label: label,
 				value: this.convert(matches[1]),
 			}]
 		}
