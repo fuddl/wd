@@ -75,6 +75,9 @@ async function processJobs(jobsUngrouped) {
 
 		} else if (job.type === 'set_sitelink') {
 			setSiteLink(job.subject, job.verb, job.object);
+		} else if (job.type === 'set_label_or_alias') {
+			let subject = job.subject !== 'LAST' ? job.subject : lastCreated.id;
+			setLabelOrAlias(subject, job.language, job.value);
 		} else if (job.type === 'set_claim') {
 			let subject = job.subject !== 'LAST' ? job.subject : lastCreated.id;
 			let extistingStatement = await getExistingStatement(job.object, job.verb, subject);
@@ -176,6 +179,71 @@ async function setSiteLink(subjectId, property, value) {
 	data.append('token', await getTokens());
 	const action = `action=wbsetsitelink&id=${subjectId}&linksite=${property}&linktitle=${value}&format=json`;
 	let response = await fetch(`https://www.wikidata.org/w/api.php?${action}`, {
+		method: 'post',
+		body: new URLSearchParams(data),
+	});
+}
+
+async function setLabelOrAlias(subjectId, language, value) {
+	let labelOrAlias = {
+		language: language,
+		value: value,
+	}
+	let subject = await wikidataGetEntity(subjectId, false, true);
+	const hasLabel = subject?.labels?.[language]?.hasOwnProperty('value')
+	const isLabel = subject?.labels?.[language]?.value == value;
+	const aliasExists = subject?.aliases?.[language]?.includes(labelOrAlias);
+	
+	if (hasLabel) {
+		if (!aliasExists) {
+			setAlias(subjectId, language, value)
+		}
+	} else {
+		if (!isLabel) {
+			setLabel(subjectId, language, value)
+		}
+	}
+}
+
+async function setLabel(subjectId, language, value) {
+	const config = namespaceGetInstance(subjectId)
+	let token = await getTokens(config.instance);
+	const extensionTag = await makeExtensionTag()
+	
+	let data = new FormData();
+	data.append('action', 'wbsetlabel');
+	data.append('value', value);
+	data.append('id', subjectId);
+	data.append('language', language);
+
+	data.append('tags', extensionTag);
+	data.append('token', token);
+	data.append('bot', '1');
+	data.append('format', "json");
+	
+	let response = await fetch(`${config.instance}/w/api.php`, {
+		method: 'post',
+		body: new URLSearchParams(data),
+	});
+}
+
+async function setAlias(subjectId, language, value) {
+	const config = namespaceGetInstance(subjectId)
+	let token = await getTokens(config.instance);
+	const extensionTag = await makeExtensionTag()
+	
+	let data = new FormData();
+	data.append('action', 'wbsetaliases');
+	data.append('add', value);
+	data.append('id', subjectId);
+	data.append('language', language);
+
+	data.append('tags', extensionTag);
+	data.append('token', token);
+	data.append('bot', '1');
+	data.append('format', "json");
+	
+	let response = await fetch(`${config.instance}/w/api.php`, {
 		method: 'post',
 		body: new URLSearchParams(data),
 	});

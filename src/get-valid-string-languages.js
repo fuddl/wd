@@ -7,11 +7,23 @@ async function getValidStringLanguages() {
 	return response;
 }
 
-async function makeLanguageValid(invalidLang) {
+async function getValidTermLanguages() {
+	let response = await fetch('https://www.wikidata.org/w/api.php?action=query&meta=wbcontentlanguages&wbclcontext=term&wbclprop=code&format=json&origin=*', {cache: "force-cache"});
+	response = await response.json();
+	response = response.query.wbcontentlanguages;
+	return response;
+}
+
+async function makeLanguageValid(invalidLang, context = 'monolingualtext') {
 
 	// all valid languages seem to be lowercased
 	invalidLang = invalidLang.toLowerCase();
-	let validLangs = await getValidStringLanguages();
+	let validLangs;
+	if (context == 'monolingualtext') {
+		validLangs = await getValidStringLanguages();
+	} else {
+		validLangs = await getValidTermLanguages();
+	}
 	// if it already is in the valid langs, just return it.
 	if (Object.keys(validLangs).includes(invalidLang)) {
 		return invalidLang;

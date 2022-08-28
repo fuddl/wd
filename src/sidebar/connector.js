@@ -1,4 +1,4 @@
-import {wikidataGetEntity} from '../wd-get-entity.js'
+import { wikidataGetEntity, userLanguagesWithFallbacks } from '../wd-get-entity.js'
 import {getTokens} from './wd-get-token.js'
 import {templates} from './components/templates.tpl.js'
 import {constraintsToStatements} from './constraintsToStatements.js'
@@ -8,7 +8,7 @@ import browser from 'webextension-polyfill'
 import {Browser} from "../core/browser"
 import jobRedundancyChecker from './redundancy-checker.js'
 import {PrependNav} from './prepend-nav.js'
-import { getLangQid } from '../get-valid-string-languages.js';
+import { getLangQid, makeLanguageValid } from '../get-valid-string-languages.js';
 
 
 PrependNav()
@@ -112,6 +112,55 @@ let existing = new jobRedundancyChecker();
 			allLabels.push(item?.[0]?.label)
 		}
 	})
+
+
+	let labelLanguage = await makeLanguageValid(proposals.source.lang, 'term')
+	for (let label of allLabels) {
+		let check 
+		let select
+		let labelPreview = new DocumentFragment()
+		if (labelLanguage != 'und') {
+			check = document.createElement('input')	
+			check.setAttribute('type', 'checkbox')
+			check.setAttribute('name', `label-${allLabels.indexOf(label)}`)
+			check.setAttribute('value', JSON.stringify({
+				type: 'set_label_or_alias',
+				language: proposals.source.lang,
+				value: label,
+			}))
+			check.checked = true
+			labelPreview.appendChild(document.createTextNode(`${proposals.source.lang}: `))
+		} else {
+			select = document.createElement('select')
+			select.setAttribute('name', `label-${allLabels.indexOf(label)}`)
+			const emptyOption = document.createElement('option')
+			select.appendChild(emptyOption)
+			let userLanguages = await userLanguagesWithFallbacks()
+			for (let userLanguage of userLanguages) {
+				let validUserLanguage = await makeLanguageValid(userLanguage, 'term')
+				if (validUserLanguage != 'und') {
+					let userLanguageOption = document.createElement('option')
+					userLanguageOption.setAttribute('value', JSON.stringify({
+						type: 'set_label_or_alias',
+						language: validUserLanguage,
+						value: label,
+					}))
+					userLanguageOption.innerText = validUserLanguage
+					select.appendChild(userLanguageOption)
+				}
+			}
+			labelPreview.appendChild(select)
+		}
+
+		labelPreview.appendChild(templates.title({ text: label }))
+		
+		propform.appendChild(templates.remark({
+			prop: document.createTextNode(`Label or alias`),
+			vals: [labelPreview],
+			check: check ?? null,
+		}));
+	}
+
 
 	let labelField = templates.join({
 		human: allLabels?.[0] ?? proposals.titles[0],
