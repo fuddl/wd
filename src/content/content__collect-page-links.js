@@ -286,7 +286,7 @@ async function collectPageLinks(subject) {
 					}
 					e.preventDefault();
 
-					let sectionData = getClosestID(e.target);
+					let sectionData = getClosestID(selector.parentNode.host.previousElementSibling);
 
 					let hash = sectionData.hash ? '#' + sectionData.hash : '';
 
