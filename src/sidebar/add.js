@@ -92,10 +92,14 @@ content.innerHTML = '';
 		let datatype =	propPicker.element.getAttribute('data-datatype');
 		let propertSelected = propPicker.element.hasAttribute('data-prop');
 		let selectedEntities = propPicker.selection.querySelectorAll(`[data-selected]`);
+		let formData = new FormData(statements)
 		if (
-			selectedEntities.length > 0 &&
-			propertSelected &&
-			itemTypes.includes(datatype)
+			(
+				selectedEntities.length > 0 &&
+				propertSelected &&
+			 	itemTypes.includes(datatype)
+			) ||
+			[...formData.entries()].length > 0
 		) {
 			saveButton.removeAttribute('disabled');
 		} else if (
@@ -167,6 +171,69 @@ content.innerHTML = '';
 				propPicker.languagePicker.value = data.valueLang.toLowerCase();
 			}
 
+		} else if (data.type === 'use_as_statement') {
+			const check = document.createElement('input')
+			check.setAttribute('type', 'checkbox')
+			check.setAttribute('name', `${data.verb}-${data.object}`)
+			check.checked = true
+			const job = {
+				type: 'set_claim',
+				verb: data.verb,
+				object: data.object,
+				references: [ (()=> {
+					let reference = []
+					if (data?.reference?.url) {
+						reference.push({
+							"snaktype": "value",
+							"property": "P854",
+							"datavalue": {
+								"value": data.reference.url,
+								"type": "string"
+							},
+							"datatype": "url"
+						})
+					}
+
+					if (data?.reference?.title) {
+						reference.push({
+							"snaktype": "value",
+							"property": "P1476",
+							"datavalue": {
+								"value": {
+									text: data.reference.title,
+									language: data.reference.language,
+								},
+								"type": "monolingualtext"
+							},
+							"datatype": "string"
+						})
+					}
+
+					if (data?.reference?.section) {
+						reference.push({
+							"snaktype": "value",
+							"property": "P958",
+							"datavalue": {
+								"value": data.reference.section,
+								"type": "string"
+							},
+							"datatype": "string"
+						})
+					}
+					return reference
+				})() ]
+			}
+
+			check.setAttribute('value', JSON.stringify(job))
+			check.addEventListener('change', () => {
+				checkSaveButton()
+			})
+			statements.appendChild(templates.remark({
+				prop: templates.placeholder({ entity: data.verb }),
+				vals: [templates.code(data.object)],
+				check: check,
+			}));
+			checkSaveButton()
 		}
 	});
 
@@ -174,6 +241,9 @@ content.innerHTML = '';
 		type: 'collect_pagelinks',
 		subject: currentEntity,
 	});
+
+	const statements = document.createElement('form')
+	content.appendChild(statements);
 
 	saveButton.setAttribute('disabled', 'disabled');
 	saveButton.innerText = 'Send to Wikidata';
@@ -323,6 +393,17 @@ content.innerHTML = '';
 				}
 			}
 
+			const formData = new FormData(statements)
+			for (let pair of formData.entries()) {
+				if (pair[1] != '') {
+				 	let job = JSON.parse(pair[1]);
+				 	if (!job.subject) {
+				 		job.subject = currentEntity;
+				 		job.fromTab = currentTab;
+				 	}
+				 	jobs.push(job);
+				}
+			}
 
 			Promise.all([
 				browser.runtime.sendMessage({

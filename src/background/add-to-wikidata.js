@@ -191,7 +191,7 @@ async function setLabelOrAlias(subjectId, language, value) {
 	const aliasExists = subject?.aliases?.[language]?.some(item => item.value === value)
 	
 	if (hasLabel) {
-		if (!aliasExists) {
+		if (!aliasExists && !isLabel) {
 			setAlias(subjectId, language, value)
 		}
 	} else {

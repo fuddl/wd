@@ -162,11 +162,13 @@ browser.runtime.onMessage.addListener(async (data, sender) => {
             browser.runtime.getURL('sidebar/add.html') + '?' + data.entity)
     }
 
-    if (data.type === 'use_in_statement') {
+    if (data.type == 'use_in_statement') {
         const message = {
-            type: 'use_in_statement',
+            type: data.type,
             dataype: data.dataype,
             value: data.value ? data.value : null,
+            verb: data.verb ? data.verb : null,
+            object: data.object ? data.object : null,
             wdEntityId: data.entityId ? data.entityId : null,
             reference: data.reference ? data.reference : null,
         }
