@@ -42,7 +42,7 @@ async function detectPotentialMatches(location) {
 			meta: await enrichMetaData(metaData, lang, window.location.href),
 			source: {
 				url: location.toString(),
-				title: document.querySelector('title').innerText,
+				title: document?.title,
 				lang,
 			},
 		},

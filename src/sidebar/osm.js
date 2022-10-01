@@ -26,6 +26,20 @@ const tagsAndKeys = [
 		}
 	},
 	{
+		tag: 'amenity=restaurant',
+		statement: {
+			prop: 'P31',
+			value: 'Q11707',
+		}
+	},
+	{
+		tag: 'amenity=cafe',
+		statement: {
+			prop: 'P31',
+			value: 'Q30022',
+		}
+	},
+	{
 		tag: 'wheelchair=*',
 		statement: {
 			prop: 'P2846',

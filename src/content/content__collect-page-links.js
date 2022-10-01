@@ -4,65 +4,7 @@ import {updateStatus} from '../update-status'
 import { getLangQid, makeLanguageValid} from '../get-valid-string-languages.js';
 import browser from 'webextension-polyfill'
 
-const styleSheet = `
-	.entity-selector {
-		-moz-appearance: button;
-		background-color: #6F6F6F;
-		border-radius: 1em;
-		border: 1px solid;
-		color: white;
-		cursor: pointer;
-		font-family: sans-serif;
-		font-size: .75em;
-		line-height: 1.2;
-		margin: 0 .5em .5em 0; 
-		padding: .25em 1em;
-		text-decoration: none;
-		transition: background .5s;
-		user-select: none;
-		white-space: nowrap;
-	}
-
-	.entity-selector--selectable {
-		background-color: #339966;
-	}
-
-	.entity-selector--unconnected {
-		background-color: #6F6F6F;
-	}
-
-	.entity-selector--selected {
-		background-color: #006699;
-	}
-
-
-	.entity-selector--queued {
-		min-width: 3em;
-		min-height: 1em;
-		display: inline-block;
-		background-image: linear-gradient( 135deg, 
-			#339966 0%,
-			#339966 25%,
-			#006699 25%,
-			#006699 50%,
-			#339966 50%,
-			#339966 75%,
-			#006699 75%,
-			#006699 100%
-		) !important;
-		background-size: 2em 2em;
-		animation: working 3s linear infinite;
-	}
-
-	@keyframes working {
-		from {
-			background-position: 0 0;
-		}
-		to {
-			background-position: 200% 0;
-		}
-	}
-`
+const entitySelectorStlesheet = browser.runtime.getURL('content/entity-selector.css');
 
 function getClosestID(element) {
 	let subject = element;
@@ -215,9 +157,11 @@ async function collectPageLinks(subject) {
 				let shadow = wrapper.attachShadow({ mode: 'closed' });
 				let selector = document.createElement('a')
 				shadow.appendChild(selector)
-				let style = document.createElement('style')
+				let style = document.createElement('link')
+				style.setAttribute('rel', 'stylesheet')
+    			style.setAttribute('href',  entitySelectorStlesheet)
+
 				shadow.appendChild(style)
-				style.innerText = styleSheet
 				selector.classList.add('entity-selector', 'entity-selector--queued');
 				link.parentNode.insertBefore(wrapper, link.nextSibling);
 				this.selectors.push(selector);
