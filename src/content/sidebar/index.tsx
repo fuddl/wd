@@ -13,12 +13,14 @@ export const setupSidebar = async () => {
     style.setAttribute('href',  browser.runtime.getURL('content/sidebar/sidebar.css'))
     
     sidebar.style.setProperty('all', 'revert', 'important')
+    shadow.appendChild(style);
     
     const key = `sidebar.open${ await Browser.getCurrentTabIdForAllContexts() }`
     const open = await browser.storage.local.get({[key]: false})
-    
-
-    ReactDOM.render(<SidebarWrapper initiallyOpen={ open[key] } />, shadow);
-    shadow.appendChild(style);
+    const wrapper = document.createElement('div')
+    shadow.appendChild(wrapper)
+    style.addEventListener('load', () => {
+        ReactDOM.render(<SidebarWrapper initiallyOpen={ open[key] } />, wrapper);
+    })
     document.body.appendChild(sidebar);
 }
