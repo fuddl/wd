@@ -13,7 +13,11 @@ const url: Resolver = {
 		}
 	},
 	getEntityId: async function(location) {
-		const href = location.href
+		let href = location.href
+
+		// make sure href always end with a slash
+		href += !href.endsWith('/') ? '/' : ''
+
 		const hrefNoSlash = href.replace(/\/$/, '')
 		const query = `
 			SELECT ?item {

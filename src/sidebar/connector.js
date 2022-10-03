@@ -228,6 +228,7 @@ let existing = new jobRedundancyChecker();
 					verb: connectorProp,
 					object: proposals.ids[0][0].value,
 					fromTab: currentTab,
+					fromUrl: proposals.source.url,
 					qualifiers: (langRequired && proposals?.source?.lang && proposals.source.lang != 'und') ? [{
 						property: "P407",
 						value:  {
