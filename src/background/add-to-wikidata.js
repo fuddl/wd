@@ -187,8 +187,8 @@ async function setSiteLink(subjectId, property, value) {
 async function setLabelOrAlias(subjectId, language, value) {
 	let subject = await wikidataGetEntity(subjectId, false, true);
 	const hasLabel = subject?.labels?.[language]?.hasOwnProperty('value')
-	const isLabel = subject?.labels?.[language]?.value == value;
-	const aliasExists = subject?.aliases?.[language]?.some(item => item.value === value)
+	const isLabel = subject?.labels?.[language]?.value.toLowerCase() == value.toLowerCase();
+	const aliasExists = subject?.aliases?.[language]?.some(item => item.value.toLowerCase() == value.toLowerCase())
 	
 	if (hasLabel) {
 		if (!aliasExists && !isLabel) {
