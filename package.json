@@ -33,6 +33,7 @@
 	},
 	"dependencies": {
 		"@emotion/react": "^11.7.1",
+		"binary-variations": "^1.0.2",
 		"furigana": "^0.19.3",
 		"react": "^17.0.2",
 		"react-burger-menu": "^3.0.6",
