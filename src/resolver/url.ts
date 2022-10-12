@@ -3,40 +3,49 @@ import {Resolver} from './types'
 
 const url: Resolver = {
 	id: 'url',
+	props: ['P953', 'P973', 'P856', 'P2699'],
 	applicable: async function(location) {
 		if (location.href === window.location.href) {
 			return [{
-				prop: ['P953', 'P973', 'P856', 'P2699'],
+				prop: this.props,
 				value: location.href,
 				langRequired: true,
 			}]
 		}
 	},
+	fuzziness: {
+		slashNoSlash: [
+			(url) => url.endsWith('/') ? url : `${url}/`,
+			(url) => !url.endsWith('/') ? url : url.replace(/\/$/, ''),
+		],
+		secureNoSecure: [
+			(url) => url.startsWith('http://') ? url.replace(/^http:\/\//, 'https://') : url,
+			(url) => url.startsWith('https://') ? url : url.replace(/^https:\/\//, 'http://'),
+		],
+		wwwNoWww: [
+			(url) => url.match(/https?:\/\/www\./) ? url.replace(/^(http:\/\/)www\./, '$1') : null,
+		],
+	},
 	getEntityId: async function(location) {
 		let href = location.href
 
-		// make sure href always end with a slash
-		href += !href.endsWith('/') ? '/' : ''
+		let groups = []
 
-		const hrefNoSlash = href.replace(/\/$/, '')
+		for (const prop of this.props) {
+			for (const fuzz in this.fuzziness) {
+				for (const variation of this.fuzziness[fuzz]) {
+					const fuzzyUrl = variation(href)
+					if (fuzzyUrl) {
+						groups.push(`?item wdt:${prop} <${ fuzzyUrl }>.`)
+					}
+				}
+			}
+		}
+
 		const query = `
 			SELECT ?item {
 			  {
-			    ?item wdt:P953 <${ href }>.
-			  } UNION {
-			    ?item wdt:P973 <${ href }>.
-			  } UNION {
-			    ?item wdt:P856 <${ href }>.
-			  } UNION {
-			    ?item wdt:P2699 <${ href }>.
-			  } UNION {
-			    ?item wdt:P953 <${ hrefNoSlash }>.
-			  } UNION {
-			    ?item wdt:P973 <${ hrefNoSlash }>.
-			  } UNION {
-			    ?item wdt:P856 <${ hrefNoSlash }>.
-			  } UNION {
-			    ?item wdt:P2699 <${ hrefNoSlash }>.
+				${groups.join('\n} UNION {\n')}
 			  }
 			}
 		`
