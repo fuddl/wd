@@ -1,5 +1,7 @@
 import {resolveAll} from '../resolver'
 
+import ISBN from 'isbn3' 
+
 const usefullMetatags = [
 	{
 		name: 'og:title',
@@ -54,6 +56,29 @@ const usefullMetatags = [
 		name: 'books:isbn',
 		prop: 'P212',
 		type: 'ExternalId',
+		process: (input) => {
+			const isbnProperties = {
+				P212: {
+					test: 'isIsbn13',
+					format: 'isbn13h',
+				},
+				P957: {
+					test: 'isIsbn10',
+					format: 'isbn10h',
+				},
+			}
+
+			const parsed = ISBN.parse(input)
+
+			for (const key in isbnProperties) {
+				if (parsed[isbnProperties[key].test]) {
+					return {
+						prop: key,
+						id: parsed[isbnProperties[key].format],
+					}
+				}
+			}
+		},
 		suggested: true,
 	},
 	{
@@ -130,9 +155,18 @@ async function enrichMetaData(tags, lang, url) {
 					})
 				}
 			} else if (type.type === 'String' || type.type === 'ExternalId') {
+				let object = tags[key][delta]
+				let verb = type.prop
+				if ('process' in type) {
+					const result = type.process(object)
+					if (result) {
+						object = result.id
+						verb = result.verb
+					}
+				}
 				enriched[newKey] = {
 					verb: type.prop,
-					object: tags[key][delta],
+					object: object,
 				};
 			} else if (type.type === 'Quantity') {
 				let amount = tags[key][delta];

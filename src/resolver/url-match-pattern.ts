@@ -1,6 +1,7 @@
 import { sparqlQuery } from '../sqarql-query.js'
 import * as browser from 'webextension-polyfill'
-import {Resolver} from './types'
+import { Resolver } from './types'
+import ISBN from 'isbn3' 
 
 const URL_match_pattern: Resolver = {
 	id: 'URL_match_pattern',
@@ -43,6 +44,16 @@ const URL_match_pattern: Resolver = {
 		}
 		return output
 	},
+	isbnProperties: {
+		P212: {
+			test: 'isIsbn13',
+			format: 'isbn13h',
+		},
+		P957: {
+			test: 'isIsbn10',
+			format: 'isbn10h',
+		},
+	},
 	async applicable(location) {
 		if (!this.patterns) {
 			this.patterns = await this.aquireRegexes()
@@ -74,6 +85,18 @@ const URL_match_pattern: Resolver = {
 					} catch(e) {
 						isValid = false
 						console.warn('This title extractor regex is not valid', JSON.stringify(prop, null, 2))
+					}
+				}
+
+				if (Object.keys(this.isbnProperties).includes(prop.p)) {
+					const parsedISBN = ISBN.parse(desiredId)
+					if (parsedISBN.isValid) {
+						for (const key in this.isbnProperties) {
+							if (parsedISBN[this.isbnProperties[key].test]) {
+								prop.p = key
+								desiredId = parsedISBN[this.isbnProperties[key].format]
+							}
+						}
 					}
 				}
 
