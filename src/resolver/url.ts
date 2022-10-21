@@ -4,11 +4,10 @@ import binaryVariations from 'binary-variations'
 
 const url: Resolver = {
 	id: 'url',
-	props: ['P953', 'P973', 'P856', 'P2699', 'P1581'],
 	applicable: async function(location) {
 		if (location.href === window.location.href) {
 			return [{
-				prop: this.props,
+				prop: await this.getProps(),
 				value: location.href,
 				langRequired: true,
 			}]
@@ -21,6 +20,30 @@ const url: Resolver = {
 		secure: (url) => url.startsWith('http://') ? url.replace(/^http:\/\//, 'https://') : url,
 		noScecure: (url) => url.startsWith('https://') ? url.replace(/^https:\/\//, 'http://') : url,
 		noWww: (url) => url.match(/https?:\/\/www\./) ? url.replace(/^(http:\/\/)www\./, '$1') : url,
+	},
+	getProps: async function() {
+		let props = await sparqlQuery(`
+			SELECT DISTINCT ?p WHERE {
+				SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE]". }
+				{
+					SELECT DISTINCT ?prop WHERE {
+						?prop p:P31 ?s0.
+						?prop wikibase:propertyType wikibase:Url.
+						?s0 (ps:P31/(wdt:P279*)) wd:Q84764641.
+						MINUS {
+							?prop p:P31 ?s1.
+							?s1 (ps:P31/(wdt:P279*)) wd:Q19847637.
+						}
+					}
+				}
+				MINUS { ?prop wdt:P8966 [] } .
+				BIND(REPLACE(STR(?prop), "http://www.wikidata.org/entity/", "") as ?p)
+			}
+		`)
+
+		return props.map((item) => { 
+			return item.p.value
+		})
 	},
 	getEntityId: async function(location) {
 		let href = location.href
@@ -39,21 +62,25 @@ const url: Resolver = {
 			}
 		}
 
+
+		const props = await this.getProps()
+
 		let groups = []
-		for (const prop of this.props) {
-			for (const fuzzyHref of hrefs) {
-				groups.push(`?item wdt:${prop} <${ fuzzyHref }>.`)
-			}
+		for (const fuzzyHref of hrefs) {
+			groups.push(`?item ?predicate <${ fuzzyHref }>.`)
 		}
 
 		const query = `
-			SELECT ?item {
-			  {
-				${groups.join('\n} UNION {\n')}
-			  }
+			SELECT ?item ?property WHERE {
+				{
+					${groups.join('\n} UNION {\n')}
+				}
+				?property wikibase:directClaim ?predicate.
+				FILTER(?property IN (wd:${ props.join(', wd:') }))
 			}
+			LIMIT 1
 		`
-
+		
 		const entity = await sparqlQuery(query)
 		if (entity[0]) {
 			const entityId = entity[0].item.value.match(/https?:\/\/www\.wikidata\.org\/entity\/(Q\d+)/)[1]
