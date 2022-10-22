@@ -82,6 +82,13 @@ const join = (vars) => {
 		}
 	}
 
+	browser.runtime.onMessage.addListener(async (data, sender) => {
+		if (data.type === 'use_in_statement' && data.dataype === 'string') {
+			humanField.value = data.value;
+			updateList()
+		}
+	})
+
 	//humanField.addEventListener('change', updateList);
 	humanField.addEventListener('focus', updateList);
 	humanField.addEventListener('keyup', updateList);
