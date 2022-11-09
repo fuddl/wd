@@ -6,6 +6,7 @@ import {inventaire} from './inventaire'
 import {URL_match_pattern} from './url-match-pattern'
 import {wikipedia} from './wikipedia'
 import {schemaOrg} from './schema-org'
+import {mastodon} from './mastodon'
 import {url} from './url'
 import {googleMaps} from './google-maps'
 import {wikidata} from './wikidata'
@@ -19,6 +20,7 @@ export const resolvers = [
 	wikipedia,
 	inventaire,
 	commons,
+	mastodon,
 	URL_match_pattern,
 	doi,
 	schemaOrg,

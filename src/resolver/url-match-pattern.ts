@@ -11,7 +11,7 @@ const URL_match_pattern: Resolver = {
 			SELECT ?p ?s ?r ?c ?t WHERE {
 				?stat ps:P8966 ?s.
 				OPTIONAL { ?stat pq:P8967 ?r. }
-                OPTIONAL { ?stat pq:P10999 ?t }
+				OPTIONAL { ?stat pq:P10999 ?t }
 				?prop p:P8966 ?stat.
 				BIND(IF(EXISTS{?prop wdt:P1552 wd:Q3960579}, 'upper',
 					IF(EXISTS{?prop wdt:P1552 wd:Q65048529}, 'lower',
@@ -19,6 +19,7 @@ const URL_match_pattern: Resolver = {
 					)
 				) AS ?c)
 				BIND(REPLACE(STR(?prop), 'http://www.wikidata.org/entity/', '')	AS ?p ).
+				FILTER (?p != 'P4033')
 			} ORDER BY STRLEN(str(?s))
 		`
 		const patterns = await sparqlQuery(query)
