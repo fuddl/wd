@@ -23,19 +23,20 @@ const mastodon: Resolver = {
 		if (!this.domains) {
 			this.domains = await this.aquireKnownInstances()
 		}
-		const mastHost = this.domains.find(domain => domain == location.hostname);
+		const mastHost = this.domains.find(domain => domain == location.hostname)
+		let pathnameNormalized = location.pathname.replace(/^\/web/, '')
 		const username = (() => {
-			if (location.pathname.match(/\/@([0-9a-zA-Z_]+)$/)) {
-				return document.location.pathname.substring(2)
+			if (pathnameNormalized.match(/\/@([0-9a-zA-Z_]+)/)) {
+				return pathnameNormalized.match(/\/@([0-9a-zA-Z_]+)/)[1]
 			}
-			if (location.pathname.match(/^\/users\/([^\/]+)/)) {
-				return document.location.pathname.split('/')[2]
+			if (pathnameNormalized.match(/^\/users\/([^\/]+)/)) {
+				return pathnameNormalized.split('/')[2]
 			}
 			
 		})()
 		const address = (() => {
-			if (location.pathname.match(/\/@[0-9A-Za-z_]+@[0-9a-z\.\-]+[0-9a-z]+$/)) {
-				return document.location.pathname.substring(2)
+			if (pathnameNormalized.match(/\/@[0-9A-Za-z_]+@[0-9a-z\.\-]+[0-9a-z]+/)) {
+				return pathnameNormalized.substring(2)
 			}
 		})()
 		if (address || username) {
@@ -44,12 +45,22 @@ const mastodon: Resolver = {
 			return false
 		}
 	},
+	getTitle() {
+		if (typeof document?.title === 'string' ) {
+			const matches = document.title.match(/^(.+)\s\(@[^@]+@[^@\.]+\.[^\.]+\)/)
+			return matches?.[1]
+		} else {
+			return false
+		}
+	},
 	async applicable(location) {
 		let address = await this.getAddress(location)
+		let title = this.getTitle(document)
 		if (address) {
 			return [{
 				prop: 'P4033',
 				value: address,
+				label: this.getTitle() ?? null,
 				recommended: true,
 			}]
 		} else {
@@ -65,7 +76,7 @@ const mastodon: Resolver = {
 				?item wdt:P4033 "${ address }".
 			}
 		`
-
+		
 		const result = await sparqlQuery(query)
 		if (result[0]) {
 			const entityId = result[0].item.value.match(/https?:\/\/www\.wikidata\.org\/entity\/(\w\d+)/)[1]
