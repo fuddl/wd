@@ -24,6 +24,9 @@ const mastodon: Resolver = {
 			this.domains = await this.aquireKnownInstances()
 		}
 		const mastHost = this.domains.find(domain => domain == location.hostname)
+		if (!mastHost) {
+			return false
+		}
 		let pathnameNormalized = location.pathname.replace(/^\/web/, '')
 		const username = (() => {
 			if (pathnameNormalized.match(/\/@([0-9a-zA-Z_]+)/)) {
