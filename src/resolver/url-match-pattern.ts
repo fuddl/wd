@@ -91,7 +91,7 @@ const URL_match_pattern: Resolver = {
 
 				if (Object.keys(this.isbnProperties).includes(prop.p)) {
 					const parsedISBN = ISBN.parse(desiredId)
-					if (parsedISBN.isValid) {
+					if (parsedISBN?.isValid) {
 						for (const key in this.isbnProperties) {
 							if (parsedISBN[this.isbnProperties[key].test]) {
 								prop.p = key
