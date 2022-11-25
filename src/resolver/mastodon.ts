@@ -27,6 +27,7 @@ const mastodon: Resolver = {
 		if (!mastHost) {
 			return false
 		}
+
 		let pathnameNormalized = location.pathname.replace(/^\/web/, '')
 		const username = (() => {
 			if (pathnameNormalized.match(/\/@([0-9a-zA-Z_]+)/)) {
@@ -42,8 +43,17 @@ const mastodon: Resolver = {
 				return pathnameNormalized.substring(2)
 			}
 		})()
-		if (address || username) {
-			return address ?? `${username}@${mastHost}`
+
+		const addressNormalized = address ?? `${username}@${mastHost}`
+
+		// verify if the wikidata's address list isn't 
+		// faulty and that this is actually 
+		// a mastodon instance:
+		// https://github.com/mastodon/mastodon/discussions/21493#discussioncomment-4225825
+		const webfinger = await fetch(`https://${mastHost}/.well-known/webfinger?resource=acct:${addressNormalized}`)
+
+		if (webfinger.status == 200 && addressNormalized) {
+			return addressNormalized
 		} else {
 			return false
 		}
