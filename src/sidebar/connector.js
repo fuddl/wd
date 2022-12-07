@@ -33,6 +33,7 @@ function getPropertyScope(property) {
 let existing = new jobRedundancyChecker();
 
 (async () => {
+	let cache = await browser.storage.local.get();
 	let proposals = JSON.parse(decodeURIComponent(window.location.search.replace(/^\?/, '')));
 
 	let content = document.getElementById('content');
@@ -70,8 +71,7 @@ let existing = new jobRedundancyChecker();
 				let option = templates.placeholder({
 					tag: 'option',
 					entity: prop,
-					type: 'option',
-				});
+				}, cache);
 				option.setAttribute('value', prop);
 
 				propPreview.appendChild(option);

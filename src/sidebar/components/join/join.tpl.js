@@ -1,5 +1,6 @@
-import { wikidataAutocomplete } from '../../wd-autocomplete.js';
-import { getAutodesc } from '../../get-autodesc.js';
+import { wikidataAutocomplete } from '../../wd-autocomplete.js'
+import { getAutodesc } from '../../get-autodesc.js'
+import browser from 'webextension-polyfill'
 
 let joinCounter = 0;
 

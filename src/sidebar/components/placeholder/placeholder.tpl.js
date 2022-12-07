@@ -7,7 +7,7 @@ const placeholder = (vars, cache) => {
 	let tagName = vars?.tag ?? 'a';
 
 	// don't create a placeholder if the label is already in cache
-	if (vars.entity && cache && 'labels' in cache && cache.labels[vars.entity] && !vars.type) {
+	if (vars.entity && cache?.labels?.[vars.entity]) {
 		let link = document.createElement(tagName);
 		link.innerText = cache.labels[vars.entity];
 		if ('descriptions' in cache && cache.descriptions[vars.entity]) {
@@ -19,8 +19,8 @@ const placeholder = (vars, cache) => {
 				e.preventDefault();
 				window.location = 'entity.html?' + vars.entity;
 			});
-			return link;
 		}
+		return link;
 	}
 
 	let rand = (min, max) => {
@@ -28,13 +28,13 @@ const placeholder = (vars, cache) => {
 		max = Math.floor(max);
 		return Math.floor(Math.random() * (max - min)) + min;
 	}
-	let tag = document.createElement('span');
+	let tag = document.createElement(vars?.tag ?? 'span');
 	tag.classList.add('placeholder');
 	if (vars.entity) {
 		tag.setAttribute('data-entity', vars.entity);
 	}
-	if (vars.type) {
-		tag.setAttribute('data-type', vars.type);
+	if (vars.tag) {
+		tag.setAttribute('data-type', tagName);
 	}
 	let words = [];
 	if (vars.lazy) {
@@ -49,7 +49,7 @@ const placeholder = (vars, cache) => {
 	(async () => {
 		let id = tag.getAttribute('data-entity');
 		let type = tag.getAttribute('data-type');
-		let link = document.createElement(type ? type : 'a');
+		let link = document.createElement(tagName);
 		if (id !== null) {
 			let entity = await wikidataGetEntity(id);
 			link.setAttribute('href', getLink(id));
@@ -91,7 +91,9 @@ const placeholder = (vars, cache) => {
 			}
 		} else if (vars.json) {
 			try {
-				const response = await fetch(vars.json);
+				const response = await fetch(vars.json, {
+					cache: 'force-cache',
+				});
 
 				if (response.status !== 200) {
 					throw 'Status Code: ' + response.status;

@@ -257,7 +257,7 @@ function renderStatements(snak, references, type, target, scope, delta) {
 			}
 
 			qualifiers.push({
-				prop: templates.placeholder({ entity: prop }),
+				prop: templates.placeholder({ entity: prop }, cache),
 				vals: qvalues,
 			});
 		}
@@ -601,7 +601,7 @@ function updateView(id, useCache = true) {
 					senseFlat[id] = newSense;
 					if (!senseTree[id].gloss && senseTree[id].sense?.claims?.P5137?.[0].mainsnak?.datavalue?.value?.id) {
 						senseTree[id].gloss = templates.placeholder({
-							type: 'span',
+							tag: 'span',
 							entity: senseTree[id].sense.claims.P5137[0].mainsnak.datavalue.value.id,
 							desiredInner: 'descriptions',
 						});
@@ -682,8 +682,8 @@ function updateView(id, useCache = true) {
 						let heading = document.createElement('h2');
 						let headingText = templates.placeholder({
 							entity: pid,
-							type: 'span',
-						});
+							tag: 'span',
+						}, cache);
 						heading.appendChild(headingText);
 						section.appendChild(heading);
 
@@ -778,8 +778,8 @@ function updateView(id, useCache = true) {
 						let heading = document.createElement('h2');
 						let headingText = templates.placeholder({
 							entity: pid,
-							type: 'span',
-						});
+							tag: 'span',
+						}, cache);
 						heading.appendChild(headingText);
 						section.appendChild(heading);
 
@@ -834,8 +834,8 @@ function updateView(id, useCache = true) {
 							let heading = document.createElement('h2');
 							let headingText = templates.placeholder({
 								entity: cid,
-								type: 'span',
-							});
+								tag: 'span',
+							}, cache);
 							heading.appendChild(headingText);
 							section.appendChild(heading);
 							for (let claim of e.claims[cid]) {
@@ -893,11 +893,11 @@ function updateView(id, useCache = true) {
 							let heading = document.createElement('h2');
 							let headingText = templates.placeholder({
 								entity: cid,
-								type: 'span',
-							});
+								tag: 'span',
+							}, cache);
 							heading.appendChild(headingText);
 							section.appendChild(heading);
-							section.appendChild(templates.blender(parts, templates.placeholder({entity: id, type: 'span'})));
+							section.appendChild(templates.blender(parts, templates.placeholder({entity: id, tag: 'span'}, cache)));
 							glosses.appendChild(section);
 						}
 					}
@@ -909,7 +909,7 @@ function updateView(id, useCache = true) {
 				let heading = document.createElement('h2');
 				let headingText = templates.placeholder({
 					json: `https://www.wikidata.org/w/api.php?action=parse&page=Translations:Help:Data_type/87/${lang}&disableeditsection=true&format=json`,
-					type: 'span',
+					tag: 'span',
 					extractor: (input) => {
 						if (input?.parse?.text?.['*']) {
 							return input.parse.text['*'].replace(/<\/?[^>]+(>|$)/g, "").trim();
