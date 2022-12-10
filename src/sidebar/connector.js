@@ -113,52 +113,53 @@ let existing = new jobRedundancyChecker();
 		}
 	})
 
-
-	let labelLanguage = await makeLanguageValid(proposals.source.lang, 'term')
-	for (let label of allLabels) {
-		let check 
-		let select
-		let labelPreview = new DocumentFragment()
-		if (labelLanguage != 'und') {
-			check = document.createElement('input')	
-			check.setAttribute('type', 'checkbox')
-			check.setAttribute('name', `label-${allLabels.indexOf(label)}`)
-			check.setAttribute('value', JSON.stringify({
-				type: 'set_label_or_alias',
-				language: proposals.source.lang,
-				value: label,
-			}))
-			check.checked = true
-			labelPreview.appendChild(document.createTextNode(`${proposals.source.lang}: `))
-		} else {
-			select = document.createElement('select')
-			select.setAttribute('name', `label-${allLabels.indexOf(label)}`)
-			const emptyOption = document.createElement('option')
-			select.appendChild(emptyOption)
-			let userLanguages = await userLanguagesWithFallbacks()
-			for (let userLanguage of userLanguages) {
-				let validUserLanguage = await makeLanguageValid(userLanguage, 'term')
-				if (validUserLanguage != 'und') {
-					let userLanguageOption = document.createElement('option')
-					userLanguageOption.setAttribute('value', JSON.stringify({
-						type: 'set_label_or_alias',
-						language: validUserLanguage,
-						value: label,
-					}))
-					userLanguageOption.innerText = validUserLanguage
-					select.appendChild(userLanguageOption)
+	if (scope != 'lexeme') {
+		let labelLanguage = await makeLanguageValid(proposals.source.lang, 'term')
+		for (let label of allLabels) {
+			let check 
+			let select
+			let labelPreview = new DocumentFragment()
+			if (labelLanguage != 'und') {
+				check = document.createElement('input')	
+				check.setAttribute('type', 'checkbox')
+				check.setAttribute('name', `label-${allLabels.indexOf(label)}`)
+				check.setAttribute('value', JSON.stringify({
+					type: 'set_label_or_alias',
+					language: proposals.source.lang,
+					value: label,
+				}))
+				check.checked = true
+				labelPreview.appendChild(document.createTextNode(`${proposals.source.lang}: `))
+			} else {
+				select = document.createElement('select')
+				select.setAttribute('name', `label-${allLabels.indexOf(label)}`)
+				const emptyOption = document.createElement('option')
+				select.appendChild(emptyOption)
+				let userLanguages = await userLanguagesWithFallbacks()
+				for (let userLanguage of userLanguages) {
+					let validUserLanguage = await makeLanguageValid(userLanguage, 'term')
+					if (validUserLanguage != 'und') {
+						let userLanguageOption = document.createElement('option')
+						userLanguageOption.setAttribute('value', JSON.stringify({
+							type: 'set_label_or_alias',
+							language: validUserLanguage,
+							value: label,
+						}))
+						userLanguageOption.innerText = validUserLanguage
+						select.appendChild(userLanguageOption)
+					}
 				}
+				labelPreview.appendChild(select)
 			}
-			labelPreview.appendChild(select)
-		}
 
-		labelPreview.appendChild(templates.title({ text: label }))
-		
-		propform.appendChild(templates.remark({
-			prop: document.createTextNode(`Label or alias`),
-			vals: [labelPreview],
-			check: check ?? null,
-		}));
+			labelPreview.appendChild(templates.title({ text: label }))
+			
+			propform.appendChild(templates.remark({
+				prop: document.createTextNode(`Label or alias`),
+				vals: [labelPreview],
+				check: check ?? null,
+			}));
+		}
 	}
 
 
