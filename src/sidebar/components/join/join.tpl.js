@@ -88,6 +88,11 @@ const join = (vars) => {
 		}, 100)
 	}
 
+	// open the list initially
+	updateList()
+
+	// and whenever text is selected on the page, after
+	// the selection has been inserted
 	browser.runtime.onMessage.addListener(async (data, sender) => {
 		if (data.type === 'use_in_statement' && data.dataype === 'string') {
 			humanField.value = data.value;
@@ -95,7 +100,7 @@ const join = (vars) => {
 		}
 	})
 
-	//humanField.addEventListener('change', updateList);
+	// and whenever the field is focussed or typed into
 	humanField.addEventListener('focus', updateList);
 	humanField.addEventListener('keyup', updateList);
 
