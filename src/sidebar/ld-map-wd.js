@@ -10,8 +10,6 @@ function convertHTMLentities(string) {
 		.replace(/&amp;/gm, '&')
 }
 
-const ratingProps = ['ratingCount', 'ratingValue'];
-
 function makeRating(props) {
 	const best = props?.bestRating ? parseFloat(props.bestRating) : 5;
 	const worst = props?.worstRating ? parseFloat(props.worstRating) : 1;
@@ -360,8 +358,9 @@ async function findConnections(thing, source) {
 				})
 			}
 		}
-		if (prop === 'aggregateRating' && ratingProps.every(v => { return thing[prop].hasOwnProperty(v)})) {
+		if (prop === 'aggregateRating' && 'ratingValue' in thing[prop] && ( 'ratingCount' in thing[prop] || 'reviewCount' in thing[prop] ) ) {
 			let now = new Date();
+			const count = thing[prop].ratingCount ?? thing[prop].reviewCount
 			values.push({
 				type: 'String',
 				value: makeRating(thing[prop]),
@@ -369,7 +368,7 @@ async function findConnections(thing, source) {
 				qualifiers: [{
 					property: 'P7887',
 					value: {
-						amount: `+${thing[prop].ratingCount}`,
+						amount: `+${count}`,
 						unit: "http://www.wikidata.org/entity/Q20058247",
 					},
 				},
