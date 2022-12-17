@@ -58,7 +58,14 @@ async function parse(thing, ids, url) {
 }
 
 function jsonParse(i) {
-	return JSON.parse(i.replace(/\/\*[\s\S]*?\*\//g, ""));
+	try {
+		return JSON.parse(i.replace(/\/\*[\s\S]*?\*\//g, ""))
+	  
+	} catch (error) {
+		console.error(error);
+		return {}
+	}
+
 }
 
 export async function enrichLinkedData(snippeds, ids, url) {
