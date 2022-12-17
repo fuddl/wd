@@ -360,7 +360,7 @@ async function findConnections(thing, source) {
 		}
 		if (prop === 'aggregateRating' && 'ratingValue' in thing[prop] && ( 'ratingCount' in thing[prop] || 'reviewCount' in thing[prop] ) ) {
 			let now = new Date();
-			const count = thing[prop].ratingCount ?? thing[prop].reviewCount
+			const count = thing[prop]?.ratingCount || thing[prop]?.reviewCount
 			values.push({
 				type: 'String',
 				value: makeRating(thing[prop]),
