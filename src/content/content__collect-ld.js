@@ -1,5 +1,6 @@
 import {getMatchSuggestions, resolveAll} from '../resolver'
 import fixNewlinesInJsonStrings from 'fix-newlines-in-json-strings'
+import { jsonParse } from './json-parse.js'
 
 function createLink(thing, url) {
 	let link = document.createElement("a")
@@ -56,18 +57,6 @@ async function parse(thing, ids, url) {
 		}
 	}
 	return thing;
-}
-
-function jsonParse(i) {
-	try {
-		return JSON.parse(fixNewlinesInJsonStrings(i.replace(/\/\*[\s\S]*?\*\//g, "")))
-	  
-	} catch (error) {
-		console.error(error);
-		console.error(i);
-		return {}
-	}
-
 }
 
 export async function enrichLinkedData(snippeds, ids, url) {

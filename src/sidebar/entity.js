@@ -10,14 +10,14 @@ import browser from 'webextension-polyfill'
 import { PrependNav } from './prepend-nav.js';
 import { rubifyLemma } from './rubifyLemma.js';
 import { getDeducedSenseClaims } from './deduce-sense-statements.js';
+import { initializeCache } from './cache.js';
 
+initializeCache()
 PrependNav();
 
 const lang = navigator.language.substr(0,2);
 const footnoteStorage = {};
 let refCounter = {};
-
-let cache = {}
 
 function highlightWord(el, text) {
 	if (el.childNodes.length > 1) {
@@ -161,7 +161,7 @@ function renderStatements(snak, references, type, target, scope, delta) {
 			}
 			target.appendChild(templates.placeholder({
 				entity: vid,
-			}, cache));
+			}));
 		}
 		if (valueType === "external-id") {
 			target.appendChild(templates.code(snak.datavalue.value));
@@ -257,7 +257,7 @@ function renderStatements(snak, references, type, target, scope, delta) {
 			}
 
 			qualifiers.push({
-				prop: templates.placeholder({ entity: prop }, cache),
+				prop: templates.placeholder({ entity: prop }),
 				vals: qvalues,
 			});
 		}
@@ -270,7 +270,7 @@ function renderStatement(value) {
 		let pid = value[0].mainsnak.property;
 		let label = templates.placeholder({
 			entity: pid,
-		}, cache);
+		});
 
 		let values = [];
 		let hasPreferred = false;
@@ -315,7 +315,7 @@ function renderStatement(value) {
 									let refStatement = templates.proof({
 										prop: templates.placeholder({
 											entity: key,
-										}, cache),
+										}),
 										vals: refvalues,
 									});
 									listItem.appendChild(refStatement);
@@ -350,7 +350,7 @@ function renderStatement(value) {
 		let statement = templates.remark({
 			prop: templates.placeholder({
 				entity: pid,
-			}, cache),
+			}),
 			vals: values,
 			id: pid,
 		});
@@ -372,8 +372,7 @@ function updateView(id, useCache = true) {
 	let footer = document.getElementById('footer');
 	content.innerHTML = '';
 	(async () => {
-		let entities = await wikidataGetEntity(id, useCache);
-		cache = await browser.storage.local.get();
+		let entities = await wikidataGetEntity(id, useCache)
 
 		for (let id of Object.keys(entities)) {
 			let e = entities[id];
@@ -405,13 +404,13 @@ function updateView(id, useCache = true) {
 
 				lexemeDescription.appendChild(templates.placeholder({
 					entity: e.language
-				}, cache));
+				}));
 
 				lexemeDescription.appendChild(document.createTextNode(', '));
 
 				lexemeDescription.appendChild(templates.placeholder({
 					entity: e.lexicalCategory
-				}, cache));
+				}));
 
 				wrapper.appendChild(templates.ensign({
 					revid: e.lastrevid,
@@ -683,7 +682,7 @@ function updateView(id, useCache = true) {
 						let headingText = templates.placeholder({
 							entity: pid,
 							tag: 'span',
-						}, cache);
+						});
 						heading.appendChild(headingText);
 						section.appendChild(heading);
 
@@ -779,7 +778,7 @@ function updateView(id, useCache = true) {
 						let headingText = templates.placeholder({
 							entity: pid,
 							tag: 'span',
-						}, cache);
+						});
 						heading.appendChild(headingText);
 						section.appendChild(heading);
 
@@ -835,7 +834,7 @@ function updateView(id, useCache = true) {
 							let headingText = templates.placeholder({
 								entity: cid,
 								tag: 'span',
-							}, cache);
+							});
 							heading.appendChild(headingText);
 							section.appendChild(heading);
 							for (let claim of e.claims[cid]) {
@@ -894,10 +893,10 @@ function updateView(id, useCache = true) {
 							let headingText = templates.placeholder({
 								entity: cid,
 								tag: 'span',
-							}, cache);
+							});
 							heading.appendChild(headingText);
 							section.appendChild(heading);
-							section.appendChild(templates.blender(parts, templates.placeholder({entity: id, tag: 'span'}, cache)));
+							section.appendChild(templates.blender(parts, templates.placeholder({entity: id, tag: 'span'})));
 							glosses.appendChild(section);
 						}
 					}
@@ -974,7 +973,7 @@ function updateView(id, useCache = true) {
 		}, 0);
 
 		resolvePlaceholders();
-		resolveBreadcrumbs(cache);
+		resolveBreadcrumbs();
 
 		resolveIdLinksPlaceholder();
 	})();

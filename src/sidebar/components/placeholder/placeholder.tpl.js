@@ -3,8 +3,9 @@ import { wikidataGetEntity } from '../../../wd-get-entity.js';
 import { getValueByLang } from '../../get-value-by-lang.js';
 import { rubifyLemma } from '../../rubifyLemma.js';
 
-const placeholder = (vars, cache) => {
-	let tagName = vars?.tag ?? 'a';
+const placeholder = (vars) => {
+	let tagName = vars?.tag ?? 'a'
+	const cache = window?.cache
 
 	// don't create a placeholder if the label is already in cache
 	if (vars.entity && cache?.labels?.[vars.entity]) {

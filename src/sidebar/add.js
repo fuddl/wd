@@ -7,7 +7,9 @@ import browser from 'webextension-polyfill'
 import {PrependNav} from './prepend-nav.js'
 import {Browser} from "../core/browser"
 import {unlockAndWait} from "./sidebar-control"
+import { initializeCache } from './cache.js'
 
+initializeCache()
 PrependNav();
 
 const itemTypes = [

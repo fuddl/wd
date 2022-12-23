@@ -1,3 +1,5 @@
+import { jsonParse } from './json-parse.js'
+
 function displayMetadata() {
 	const snippeds = document.querySelectorAll('script[type="application/ld+json"]');
 
@@ -136,7 +138,7 @@ function displayMetadata() {
 	];
 
 	for (let snipped of snippeds) {
-		let json = JSON.parse(snipped.innerText);
+		let json = jsonParse(snipped.innerText);
 		let container = document.createElement('details');
 		container.style.padding = '1em';
 		container.style.border = '1px solid';

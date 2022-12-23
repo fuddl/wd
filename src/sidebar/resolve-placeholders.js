@@ -20,7 +20,7 @@ function resolvePlaceholders(scope) {
 
 }
 
-function resolveBreadcrumbs(cache) {
+function resolveBreadcrumbs() {
 	let placeholders = document.querySelectorAll('.breadcrumbs[data-child-id]');
 
 	Array.from(placeholders).reduce((k, placeholder) => {
@@ -41,7 +41,7 @@ function resolveBreadcrumbs(cache) {
 			for (let crumb of crumbItems) {
 				trail.push(templates.placeholder({
 					entity: crumb,
-				}, cache));
+				}));
 			}
 			placeholder.parentNode.replaceChild(breadcrumbs(trail), placeholder);
 			resolvePlaceholders(placeholder.parentNode);

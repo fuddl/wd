@@ -19,7 +19,7 @@ function statusMessage(parts) {
 
 const bouncer = () => {
 	let style = document.createElement('link');
-	style.setAttribute('rel',	"stylesheet");
+	style.setAttribute('rel', "stylesheet");
 	style.setAttribute('href', "components/bouncer/bouncer.css");
 
 	let bg = document.createElement('div');
