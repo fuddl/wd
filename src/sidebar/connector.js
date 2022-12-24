@@ -58,13 +58,10 @@ function propSelector() {
 			index.push({
 				prop: prop,
 				element: option,
-				lastUsed: history?.[prop] ?? 0,
+				lastUsed: prop ? history?.[prop] ?? 0 : Date.now() + 1,
 			});
 		}
 		index.sort(function(a, b) {
-			if (a.element === emptyOption) {
-				return -1;
-			}
 		 	return a.lastUsed < b.lastUsed ? 1 : -1
 		});
 
