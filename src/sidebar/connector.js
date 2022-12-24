@@ -34,6 +34,56 @@ function getPropertyScope(property) {
 
 let existing = new jobRedundancyChecker();
 
+
+function propSelector() {
+	const select = document.createElement('select')
+
+	let emptyOption = document.createElement('option');
+	select.appendChild(emptyOption);
+
+	let optionAmount = 0;
+	const observer = new MutationObserver(async (mutation) => {
+		const history = window?.cache?.propSelectionHistory ?? false
+		if (!history) {
+			return
+		}
+		if (optionAmount < select.childNodes.length) {
+			optionAmount = select.childNodes.length
+		} else {
+			return
+		}
+		const index = []
+		for (const option of select.childNodes) {
+			const prop = option.getAttribute('value')
+			index.push({
+				prop: prop,
+				element: option,
+				lastUsed: history?.[prop] ?? 0,
+			});
+		}
+		index.sort(function(a, b) {
+			if (a.element === emptyOption) {
+				return -1;
+			}
+		 	return a.lastUsed < b.lastUsed ? 1 : -1
+		});
+
+		for (const item of index) {
+		 	select.appendChild(item.element);
+		}
+	});
+	observer.observe(select, { childList: true });
+
+	select.addEventListener('change', () => {
+		const history = window?.cache?.propSelectionHistory ?? {}
+		history[select.value] = Date.now()
+		browser.storage.local.set({ 'propSelectionHistory': history });
+		select.removeChild(emptyOption);
+	})
+
+	return select
+}
+
 (async () => {
 	let proposals = JSON.parse(decodeURIComponent(window.location.search.replace(/^\?/, '')));
 
@@ -65,9 +115,7 @@ let existing = new jobRedundancyChecker();
 				entity: proposals.ids[0][0].prop,
 			})
 		} else {
-			propPreview = document.createElement('select');
-			let emptyOption = document.createElement('option');
-			propPreview.appendChild(emptyOption);
+			propPreview = propSelector()
 			for (let prop of proposals.ids[0][0].prop) {
 				let option = templates.placeholder({
 					tag: 'option',
@@ -79,7 +127,6 @@ let existing = new jobRedundancyChecker();
 			}
 			propPreview.addEventListener('change', function(event) {
 				connectorProp = event.target.value;
-				propPreview.removeChild(emptyOption);
 			});
 		}
 		preview = templates.remark({
