@@ -1,5 +1,4 @@
 import {getMatchSuggestions, resolveAll} from '../resolver'
-import fixNewlinesInJsonStrings from 'fix-newlines-in-json-strings'
 import { jsonParse } from './json-parse.js'
 
 function createLink(thing, url) {

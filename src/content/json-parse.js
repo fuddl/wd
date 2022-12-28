@@ -1,3 +1,5 @@
+import fixNewlinesInJsonStrings from 'fix-newlines-in-json-strings'
+
 function jsonParse(i) {
 	try {
 		return JSON.parse(fixNewlinesInJsonStrings(i.replace(/\/\*[\s\S]*?\*\//g, "")))  
@@ -8,3 +10,5 @@ function jsonParse(i) {
 	}
 
 }
+
+export { jsonParse }
