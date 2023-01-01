@@ -23,7 +23,7 @@ const mastodon: Resolver = {
 		if (!this.domains) {
 			this.domains = await this.aquireKnownInstances()
 		}
-		const mastHost = this.domains.find(domain => domain == location.hostname)
+		let mastHost = this.domains.find(domain => domain == location.hostname)
 		if (!mastHost) {
 			return false
 		}
@@ -44,7 +44,11 @@ const mastodon: Resolver = {
 			}
 		})()
 
+
 		const addressNormalized = address ?? `${username}@${mastHost}`
+
+		// extract the actual host of the address
+		mastHost = addressNormalized.substring(addressNormalized.indexOf('@') + 1)
 
 		// verify if the wikidata's address list isn't 
 		// faulty and that this is actually 
