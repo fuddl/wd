@@ -1,5 +1,6 @@
 import { templates } from './components/templates.tpl.js';
 import { findMatchingClass, findConnections, makeReferences } from './ld-map-wd.js';
+import { propSelector } from './prop-selector.js'
 
 function uuidv4() {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
@@ -112,10 +113,8 @@ async function ldToStatements(ld, propform, source, existing) {
 						check.setAttribute('value', JSON.stringify(connection.jobs[0].instructions));
 						check.checked = true;
 					} else {
-						select = document.createElement('select');
+						select = propSelector();						
 						select.setAttribute('name', uuidv4());
-						let emptyOption = document.createElement('option');
-						select.appendChild(emptyOption);
 						for (let job of connection.jobs) {
 							if (existing.check(job.instructions)) {
 								continue;
@@ -126,6 +125,7 @@ async function ldToStatements(ld, propform, source, existing) {
 								type: 'option',
 							});
 							option.setAttribute('value', JSON.stringify(job.instructions));
+							option.setAttribute('data-prop', job.instructions.verb);
 
 							select.appendChild(option);
 						}

@@ -13,4 +13,5 @@
 .proof__object {
 	display: inline-block;
 	margin: 0;
+	vertical-align: top;
 }
