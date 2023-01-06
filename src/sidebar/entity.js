@@ -879,14 +879,14 @@ function updateView(id, useCache = true) {
 							const parts = [];
 							for (let part of e.claims[cid]) {
 								if (part?.mainsnak?.datavalue?.value?.id) {
-									let sortkey = part?.qualifiers?.[cid]?.[0]?.datavalue?.value ?? null;
+									let sortkey = part.qualifiers?.P1545?.[0]?.datavalue?.value ?? '';
 									parts.push({
 										element: templates.placeholder({ entity: part?.mainsnak?.datavalue?.value?.id }),
 										order: sortkey, 
 									})
 								}
 							}
-							parts.sort((a,b) => a.order - b.order); 
+							parts.sort((a,b) => a.order - b.order)
 
 							let section = document.createElement('section');
 							let heading = document.createElement('h2');
