@@ -816,6 +816,13 @@ function updateView(id, useCache = true) {
 											senses: [],
 										};
 									}
+									// don't add the sense if it is already present in the statements
+									// of this sence.
+									if (translations?.[lexemeLanguage]?.[sid]?.senses?.find((element) => {
+										return element.id == sense.id;
+									})) {
+										continue
+									}
 									translations[lexemeLanguage][sid].senses.push(sense);
 								}
 							}

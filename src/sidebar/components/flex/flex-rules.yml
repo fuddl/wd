@@ -261,3 +261,30 @@ tlh:
           features: ["Q110786"]
         plural:
           features: ["Q146786"]
+fi:
+  lang: Q1412
+  categories:
+    noun:
+      category: Q1084
+      xAxis:
+        singular:
+          features: ["Q110786"]
+        plural:
+          features: ["Q146786"]
+      yAxis:
+        nominative:
+          features: ["Q131105"]
+        genitive:
+          features: ["Q146233"]
+        partitive:
+          features: ["Q857325"]
+        illative:
+          features: ["Q474668"]
+        adessive:
+          features: ["Q281954"]
+        ablative:
+          features: ["Q156986"]
+        allative:
+          features: ["Q655020"]
+        instructive:
+          features: ["Q1665275"]
