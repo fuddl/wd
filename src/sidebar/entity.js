@@ -583,7 +583,6 @@ function updateView(id, useCache = true) {
 				}
 			}
 			if (e['senses']) {
-				const singleSense = e['senses'].length === 1;
 				let senseTree = {};
 				let senseFlat = {};
 				let senseProps = {};
@@ -654,6 +653,10 @@ function updateView(id, useCache = true) {
 				let assignSymbols = (tree, parent = '') => {
 					let counter = 0;
 					for (let id in tree) {
+						if (id === 'seeAlso') {
+							tree[id].symbol = templates.symbol('⋮'); 
+							continue;
+						}
 						counter++;
 						let child = counter.toString();
 						if (parent.length > 0) {
@@ -668,7 +671,23 @@ function updateView(id, useCache = true) {
 					return tree;
 				}
 
-				if (!singleSense) {
+				if (e?.claims?.P5402) {
+					const homographes = []
+					for (const p of e.claims.P5402) {
+						if (p?.mainsnak?.datavalue?.value?.id) {
+							homographes.push(templates.placeholder({
+								entity: p.mainsnak.datavalue.value.id,
+							}))
+						}
+					}
+					if (homographes.length > 0) {
+						senseTree.seeAlso = {
+							lexemes: homographes,
+						}
+					}
+				}
+
+				if (Object.entries(senseTree).length > 1) {
 					senseTree = assignSymbols(senseTree);
 				}
 

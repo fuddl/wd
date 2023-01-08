@@ -33,6 +33,15 @@ const glossary = (senses) => {
 		} else if (senses[id].gloss instanceof HTMLElement) {
 			glossItem.appendChild(senses[id].gloss);
 		}
+
+		if (senses[id]?.lexemes) {
+			for (let lexeme of senses[id].lexemes) {
+				if (glossItem.childNodes.length > 0) {
+					glossItem.appendChild(document.createTextNode(', '));
+				}
+				glossItem.appendChild(lexeme);
+			}
+		}
 		glossItem.classList.add('glossary__gloss');
 		list.appendChild(symbolItem);
 		list.appendChild(glossItem);
@@ -47,7 +56,7 @@ const glossary = (senses) => {
 			glossItem.appendChild(arrow);
 			glossItem.appendChild(link);
 		}
-		if (JSON.stringify(senses[id].children) != '{}') {
+		if (senses[id]?.children && JSON.stringify(senses[id].children) != '{}') {
 			glossItem.appendChild(glossary(senses[id].children));
 		}
 	}

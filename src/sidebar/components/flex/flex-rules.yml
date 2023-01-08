@@ -266,6 +266,7 @@ fi:
   categories:
     noun:
       category: Q1084
+      # showcase lexeme https://www.wikidata.org/wiki/Lexeme:L29827
       xAxis:
         singular:
           features: ["Q110786"]
