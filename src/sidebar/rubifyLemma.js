@@ -58,7 +58,10 @@ const rubifyLemma = function (lemmas) {
 	}
 	if ('ja' in lemmas && 'ja-hira' in lemmas) {
 		try {
-			const fitted = fit(lemmas.ja.value, lemmas['ja-hira'].value, {type: 'object'});
+			const fitted = fit(lemmas.ja.value, lemmas['ja-hira'].value, {
+				type: 'object',
+				kanaReading: false,
+			});
 			// undo the katakana → hiragana transliteration
 			for (let i in fitted) {
 				if(fitted[i].w.match(/^[゠-ヿ]+$/)) {
