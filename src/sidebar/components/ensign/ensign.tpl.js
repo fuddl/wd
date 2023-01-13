@@ -1,9 +1,11 @@
 import { getTokens } from "../../wd-get-token.js";
-import "./ensign.css"
+import { requreStylesheet } from '../require-styleheet.js'
+
 
 const lang = navigator.language.substr(0,2);
 
 const ensign = (vars) => {
+	requreStylesheet('components/ensign/ensign.css')
 	let header = document.createElement('header');
 	let title = document.createElement('h1');
 	let id = document.createElement('small');

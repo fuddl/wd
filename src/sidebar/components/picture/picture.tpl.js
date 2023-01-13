@@ -1,3 +1,5 @@
+import { requreStylesheet } from '../require-styleheet.js'
+
 const picture = (vars) => {
 	let tag = document.createElement('img');
 	let srcset = [];
@@ -46,11 +48,7 @@ const picture = (vars) => {
 		caption.appendChild(document.createTextNode(vars.caption))
 	}
 
-	let style = document.createElement('link');
-	style.setAttribute('rel',	"stylesheet");
-	style.setAttribute('href', "components/picture/picture.css");
-
-	wrapper.appendChild(style);
+	requreStylesheet("components/picture/picture.css");
 
 	if (vars.tag) {
 		let tagWrapper = document.createElement('div');

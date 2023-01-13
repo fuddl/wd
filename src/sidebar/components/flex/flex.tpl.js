@@ -1,9 +1,13 @@
 import { placeholder } from "../placeholder/placeholder.tpl.js";
 import { rubifyLemma } from '../../rubifyLemma.js';
+import { requreStylesheet } from '../require-styleheet.js'
 
 import rules from "./flex-rules.yml";
 
 function buildRepresentations(target, form, affix = {}, lexeme) {
+	
+	requreStylesheet('components/flex/flex.css')
+	
 	let variation = document.createElement("div");
 	variation.classList.add("flex__variant");
 	let formLink = document.createElement("a");

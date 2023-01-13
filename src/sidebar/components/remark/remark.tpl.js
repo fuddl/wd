@@ -1,4 +1,4 @@
-import "./remark.css"
+import { requreStylesheet } from '../require-styleheet.js'
 
 const remark = (vars) => {
 	let dl = document.createElement('dl');
@@ -33,6 +33,8 @@ const remark = (vars) => {
 		check.appendChild(vars.check);
 		dl.appendChild(check);
 	}
+
+	requreStylesheet('components/remark/remark.css')
 
 	return dl;
 }

@@ -1,5 +1,6 @@
 import { wikidataAutocomplete } from '../../wd-autocomplete.js'
 import { getAutodesc } from '../../get-autodesc.js'
+import { requreStylesheet } from '../require-styleheet.js'
 import browser from 'webextension-polyfill'
 
 let joinCounter = 0;
@@ -32,11 +33,8 @@ const join = (vars) => {
 	wrapper.appendChild(humanField);
 	wrapper.appendChild(proposals);
 
-	let style = document.createElement('link');
-	style.setAttribute('rel',	"stylesheet");
-	style.setAttribute('href', "components/join/join.css");
+	requreStylesheet("components/join/join.css")
 
-	wrapper.appendChild(style);
 
 	var timeout = null
 	let updateList = async () => {

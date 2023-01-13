@@ -2,6 +2,7 @@ import { getValidStringLanguages, makeLanguageValid } from '../../../get-valid-s
 import { wikidataGetEntity } from '../../../wd-get-entity.js';
 import { getValueByLang } from '../../get-value-by-lang.js';
 import { getAutodesc } from '../../get-autodesc.js';
+import { requreStylesheet } from '../require-styleheet.js'
 import browser from 'webextension-polyfill'
 
 const express = (vars) => {
@@ -87,11 +88,7 @@ const express = (vars) => {
 
 	main.appendChild(input);
 
-	let style = document.createElement('link');
-	style.setAttribute('rel',	"stylesheet");
-	style.setAttribute('href', "components/express/express.css");
-
-	wrapper.appendChild(style);
+	requreStylesheet('components/express/express.css')
 
 	main.appendChild(autocomplete);
 	main.appendChild(desc);

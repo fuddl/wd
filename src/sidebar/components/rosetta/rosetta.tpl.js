@@ -1,4 +1,5 @@
 import { placeholder } from '../placeholder/placeholder.tpl.js';
+import { requreStylesheet } from '../require-styleheet.js'
 
 const genderSymbols = {
 	'Q43445': '♀',
@@ -71,11 +72,8 @@ const rosetta = (translations, mainLanguage) => {
 		}
 	}
 
-	let style = document.createElement('link');
-	style.setAttribute('rel', "stylesheet");
-	style.setAttribute('href', "components/rosetta/rosetta.css");
+	requreStylesheet("components/rosetta/rosetta.css");
 
-	div.appendChild(style);
 	return div;
 }
 

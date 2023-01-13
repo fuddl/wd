@@ -1,4 +1,8 @@
+import { requreStylesheet } from '../require-styleheet.js'
+
 const actions = (title, items) => {
+	requreStylesheet('components/actions/actions.css')
+	
 	let wrapper = document.createElement('nav');
 	wrapper.classList.add('actions');
 

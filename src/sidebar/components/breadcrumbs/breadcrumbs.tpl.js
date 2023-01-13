@@ -1,9 +1,8 @@
 import { placeholder } from '../placeholder/placeholder.tpl.js';
+import { requreStylesheet } from '../require-styleheet.js'
 
 const breadcrumbs = (crumbs, childId = false) => {
-	let style = document.createElement('link');
-	style.setAttribute('rel',	"stylesheet");
-	style.setAttribute('href', "components/breadcrumbs/breadcrumbs.css");
+	requreStylesheet("components/breadcrumbs/breadcrumbs.css")
 
 	let nav = document.createElement('nav');
 	nav.classList.add('breadcrumbs');
@@ -16,7 +15,7 @@ const breadcrumbs = (crumbs, childId = false) => {
 		}
 		nav.appendChild(crumb);
 	}
-	nav.appendChild(style);
+
 	if (childId) {
 		nav.setAttribute('data-child-id', childId);
 	}

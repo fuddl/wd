@@ -1,3 +1,5 @@
+import { requreStylesheet } from '../require-styleheet.js'
+
 const annote = (qualifiers) => { 
 	let dl = document.createElement('dl');
 	dl.classList.add('annote');
@@ -17,11 +19,8 @@ const annote = (qualifiers) => {
 		}
 	}
 
-	let style = document.createElement('link');
-	style.setAttribute('rel',	"stylesheet");
-	style.setAttribute('href', "components/annote/annote.css");
-
-	dl.appendChild(style);
+	requreStylesheet("components/annote/annote.css");
+	
 	return dl;
 }
 

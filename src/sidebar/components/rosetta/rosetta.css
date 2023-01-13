@@ -1,7 +1,12 @@
-.rosetta {
+.rosetta,
+.rosetta__group:only-child {
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(10em, 1fr));
 	grid-gap: 1em;
+}
+
+.rosetta__group:only-child {
+	grid-gap: 0 1em;
 }
 
 .rosetta__group {
@@ -11,6 +16,7 @@
 .rosetta__lang {
 	font-weight: bold;
 	margin-bottom: .5em;
+	grid-column: 1 / -1;
 }
 
 .rosetta__lang > a {

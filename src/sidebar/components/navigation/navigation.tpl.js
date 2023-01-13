@@ -1,6 +1,8 @@
-import "./navigation.css"
+import { requreStylesheet } from '../require-styleheet.js'
 
 const navigation = () => {
+
+	requreStylesheet('components/navigation/navigation.css')
 
 	let wrapper = document.createElement('nav');
 	wrapper.classList.add('navigation')

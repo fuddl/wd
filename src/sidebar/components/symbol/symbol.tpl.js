@@ -1,3 +1,5 @@
+import { requreStylesheet } from '../require-styleheet.js'
+
 const symbol = (text, id) => {
 	let node = document.createElement('span');
 	node.innerText = text;
@@ -6,11 +8,7 @@ const symbol = (text, id) => {
 		node.setAttribute('data-lexeme', id);
 	}
 
-	let style = document.createElement('link');
-	style.setAttribute('rel',	"stylesheet");
-	style.setAttribute('href', "components/symbol/symbol.css");
-
-	node.appendChild(style);
+	requreStylesheet("components/symbol/symbol.css");
 
 	return node;
 }

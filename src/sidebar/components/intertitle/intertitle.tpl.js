@@ -1,7 +1,7 @@
+import { requreStylesheet } from '../require-styleheet.js'
+
 const intertitle = (vars) => {
-	let style = document.createElement('link');
-	style.setAttribute('rel',	"stylesheet");
-	style.setAttribute('href', "components/intertitle/intertitle.css");
+	requreStylesheet("components/intertitle/intertitle.css")
 
 	let div = document.createElement('div');
 	div.classList.add('intertitle');
@@ -17,7 +17,6 @@ const intertitle = (vars) => {
 
 	div.appendChild(icon);
 	div.appendChild(text);
-	div.appendChild(style);
 	return div;
 }
 

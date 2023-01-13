@@ -1,3 +1,5 @@
+import { requreStylesheet } from '../require-styleheet.js'
+
 const direction = (vars) => { 
 	let wrapper = document.createElement('div');
 	wrapper.classList.add('direction');
@@ -13,11 +15,7 @@ const direction = (vars) => {
 		});
 	}
 
-	let style = document.createElement('link');
-	style.setAttribute('rel',	"stylesheet");
-	style.setAttribute('href', "components/direction/direction.css");
-
-	wrapper.appendChild(style);
+	requreStylesheet("components/direction/direction.css");
 
 	return wrapper;
 }

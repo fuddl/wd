@@ -1,14 +1,12 @@
 import { placeholder } from '../placeholder/placeholder.tpl.js';
+import { requreStylesheet } from '../require-styleheet.js'
 
 const glossary = (senses) => { 
 	let list = document.createElement('dl');
-
-	let style = document.createElement('link');
-	style.setAttribute('rel',	"stylesheet");
-	style.setAttribute('href', "components/glossary/glossary.css");
-
 	list.classList.add('glossary');
-	list.appendChild(style);
+
+	requreStylesheet("components/glossary/glossary.css");
+
 
 	for (let id in senses) {
 		let symbolItem = document.createElement('dt');

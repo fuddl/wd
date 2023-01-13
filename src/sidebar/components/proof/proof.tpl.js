@@ -1,3 +1,5 @@
+import { requreStylesheet } from '../require-styleheet.js';
+
 const proof = (vars) => { 
 	let dl = document.createElement('dl');
 	dl.classList.add('proof');
@@ -15,11 +17,8 @@ const proof = (vars) => {
 		dl.appendChild(dd);
 	}
 
-	let style = document.createElement('link');
-	style.setAttribute('rel',	"stylesheet");
-	style.setAttribute('href', "components/proof/proof.css");
-
-	dl.appendChild(style);
+	requreStylesheet("components/proof/proof.css");
+	
 	return dl;
 }
 
