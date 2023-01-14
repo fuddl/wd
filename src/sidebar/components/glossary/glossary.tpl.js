@@ -33,11 +33,21 @@ const glossary = (senses) => {
 		}
 
 		if (senses[id]?.lexemes) {
+			if (senses[id].label) {
+				const label = document.createElement('span')
+				label.classList.add('glossary__see-also-label')
+				label.appendChild(senses[id].label);
+				label.appendChild(document.createTextNode(': '))
+				glossItem.appendChild(label);
+			}
+			const value = document.createElement('span')
+			value.classList.add('glossary__see-also')
+			glossItem.appendChild(value);
 			for (let lexeme of senses[id].lexemes) {
-				if (glossItem.childNodes.length > 0) {
-					glossItem.appendChild(document.createTextNode(', '));
+				if (value.childNodes.length > 0) {
+					value.appendChild(document.createTextNode(', '))
 				}
-				glossItem.appendChild(lexeme);
+				value.appendChild(lexeme);
 			}
 		}
 		glossItem.classList.add('glossary__gloss');

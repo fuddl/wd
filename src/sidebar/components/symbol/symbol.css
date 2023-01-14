@@ -7,6 +7,7 @@
 	display: inline-block;
 	font-size: .75rem;
 	font-family: "Linux Libertine", "Georgia", "Times", 'pIqaD', serif;
+	vertical-align: top;
 }
 
 @media (prefers-color-scheme: dark) {

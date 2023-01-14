@@ -682,6 +682,9 @@ function updateView(id, useCache = true) {
 					}
 					if (homographes.length > 0) {
 						senseTree.seeAlso = {
+							label: templates.placeholder({
+								entity: 'P5402',
+							}),
 							lexemes: homographes,
 						}
 					}
