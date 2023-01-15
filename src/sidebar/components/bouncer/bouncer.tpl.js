@@ -20,7 +20,7 @@ function statusMessage(parts) {
 }
 
 const bouncer = () => {
-	requreStylesheet('href', "components/bouncer/bouncer.css");
+	requreStylesheet("components/bouncer/bouncer.css");
 
 	let bg = document.createElement('div');
 	bg.classList.add('bouncer');
@@ -31,7 +31,6 @@ const bouncer = () => {
 	let bounce = document.createElement('div');
 	bounce.classList.add('bouncer__bounce');
 	div.appendChild(bounce);
-	div.appendChild(style);
 	let status = document.createElement('div')
 	status.classList.add('bouncer__status');
 	div.appendChild(status);
