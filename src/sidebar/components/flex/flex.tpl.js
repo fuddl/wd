@@ -5,7 +5,7 @@ import intersection from 'array-intersection'
 
 import rules from "./flex-rules.yml";
 
-const variantFeatures = ['Q115819543']
+const variantFeatures = ['Q113155270','Q115819543']
 
 function buildRepresentations(target, form, affix = {}, lexeme) {
 	
@@ -81,14 +81,7 @@ const flex = (vars) => {
 	let affixes = [];
 	let hiddenLabels = [];
 
-	const formSets = {
-		'Q0': [],
-	}
-	for (const form of vars.forms) {
-		if (intersection(form.grammaticalFeatures, variantFeatures).length == 0) {
-			formSets.Q0.push(form)
-		}
-	}
+	const formSets = {}
 
 	for (const feature of variantFeatures) {
 		for (const form of vars.forms) {
@@ -98,8 +91,40 @@ const flex = (vars) => {
 				}
 				formSets[feature].push(form)
 			}
+			if (form?.claims?.P8530?.[0]?.mainsnak?.datavalue) {
+				const roles = form?.claims?.P8530.map((i) => {
+					if (i.qualifiers) {
+						return i?.qualifiers?.P2868.map((ii) => {
+							if (ii?.datavalue?.value?.id) {
+								return ii.datavalue.value.id
+							}
+						})
+					}
+				}).flat(1)
+				if (roles.includes(feature)) {
+					if (!formSets.hasOwnProperty(feature)) {
+						formSets[feature] = []
+					}
+					formSets[feature].push(form)
+				}
+			}
 		}
 	}
+
+	const sortedForms = Object.values(formSets).map((set) => {
+		return set.map((form) => form.id)
+	}).flat(1)
+
+	const vanillaForms = []
+	for (const form of vars.forms) {
+		if (!sortedForms.includes(form.id)) {
+			vanillaForms.push(form)
+		}
+	}
+	if (vanillaForms.length > 0) {
+		formSets.Q0 = vanillaForms
+	}
+
 	for (const set in formSets) {
 		let table = document.createElement("table");
 		table.classList.add("flex");
@@ -238,8 +263,10 @@ const flex = (vars) => {
 					entity: set,
 				}))
 				output.appendChild(heading)
+				output.appendChild(table)
+			} else {
+				output.prepend(table)
 			}
-			output.appendChild(table)
 		}
 	}
 
