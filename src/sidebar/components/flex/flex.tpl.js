@@ -232,7 +232,6 @@ const flex = (vars) => {
 			}
 		}
 		if (table.childNodes.length > 0) {
-			console.debug(set)
 			if (set != 'Q0') {
 				const heading = document.createElement('h3')
 				heading.appendChild(placeholder({

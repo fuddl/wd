@@ -857,7 +857,7 @@ function updateView(id, useCache = true) {
 				}
 				if (e.claims) {
 					for (let cid in e.claims) {
-						if(e.claims[cid]?.[0].mainsnak?.datatype === 'monolingualtext') {
+						if(e.claims[cid]?.[0]?.mainsnak?.datatype === 'monolingualtext') {
 							let section = document.createElement('section');
 							let heading = document.createElement('h2');
 							let headingText = templates.placeholder({
