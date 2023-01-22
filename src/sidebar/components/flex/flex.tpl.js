@@ -1,11 +1,10 @@
 import { placeholder } from "../placeholder/placeholder.tpl.js";
 import { rubifyLemma } from '../../rubifyLemma.js';
 import { requreStylesheet } from '../require-styleheet.js'
-import intersection from 'array-intersection'
 
 import rules from "./flex-rules.yml";
 
-const variantFeatures = ['Q113155270','Q115819543']
+const variantFeatures = ['Q101583918','Q113155270','Q115819543','Q3960579']
 
 function buildRepresentations(target, form, affix = {}, lexeme) {
 	

@@ -33,7 +33,6 @@
 	},
 	"dependencies": {
 		"@emotion/react": "^11.7.1",
-		"array-intersection": "^0.1.2",
 		"binary-variations": "^1.0.2",
 		"fix-newlines-in-json-strings": "^1.0.0",
 		"furigana": "^0.19.3",
