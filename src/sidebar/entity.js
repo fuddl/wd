@@ -387,15 +387,22 @@ function updateView(id, useCache = true) {
 				if (ruby.rubified) {
 					labels.appendChild(ruby.rubified);
 				}
+
+				const uniqueLemmas = []
 				for (let lang in ruby.unrubified) {
-					let lemma = AddLemmaAffix(e.lemmas[lang].value, {
+					const newLemma = e.lemmas[lang].value
+					if (uniqueLemmas.includes(newLemma)) {
+						continue
+					}
+					uniqueLemmas.push(newLemma)
+					let lemma = AddLemmaAffix(newLemma, {
 						category: e.lexicalCategory,
 						lang: e.language,
 						gender: typeof e.claims?.P5185 === 'object' ? e.claims?.P5185[0]?.mainsnak?.datavalue?.value?.id : null,
 					});
 
 					if (labels.childNodes.length !== 0) {
-						labels.appendChild(document.createTextNode(' ‧ '));
+						labels.appendChild(document.createTextNode(', '));
 					}
 					labels.appendChild(lemma);
 				}
@@ -411,6 +418,17 @@ function updateView(id, useCache = true) {
 				lexemeDescription.appendChild(templates.placeholder({
 					entity: e.lexicalCategory
 				}));
+
+				if (e?.claims?.P31) {
+					for (const statement of e.claims.P31) {
+						if (statement?.mainsnak?.datavalue?.value?.id) {
+							lexemeDescription.appendChild(document.createTextNode(', '));
+							lexemeDescription.appendChild(templates.placeholder({
+								entity: statement.mainsnak.datavalue.value.id,
+							}));
+						}
+					}
+				}
 
 				wrapper.appendChild(templates.ensign({
 					revid: e.lastrevid,

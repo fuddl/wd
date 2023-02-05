@@ -74,11 +74,17 @@ const placeholder = (vars) => {
 					link.appendChild(ruby.rubified);
 				}
 
+				const uniqueLemmas = []
 				for (let lang in ruby.unrubified) {
-					if (link.innerText != '') {
-						link.appendChild(document.createTextNode(' ‧ '))
+					const newLemma = lemmas[lang].value
+					if (uniqueLemmas.includes(newLemma)) {
+						continue;
 					}
-					link.appendChild(document.createTextNode(lemmas[lang].value))
+					uniqueLemmas.push(newLemma)
+					if (link.innerText != '') {
+						link.appendChild(document.createTextNode(', '))
+					}
+					link.appendChild(document.createTextNode(newLemma))
 				}
 			} else if (entity[id].glosses) {
 
