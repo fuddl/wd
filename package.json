@@ -48,7 +48,7 @@
 		"@emotion/babel-plugin": "^11.7.1",
 		"@parcel/config-webextension": "^2.0.0-rc.0",
 		"@parcel/transformer-image": "^2.0.0-rc.0",
-		"@parcel/transformer-yaml": "^2.0.1",
+		"@parcel/transformer-yaml": "^2.8.3",
 		"@types/react": "^17.0.37",
 		"@types/react-burger-menu": "^2.8.2",
 		"@types/react-dom": "^17.0.11",

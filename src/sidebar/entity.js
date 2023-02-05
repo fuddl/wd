@@ -690,7 +690,7 @@ function updateView(id, useCache = true) {
 					}
 				}
 
-				if (Object.entries(senseTree).length > 1) {
+				if (Object.entries(senseTree).length > 1 || Object.keys(senseTree[Object.keys(senseTree)[0]]?.children ?? {}).length > 0) {
 					senseTree = assignSymbols(senseTree);
 				}
 
