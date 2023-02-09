@@ -66,6 +66,11 @@ a:hover {
 	text-decoration: underline;
 }
 
+svg,
+text {
+	text-decoration: inherit;
+}
+
 a {
 	color: var(--link);
 	hyphens: manual;

@@ -1,7 +1,10 @@
 import { getLink } from '../../resolve-placeholders.js';
 import { wikidataGetEntity } from '../../../wd-get-entity.js';
 import { getValueByLang } from '../../get-value-by-lang.js';
-import { rubifyLemma } from '../../rubifyLemma.js';
+import { rubifyLemma } from '../../rubifyLemma.js'
+import { sutton } from '../sutton/sutton.tpl.js'
+import { convert } from '@sutton-signwriting/core'
+import { getSuttonLangages } from '../../../get-valid-string-languages.js'
 
 const placeholder = (vars) => {
 	let tagName = vars?.tag ?? 'a'
@@ -83,6 +86,11 @@ const placeholder = (vars) => {
 					uniqueLemmas.push(newLemma)
 					if (link.innerText != '') {
 						link.appendChild(document.createTextNode(', '))
+					}
+					const suttonLanguages = await getSuttonLangages() 
+					if (suttonLanguages.includes(lang)) {
+						link.appendChild(sutton(newLemma))
+						continue;
 					}
 					link.appendChild(document.createTextNode(newLemma))
 				}

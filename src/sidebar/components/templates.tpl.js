@@ -17,6 +17,7 @@ import { placeholder } from './placeholder/placeholder.tpl.js';
 import { proof } from './proof/proof.tpl.js';
 import { remark } from './remark/remark.tpl.js';
 import { rosetta } from './rosetta/rosetta.tpl.js';
+import { sutton } from './sutton/sutton.tpl.js';
 import { symbol } from './symbol/symbol.tpl.js';
 import { title } from './title/title.tpl.js';
 import { ruby } from './ruby/ruby.tpl.js';
@@ -37,6 +38,7 @@ const templates = {
 	proof: proof,
 	remark: remark,
 	rosetta: rosetta,
+	sutton: sutton,
 	symbol: symbol,
 	direction: direction,
 	title: title,

@@ -1,9 +1,11 @@
 import { wait } from './core/async'
 
-async function sparqlQuery(query, attempt = 1) {
+async function sparqlQuery(query, attempt = 1, forceCache = false) {
 	let url = 'https://query.wikidata.org/sparql?format=json&query=' + encodeURIComponent(query.split(/\s+/).join(' '));
 	try {
-		const response = await fetch(url);
+		const response = await fetch(url, {
+			cache: forceCache ? 'force-cache' : 'default',
+		});
 
 		if (response.status !== 200) {
 			throw 'Status Code: ' + response.status;
@@ -28,7 +30,7 @@ async function sparqlQuery(query, attempt = 1) {
 		await wait(delay);
 
 		console.log('retring…');
-		return await sparqlQuery(query, attempt + 1)
+		return await sparqlQuery(query, attempt + 1, forceCache)
 	}
 }
 

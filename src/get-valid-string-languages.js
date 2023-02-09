@@ -42,7 +42,7 @@ async function getLangQid(iso) {
 		  BIND(REPLACE(STR(?q), "http://www.wikidata.org/entity/Q", "") as ?n)
 		}
 	`;
-	const response = await sparqlQuery(query);
+	const response = await sparqlQuery(query, 0, true);
 	if (response.length > 0 && response[0].n?.value) {
 		return parseInt(response[0].n.value);
 	} else {
@@ -50,4 +50,25 @@ async function getLangQid(iso) {
 	}
 }
 
-export { getValidStringLanguages, makeLanguageValid, getLangQid }
+async function getSuttonLangages() {
+	const query = `
+		SELECT ?code WHERE {
+			?sign_language wdt:P31 wd:Q34228.
+			?sign_language wdt:P282 wd:Q1497335.
+			BIND(REPLACE(STR(?sign_language), "http://www.wikidata.org/entity/", "mis-x-") as ?fallbackCode).
+			OPTIONAL {
+				?sign_language wdt:P424 ?preferredCode.
+			}
+			BIND(COALESCE(?preferredCode, ?fallbackCode) as ?code)
+		}
+
+	`;
+	const response = await sparqlQuery(query, 0, true);
+	if (response.length > 0) {
+		return response.map((value) => value.code.value );
+	} else {
+		return false;
+	}
+}
+
+export { getValidStringLanguages, makeLanguageValid, getLangQid, getSuttonLangages }

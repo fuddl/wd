@@ -11,6 +11,7 @@ import { PrependNav } from './prepend-nav.js';
 import { rubifyLemma } from './rubifyLemma.js';
 import { getDeducedSenseClaims } from './deduce-sense-statements.js';
 import { initializeCache } from './cache.js';
+import { getSuttonLangages } from '../get-valid-string-languages.js'
 
 initializeCache()
 PrependNav();
@@ -390,9 +391,16 @@ function updateView(id, useCache = true) {
 
 				const uniqueLemmas = []
 				for (let lang in ruby.unrubified) {
+
+
 					const newLemma = e.lemmas[lang].value
 					if (uniqueLemmas.includes(newLemma)) {
 						continue
+					}
+					const sutton = await getSuttonLangages() 
+					if (sutton.includes(lang)) {
+						labels.appendChild(templates.sutton(newLemma))
+						continue;
 					}
 					uniqueLemmas.push(newLemma)
 					let lemma = AddLemmaAffix(newLemma, {
