@@ -2,11 +2,18 @@
   font-family: "SuttonSignWritingLine";
   src: url('SuttonSignWritingLine.woff2');
 }
+
 @font-face {
   font-family: "SuttonSignWritingFill";
   src: url('SuttonSignWritingFill.woff2') format('truetype');
 }
+
 @font-face {
   font-family: "SuttonSignWritingOneD";
   src: url('SuttonSignWritingOneD.woff2') format('truetype');
+}
+
+.sutton {
+  max-width: 100%;
+  height: auto;
 }

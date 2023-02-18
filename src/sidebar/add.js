@@ -8,6 +8,7 @@ import {PrependNav} from './prepend-nav.js'
 import {Browser} from "../core/browser"
 import {unlockAndWait} from "./sidebar-control"
 import { initializeCache } from './cache.js'
+import { getWebsiteItem } from '../list-check.js'
 
 initializeCache()
 PrependNav();
@@ -158,7 +159,11 @@ content.innerHTML = '';
 				checkSaveButton();
 			}
 			if (data.reference.url) {
+				const wikimediaProject = await getWebsiteItem(data.reference.url)
 				target.setAttribute('data-reference-url', data.reference.url);
+				if (wikimediaProject) {
+					target.setAttribute('data-reference-project', wikimediaProject);
+				}
 			}
 			if (data.reference.section) {
 				target.setAttribute('data-reference-section', data.reference.section);
@@ -341,15 +346,33 @@ content.innerHTML = '';
 
 					let reference = [];
 					if (selected.getAttribute('data-reference-url')) {
+						const project = selected.getAttribute('data-reference-project')
+
 						reference.push({
 							"snaktype": "value",
-							"property": "P854",
+							"property": project ? 'P4656' : 'P854',
 							"datavalue": {
 								"value": selected.getAttribute('data-reference-url'),
 								"type": "string"
 							},
 							"datatype": "url"
 						});
+
+						if (project) {
+							reference.push({
+								"snaktype": "value",
+								"property": 'P143',
+								"datavalue": {
+									"type": "wikibase-entityid",
+									"value": {
+										"entity-type": "item",
+										"numeric-id": parseInt(project.replace('Q', '')),
+										"id": project,
+									},
+								},
+								"datatype": "wikibase-entityid",
+							});
+						}
 					}
 
 					if (selected.getAttribute('data-reference-title')) {

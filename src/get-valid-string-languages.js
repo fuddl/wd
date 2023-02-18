@@ -65,7 +65,7 @@ async function getSuttonLangages() {
 	`;
 	const response = await sparqlQuery(query, 0, true);
 	if (response.length > 0) {
-		return response.map((value) => value.code.value );
+		return response.map((value) => value.code.value);
 	} else {
 		return false;
 	}

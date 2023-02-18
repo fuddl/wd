@@ -13,6 +13,7 @@ const sutton = (ascii) => {
 	const svgNameSpace = 'http://www.w3.org/2000/svg'
 
 	const image = document.createElementNS(svgNameSpace, 'svg')
+	image.classList.add('sutton')
 	image.setAttribute('width', width)
 	image.setAttribute('height', height)
 	image.setAttribute('viewBox', viewbox)
