@@ -1,5 +1,6 @@
 import { sparqlQuery } from "../sqarql-query.js";
 import { makeLanguageValid } from '../get-valid-string-languages.js';
+import { getWebsiteItem } from '../list-check.js'
 
 function convertHTMLentities(string) {
 	return string
@@ -361,11 +362,9 @@ async function findConnections(thing, source) {
 		if (prop === 'aggregateRating' && 'ratingValue' in thing[prop] && ( 'ratingCount' in thing[prop] || 'reviewCount' in thing[prop] ) ) {
 			let now = new Date();
 			const count = thing[prop]?.ratingCount || thing[prop]?.reviewCount
-			values.push({
-				type: 'String',
-				value: makeRating(thing[prop]),
-				prop: 'AggregateRating',
-				qualifiers: [{
+
+			const ratingQualifiers = [
+				{
 					property: 'P7887',
 					value: {
 						amount: `+${count}`,
@@ -382,7 +381,29 @@ async function findConnections(thing, source) {
 						time: `+${ now.toISOString().substr(0,10) }T00:00:00Z`,
 						timezone: 0,
 					}
-				}],
+				}
+			]
+
+			const ratingBy = await getWebsiteItem(source.url, {
+				verb: 'wdt:P366',
+				subject: 'Q80700183',
+			})
+
+			if (ratingBy) {
+				ratingQualifiers.push({
+					property: 'P447',
+					value: {
+						"entity-type":"item",
+						"numeric-id": parseInt(ratingBy.replace(/^\w/, '')),
+					},
+				})
+			}
+
+			values.push({
+				type: 'String',
+				value: makeRating(thing[prop]),
+				prop: 'AggregateRating',
+				qualifiers: ratingQualifiers,
 			})
 		}
 	}
