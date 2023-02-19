@@ -1,20 +1,11 @@
 import { sparqlQuery } from "./sqarql-query.js";
 
-async function getWebsiteItem(url, inputOptions = {}) {
-	const defaultOptions = {
-		verb: 'wdt:P31/wdt:P279*',
-		subject: 'Q14827288',
-	}
-	const options = {
-		...defaultOptions,
-		...inputOptions,
-	}
-
+async function getWebsiteItem(url, queryFragment = '?item wdt:P31/wdt:P279* wd:Q14827288.') {
 	const ourHostname = new URL(url).hostname
 
 	const query = `
-		SELECT ?hostname ?id WHERE {
-			?item ${options.verb} wd:${options.subject}.
+		SELECT DISTINCT ?hostname ?id WHERE {
+			${queryFragment}
 			?item wdt:P856 ?url.
 			BIND(REPLACE(STR(?item), "http://www.wikidata.org/entity/", "") as ?id).
 			BIND(REPLACE(STR(?url), "^[a-z]+://", "") as ?sans_protocol).

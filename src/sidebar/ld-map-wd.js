@@ -384,10 +384,7 @@ async function findConnections(thing, source) {
 				}
 			]
 
-			const ratingBy = await getWebsiteItem(source.url, {
-				verb: 'wdt:P366',
-				subject: 'Q80700183',
-			})
+			const ratingBy = await getWebsiteItem(source.url, '?s pq:P447 ?item. ?item wdt:P856 ?url.')
 
 			if (ratingBy) {
 				ratingQualifiers.push({
