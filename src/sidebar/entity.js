@@ -9,7 +9,7 @@ import {AddLemmaAffix} from './lemma-afixes.js'
 import browser from 'webextension-polyfill'
 import { PrependNav } from './prepend-nav.js';
 import { rubifyLemma } from './rubifyLemma.js';
-import { getDeducedSenseClaims } from './deduce-sense-statements.js';
+import { getDeducedSenseClaims, getReverseLinks } from './deduce-sense-statements.js';
 import { initializeCache } from './cache.js';
 import { getSuttonLangages } from '../get-valid-string-languages.js'
 
@@ -956,6 +956,22 @@ function updateView(id, useCache = true) {
 						}
 					}
 				}
+			}
+
+			const reverseLinks = await getReverseLinks(id)
+			for (let prop in reverseLinks) {
+				let section = document.createElement('section');
+				let heading = document.createElement('h2');
+				let headingText = templates.placeholder({
+					entity: prop,
+					inverse: true,
+					tag: 'span',
+				});
+				heading.appendChild(headingText);
+				section.appendChild(heading);
+				section.appendChild(templates.rosetta(reverseLinks[prop], e.language));
+				glosses.appendChild(section);
+
 			}
 
 			if (e?.forms?.length > 0) {

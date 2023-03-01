@@ -11,7 +11,7 @@ const placeholder = (vars) => {
 	const cache = window?.cache
 
 	// don't create a placeholder if the label is already in cache
-	if (vars.entity && cache?.labels?.[vars.entity]) {
+	if (vars.entity && cache?.labels?.[vars.entity] && !vars?.inverse) {
 		let link = document.createElement(tagName);
 		link.innerText = cache.labels[vars.entity];
 		if ('descriptions' in cache && cache.descriptions[vars.entity]) {
@@ -40,6 +40,9 @@ const placeholder = (vars) => {
 	if (vars.tag) {
 		tag.setAttribute('data-type', tagName);
 	}
+	if (vars.inverse) {
+		tag.setAttribute('data-inverse', 'inverse');
+	}
 	let words = [];
 	if (vars.lazy) {
 		tag.setAttribute('data-lazy', true);
@@ -53,9 +56,11 @@ const placeholder = (vars) => {
 	(async () => {
 		let id = tag.getAttribute('data-entity');
 		let type = tag.getAttribute('data-type');
+		let inverse = tag.getAttribute('data-inverse');
 		let link = document.createElement(tagName);
 		if (id !== null) {
 			let entity = await wikidataGetEntity(id);
+
 			link.setAttribute('href', getLink(id));
 			if (entity[id].labels || entity[id].descriptions) {
 				if (vars.desiredInner != 'descriptions') {
@@ -104,6 +109,9 @@ const placeholder = (vars) => {
 					link.appendChild(gloss);
 				} 
 			}
+			if (inverse) {
+				resolveInverse({ ...vars, inverse: false }, entity[id], link)
+			}
 		} else if (vars.json) {
 			try {
 				const response = await fetch(vars.json, {
@@ -137,6 +145,19 @@ const placeholder = (vars) => {
 	})();
 
 	return tag;
+}
+
+function resolveInverse (vars, entity, link)  {
+	link.prepend(document.createTextNode('← '))
+	const labelItem = entity?.claims?.P7087?.[0]?.mainsnak?.datavalue?.value?.id
+	if (labelItem) {
+		requestAnimationFrame(() => {
+			link.parentNode.replaceChild(placeholder({
+				...vars,
+				entity: labelItem,
+			}), link)
+		});
+	}
 }
 
 export { placeholder }

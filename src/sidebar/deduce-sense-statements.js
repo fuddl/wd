@@ -84,7 +84,7 @@ async function getDeducedSenseClaims(props, id, lang, sense) {
                   }
                   ORDER BY (LCASE(?language))
                 `;
-                let results = await sparqlQuery(query);
+                let results = await sparqlQuery(query, null, true);
                 if (results.length > 0) {
                   if (!props.hasOwnProperty(mapping[m].to)) {
                     props[mapping[m].to] = {
@@ -133,4 +133,45 @@ async function getDeducedSenseClaims(props, id, lang, sense) {
   return props;
 }
 
-export { getDeducedSenseClaims }
+async function getReverseLinks(object) {
+  const query = `
+  SELECT ?id ?p ?l WHERE {
+    ${ ['P5238', 'P5191', 'P7706'].map((p) => `{
+      BIND (wdt:${p} as ?prop).
+      ?lexeme ?prop wd:${object}.
+      ?lexeme dct:language ?language;
+    }
+    `).join(' UNION ') }
+    BIND(REPLACE(STR(?lexeme), 'http://www.wikidata.org/entity/', '')  AS ?id ).
+    BIND(REPLACE(STR(?prop), 'http://www.wikidata.org/prop/direct/', '')  AS ?p ).
+    BIND(REPLACE(STR(?language), 'http://www.wikidata.org/entity/', '')  AS ?l ).
+  }
+  `
+  let results = await sparqlQuery(query, null, true)
+  const output = {}
+
+  if (results.length > 0) {
+    for (const result of results) {
+      const language = result.l.value
+      const lexeme = result.id.value
+      const property = result.p.value
+      if (!(property in output)) {
+        output[property] = {}
+      }
+      if (!(language in output[property])) {
+        output[property][language] = {}
+      }
+      if (!(object in output[property][language])) {
+        output[property][language][object] = {
+          senses: [],
+        }
+      }
+      output[property][language][object].senses.push({
+        id: lexeme
+      })
+    }
+  }
+  return output
+}
+
+export { getDeducedSenseClaims, getReverseLinks }
