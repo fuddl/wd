@@ -10,8 +10,10 @@ const placeholder = (vars) => {
 	let tagName = vars?.tag ?? 'a'
 	const cache = window?.cache
 
+	const skipCache = vars.inverse ? vars.inverse : false
+
 	// don't create a placeholder if the label is already in cache
-	if (vars.entity && cache?.labels?.[vars.entity] && !vars?.inverse) {
+	if (vars.entity && cache?.labels?.[vars.entity] && !skipCache) {
 		let link = document.createElement(tagName);
 		link.innerText = cache.labels[vars.entity];
 		if ('descriptions' in cache && cache.descriptions[vars.entity]) {
