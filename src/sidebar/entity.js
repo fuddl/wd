@@ -558,10 +558,18 @@ function updateView(id, useCache = true) {
 					desc: 'A list of item that link to this',
 				},
 				{
-					link: 'improve.html?' + id,
+					link: `improve.html?${id}`,
 					moji: './icons/u2728-specialPages.svg',
 					title: 'Improve',
 					desc: 'Automatic suggestions on how to improve this item',
+					callback: (e) => {
+						e.preventDefault()
+						window.open(
+							`improve.html?${id}`,
+							`wd-improve-${id}`,
+							`popup=true,left=${window?.mozInnerScreenX},top=${window?.mozInnerScreenY},width=${window.innerWidth},height=${window.innerHeight}`
+							)
+					}
 				},
 				{
 					link: `https://query.wikidata.org/embed.html#${encodeURIComponent(`

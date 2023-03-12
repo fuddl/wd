@@ -131,7 +131,7 @@ const URL_match_pattern: Resolver = {
 		const query = `
 			SELECT ?item
 			WHERE {
-				?item wdt:${ prop } ${ c == 'insensitive' ? '?id' : `"${ id }"`}.
+				?item wdt:${ prop } ${ c == 'insensitive' ? '?id' : `"${ id.replace(/"/g, '\\"') }"`}.
 				${ c == 'insensitive' ? `filter(lcase(?id) = "${ id }")` : ''}
 			}
 		`
