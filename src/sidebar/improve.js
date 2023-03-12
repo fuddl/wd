@@ -291,7 +291,8 @@ if (window.location.search) {
 				type: 'send_to_wikidata',
 				data: jobs,
 			}),
-            unlockAndWait(currentTab)
+            unlockAndWait(currentTab),
+            window.close(),
 		])
 	});
 }
