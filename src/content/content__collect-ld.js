@@ -36,6 +36,8 @@ async function parse(thing, ids, url) {
 		// Check perf impact
 		const matchSuggestions = await getMatchSuggestions(link)
 		thing.isNeedle = Boolean(matchSuggestions.find(it => JSON.stringify(it) === JSON.stringify(ids)))
+	} else {
+		thing.isNeedle = true
 	}
 	for (let prop in thing) {
 		if (Array.isArray(thing[prop])) {

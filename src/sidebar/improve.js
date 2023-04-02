@@ -292,7 +292,12 @@ if (window.location.search) {
 				data: jobs,
 			}),
             unlockAndWait(currentTab),
-            window.close(),
-		])
+		]).then(() => {
+			window.close()
+		}).catch(error => {
+			console.error(error);
+			window.close()
+		});
+
 	});
 }

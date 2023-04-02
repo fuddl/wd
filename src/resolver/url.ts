@@ -36,7 +36,6 @@ const url: Resolver = {
 						}
 					}
 				}
-				MINUS { ?prop wdt:P8966 [] } .
 				BIND(REPLACE(STR(?prop), "http://www.wikidata.org/entity/", "") as ?p)
 			}
 		`)
