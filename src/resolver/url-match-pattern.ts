@@ -20,6 +20,9 @@ const URL_match_pattern: Resolver = {
 				) AS ?c)
 				BIND(REPLACE(STR(?prop), 'http://www.wikidata.org/entity/', '')	AS ?p ).
 				FILTER (?p != 'P4033')
+				MINUS {
+					?prop wdt:P31 wd:Q18644427.
+				}
 			} ORDER BY STRLEN(str(?s))
 		`
 		const patterns = await sparqlQuery(query)
