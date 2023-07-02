@@ -43,7 +43,7 @@
 		"react-dom": "^17.0.2",
 		"react-shadow-dom-retarget-events": "^1.1.0",
 		"svgo": "^2.8.0",
-		"webextension-polyfill": "^0.8.0",
+		"webextension-polyfill": "^0.10.0",
 		"wikidata-sdk": "^8.0.1"
 	},
 	"devDependencies": {
@@ -54,7 +54,7 @@
 		"@types/react": "^17.0.37",
 		"@types/react-burger-menu": "^2.8.2",
 		"@types/react-dom": "^17.0.11",
-		"@types/webextension-polyfill": "^0.8.2",
+		"@types/webextension-polyfill": "^0.10.0",
 		"@typescript-eslint/eslint-plugin": "^5.11.0",
 		"@typescript-eslint/parser": "^5.11.0",
 		"buffer": "^5.7.1",
@@ -77,5 +77,8 @@
 	},
 	"webExt": {
 		"sourceDir": "distribution"
-	}
+	},
+	"parcel": {
+    "exclude": ["node_modules/webextension-polyfill/dist/browser-polyfill.js"]
+  }
 }

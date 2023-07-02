@@ -6,7 +6,7 @@
 	"icons": {
 		"48": "icons/wd-48.png",
 		"96": "icons/wd-96.png",
-        "128": "icons/wd-128.png"
+		"128": "icons/wd-128.png"
 	},
 	"browser_action": {
 		"default_icon": "icons/inactive-32.png",

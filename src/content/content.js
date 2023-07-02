@@ -7,7 +7,13 @@ import {findDescriptions} from './pagedata__description.js'
 import {enrichLinkedData, findLinkedData} from './content__collect-ld.js'
 import {enrichMetaData, findMetaData} from './content__collect-meta.js'
 import {setupSidebar} from "./sidebar"
-import browser from 'webextension-polyfill'
+
+async function initializeBrowser() {
+  if (typeof browser === 'undefined') {
+    const something = await import('webextension-polyfill');
+    window.browser = something;
+  }
+}
 
 async function findDirectMatch(location) {
 	const resolution = await resolve(location)
@@ -56,6 +62,9 @@ async function findApplicables(location) {
 }
 
 async function main() {
+
+	await initializeBrowser()
+
 	await setupSidebar()
 
 	await findApplicables(location)
