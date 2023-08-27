@@ -11,6 +11,7 @@ import { flex } from './flex/flex.tpl.js';
 import { glossary } from './glossary/glossary.tpl.js';
 import { intertitle } from './intertitle/intertitle.tpl.js';
 import { join } from './join/join.tpl.js';
+import { locator } from './locator/locator.tpl.js';
 import { mercator } from './mercator/mercator.tpl.js';
 import { picture } from './picture/picture.tpl.js';
 import { placeholder } from './placeholder/placeholder.tpl.js';
@@ -40,6 +41,7 @@ const templates = {
 	rosetta: rosetta,
 	sutton: sutton,
 	symbol: symbol,
+	locator: locator,
 	direction: direction,
 	title: title,
 	join: join,

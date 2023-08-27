@@ -53,7 +53,7 @@ async function processJobs(jobsUngrouped) {
 	let refAnswer = null;
 	let qualAnswer = null;
 	for (let job of jobs) {
-		if (job.hasOwnProperty('object') && (job.object.hasOwnProperty('numeric-id') && !job.object.hasOwnProperty('entity-type'))) {
+		if (job?.object !== null && job.hasOwnProperty('object') && (job.object.hasOwnProperty('numeric-id') && !job.object.hasOwnProperty('entity-type'))) {
 			job.object['entity-type'] = "item";
 		}
 
@@ -254,14 +254,20 @@ async function setClaim(subjectId, property, value) {
 	let data = new FormData();
 	data.append('action', 'wbcreateclaim');
 	data.append('entity', subject[subjectId].id);
-	data.append('snaktype', 'value');
+	if (value !== null) {
+		data.append('snaktype', 'value');
+	} else {
+		data.append('snaktype', 'novalue');
+	}
 	data.append('property', property);
 
 	if (typeof value === "string") {
 		await URL_match_pattern.addToExternalIDCache(property, value, subject[subjectId].id);
 		data.append('value', '"' + value + '"');
 	} else {
-		data.append('value', JSON.stringify(value));
+		if (value !== null) {
+			data.append('value', JSON.stringify(value));
+		}
 	}
 
 	data.append('tags', extensionTag);
@@ -287,6 +293,17 @@ async function setClaim(subjectId, property, value) {
 			body: new URLSearchParams(data),
 		});
 		parsedResponse = JSON.parse(await response.text())
+	}
+
+	if (parsedResponse?.success === 1) {
+		await browser.runtime.sendMessage({
+			type: 'success_info',
+			data: {
+				subject: subjectId,
+				verb: property, 
+				object: value,
+			}
+		})
 	}
 
 	return parsedResponse;
@@ -355,7 +372,10 @@ async function getExistingStatement(object, verb, subject) {
 		} else {
 			for (const claim of claims[verb]) {
 				if(claim.hasOwnProperty('mainsnak')) {
-					const value = claim.mainsnak.datavalue.value;
+					const value = claim.mainsnak?.datavalue?.value;
+					if (!value && object === null) {
+						return claim.id;
+					}
 					if (object.hasOwnProperty('numeric-id') && value.hasOwnProperty('numeric-id') && object['numeric-id'] == value['numeric-id']) {
 						return claim.id;
 					}

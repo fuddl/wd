@@ -572,6 +572,20 @@ function updateView(id, useCache = true) {
 					}
 				},
 				{
+					link: `find.html?${id}`,
+					moji: './icons/u2728-specialPages.svg',
+					title: 'Find ids',
+					desc: 'Search the web for more Ids',
+					callback: (e) => {
+						e.preventDefault()
+						window.open(
+							`find.html?${id}`,
+							`wd-find-${id}`,
+							`popup=true,left=${window?.mozInnerScreenX},top=${window?.mozInnerScreenY},width=${window.innerWidth},height=${window.innerHeight}`
+							)
+					}
+				},
+				{
 					link: `https://query.wikidata.org/embed.html#${encodeURIComponent(`
 						#defaultView:Map
 						SELECT ?item ?itemLabel ?property ?propertyLabel ?coord

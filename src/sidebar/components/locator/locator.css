@@ -1,0 +1,28 @@
+.locator {
+	background: #f8f9fa;
+	border: 1px solid #eaecf0;
+	padding: 7px 10px;
+	margin: 6px 0;
+}
+
+.locator--maybe-satisfied > summary::after {
+	color: green;
+	content: '✓?';
+	float: right;
+}
+
+.locator--satisfied > summary::after {
+	color: green;
+	content: '✓';
+	float: right;
+}
+
+.locator--no-apply {
+	opacity: .75;
+}
+
+.locator--no-apply > summary::after {
+	color: silver;
+	content: '—';
+	float: right;
+}

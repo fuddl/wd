@@ -18,7 +18,7 @@
 		"default_panel": "sidebar/entity.html",
 		"open_at_install": true
 	},
-	"permissions": ["storage", "webNavigation", "<all_urls>"],
+	"permissions": ["storage", "webNavigation", "<all_urls>", "search"],
 	"background": {
 		"scripts": ["background/index.js"]
 	},
