@@ -15,7 +15,7 @@ const usefullMetatags = [
 		type: 'WikibaseItem',
 		options: {
 			'books.author': 36180,
-			'books.book': 571,
+			'books.book': 3331189,
 			'music.album': 482994,
 			'music.playlist': 1569406,
 			'music.radio_station': 14350,
