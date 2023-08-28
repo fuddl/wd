@@ -1,6 +1,6 @@
 .locator {
-	background: #f8f9fa;
-	border: 1px solid #eaecf0;
+	background: var(--paper);
+	border: 1px solid var(--contour);
 	padding: 7px 10px;
 	margin: 6px 0;
 }

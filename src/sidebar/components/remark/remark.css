@@ -1,16 +1,8 @@
 .remark {
 	padding: 7px 10px;
-	background: #f8f9fa;
-	border: 1px solid #eaecf0;
+	background: var(--paper);
+	border: 1px solid var(--contour);
 	line-height: 24px
-}
-
-
-@media (prefers-color-scheme: dark) {
-	.remark {
-		background-color: #27292D;
-		border-color: #27292D;
-	}
 }
 
 .remark + .remark {

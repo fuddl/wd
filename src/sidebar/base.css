@@ -4,6 +4,7 @@
 	--link: #3366cc;
 	--mark: #eaf3ff;
 	--code: #c8ccd1;
+	--contour: #eaecf0;
 	--shadow: #00000011;
 }
 
@@ -20,6 +21,7 @@
 		--link: #7198F7;
 		--mark: #27292D;
 		--code: #55595D;
+		--contour: #27292D;
 		--shadow: #F7F8F911;
 	}
 }
