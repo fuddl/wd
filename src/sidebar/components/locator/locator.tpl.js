@@ -37,7 +37,7 @@ const locator = (vars) => {
 		}
 		if (vars.existingIds.length > 0) {
 			const list = document.createElement('ul')
-			for (id of vars.existingIds) {
+			for (const id of vars.existingIds) {
 				const listItem = document.createElement('li')
 				listItem.appendChild(templates.code(id))
 				list.appendChild(listItem)

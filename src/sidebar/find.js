@@ -18,7 +18,7 @@ if (window.location.search) {
 				type: 'lock_sidebar',
 			});
 
-			const entities = await wikidataGetEntity(currentEntity, false)
+			const entities = await wikidataGetEntity(currentEntity, false, false, true)
 
 			bouncer.remove()
 			const stage = document.getElementById('content')

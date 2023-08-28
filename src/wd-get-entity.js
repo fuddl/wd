@@ -48,14 +48,14 @@ async function userLanguagesWithFallbacks() {
 	return [... new Set([...langs, ...babelLangs, ...langsFallback])];
 }
 
-async function wikidataGetEntity(id, usecache = true, returnSingle = false) {
+async function wikidataGetEntity(id, usecache = true, returnSingle = false, allLanguages = false) {
 
 	let config = namespaceGetInstance(id);
 	let wbk = WBK(config);
 
 	let url = wbk.getEntities({
 		ids: id,
-		languages: await userLanguagesWithFallbacks(),
+		languages: allLanguages ? null : await userLanguagesWithFallbacks(),
 	});
 
 	try {

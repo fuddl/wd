@@ -1,10 +1,11 @@
 import { sparqlQuery } from '../sqarql-query.js'
 import { templates } from "./components/templates.tpl.js"
+import { getValueByLang } from './get-value-by-lang.js';
 
 async function getExpectedProps(e) {
 	const search = await browser.search.get()
 	const query = `
-		SELECT DISTINCT ?c ?p ?v ?sfu ?url ?single WHERE {
+		SELECT DISTINCT ?c ?p ?v ?sfu ?sfulang ?url ?single WHERE {
 			SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
 			wd:${e.id} wdt:P31/wdt:P279* ?class.
 			?class p:P1963 ?props.
@@ -12,7 +13,14 @@ async function getExpectedProps(e) {
 			?prop wikibase:propertyType wikibase:ExternalId.
 			BIND(EXISTS{?prop wdt:P2302 wd:Q19474404} AS ?single)
 			OPTIONAL { ?props pq:P11889 ?value. }
-			OPTIONAL { ?prop wdt:P4354 ?sfu. }
+			OPTIONAL {
+              ?prop p:P4354 ?sfuprop.
+              ?sfuprop ps:P4354 ?sfu.
+              OPTIONAL {
+                ?sfuprop pq:P407 ?lang.
+                ?lang wdt:P424 ?sfulang. 
+              } 
+            }
 			OPTIONAL { ?prop wdt:P2699 ?url. }
 			BIND (REPLACE(STR(?class), "http://www.wikidata.org/entity/", "") as ?c)
 			BIND (REPLACE(STR(?prop), "http://www.wikidata.org/entity/", "") as ?p)
@@ -23,11 +31,15 @@ async function getExpectedProps(e) {
 	let results = await sparqlQuery(query, null)
 
 	const keywords = []
+	keywords.push(getValueByLang(e, 'labels', ''))
+	
 	for (const lang in e.labels) {
 		if (e.labels[lang]?.value && !keywords.includes(e.labels[lang].value)) {
 			keywords.push(e.labels[lang].value)
 		}
 	}
+
+
 	for (const lang in e.aliases) {
 		for (const alias of e.aliases[lang]) {
 			if (!keywords.includes(alias.value)) {
@@ -52,13 +64,15 @@ async function getExpectedProps(e) {
 					}
 				}
 			}
+			const bestLabel = result?.sfulang?.value ? e?.labels[result.sfulang.value].value : false
+
 			const newResult = {
 				subject: e.id,
 				expectedFromClass: result.c.value,
 				prop: result.p.value,
 				searchUrl: result?.sfu?.value,
 				url: result?.url?.value,
-				keywords: keywords,
+				keywords: bestLabel ? [bestLabel, ...keywords] : keywords,
 				existingIds: existingIds,
 				noValue: noValue,
 				singleValue: result?.single?.value == 'true',
