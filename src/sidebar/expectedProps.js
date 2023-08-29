@@ -64,7 +64,7 @@ async function getExpectedProps(e) {
 					}
 				}
 			}
-			const bestLabel = result?.sfulang?.value ? e?.labels[result.sfulang.value].value : false
+			const bestLabel = result?.sfulang?.value ? e?.labels?.[result.sfulang.value]?.value : false
 
 			const newResult = {
 				subject: e.id,
