@@ -28,6 +28,15 @@ const usefullMetatags = [
 		suggested: false,
 	},
 	{
+		name: 'og:type',
+		prop: 'P106',
+		type: 'WikibaseItem',
+		options: {
+			'books.author': 36180,
+		},
+		suggested: false,
+	},
+	{
 		name: 'music:duration',
 		type: 'Quantity',
 		prop: 'P2047',
@@ -125,79 +134,82 @@ const durations = [
 async function enrichMetaData(tags, lang, url) {
 	let enriched = {};
 	for (let key in tags) {
-		let type = usefullMetatags.find(v => v.name === key);
+		let types = usefullMetatags.filter(v => v.name === key);
 		for (let delta in tags[key]) {
-			const newKey = `${key}|${delta}`;
-			if (type.type === 'WikibaseItem') {
-				if (type.hasOwnProperty('options')) {
-					if (type.options.hasOwnProperty(tags[key])) {
-						enriched[newKey] = {
-							verb: type.prop,
-							object: {
-								'entity-type': "item",
-								'numeric-id': type.options[tags[key][delta]].toString(),
-							}
-						};
-					}
-				} else {
-					let link = document.createElement('a')
-					link.href = tags[key][delta]
-
-					const resolutions = await resolveAll(link)
-					resolutions.forEach(resolution => {
-						enriched[newKey] = {
-							verb: type.prop,
-							object: {
-								'entity-type': 'item',
-								'numeric-id': resolution.entityId.replace(/^Q/, ''),
-							}
+			for (const typeKey in types) {
+				const type = types[typeKey]
+				const newKey = `${key}|${delta}|${typeKey}`;
+				if (type.type === 'WikibaseItem') {
+					if (type.hasOwnProperty('options')) {
+						if (type.options.hasOwnProperty(tags[key])) {
+							enriched[newKey] = {
+								verb: type.prop,
+								object: {
+									'entity-type': "item",
+									'numeric-id': type.options[tags[key][delta]].toString(),
+								}
+							};
 						}
-					})
-				}
-			} else if (type.type === 'String' || type.type === 'ExternalId') {
-				let object = tags[key][delta]
-				let verb = type.prop
-				if ('process' in type) {
-					const result = type.process(object)
-					if (result) {
-						object = result.id
-						verb = result.verb
-					}
-				}
-				enriched[newKey] = {
-					verb: type.prop,
-					object: object,
-				};
-			} else if (type.type === 'Quantity') {
-				let amount = tags[key][delta];
-				let unit = '1';
+					} else {
+						let link = document.createElement('a')
+						link.href = tags[key][delta]
 
-				if (type?.hasTimeUnit) {
-					for (const interval of durations) {
-						let divided = amount / interval.seconds;
-						if (divided > 1 && divided % 1 === 0 && amount !== divided) {
-							amount = divided;
-							unit = `http://www.wikidata.org/entity/${interval.wd}`;
+						const resolutions = await resolveAll(link)
+						resolutions.forEach(resolution => {
+							enriched[newKey] = {
+								verb: type.prop,
+								object: {
+									'entity-type': 'item',
+									'numeric-id': resolution.entityId.replace(/^Q/, ''),
+								}
+							}
+						})
+					}
+				} else if (type.type === 'String' || type.type === 'ExternalId') {
+					let object = tags[key][delta]
+					let verb = type.prop
+					if ('process' in type) {
+						const result = type.process(object)
+						if (result) {
+							object = result.id
+							verb = result.verb
 						}
 					}
-				}
+					enriched[newKey] = {
+						verb: type.prop,
+						object: object,
+					};
+				} else if (type.type === 'Quantity') {
+					let amount = tags[key][delta];
+					let unit = '1';
 
-				enriched[newKey] = {
-					verb: type.prop,
-					object: {
-						amount: amount,
-						unit: unit,
+					if (type?.hasTimeUnit) {
+						for (const interval of durations) {
+							let divided = amount / interval.seconds;
+							if (divided > 1 && divided % 1 === 0 && amount !== divided) {
+								amount = divided;
+								unit = `http://www.wikidata.org/entity/${interval.wd}`;
+							}
+						}
 					}
-				};
-			} else if (type.type === 'Monolingualtext') {
-				if (lang) {
+
 					enriched[newKey] = {
 						verb: type.prop,
 						object: {
-							text: tags[key][delta],
-							language: lang,
+							amount: amount,
+							unit: unit,
 						}
 					};
+				} else if (type.type === 'Monolingualtext') {
+					if (lang) {
+						enriched[newKey] = {
+							verb: type.prop,
+							object: {
+								text: tags[key][delta],
+								language: lang,
+							}
+						};
+					}
 				}
 			}
 		}
