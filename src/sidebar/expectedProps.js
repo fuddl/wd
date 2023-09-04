@@ -3,35 +3,66 @@ import { templates } from "./components/templates.tpl.js"
 import { getValueByLang } from './get-value-by-lang.js';
 
 async function getExpectedProps(e) {
-	const search = await browser.search.get()
-	const query = `
-		SELECT DISTINCT ?c ?p ?v ?sfu ?sfulang ?url ?single WHERE {
-			SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
-			wd:${e.id} wdt:P31/wdt:P279* ?class.
-			?class p:P1963 ?props.
-			?props ps:P1963 ?prop.
-			?prop wikibase:propertyType wikibase:ExternalId.
-			BIND(EXISTS{?prop wdt:P2302 wd:Q19474404} AS ?single)
-			OPTIONAL { ?props pq:P11889 ?value. }
-			OPTIONAL {
-              ?prop p:P4354 ?sfuprop.
-              ?sfuprop ps:P4354 ?sfu.
-              OPTIONAL {
-                ?sfuprop pq:P407 ?lang.
-                ?lang wdt:P424 ?sfulang. 
-              } 
-            }
-			OPTIONAL { ?prop wdt:P2699 ?url. }
-			BIND (REPLACE(STR(?class), "http://www.wikidata.org/entity/", "") as ?c)
-			BIND (REPLACE(STR(?prop), "http://www.wikidata.org/entity/", "") as ?p)
-			BIND (REPLACE(STR(?value), "http://www.wikidata.org/entity/", "") as ?v)
-		}
-	`
+	let query
+	if (e.type == 'lexeme') {
+		query = `
+			SELECT DISTINCT ?p ?sfu ?sfulang ?url ?single WHERE {
+				SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+
+				?prop p:P2302 ?cst. 
+				?cst ps:P2302 wd:Q55819106.
+				?cst pq:P2305 wd:Q5287.
+
+				?prop wikibase:propertyType wikibase:ExternalId.
+				BIND(EXISTS{?prop wdt:P2302 wd:Q19474404} AS ?single)
+
+				OPTIONAL { ?props pq:P11889 ?value. }
+				OPTIONAL {
+					?prop p:P4354 ?sfuprop.
+					?sfuprop ps:P4354 ?sfu.
+					OPTIONAL {
+						?sfuprop pq:P407 ?lang.
+						?lang wdt:P424 ?sfulang. 
+					} 
+				}
+				OPTIONAL { ?prop wdt:P2699 ?url. }
+				BIND (REPLACE(STR(?prop), "http://www.wikidata.org/entity/", "") as ?p)
+			}
+		`
+
+	} else {
+		query = `
+			SELECT DISTINCT ?c ?p ?v ?sfu ?sfulang ?url ?single WHERE {
+				SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+				wd:${e.id} wdt:P31/wdt:P279* ?class.
+				?class p:P1963 ?props.
+				?props ps:P1963 ?prop.
+				?prop wikibase:propertyType wikibase:ExternalId.
+				BIND(EXISTS{?prop wdt:P2302 wd:Q19474404} AS ?single)
+				OPTIONAL { ?props pq:P11889 ?value. }
+				OPTIONAL {
+					?prop p:P4354 ?sfuprop.
+					?sfuprop ps:P4354 ?sfu.
+					OPTIONAL {
+						?sfuprop pq:P407 ?lang.
+						?lang wdt:P424 ?sfulang. 
+					} 
+				}
+				OPTIONAL { ?prop wdt:P2699 ?url. }
+				BIND (REPLACE(STR(?class), "http://www.wikidata.org/entity/", "") as ?c)
+				BIND (REPLACE(STR(?prop), "http://www.wikidata.org/entity/", "") as ?p)
+				BIND (REPLACE(STR(?value), "http://www.wikidata.org/entity/", "") as ?v)
+			}
+		`
+	}
 
 	let results = await sparqlQuery(query, null)
 
 	const keywords = []
-	keywords.push(getValueByLang(e, 'labels', ''))
+	const defaultLabel = getValueByLang(e, 'labels', false)
+	if (defaultLabel) {
+		keywords.push(defaultLabel)
+	}
 	
 	for (const lang in e.labels) {
 		if (e.labels[lang]?.value && !keywords.includes(e.labels[lang].value)) {
@@ -45,6 +76,13 @@ async function getExpectedProps(e) {
 			if (!keywords.includes(alias.value)) {
 				keywords.push(alias.value)
 			}
+		}
+	}
+
+
+	for (const lang in e.lemmas) {
+		if (!keywords.includes(e.lemmas[lang].value)) {
+			keywords.push(e.lemmas[lang].value)
 		}
 	}
 
@@ -68,7 +106,7 @@ async function getExpectedProps(e) {
 
 			const newResult = {
 				subject: e.id,
-				expectedFromClass: result.c.value,
+				expectedFromClass: result?.c?.value,
 				prop: result.p.value,
 				searchUrl: result?.sfu?.value,
 				url: result?.url?.value,

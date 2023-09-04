@@ -18,9 +18,11 @@ const locator = (vars) => {
         intro.removeChild(intro.firstChild);
     }
 
-		intro.appendChild(document.createTextNode('Expected from '))
-		intro.appendChild(templates.placeholder({ entity: vars.expectedFromClass }))
-		intro.appendChild(document.createTextNode('. '))
+    	if (vars.expectedFromClass) {
+			intro.appendChild(document.createTextNode('Expected from '))
+			intro.appendChild(templates.placeholder({ entity: vars.expectedFromClass }))
+			intro.appendChild(document.createTextNode('. '))
+    	}
 		
 		if (vars.singleValue) {
 			intro.appendChild(document.createTextNode('Is expected to have 1 value. '))
