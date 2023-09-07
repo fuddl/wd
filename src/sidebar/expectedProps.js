@@ -11,7 +11,7 @@ async function getExpectedProps(e) {
 
 				?prop p:P2302 ?cst. 
 				?cst ps:P2302 wd:Q55819106.
-				?cst pq:P2305 wd:Q5287.
+				?cst pq:P2305 wd:${e.language}.
 
 				?prop wikibase:propertyType wikibase:ExternalId.
 				BIND(EXISTS{?prop wdt:P2302 wd:Q19474404} AS ?single)
@@ -32,7 +32,7 @@ async function getExpectedProps(e) {
 
 	} else {
 		query = `
-			SELECT DISTINCT ?c ?p ?v ?sfu ?sfulang ?url ?single WHERE {
+			SELECT DISTINCT ?c ?p ?v ?sfu ?sfulang ?url ?single ?cp ?ci WHERE {
 				SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
 				wd:${e.id} wdt:P31/wdt:P279* ?class.
 				?class p:P1963 ?props.
@@ -48,10 +48,22 @@ async function getExpectedProps(e) {
 						?lang wdt:P424 ?sfulang. 
 					} 
 				}
+				OPTIONAL {
+					?prop p:P2302 ?cst.
+					?cst ps:P2302 wd:Q21503247.
+					OPTIONAL {
+						?cst pq:P2306 ?constraintProp. 
+					}
+					OPTIONAL {
+						?cst pq:P2305 ?constraintItem.
+					}
+				}
 				OPTIONAL { ?prop wdt:P2699 ?url. }
 				BIND (REPLACE(STR(?class), "http://www.wikidata.org/entity/", "") as ?c)
 				BIND (REPLACE(STR(?prop), "http://www.wikidata.org/entity/", "") as ?p)
 				BIND (REPLACE(STR(?value), "http://www.wikidata.org/entity/", "") as ?v)
+				BIND (REPLACE(STR(?constraintProp), "http://www.wikidata.org/entity/", "") as ?cp)
+				BIND (REPLACE(STR(?constraintItem), "http://www.wikidata.org/entity/", "") as ?ci)
 			}
 		`
 	}
@@ -86,10 +98,21 @@ async function getExpectedProps(e) {
 		}
 	}
 
-	const existingResults = []
-	const proposals = []
+	let proposals = []
 	for (const result of results) {
 		if (result?.sfu?.value || result?.url?.value) {
+			const prop = result.p.value
+			
+			if (result.p.value in proposals) {
+				if (result?.c?.value && !proposals[prop].expectedFromClass.includes(result.c.value)) {
+					proposals[prop].expectedFromClass.push(result.c.value)
+				}
+				if (result?.cp?.value) {
+					proposals[prop].constraints.push(result.cp.value)
+				}
+				continue;
+			}
+
 			const existingIds = []
 			let noValue = false
 			if (e.claims?.[result.p.value]) {
@@ -106,8 +129,12 @@ async function getExpectedProps(e) {
 
 			const newResult = {
 				subject: e.id,
-				expectedFromClass: result?.c?.value,
-				prop: result.p.value,
+				expectedFromClass: result?.c?.value ? [ result.c.value ] : [],
+				prop: prop,
+				constraints: result?.cp?.value ? [{
+					prop: result.cp.value,
+					value: result?.ci?.value,
+				}] : [],
 				searchUrl: result?.sfu?.value,
 				url: result?.url?.value,
 				keywords: bestLabel ? [bestLabel, ...keywords] : keywords,
@@ -117,16 +144,25 @@ async function getExpectedProps(e) {
 			}
 
 			newResult.satisfied = (newResult.singleValue == true && newResult.existingIds.length > 0)
+			
+			newResult.migtNotApply = !newResult.constraints.every((constraint) => {
+				if (constraint.prop in e.claims) {
+					if (!constraint.value) {
+						return true
+					}
+					for (const claim of e.claims[constraint.prop]) {
+						if (claim.mainsnak?.datavalue?.value?.id === constraint.value) {
+							return true
+						} 
+					}
+				}
+				return false
+			})
 
-			const hash = JSON.stringify(newResult)
-
-			if (!existingResults.includes(hash)) {
-				existingResults.push(hash)
-				proposals.push(newResult)
-			}
-
+			proposals[result.p.value] = newResult
 		}
 	}
+	proposals = Object.values(proposals)
 
 	proposals.sort((a, b) => {
 
@@ -134,10 +170,13 @@ async function getExpectedProps(e) {
 			return !a.noValue ? -1 : 1;
 		}
 
+		if (a.migtNotApply !== b.migtNotApply) {
+			return !a.migtNotApply ? -1 : 1;
+		}
+
 		if (a.satisfied !== b.satisfied) {
 			return !a.satisfied ? -1 : 1;
 		}
-
 
 		return a.existingIds.length > a.existingIds.length ? -1 : 1;
 	});

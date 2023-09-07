@@ -1,5 +1,6 @@
 import { templates } from "../templates.tpl.js";
 import { requreStylesheet } from '../require-styleheet.js'
+import { sparqlQuery } from '../../../sqarql-query.js'
 
 const locator = (vars) => { 
 	requreStylesheet("components/locator/locator.css")
@@ -15,17 +16,49 @@ const locator = (vars) => {
 
 		// clear all nodes that exist yet
 		while (intro.firstChild) {
-        intro.removeChild(intro.firstChild);
-    }
+        	intro.removeChild(intro.firstChild);
+    	}
 
     	if (vars.expectedFromClass) {
 			intro.appendChild(document.createTextNode('Expected from '))
-			intro.appendChild(templates.placeholder({ entity: vars.expectedFromClass }))
+			const numberOfClasses = vars.expectedFromClass.length
+			const last = numberOfClasses > 1 ? vars.expectedFromClass.pop() : null
+			for (const classItem of vars.expectedFromClass) {
+				intro.appendChild(templates.placeholder({ entity: classItem }))
+				if (numberOfClasses > 3) {
+					intro.appendChild(document.createTextNode(', '))
+				}
+			}
+			if (numberOfClasses > 1) {
+				intro.appendChild(document.createTextNode(' and '))
+				intro.appendChild(templates.placeholder({ entity: last }))
+			}
+
 			intro.appendChild(document.createTextNode('. '))
     	}
-		
+
 		if (vars.singleValue) {
 			intro.appendChild(document.createTextNode('Is expected to have 1 value. '))
+		} else if (!vars.hasOwnProperty('averageValues')) {
+			(async () => {
+				const answer = await sparqlQuery(`
+					select (min(?count) as ?min) (round(avg(?count)*100)/100 as ?avg) (max(?count) as ?max) (sum(?count) as ?sum) (count(*) as ?items)
+					where {
+						{
+							select ?item (count(*) AS ?count)
+							where {
+							?item wdt:P6262 ?val . filter(!wikibase:isSomeValue(?val))
+						}
+							group by ?item
+						}
+					}
+
+				`)
+				vars.averageValues = answer?.[0]?.avg?.value ? parseFloat(answer?.[0]?.avg?.value) : false
+				updateIntro()
+			})()
+		} else if (vars.averageValues) {
+			intro.appendChild(document.createTextNode(`Has ${vars.averageValues} values on average. `))
 		}
 		if (vars.existingIds.length > 0) {
 			intro.appendChild(document.createTextNode(`Has ${vars.existingIds.length} values: `))
@@ -54,10 +87,11 @@ const locator = (vars) => {
 	wrapper.appendChild(legend)
 
 	const updateModifiers = () => {
-		wrapper.open = !(vars.existingIds.length > 0) && !vars.noValue
+		wrapper.open = !(vars.existingIds.length > 0) && !vars.noValue && !vars.migtNotApply
 		wrapper.classList.toggle('locator--satisfied', (vars.singleValue == true && vars.existingIds.length > 0))
 		wrapper.classList.toggle('locator--no-apply', vars.noValue)
 		wrapper.classList.toggle('locator--maybe-satisfied', vars.existingIds.length > 0)
+		wrapper.classList.toggle('locator--might-not-apply', vars.migtNotApply)
 	}
 	updateModifiers()
 

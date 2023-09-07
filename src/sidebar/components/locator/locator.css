@@ -26,3 +26,9 @@
 	content: '—';
 	float: right;
 }
+
+.locator--might-not-apply > summary::after {
+	color: silver;
+	content: '╳';
+	float: right;
+}
