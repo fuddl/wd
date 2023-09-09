@@ -47,7 +47,7 @@ const locator = (vars) => {
 						{
 							select ?item (count(*) AS ?count)
 							where {
-							?item wdt:P6262 ?val . filter(!wikibase:isSomeValue(?val))
+							?item wdt:${vars.prop} ?val . filter(!wikibase:isSomeValue(?val))
 						}
 							group by ?item
 						}
