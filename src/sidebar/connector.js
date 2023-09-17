@@ -346,3 +346,20 @@ let existing = new jobRedundancyChecker();
 		content.insertBefore(warning, labelField);
 	}
 })()
+
+let footer = document.getElementById('footer')
+
+footer.appendChild(templates.actions('Actions', [
+	{
+		link: '',
+		moji: './icons/u270Eu002B-addStatement.svg',
+		title: 'Highlight wikidata links',
+		desc: 'Find wikidata on this website',
+		callback: (e) => {
+			browser.runtime.sendMessage({
+				type: 'highlight_pagelinks',
+			});
+		}
+	}
+]));
+

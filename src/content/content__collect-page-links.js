@@ -5,6 +5,7 @@ import { getLangQid, makeLanguageValid} from '../get-valid-string-languages.js';
 import browser from 'webextension-polyfill'
 
 const entitySelectorStlesheet = browser.runtime.getURL('content/entity-selector.css');
+const entityHighlighterStlesheet = browser.runtime.getURL('content/entity-highlighter.css');
 
 function getClosestID(element) {
 	let subject = element;
@@ -90,7 +91,7 @@ function toggleSelectedEntities(id) {
 	}
 }
 
-async function collectPageLinks(subject) {
+async function collectPageLinks(subject, highlightOnly = false) {
 	updateStatus([
 		'Searching ',
 		{urlLink: window.location.href},
@@ -157,9 +158,19 @@ async function collectPageLinks(subject) {
 				let shadow = wrapper.attachShadow({ mode: 'closed' });
 				let selector = document.createElement('a')
 				shadow.appendChild(selector)
+
 				let style = document.createElement('link')
 				style.setAttribute('rel', 'stylesheet')
-    			style.setAttribute('href',  entitySelectorStlesheet)
+				style.setAttribute('href', highlightOnly ? entityHighlighterStlesheet : entitySelectorStlesheet)
+				
+				if (highlightOnly) {
+					const originalLinkstyle = getComputedStyle(link)
+					for (const cssProp of originalLinkstyle) {
+						if (['color'].includes(cssProp)) {
+							selector.style[cssProp] = originalLinkstyle[cssProp]
+						}
+					}
+				}
 
 				shadow.appendChild(style)
 				selector.classList.add('entity-selector', 'entity-selector--queued');
@@ -213,7 +224,7 @@ async function collectPageLinks(subject) {
 					}
 				}
 
-				if (!this.entityId) {
+				if (!this.entityId && !highlightOnly) {
 					statement = await this.resolver.applicable(this.links[0])
 					selector.innerText = `${statement[0].prop}: `;
 					const code = document.createElement('code')
@@ -225,6 +236,9 @@ async function collectPageLinks(subject) {
 				selector.classList.remove('entity-selector--queued');
 				selector.classList.add('entity-selector--selectable');
 				selector.addEventListener('click', async (e) => {
+					if (highlightOnly) {
+						return
+					}
 					if (this.entityId) {
 						toggleSelectedEntities(this.entityId);
 					}

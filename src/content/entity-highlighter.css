@@ -1,0 +1,16 @@
+.entity-selector {
+	text-decoration: none;
+}
+
+.entity-selector:not(:empty)::before {
+	content: ' (';
+}
+
+.entity-selector:not(:empty)::after {
+	content: ')';
+}
+
+.entity-selector:hover {
+	background-color: white !important;
+	color: #0645ad !important;
+}

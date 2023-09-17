@@ -64,13 +64,23 @@ async function handleMatchEvent(event, sender) {
 
 async function collectPageLinks(event) {
     const tab = await Browser.getActiveTab()
-    browser.tabs.insertCSS(tab.id, {file: "content/content__collect-page-links.css"})
 
     await browser.tabs.sendMessage(
         tab.id,
         {
             action: "collect_pagelinks",
             subject: event.subject,
+        },
+    )
+}
+
+async function highlightPageLinks(event) {
+    const tab = await Browser.getActiveTab()
+
+    await browser.tabs.sendMessage(
+        tab.id,
+        {
+            action: "highlight_pagelinks",
         },
     )
 }
@@ -179,6 +189,9 @@ browser.runtime.onMessage.addListener(async (data, sender) => {
 
     if (data.type === 'collect_pagelinks') {
         await collectPageLinks(data)
+    }
+    if (data.type === 'highlight_pagelinks') {
+        await highlightPageLinks(data)
     }
     if (data.type === 'clear_pagelinks') {
         clearPageLinks()

@@ -73,7 +73,9 @@ async function main() {
 		if (msg.action === 'find_applicables') {
 			return findApplicables(location)
 		} else if (msg.action === 'collect_pagelinks') {
-			return collectPageLinks(msg.subject)
+			return collectPageLinks(msg.subject)		
+		} else if (msg.action === 'highlight_pagelinks') {
+			return collectPageLinks(msg.subject, true)
 		} else if (msg.action === 'clear_pagelinks') {
 			clearPageLinks()
 		}
