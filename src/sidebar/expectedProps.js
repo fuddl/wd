@@ -31,10 +31,17 @@ async function getExpectedProps(e) {
 		`
 
 	} else {
+		const classes = e?.claims?.P31.map((value) => {
+			return value?.mainsnak?.datavalue?.value?.id ?? null
+		}).filter(item => item)
 		query = `
 			SELECT DISTINCT ?c ?p ?v ?sfu ?sfulang ?url ?single ?cp ?ci WHERE {
 				SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
-				wd:${e.id} wdt:P31/wdt:P279* ?class.
+				${ classes.map((c) => `
+					{ wd:${c} wdt:P279* ?class. }
+					UNION 
+					{ BIND (wd:${c} as ?class) }
+				`).join(' UNION ') }
 				?class p:P1963 ?props.
 				?props ps:P1963 ?prop.
 				?prop wikibase:propertyType wikibase:ExternalId.
