@@ -399,7 +399,7 @@ async function findConnections(thing, source) {
 			values.push({
 				type: 'String',
 				value: makeRating(thing[prop]),
-				prop: 'AggregateRating',
+				prop: 'aggregateRating',
 				qualifiers: ratingQualifiers,
 			})
 		}
