@@ -34,7 +34,8 @@ const ensign = (vars) => {
 		}
 	}
 
-	link.setAttribute('href', 'https://www.wikidata.org/wiki/' + namespace + vars.id);
+	const eUrl =  `https://www.wikidata.org/wiki/${namespace}${vars.id}`
+	link.setAttribute('href', eUrl);
 	link.innerText = vars.id;
 	link.addEventListener('click', (e) => {
 		e.preventDefault();
@@ -44,6 +45,10 @@ const ensign = (vars) => {
 		window.getSelection().addRange(range);
 	});
 	id.appendChild(link);
+
+	const opener = document.createElement('a')
+	opener.classList.add('ensign__opener')
+	opener.setAttribute('href', eUrl)
 
 
 
@@ -72,6 +77,7 @@ const ensign = (vars) => {
 	header.appendChild(title);
 	header.appendChild(space);
 	header.appendChild(id);
+	header.appendChild(opener);
 	header.appendChild(description);
 
 	return header;

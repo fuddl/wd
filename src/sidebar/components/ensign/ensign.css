@@ -53,3 +53,19 @@
 	display: flex;
 	justify-content: stretch;
 }
+
+.ensign__opener {
+	opacity: 0;
+}
+
+.ensign__opener::after {
+	content: ' ❐ ';
+}
+
+:hover > .ensign__opener {
+	opacity: 1;
+}
+
+.ensign__opener:hover {
+	text-decoration: none;
+}
