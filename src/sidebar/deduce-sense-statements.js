@@ -16,6 +16,7 @@ const mapping = {
     },
     to: 'P5972',
     lang: 'exclude',
+    query: 'same',
   },
   synonyms: {
     from: {
@@ -30,7 +31,20 @@ const mapping = {
     },
     to: 'P5973',
     lang: 'require',
+    query: 'same',
   },
+  hyperonyms: {
+    from: {
+      item: [
+        'P5137',
+        'P9970',
+        'P6271'
+      ],
+    },
+    to: 'P6593',
+    lang: 'require',
+    query: 'parents',
+  }
 };
 
 async function getDeducedSenseClaims(props, id, lang, sense) {
@@ -55,35 +69,66 @@ async function getDeducedSenseClaims(props, id, lang, sense) {
             for (const value of fromValues) {
               const qid = value.mainsnak?.datavalue?.value?.id;
               if (qid) {
-                let query = `
-                  SELECT DISTINCT ?id ?g WHERE {
-                    ?lexeme rdf:type ontolex:LexicalEntry;
-                    ontolex:sense ?sense;
-                    dct:language ?language;
-                    wikibase:lemma ?lemma.
-                    ${ scope == 'item' ? `?sense wdt:${prop} wd:${qid}.` : '' }
-                    ${ scope == 'sense' ? 
-                      `wd:${qid} wdt:P5137 ?item.
-                       { ${ mapping[m].from.item.map(p => `?othersense wdt:${p} ?item. ?sense wdt:${prop} ?othersense.`).join('} UNION {') } }
-                      ` : ''
-                    }
-                    {
-                      ?language wdt:P218 ?code.
-                    } UNION {
-                      ?language wdt:P424 ?code.
-                    }
-                    FILTER (?code IN ("${userLanguages.join('", "')}"))
+                let query;
+                switch (mapping[m].query) {
+                  case 'same':
+                    query = `
+                      SELECT DISTINCT ?id ?g WHERE {
+                        ?lexeme rdf:type ontolex:LexicalEntry;
+                        ontolex:sense ?sense;
+                        dct:language ?language;
+                        wikibase:lemma ?lemma.
+                        ${ scope == 'item' ? `?sense wdt:${prop} wd:${qid}.` : '' }
+                        ${ scope == 'sense' ? 
+                          `wd:${qid} wdt:P5137 ?item.
+                           { ${ mapping[m].from.item.map(p => `?othersense wdt:${p} ?item. ?sense wdt:${prop} ?othersense.`).join('} UNION {') } }
+                          ` : ''
+                        }
+                        {
+                          ?language wdt:P218 ?code.
+                        } UNION {
+                          ?language wdt:P424 ?code.
+                        }
+                        FILTER (?code IN ("${userLanguages.join('", "')}"))
 
-                    OPTIONAL {
-                      ?sense wdt:P10339 ?gender.
-                      BIND(REPLACE(STR(?gender), "http://www.wikidata.org/entity/", "") as ?g)
-                    }
-                    FILTER (?language ${mapping[m].lang === 'exclude' ? 'NOT ' : ''}IN (wd:${lang} ) )
-                    FILTER (?sense NOT IN (wd:${id} ) )
-                    BIND(REPLACE(STR(?sense), 'http://www.wikidata.org/entity/', '')  AS ?id ).
-                  }
-                  ORDER BY (LCASE(?language))
-                `;
+                        OPTIONAL {
+                          ?sense wdt:P10339 ?gender.
+                          BIND(REPLACE(STR(?gender), "http://www.wikidata.org/entity/", "") as ?g)
+                        }
+                        FILTER (?language ${mapping[m].lang === 'exclude' ? 'NOT ' : ''}IN (wd:${lang} ) )
+                        FILTER (?sense NOT IN (wd:${id} ) )
+                        BIND(REPLACE(STR(?sense), 'http://www.wikidata.org/entity/', '')  AS ?id ).
+                      }
+                      ORDER BY (LCASE(?language))
+                    `;
+                    break;
+                  case 'parents':
+                    query = `
+                      SELECT DISTINCT ?id ?g WHERE {
+                        ?lexeme rdf:type ontolex:LexicalEntry;
+                        ontolex:sense ?sense;
+                        dct:language ?language;
+                        wikibase:lemma ?lemma.
+                        wd:${qid} wdt:P279 ?parentClass.
+                        ?sense wdt:${prop} ?parentClass.
+                        {
+                          ?language wdt:P218 ?code.
+                        } UNION {
+                          ?language wdt:P424 ?code.
+                        }
+
+                        OPTIONAL {
+                          ?sense wdt:P10339 ?gender.
+                          BIND(REPLACE(STR(?gender), "http://www.wikidata.org/entity/", "") as ?g)
+                        }
+                        FILTER (?language ${mapping[m].lang === 'exclude' ? 'NOT ' : ''}IN (wd:${lang} ) )
+                        FILTER (?sense NOT IN (wd:${id} ) )
+                        BIND(REPLACE(STR(?sense), 'http://www.wikidata.org/entity/', '')  AS ?id ).
+                      }
+                      ORDER BY (LCASE(?language))
+                    `;
+                    break;
+                }
                 let results = await sparqlQuery(query, null, true);
                 if (results.length > 0) {
                   if (!props.hasOwnProperty(mapping[m].to)) {
