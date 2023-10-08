@@ -44,6 +44,18 @@ const mapping = {
     to: 'P6593',
     lang: 'require',
     query: 'parents',
+  },
+  antonyms: {
+    from: {
+      item: [
+        'P5137',
+        'P9970',
+        'P6271'
+      ],
+    },
+    to: 'P5974',
+    lang: 'require',
+    query: 'opposite',
   }
 };
 
@@ -117,6 +129,34 @@ async function getDeducedSenseClaims(props, id, lang, sense) {
                           wd:${qid} wdt:P31 ?parentClass.
                         }
                         ?sense wdt:${prop} ?parentClass.
+                        {
+                          ?language wdt:P218 ?code.
+                        } UNION {
+                          ?language wdt:P424 ?code.
+                        }
+
+                        OPTIONAL {
+                          ?sense wdt:P10339 ?gender.
+                          BIND(REPLACE(STR(?gender), "http://www.wikidata.org/entity/", "") as ?g)
+                        }
+                        FILTER (?language ${mapping[m].lang === 'exclude' ? 'NOT ' : ''}IN (wd:${lang} ) )
+                        FILTER (?sense NOT IN (wd:${id} ) )
+                        BIND(REPLACE(STR(?sense), 'http://www.wikidata.org/entity/', '')  AS ?id ).
+                      }
+                      ORDER BY (LCASE(?language))
+                    `;
+                    break;
+                  case 'opposite':
+                    query = `
+                      SELECT DISTINCT ?id ?g WHERE {
+                        ?lexeme rdf:type ontolex:LexicalEntry;
+                        ontolex:sense ?sense;
+                        dct:language ?language;
+                        wikibase:lemma ?lemma.
+
+                        wd:${qid} wdt:P461 ?oppositeClass.
+                        
+                        ?sense wdt:${prop} ?oppositeClass.
                         {
                           ?language wdt:P218 ?code.
                         } UNION {
