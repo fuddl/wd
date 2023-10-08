@@ -109,7 +109,13 @@ async function getDeducedSenseClaims(props, id, lang, sense) {
                         ontolex:sense ?sense;
                         dct:language ?language;
                         wikibase:lemma ?lemma.
-                        wd:${qid} wdt:P279 ?parentClass.
+                        {
+                          wd:${qid} wdt:P279 ?parentClass.
+                        } UNION {
+                          wd:${qid} wdt:P171 ?parentClass.
+                        } UNION {
+                          wd:${qid} wdt:P31 ?parentClass.
+                        }
                         ?sense wdt:${prop} ?parentClass.
                         {
                           ?language wdt:P218 ?code.
