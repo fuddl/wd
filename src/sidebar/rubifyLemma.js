@@ -75,6 +75,14 @@ const rubifyLemma = function (lemmas) {
 			console.error('ja and ja-hira representations of this lexeme are probably invalid')
 		}
 	}
+	else if ('ja' in lemmas && 'ja-kana' in lemmas && !lemmas.ja.value.match(/([ぁ-んァ-ン])/)) {
+		// if `ja` doesn't contain hiragana or katakana while `ja-kana` is present
+		// it is probably a loanword (?)
+		// lets rubyfy it as it is
+		output.rubified = ruby([{w: lemmas.ja.value, r: lemmas['ja-kana'].value}], 'ja');
+		delete lemmas['ja'];
+		delete lemmas['ja-kana'];
+	}
 	if ('tlh-piqd' in lemmas && 'tlh-latn' in lemmas) {
 		try {
 			const fitted = fitKlingon(lemmas['tlh-piqd' ].value, lemmas['tlh-latn'].value);
