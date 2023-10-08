@@ -98,10 +98,19 @@ async function getExpectedProps(e) {
 		}
 	}
 
-
 	for (const lang in e.lemmas) {
 		if (!keywords.includes(e.lemmas[lang].value)) {
 			keywords.push(e.lemmas[lang].value)
+		}
+	}
+
+	if (e?.forms) {
+		for (const form of e.forms) {
+			for (const lang in form.representations) {
+				if (!keywords.includes(form.representations[lang].value)) {
+					keywords.push(form.representations[lang].value)
+				}
+			}
 		}
 	}
 
