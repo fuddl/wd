@@ -35,7 +35,7 @@ async function getExpectedProps(e) {
 			return value?.mainsnak?.datavalue?.value?.id ?? null
 		}).filter(item => item)
 		query = `
-			SELECT DISTINCT ?c ?p ?v ?sfu ?sfulang ?url ?single ?cp ?ci WHERE {
+			SELECT DISTINCT ?c ?p ?v ?sfu ?sfulang ?contextUrl ?url ?single ?cp ?ci WHERE {
 				SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
 				${ classes.map((c) => `
 					{ wd:${c} wdt:P279* ?class. }
@@ -48,12 +48,19 @@ async function getExpectedProps(e) {
 				BIND(EXISTS{?prop wdt:P2302 wd:Q19474404} AS ?single)
 				OPTIONAL { ?props pq:P11889 ?value. }
 				OPTIONAL {
-					?prop p:P4354 ?sfuprop.
-					?sfuprop ps:P4354 ?sfu.
-					OPTIONAL {
-						?sfuprop pq:P407 ?lang.
-						?lang wdt:P424 ?sfulang. 
-					} 
+					{
+          	?props pq:P4354 ?sfu.
+          	OPTIONAL {
+          		?props pq:P1896 ?contextUrl.
+          	}
+          } UNION {
+					  ?prop p:P4354 ?sfuprop.
+					  ?sfuprop ps:P4354 ?sfu.
+					  OPTIONAL {
+					 	 	?sfuprop pq:P407 ?lang.
+				      ?lang wdt:P424 ?sfulang. 
+				    }
+          }
 				}
 				OPTIONAL {
 					?prop p:P2302 ?cst.
@@ -116,10 +123,12 @@ async function getExpectedProps(e) {
 
 	let proposals = []
 	for (const result of results) {
+		const id = result.p.value + (result?.contextUrl?.value ?? '')
+
 		if (result?.sfu?.value || result?.url?.value) {
 			const prop = result.p.value
 			
-			if (result.p.value in proposals) {
+			if (id in proposals) {
 				if (result?.c?.value && !proposals[prop].expectedFromClass.includes(result.c.value)) {
 					proposals[prop].expectedFromClass.push(result.c.value)
 				}
@@ -145,6 +154,7 @@ async function getExpectedProps(e) {
 
 			const newResult = {
 				subject: e.id,
+				contextUrl: result?.contextUrl?.value ?? null,
 				expectedFromClass: result?.c?.value ? [ result.c.value ] : [],
 				prop: prop,
 				constraints: result?.cp?.value ? [{
@@ -175,7 +185,8 @@ async function getExpectedProps(e) {
 				return false
 			})
 
-			proposals[result.p.value] = newResult
+
+			proposals[id] = newResult
 		}
 	}
 	proposals = Object.values(proposals)

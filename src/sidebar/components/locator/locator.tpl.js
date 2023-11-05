@@ -86,6 +86,12 @@ const locator = (vars) => {
 	legend.appendChild(title)
 	wrapper.appendChild(legend)
 
+	if (vars.contextUrl) {
+		legend.appendChild(document.createTextNode(' ('))
+		legend.appendChild(templates.urlLink(vars.contextUrl))
+		legend.appendChild(document.createTextNode(')'))
+	}
+
 	const updateModifiers = () => {
 		wrapper.open = !(vars.existingIds.length > 0) && !vars.noValue && !vars.migtNotApply
 		wrapper.classList.toggle('locator--satisfied', (vars.singleValue == true && vars.existingIds.length > 0))
