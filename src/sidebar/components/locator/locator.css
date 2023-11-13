@@ -32,3 +32,44 @@
 	content: '╳';
 	float: right;
 }
+
+.locator__search-button {
+	display: inline-block;
+	white-space: nowrap;
+	line-height: 1.9em;
+	padding-right: 11px;
+ 	padding-left: 11px;
+ 	font-weight: 700;
+ 	font-size: 14px;
+	background-color: #fff;
+	color: #404244;
+	cursor: pointer;
+	border-width: 1px;
+	border-style: solid;
+	border-radius: 0 2px 2px 0;
+	vertical-align: bottom;
+	border-color: rgb(162, 169, 177)
+}
+
+.locator__search-button:hover {
+	text-decoration: none;
+}
+
+input.locator__search-button {
+	height: 18px;
+	padding-top: 4px;
+	padding-bottom: 4px;
+}
+
+.locator__search-bar {
+	display: flex;
+	margin: 1em 0;
+}
+
+.locator__query {
+	flex-grow: 1;
+	border-radius: 2px 0 0 2px;
+	border-width: 1px 0 1px 1px;
+	border-style: solid;
+	border-color: rgb(162, 169, 177)
+}

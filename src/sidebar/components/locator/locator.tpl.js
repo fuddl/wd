@@ -10,7 +10,7 @@ const locator = (vars) => {
 	const legend = document.createElement('summary')
 	const title = templates.placeholder({ entity: vars.prop, tag: 'span' })
 
-	const intro = document.createElement('div')
+	const intro = document.createElement('p')
 	
 	const updateIntro = () => {
 
@@ -113,26 +113,47 @@ const locator = (vars) => {
 	const searchField = document.createElement('input')
 	searchField.setAttribute('type', 'search')
 	searchField.setAttribute('list', vars.id)
+	searchField.classList.add('locator__query')
 	searchField.value = vars.keywords[0]
-	const searchButton = document.createElement('button')
+	const searchButton = vars?.searchUrl ? document.createElement('a') : document.createElement('input')
 	searchButton.innerText = '🔎'
-	searchButton.addEventListener('click', () => {
-		if (vars.searchUrl) {
-			window.open(
-				vars.searchUrl.replace('$1', encodeURIComponent(searchField.value)),
-				vars.id
-			)
-		} else {
-			browser.search.query({
-				text: `${searchField.value} site:${vars.url}`,
-				disposition: 'NEW_TAB',
-			});
+	searchButton.classList.add('locator__search-button')
+
+
+
+	if (!vars?.searchUrl) {
+		(async () => {
+			const engines = await browser.search.get()
+			const defaultEngine = engines.find(engine => engine.isDefault === true)
+
+			searchButton.type = 'image'
+			searchButton.src = defaultEngine.favIconUrl
+			searchButton.addEventListener('click', () => {
+				browser.search.query({
+					text: `${searchField.value} site:${vars.url}`,
+					disposition: 'NEW_TAB',
+				})
+			})
+		})()
+	} else {
+		const updateButton = () => {
+			if (vars.searchUrl) {
+				const searchUrl = vars.searchUrl.replace('$1', encodeURIComponent(searchField.value))
+				searchButton.href = searchUrl
+				searchButton.target = vars.id
+				searchButton.innerText = ''
+				searchButton.appendChild(document.createTextNode(`Search on ${ searchUrl.match(/https?\:\/\/(?:www\.)?([^\/]+)/)[1] }`))
+			}
 		}
-	})
+		searchField.addEventListener('change', updateButton) 
+		updateButton()
+	}
+
 
 	const searchBox = document.createElement('div')
 	searchBox.appendChild(searchField)
 	searchBox.appendChild(searchButton)
+	searchBox.classList.add('locator__search-bar')
 
 	wrapper.appendChild(searchBox)
 
