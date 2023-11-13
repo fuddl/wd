@@ -558,6 +558,12 @@ function updateView(id, useCache = true) {
 					desc: 'A list of item that link to this',
 				},
 				{
+					link: 'similar.html?' + id,
+					moji: './icons/u2BA9u1F4C4uFE0E-articleRedirect.svg',
+					title: 'Find similar items',
+					desc: 'Items that have statements in common with this one.',
+				},
+				{
 					link: `improve.html?${id}`,
 					moji: './icons/u2728-specialPages.svg',
 					title: 'Improve',
