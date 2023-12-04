@@ -19,6 +19,7 @@ PrependNav()
 function getPropertyScope(property) {
 	let scopes = {
 		'Q54254515': 'lexeme',
+		'Q54275340': 'sense',
 	};
 	if (property.claims.P31) {
 		for (let instanceOf of property.claims.P31) {
@@ -112,7 +113,7 @@ let existing = new jobRedundancyChecker();
 		}
 	})
 
-	if (scope != 'lexeme') {
+	if (scope == 'item') {
 		let labelLanguage = await makeLanguageValid(proposals.source.lang, 'term')
 		for (let label of allLabels) {
 			let check 
