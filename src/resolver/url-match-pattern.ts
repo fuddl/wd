@@ -23,8 +23,24 @@ const URL_match_pattern: Resolver = {
 				MINUS {
 					?prop wdt:P31 wd:Q18644427.
 				}
-			} ORDER BY STRLEN(str(?s))
+				MINUS {
+					?prop wikibase:propertyType wikibase:GlobeCoordinate.
+                }
+				${ /* giving a high priority to ids representing wiki articles */ '' }
+				OPTIONAL {
+					?prop wdt:P31 wd:Q123667996.
+					BIND(1 as ?prio)
+				}
+				${ /* giving a low priority to ids representing a full url */ '' }
+				OPTIONAL {
+					?prop wikibase:propertyType wikibase:Url.
+					BIND(3 as ?prio)
+				}
+				${ /* giving everything else a default priority */ '' }
+				BIND(IF(BOUND(?prio),?prio,2) AS ?prio).
+			} ORDER BY ?prio STRLEN(str(?s))
 		`
+
 		const patterns = await sparqlQuery(query)
 		const output = []
 		for (const prop of patterns) {
