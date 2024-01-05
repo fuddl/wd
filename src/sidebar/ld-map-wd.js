@@ -363,26 +363,7 @@ async function findConnections(thing, source) {
 			let now = new Date();
 			const count = thing[prop]?.ratingCount || thing[prop]?.reviewCount
 
-			const ratingQualifiers = [
-				{
-					property: 'P7887',
-					value: {
-						amount: `+${count}`,
-						unit: "http://www.wikidata.org/entity/Q20058247",
-					},
-				},
-				{
-					property: "P585",
-					value: {
-						after: 0,
-						before: 0,
-						calendarmodel: "http://www.wikidata.org/entity/Q1985727",
-						precision: 11,
-						time: `+${ now.toISOString().substr(0,10) }T00:00:00Z`,
-						timezone: 0,
-					}
-				}
-			]
+			const ratingQualifiers = []
 
 			const ratingBy = await getWebsiteItem(source.url, '?s pq:P447 ?item. ?item wdt:P856 ?url.')
 
@@ -395,6 +376,26 @@ async function findConnections(thing, source) {
 					},
 				})
 			}
+
+			ratingQualifiers.push({
+				property: 'P7887',
+				value: {
+					amount: `+${count}`,
+					unit: "http://www.wikidata.org/entity/Q20058247",
+				},
+			})
+
+			ratingQualifiers.push({
+				property: "P585",
+				value: {
+					after: 0,
+					before: 0,
+					calendarmodel: "http://www.wikidata.org/entity/Q1985727",
+					precision: 11,
+					time: `+${ now.toISOString().substr(0,10) }T00:00:00Z`,
+					timezone: 0,
+				}
+			})
 
 			values.push({
 				type: 'String',

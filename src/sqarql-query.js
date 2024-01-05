@@ -19,7 +19,7 @@ async function sparqlQuery(query, attempt = 1, forceCache = false) {
 			return json;
 		}
 	} catch(error) {
-		if (attempt > 5) {
+		if (attempt > 5 || error === 'Status Code: 400') {
 			throw ['Fetch Error :-S', error];
 		}
 		
