@@ -1,5 +1,4 @@
-function getElementLanguage(selection) {
-	let element = selection.focusNode;
+function getElementLanguage(element) {
 	while (typeof element.closest === 'undefined') {
 		element = element.parentElement;
 	}

@@ -7,6 +7,7 @@ import {findDescriptions} from './pagedata__description.js'
 import {enrichLinkedData, findLinkedData} from './content__collect-ld.js'
 import {enrichMetaData, findMetaData} from './content__collect-meta.js'
 import {setupSidebar} from "./sidebar"
+import debounce from 'debounce'
 
 async function initializeBrowser() {
   if (typeof browser === 'undefined') {
@@ -105,12 +106,20 @@ async function main() {
 
 	titleObserver.observe(head, { characterData: true });
 
-	document.addEventListener('selectionchange', (e) => {
+	const submitSelection = (e) => {
 		(async () => {
-			let text = document.getSelection().toString().trim();
+			let text = ''
+			if (e.target == document) {
+				text = document.getSelection().toString().trim();
+			} else if('selectionStart' in e.target && 'selectionEnd' in e.target && 'value' in e.target) {
+				const start = e.target.selectionStart
+				const end = e.target.selectionEnd
+				text = e.target.value.substring(start, end)
+			}
 			if (text) {
 
-				let sectionData = getClosestID(document.getSelection().focusNode);
+				let sectionData = getClosestID(e.target == document ? document.getSelection().focusNode : e.target);
+
 
 				let hash = sectionData.hash ? '#' + sectionData.hash : '';
 
@@ -127,7 +136,7 @@ async function main() {
 					type: 'use_in_statement',
 					dataype: 'string',
 					value: text,
-					valueLang: await makeLanguageValid(getElementLanguage(document.getSelection())),
+					valueLang: await makeLanguageValid(getElementLanguage(e.target == document ? document.getSelection().focusNode : e.target)),
 					reference: {
 						url: url,
 						section: sectionData.section ? sectionData.section.trim().replace("\n", '␤') : null,
@@ -135,11 +144,18 @@ async function main() {
 						language: pageLanguage ? await makeLanguageValid(pageLanguage) : 'und',
 					}
 				}
+				
+				console.debug(sectionData)
 
 				await browser.runtime.sendMessage(message);
 			}
 		})()
-	});
+	};
+
+	document.addEventListener('selectionchange', debounce(submitSelection, 200))
+	for (const inputElement of document.querySelectorAll('input, textarea')) {
+		inputElement.addEventListener('selectionchange', debounce(submitSelection, 200))
+	}
 }
 
 export { main }
