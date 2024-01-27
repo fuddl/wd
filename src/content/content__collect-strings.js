@@ -9,7 +9,7 @@ function getElementLanguage(element) {
 			return lang;
 		}
 	}
-	return guessLanguage(selection.toString());
+	return guessLanguage(element.innerText);
 }
 
 function guessLanguage(string) {
