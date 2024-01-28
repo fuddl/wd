@@ -47,10 +47,16 @@ html {
 	src: url("res/cc-icons.woff2");
 }
 
+@font-face {
+	font-family: FairfaxHaxHD;
+	src: url("res/FairfaxHaxHD.ttf");
+  unicode-range: U+F1900-F19FF;
+}
+
 body {
 	background: var(--paper);
 	color: var(--ink);
-	font-family: 'base-icons',-apple-system,'BlinkMacSystemFont','Segoe UI','Roboto','Lato','Helvetica','Arial', 'pIqaD', cc-icons,sans-serif;
+	font-family: 'base-icons',-apple-system,'BlinkMacSystemFont','Segoe UI','Roboto','Lato','Helvetica','Arial', 'pIqaD', FairfaxHaxHD, cc-icons, sans-serif;
 	font-size: 14px;
 	line-height: 1.2;
 	margin: 0;
@@ -83,10 +89,6 @@ ruby:lang(tlh) {
 	font-family: pIqaD, monospace;
 }
 
-rt:lang(tlh) {
-	margin-bottom: .4em;
-}
-
 [hidden] {
 	display: none !important;
 }
@@ -112,7 +114,7 @@ video {
 
 h2 {
 	font-size: 1.7em;
-	font-family: "Linux Libertine", "Georgia", "Times", 'pIqaD', serif;
+	font-family: "Linux Libertine", "Georgia", "Times", 'pIqaD', FairfaxHaxHD, serif;
 	font-weight: normal;
 }
 
@@ -270,6 +272,10 @@ h3 > a {
 
 section {
 	margin: 1em 0;
+}
+
+math {
+	font-family: inherit;
 }
 
 math[display="block"] {

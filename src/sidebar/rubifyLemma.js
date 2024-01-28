@@ -1,5 +1,6 @@
 import { ruby } from './components/ruby/ruby.tpl.js'
 import { fit } from 'furigana'
+const { sitelen } = require('ucsur-sitelen-pona')
 
 const fitKlingon = function (pIqaD, latin) {
  	const trans = {
@@ -51,6 +52,19 @@ const fitKlingon = function (pIqaD, latin) {
  	return output
 }
 
+function fitSitelenPona(latin) {
+	const latinWords = latin.split(/\s+/)
+	const output = [];
+	for (const word of latinWords) {
+		output.push({
+			w: sitelen(word),
+			r: word,
+		})
+	}
+	return output
+}
+
+
 const rubifyLemma = function (lemmas) {
 	const output = {
 		rubified: null,
@@ -93,6 +107,15 @@ const rubifyLemma = function (lemmas) {
 			}
 		} catch (error) {
 			console.error('tlh-piqd and tlh-latn representations of this lexeme are probably invalid')
+		}
+	}
+	if ('tok' in lemmas) {
+		try {
+			const fitted = fitSitelenPona(lemmas['tok'].value);
+			output.rubified = ruby(fitted, 'tok')
+			delete lemmas['tok'];
+		} catch (error) {
+			console.error('tok is possibly invalid')
 		}
 	}
 	output.unrubified = lemmas
