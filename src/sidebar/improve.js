@@ -128,7 +128,7 @@ if (window.location.search) {
 	if (currentEntity.match(/[QMPL]\d+/)) {
 		( async()=> {
 
-			document.body.appendChild(bouncer);
+			//document.body.appendChild(bouncer);
 
 			browser.runtime.sendMessage({
 				type: 'lock_sidebar',
@@ -136,24 +136,28 @@ if (window.location.search) {
 
 			const entities = await wikidataGetEntity(currentEntity, false);
 
-            updateStatus([
-                'Searching OpenStreetMap for relevant data…',
-            ])
-			let osmElements = await wdGetOSMElements(currentEntity);
 
-			if (osmElements.length > 0) {
-				for (let element of osmElements) {
-					OSMToSatements(element, propform, {
-						url: element.sourceUrl,
-						title: element.title,
-					});
+			(async()=> {
+	            updateStatus([
+	                'Searching OpenStreetMap for relevant data…',
+	            ])
+				let osmElements = await wdGetOSMElements(currentEntity);
+				if (osmElements.length > 0) {
+					for (let element of osmElements) {
+						OSMToSatements(element, propform, {
+							url: element.sourceUrl,
+							title: element.title,
+						});
+					}
 				}
-			}
+			})
 
 			for (let id of Object.keys(entities)) {
 				let entity = entities[id];
 				let classes = await getAllClasses(id);
-				for(let claim in entity.claims) {
+
+				await Promise.all(Object.keys(entity.claims).map(async claim => {
+
 					if (['url', 'external-id'].includes(entity.claims[claim][0].mainsnak?.datatype) && entity?.claims[claim][0].mainsnak?.datavalue?.value) {
 						let urls = [];
 						switch (entity.claims[claim][0].mainsnak.datatype) {
@@ -254,7 +258,7 @@ if (window.location.search) {
                         ])
 						constraintsToStatements(claim, property[claim].claims.P2302, propform, classes);
 					}
-				}
+				}));
 				document.body.removeChild(bouncer);
 				if (propform.children.length < 1) {
 					document.body.appendChild(message);

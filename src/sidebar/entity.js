@@ -566,8 +566,8 @@ function updateView(id, useCache = true) {
 				{
 					link: `improve.html?${id}`,
 					moji: './icons/u2728-specialPages.svg',
-					title: 'Improve',
-					desc: 'Automatic suggestions on how to improve this item',
+					title: 'Search for metadata',
+					desc: 'Automatic suggestions for statements',
 					callback: (e) => {
 						e.preventDefault()
 						window.open(

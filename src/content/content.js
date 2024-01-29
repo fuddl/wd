@@ -144,8 +144,6 @@ async function main() {
 						language: pageLanguage ? await makeLanguageValid(pageLanguage) : 'und',
 					}
 				}
-				
-				console.debug(sectionData)
 
 				await browser.runtime.sendMessage(message);
 			}

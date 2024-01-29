@@ -52,77 +52,90 @@ async function processJobs(jobsUngrouped) {
 	let answer = null;
 	let refAnswer = null;
 	let qualAnswer = null;
+
+	let count = 0
 	for (let job of jobs) {
-		if (job?.object !== null && job.hasOwnProperty('object') && (job.object.hasOwnProperty('numeric-id') && !job.object.hasOwnProperty('entity-type'))) {
-			job.object['entity-type'] = "item";
-		}
+		console.debug(job.type)
+		count++
+		console.debug(`starting job ${count} of ${jobs.length}`)
+		try {	
+			if (job?.object !== null && job.hasOwnProperty('object') && (job.object.hasOwnProperty('numeric-id') && !job.object.hasOwnProperty('entity-type'))) {
+				job.object['entity-type'] = "item";
+			}
 
-		if (job.type === 'create') {
-			updateStatus([
-				`Creating new entity labeled ${job.label}`,
-			]);
+			if (job.type === 'create') {
+				updateStatus([
+					`Creating new entity labeled ${job.label}`,
+				]);
 
-			answer = await createEntity(job.label, job.lang);
-			if (answer.success && answer.success == 1) {
-				lastCreated = {
-					id: answer.entity.id,
+				answer = await createEntity(job.label, job.lang);
+				if (answer.success && answer.success == 1) {
+					lastCreated = {
+						id: answer.entity.id,
+						job: job,
+					}
+					updateStatus([
+						`Created new entity ${answer.entity.id}`,
+					]);
+				}
+
+			} else if (job.type === 'set_sitelink') {
+				setSiteLink(job.subject, job.verb, job.object);
+			} else if (job.type === 'set_label_or_alias') {
+				let subject = job.subject !== 'LAST' ? job.subject : lastCreated.id;
+				setLabelOrAlias(subject, job.language, job.value);
+			} else if (job.type === 'set_claim') {
+				let subject = job.subject !== 'LAST' ? job.subject : lastCreated.id;
+				let extistingStatement = await getExistingStatement(job.object, job.verb, subject);
+
+				if (!extistingStatement) {
+					updateStatus([
+						'Setting statement ', {placeholder:{entity:job.verb}},' of ', {placeholder:{entity:subject}},
+					]);
+
+					answer = await setClaim(subject, job.verb, job.object);
+				} else {
+					answer = {
+						success: 1,
+						claim: {
+							id: extistingStatement
+						}
+					}
+				}
+				if (job?.qualifiers || job?.references) {
+					console.debug(answer)
+				}
+				if (job?.references && answer.success && answer.success == 1) {
+					
+					// references are not supported on mediainfos
+					if (!subject.startsWith('M')) {
+						updateStatus([
+							'Adding references to statement ', {placeholder:{entity:job.verb}},' of ', {placeholder:{entity:subject}},
+						]);
+						for (let reference of job.references) {
+							refAnswer = await addReference(answer.claim.id, reference);
+						}
+					}
+				}
+				if (job?.qualifiers && answer.success && answer.success == 1) {
+					updateStatus([
+						'Adding qualifiers to statement ', {placeholder:{entity:job.verb}},' of ', {placeholder:{entity:subject}},
+					]);
+					for (let qualifier of job.qualifiers) {
+						qualAnswer = await addQualifier(answer.claim.id, qualifier);
+					}
+				}
+				lastEdit = {
+					id: subject,
 					job: job,
 				}
-				updateStatus([
-					`Created new entity ${answer.entity.id}`,
-				]);
 			}
-
-		} else if (job.type === 'set_sitelink') {
-			setSiteLink(job.subject, job.verb, job.object);
-		} else if (job.type === 'set_label_or_alias') {
-			let subject = job.subject !== 'LAST' ? job.subject : lastCreated.id;
-			setLabelOrAlias(subject, job.language, job.value);
-		} else if (job.type === 'set_claim') {
-			let subject = job.subject !== 'LAST' ? job.subject : lastCreated.id;
-			let extistingStatement = await getExistingStatement(job.object, job.verb, subject);
-
-			if (!extistingStatement) {
-				updateStatus([
-					'Setting statement ', {placeholder:{entity:job.verb}},' of ', {placeholder:{entity:subject}},
-				]);
-
-				answer = await setClaim(subject, job.verb, job.object);
-			} else {
-				answer = {
-					success: 1,
-					claim: {
-						id: extistingStatement
-					}
-				}
-			}
-
-			if (job?.references && answer.success && answer.success == 1) {
-				
-				// references are not supported on mediainfos
-				if (!subject.startsWith('M')) {
-					updateStatus([
-						'Adding references to statement ', {placeholder:{entity:job.verb}},' of ', {placeholder:{entity:subject}},
-					]);
-					for (let reference of job.references) {
-						refAnswer = await addReference(answer.claim.id, reference);
-					}
-				}
-			}
-			if (job?.qualifiers && answer.success && answer.success == 1) {
-				updateStatus([
-					'Adding qualifiers to statement ', {placeholder:{entity:job.verb}},' of ', {placeholder:{entity:subject}},
-				]);
-				for (let qualifier of job.qualifiers) {
-					qualAnswer = await addQualifier(answer.claim.id, qualifier);
-				}
-			}
-			lastEdit = {
-				id: subject,
-				job: job,
-			}
+		} catch (e) {
+			console.error(e)
 		}
+		console.debug(`finishing job ${count} of ${jobs.length}`)
 	}
+	console.debug(`finished all job`)
 
 	if (lastEdit == null) {
 		lastEdit = lastCreated;
@@ -295,6 +308,14 @@ async function setClaim(subjectId, property, value) {
 		parsedResponse = JSON.parse(await response.text())
 	}
 
+	if (parsedResponse?.error) {
+		console.error('Error when setting claim')
+		console.error('Response error:')
+		console.error(parsedResponse.error)
+		console.error('Submitted data:')
+		console.error(data)
+	}
+
 	if (parsedResponse?.success === 1) {
 		await browser.runtime.sendMessage({
 			type: 'success_info',
@@ -327,7 +348,17 @@ async function addReference(claimId, references) {
 		body: new URLSearchParams(data),
 	});
 
-	return JSON.parse(await response.text());
+	const parsedResponse = JSON.parse(await response.text())
+
+	if (parsedResponse?.error) {
+		console.error('Error when setting reference')
+		console.error('Response error:')
+		console.error(parsedResponse.error)
+		console.error('Submitted data:')
+		console.error(data)
+	}
+
+	return parsedResponse;
 }
 
 async function addQualifier(claimId, qualifier) {
@@ -350,7 +381,17 @@ async function addQualifier(claimId, qualifier) {
 		body: new URLSearchParams(data),
 	});
 
-	return JSON.parse(await response.text());
+	const parsedResponse = JSON.parse(await response.text())
+
+	if (parsedResponse?.error) {
+		console.error('Error when setting claim')
+		console.error('Response error:')
+		console.error(parsedResponse.error)
+		console.error('Submitted data:')
+		console.error(data)
+	}
+
+	return parsedResponse;
 }
 
 async function getExistingStatement(object, verb, subject) {
