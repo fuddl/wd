@@ -102,10 +102,7 @@ async function processJobs(jobsUngrouped) {
 						}
 					}
 				}
-				if (job?.qualifiers || job?.references) {
-					console.debug(answer)
-				}
-				if (job?.references && answer.success && answer.success == 1) {
+				if (job?.references && answer?.success == 1) {
 					
 					// references are not supported on mediainfos
 					if (!subject.startsWith('M')) {
@@ -117,7 +114,7 @@ async function processJobs(jobsUngrouped) {
 						}
 					}
 				}
-				if (job?.qualifiers && answer.success && answer.success == 1) {
+				if (job?.qualifiers && answer?.success == 1) {
 					updateStatus([
 						'Adding qualifiers to statement ', {placeholder:{entity:job.verb}},' of ', {placeholder:{entity:subject}},
 					]);
@@ -317,14 +314,16 @@ async function setClaim(subjectId, property, value) {
 	}
 
 	if (parsedResponse?.success === 1) {
-		await browser.runtime.sendMessage({
-			type: 'success_info',
-			data: {
-				subject: subjectId,
-				verb: property, 
-				object: value,
-			}
-		})
+		(async () => {
+			await browser.runtime.sendMessage({
+				type: 'success_info',
+				data: {
+					subject: subjectId,
+					verb: property, 
+					object: value,
+				}
+			})
+		})()
 	}
 
 	return parsedResponse;
