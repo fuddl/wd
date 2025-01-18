@@ -1,3 +1,5 @@
+⚠️ This project has moved to [a different repository.](https://github.com/fuddl/wikibase-for-web)
+
 # Wikidata browser extension
 
 Get this Extension for [🦊 Firefox](https://addons.mozilla.org/en-US/firefox/addon/wikidata/),
